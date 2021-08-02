@@ -1,7 +1,7 @@
 import express from "express";
 import {constants,log, db} from "./config";
 import routes from "./api/v1/routes/routes";
-
+import cors from "cors";
 // Mongoose
 import mongoose from 'mongoose';
 mongoose.connect(db.url, db.configs);
@@ -12,6 +12,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors())
 
 app.listen(port, host, () => {
     log.info(`Server listing at http://${host}:${port}`);

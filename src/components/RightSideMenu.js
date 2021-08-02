@@ -18,6 +18,8 @@ export default class RightSideMenu extends PureComponent {
             web3: newProps.web3,
             web3Config: newProps.web3Config
         })
+        // remove this line 
+        this.props.openPopup("LiquidityProvider")
     }
 
         showWithId(popup, id) {

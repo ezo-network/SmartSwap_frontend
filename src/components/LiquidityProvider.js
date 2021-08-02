@@ -9,6 +9,7 @@ import CONSTANT from '../constants';
 import swapFactoryAbi from '../abis/swapFactory.json';
 import constantConfig from '../config/constantConfig';
 import notificationConfig from '../config/notificationConfig';
+import AxiosRequest from "../helper/axiosRequest";
 var _ = require('lodash');
 
 export default class LiquidityProvider extends PureComponent {
@@ -163,6 +164,34 @@ export default class LiquidityProvider extends PureComponent {
     async deployContract(){
         console.log(`deploying contact on network - ${web3Config.getNetworkId()}`)
         console.log(this.state.spProfitPercent);
+
+        let args = {
+            data: {
+                spAccount: this.state.spAccount,
+                networkId: this.state.networkId,
+                tokenA: this.state.tokenA,
+                tokenB: this.state.tokenB,
+                amountA: this.state.amountA,
+                walletAddressToSend: this.state.walletAddressToSend,
+                gasAndFeeAmount: this.state.gasAndFeeAmount,
+                spProfitPercent: this.state.spProfitPercent,
+                accumulateFundsLimit: this.state.accumulateFundsLimit,
+                stopRepeatsMode: this.state.stopRepeatsMode,
+                stopRepeatsOnDate: this.state.stopRepeatsOnDate,
+                stopRepeatsAfterCalls: this.state.stopRepeatsAfterCalls,
+                withdrawMode: this.state.withdrawMode,
+                withdrawOnDate: this.state.withdrawOnDate,
+                withdrawAfterCalls: this.state.withdrawAfterCalls,
+                cexApiKey: this.state.cexApiKey,
+                cexApiSecret: this.state.cexApiSecret
+            },
+            path: 'become-swap-provider',
+            method: 'POST'
+        };
+
+        let response = await AxiosRequest.request(args);
+        console.log(response);
+
     }
     
     render() {
@@ -537,26 +566,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             </div> 
                         </div> 
                     </div>
-
-
-
-
-
-
-
-
                 </div>
-
-
-
-
-
-
-
-
-
-
-
                 <a href="javascript:void(0);" onClick={() => { this.props.closePopup("LiquidityProvider") }} className="close-Icon"></a>
             </div>
         )
