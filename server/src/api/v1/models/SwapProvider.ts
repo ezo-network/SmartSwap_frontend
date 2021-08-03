@@ -52,8 +52,8 @@ export interface ISwapProvider extends Document {
     stopRepeats: StopRepeats,
     withdraw: Withdraw,
     cexData: CexData,
-    smartContractAddress: string,
-    txid: string,
+    smartContractAddress?: string,
+    txid?: string,
     active: boolean
 };
 
@@ -151,13 +151,12 @@ const SwapProvider: Schema = new mongoose.Schema({
     smartContractAddress: {
         type: String,
         required: true,
-        default: null,
-        unique: true
+        default: null
     },
     txid:{
         type: String,
         required: true,
-        unique: true  
+        default: null
     },
     active: {
         type: Boolean,

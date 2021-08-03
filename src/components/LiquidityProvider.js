@@ -139,6 +139,8 @@ export default class LiquidityProvider extends PureComponent {
         this.setState({
             web3: web3Config.getWeb3(),
             btnClick: false,
+            networkId: networkId,
+            spAccount: web3Config.getAddress()
         });
     }
 
@@ -173,6 +175,7 @@ export default class LiquidityProvider extends PureComponent {
                 tokenB: this.state.tokenB,
                 amountA: this.state.amountA,
                 walletAddressToSend: this.state.walletAddressToSend,
+                walletAddressToReceive: this.state.walletAddressToReceive,
                 gasAndFeeAmount: this.state.gasAndFeeAmount,
                 spProfitPercent: this.state.spProfitPercent,
                 accumulateFundsLimit: this.state.accumulateFundsLimit,
