@@ -10,6 +10,7 @@ import swapFactoryAbi from '../abis/swapFactory.json';
 import constantConfig from '../config/constantConfig';
 import notificationConfig from '../config/notificationConfig';
 import AxiosRequest from "../helper/axiosRequest";
+import SwapFactoryContract from '../helper/swapFactoryContract';
 var _ = require('lodash');
 
 export default class LiquidityProvider extends PureComponent {
@@ -43,7 +44,12 @@ export default class LiquidityProvider extends PureComponent {
             withdrawOnDate: 'April 2,2021',
             withdrawAfterCalls: 250,
             cexApiKey: null,
-            cexApiSecret: null
+            cexApiSecret: null,
+            txid: null,
+            smartSwapContractAddress: 'Deploy contract to get this address.',
+            confirmed: false,
+            deployed: false,
+            deployButtonText: "DEPLOY SMART CONTRACT"
         }
     }
 
@@ -163,37 +169,95 @@ export default class LiquidityProvider extends PureComponent {
         });
     }
 
-    async deployContract(){
+    async deployContract(event){
+        
+        // set this to disable deploy button
+        this.setState({
+            deployed: true,
+            deployButtonText: "Deploying..."
+        });
+
         console.log(`deploying contact on network - ${web3Config.getNetworkId()}`)
         console.log(this.state.spProfitPercent);
 
         let args = {
+            // data: {
+            //     spAccount: this.state.spAccount,
+            //     networkId: this.state.networkId,
+            //     tokenA: this.state.tokenA,
+            //     tokenB: this.state.tokenB,
+            //     amountA: this.state.amountA,
+            //     walletAddressToSend: this.state.walletAddressToSend,
+            //     walletAddressToReceive: this.state.walletAddressToReceive,
+            //     gasAndFeeAmount: this.state.gasAndFeeAmount,
+            //     spProfitPercent: this.state.spProfitPercent,
+            //     accumulateFundsLimit: this.state.accumulateFundsLimit,
+            //     stopRepeatsMode: this.state.stopRepeatsMode,
+            //     stopRepeatsOnDate: this.state.stopRepeatsOnDate,
+            //     stopRepeatsAfterCalls: this.state.stopRepeatsAfterCalls,
+            //     withdrawMode: this.state.withdrawMode,
+            //     withdrawOnDate: this.state.withdrawOnDate,
+            //     withdrawAfterCalls: this.state.withdrawAfterCalls,
+            //     cexApiKey: this.state.cexApiKey,
+            //     cexApiSecret: this.state.cexApiSecret
+            // },
             data: {
-                spAccount: this.state.spAccount,
-                networkId: this.state.networkId,
-                tokenA: this.state.tokenA,
-                tokenB: this.state.tokenB,
-                amountA: this.state.amountA,
-                walletAddressToSend: this.state.walletAddressToSend,
-                walletAddressToReceive: this.state.walletAddressToReceive,
-                gasAndFeeAmount: this.state.gasAndFeeAmount,
-                spProfitPercent: this.state.spProfitPercent,
-                accumulateFundsLimit: this.state.accumulateFundsLimit,
-                stopRepeatsMode: this.state.stopRepeatsMode,
-                stopRepeatsOnDate: this.state.stopRepeatsOnDate,
-                stopRepeatsAfterCalls: this.state.stopRepeatsAfterCalls,
-                withdrawMode: this.state.withdrawMode,
-                withdrawOnDate: this.state.withdrawOnDate,
-                withdrawAfterCalls: this.state.withdrawAfterCalls,
-                cexApiKey: this.state.cexApiKey,
-                cexApiSecret: this.state.cexApiSecret
-            },
+                spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+                networkId: 42,
+                tokenA: '0x0000000000000000000000000000000000000002',
+                tokenB: '0x0000000000000000000000000000000000000001',
+                amountA: 100,
+                walletAddressToSend: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+                walletAddressToReceive: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+                gasAndFeeAmount: 10,
+                spProfitPercent: 0.3,
+                accumulateFundsLimit: 0.5,
+                stopRepeatsMode: 3,
+                stopRepeatsOnDate: 'April 2,2021',
+                stopRepeatsAfterCalls: 0,
+                withdrawMode: 3,
+                withdrawOnDate: 'April 2,2021',
+                withdrawAfterCalls: 0,
+                cexApiKey: '00000000ab',
+                cexApiSecret: '00000000yz'
+            },            
             path: 'become-swap-provider',
             method: 'POST'
         };
 
         let response = await AxiosRequest.request(args);
-        console.log(response);
+
+        if(response.status == 201){
+            console.log('record created!');
+            let networkID = response.data.networkId;
+            let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), this.state.networkId);
+            swapFactory.addSwapProvider(
+                response.data.tokenA.address,
+                response.data.tokenB.address,
+                response.data.walletAddresses.toSend,
+                response.data.walletAddresses.toReceive,
+                response.data.gasAndFeeAmount,
+                (hash) => {
+                    this.setState({
+                        txid: response.data._id,
+                    });
+                },
+                (response) => {
+                    console.log({
+                        "Contract response:": response
+                    });
+                    // this.init()
+                    this.setState({
+                        confirmed: true,
+                        deployButtonText: "Contract Deployed"
+                        // showLedger: true,
+                        // wrapBox: "success"
+                    });
+                    notificationConfig.success('Swap provider Added');
+                }
+            );
+        }
+
 
     }
     
@@ -497,51 +561,54 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             : 
                             (<div className="LiProfSbox03">
                                 <div className='LiProformBTNbar'>                                    
-                                    <button onClick={this.deployContract.bind(this)}>DEPLOY SMART CONTRACT</button>
+                                    <button onClick={this.deployContract.bind(this)} disabled={this.state.deployed}>
+                                        {this.state.deployButtonText}
+                                    </button>
                                 </div>
                             </div>)
                         }
                     </div>
 
- 
                     <div className='spacerLine'></div>
-
-                    <div className="LiProTitle03">Below is your Swap Provider smart contract address
-                        <span>Whitelist this smart contract address on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist the SmartSwap address below" aria-hidden="true"></i></i></span>
-                    </div>
-
-                    <div className="spContrlMBX">
-                        <div className='spCountrlTitle01'>SEND <span>BNB</span> {'<>'} RECEIVE <span>ETH</span></div>
-                        <div className='spContrlInputBX'>
-                            <i>1</i>
-                            <input type="text" value='0xF3B3f6F15d474C92cb4051c22697C371e6e117B1' /> 
-                            <a href="#" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
+                    {(this.state.confirmed === true) &&
+                    <div>
+                        <div className="LiProTitle03">Below is your Swap Provider smart contract address
+                            <span>Whitelist this smart contract address on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist the SmartSwap address below" aria-hidden="true"></i></i></span>
                         </div>
-                        <div className='spContrlInfotxt'>
-                        Created at April 6,2021 05:21:36pm UTC &nbsp;&nbsp;&nbsp;&nbsp; Balance:  425.563 BNB | $4,846 USDT
-                            <span>Withdraw all funds back to your CEX account</span>
-                        </div>
-                        <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
-                        <div className='spContrlSBX'>
 
-                            <div className='spContrlSSBX01'>
-                            <div className="dragorInput v2">
-                                <InputRange
-                                    maxValue={100000}
-                                    minValue={100}
-                                    value={this.state.gasAndFeeAmount}
-                                    formatLabel={value => `$${value}`}
-                                    onChange={value => this.setState({ gasAndFeeAmount: value })} />
+                        <div className="spContrlMBX">
+                            <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
+                            <div className='spContrlInputBX'>
+                                <i>></i>
+                                <input type="text" value={this.state.smartSwapContractAddress} /> 
+                                <a href="#" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                             </div>
+                            <div className='spContrlInfotxt'>
+                            Created at April 6,2021 05:21:36pm UTC &nbsp;&nbsp;&nbsp;&nbsp; Balance:  425.563 BNB | $4,846 USDT
+                                <span>Withdraw all funds back to your CEX account</span>
                             </div>
-                            <div className='spContrlSSBX02'>
-                                <button className='spContrlBTN01'>AUTHORIZE NEW LIMIT</button>
+                            <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
+                            <div className='spContrlSBX'>
+
+                                <div className='spContrlSSBX01'>
+                                <div className="dragorInput v2">
+                                    <InputRange
+                                        maxValue={100000}
+                                        minValue={100}
+                                        value={this.state.gasAndFeeAmount}
+                                        formatLabel={value => `$${value}`}
+                                        onChange={value => this.setState({ gasAndFeeAmount: value })} />
+                                </div>
+                                </div>
+                                <div className='spContrlSSBX02'>
+                                    <button className='spContrlBTN01'>AUTHORIZE NEW LIMIT</button>
+                                </div> 
                             </div> 
-                        </div> 
+                        </div>
                     </div>
-
-                    <div className="spContrlMBX">
-                    <div className='spCountrlTitle01'>SEND <span>ETH</span> {'<>'} RECEIVE <span>BNB</span></div>
+                    }
+                    {/* <div className="spContrlMBX">
+                    <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
                         <div className='spContrlInputBX'>
                             <i>2</i>
                             <input type="text" value='0xF3B3f6F15d474C92cb4051c22697C371e6e117B1' />
@@ -559,16 +626,16 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 <InputRange
                                     maxValue={100000}
                                     minValue={100}
-                                    value={this.state.value}
+                                    value={this.state.gasAndFeeAmount}
                                     formatLabel={value => `$${value}`}
-                                    onChange={value => this.setState({ value })} />
+                                    onChange={value => this.setState({ gasAndFeeAmount: value })} />
                             </div>
                             </div>
                             <div className='spContrlSSBX02'>
                                 <button className='spContrlBTN01'>AUTHORIZE NEW LIMIT</button>
                             </div> 
                         </div> 
-                    </div>
+                    </div> */}
                 </div>
                 <a href="javascript:void(0);" onClick={() => { this.props.closePopup("LiquidityProvider") }} className="close-Icon"></a>
             </div>

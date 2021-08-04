@@ -26,6 +26,7 @@ data[97].explorer = "https://testnet.bscscan.com";
 // data[42].tokenGateWay = "0xaEb8818Df09F0476c8160935Ec61978B34eC3151";
 
 data[42].swapFactoryContract = "0xeaf41806fcc2a3893a662dbba7a111630f9f6704";
+data[42].swapFactoryContract = "0xcb8fAb404a5b55942690457ccD0b31F1D09B5419";
 data[42].explorer = "http://kovan.etherscan.io";
 
 // testnet config

@@ -68,7 +68,7 @@ class SwapFactoryContract extends EventEmitter {
 
         this.web3.getSigner(0).sendTransaction(tx).then(result => {
             txCb(result.hash)
-            result.wait().then(async (receipt) => {
+            result.wait().then(async(receipt) => {
                 receiptCb(receipt);
             })
         }).catch(error => {
@@ -116,6 +116,20 @@ class SwapFactoryContract extends EventEmitter {
         // let payload = await this.swapFactoryInstance.populateTransaction.swap(tokenA, tokenB, receiver, swapAmount, licensee, isInvestment, minimumAmountToClaim, limitPice);
         console.log(payload)
         this.sendTransaction(payload, amountNew, "120000", this.swapFactoryAddress, txCb, receiptCb)
+    }
+
+    async addSwapProvider(nativeToken, foreignToken, nativeTokenReceiver, foreignTokenReceiver, feeAmountLimit, txCb, receiptCb) {
+        let _nativeToken = nativeToken.replace("0x", "");
+        let _foreignToken = foreignToken.replace("0x", "");
+        let _nativeTokenReceiver = nativeTokenReceiver.replace("0x", "");
+        let _foreignTokenReceiver = foreignTokenReceiver.replace("0x", "");
+        let _feeAmountLimit = web3Js.utils.toBN(web3Js.utils.toWei((feeAmountLimit).toString()));
+
+        var payload = `0xd104451a${this.pad32Bytes(_nativeToken)}${this.pad32Bytes(_foreignToken)}${this.pad32Bytes(_nativeTokenReceiver)}${this.pad32Bytes(_foreignTokenReceiver)}${this.pad32Bytes(_feeAmountLimit)}`
+        console.log(payload);
+        console.log(this.swapFactoryAddress);
+
+        this.sendTransaction(payload, 0, "120000", this.swapFactoryAddress, txCb, receiptCb)
     }
 
     async estimateSwapGasFee(tokenA, tokenB, amount, swapAmount, fee, gasLimit, estGasCb) {
@@ -201,7 +215,7 @@ class SwapFactoryContract extends EventEmitter {
 
 
     handleActions(action) {
-        switch (action.type) { }
+        switch (action.type) {}
     }
 
 }

@@ -90,18 +90,18 @@ const swapProviderController = {
             const swapProvider = {
                 tokenA: {
                   consumedAmount: 0,
-                  address: '0x3',
+                  address: '0x0000000000000000000000000000000000000002',
                   recievedAmount: 10
                 },
-                tokenB: { recievedAmount: 0, address: '0x4' },
+                tokenB: { recievedAmount: 0, address: '0x0000000000000000000000000000000000000001' },
                 smartContractAddress: '9b909d25-079c-49ce-b937-534b77f8a9c9',
                 txid: '5bf54f13-7e38-4127-a65c-62754aec5815',
                 active: true,
                 _id: '6109081b8a73615144abf49f',
                 walletAddresses: {
-                  toSend: '0xxxxx',
-                  toReceive: '0yyyyy',
-                  spAccount: '454545454523'
+                  toSend: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+                  toReceive: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+                  spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8'
                 },
                 networkId: 42,
                 gasAndFeeAmount: 3.3,
@@ -109,7 +109,7 @@ const swapProviderController = {
                 accumulateFundsLimit: 0.3,
                 stopRepeats: { mode: 3 },
                 withdraw: { mode: 3 },
-                cexData: { key: 'ox00000000ab', secret: 'ox00000000yz' },
+                cexData: { key: '00000000ab', secret: '00000000yz' },
                 createdAt: '2021-08-03T09:10:51.181Z',
                 updatedAt:'2021-08-03T09:10:51.181Z',
                 __v: 0
@@ -120,20 +120,21 @@ const swapProviderController = {
             });
 
             if(swapProvider.hasOwnProperty('_id')){
+                return res.status(201).json(swapProvider);
                 // call add swap provider 
                 // add as provider onto blockchain 
-                let contractAddress = constantConfig[networkId].swapFactoryContract;                
+                // let contractAddress = constantConfig[networkId].swapFactoryContract;                
                 
-                contractAddress = "0xcb8fAb404a5b55942690457ccD0b31F1D09B5419";
+                // contractAddress = "0xcb8fAb404a5b55942690457ccD0b31F1D09B5419";
 
-                let provider = 42 == 42 ? INFURA_WEB_ENDPOINT : BSC_WEB_ENDPOINT
-                const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
-                const contractInstance = new web3.eth.Contract(swapFactoryAbi as AbiItem[], contractAddress);
+                // let provider = 42 == 42 ? INFURA_WEB_ENDPOINT : BSC_WEB_ENDPOINT
+                // const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
+                // const contractInstance = new web3.eth.Contract(swapFactoryAbi as AbiItem[], contractAddress);
                 //console.log(contractInstance);
-                await swapProviderController.addSwapProvider(contractInstance, spArgs, web3).then(response => {
-                    swapProvider['addSwapProviderResponse'] = response;
-                    return res.status(201).json(swapProvider);
-                });
+                // await swapProviderController.addSwapProvider(contractInstance, spArgs, web3).then(response => {
+                //     swapProvider['addSwapProviderResponse'] = response;
+                //     return res.status(201).json(swapProvider);
+                // });
             }
 
         } catch (err) {
@@ -152,7 +153,7 @@ const swapProviderController = {
             _nativeTokenReceiver: args.walletAddresses.toSend,
             _foreignTokenReceiver: args.walletAddresses.toReceive,
             _feeAmountLimit: web3.utils.toBN(web3.utils.toWei((args.gasAndFeeAmount).toString()))
-        }).encodeABI();
+        });
 
         const data = tx.encodeABI();
 
@@ -167,22 +168,22 @@ const swapProviderController = {
             gasPrice: gasPrice,
             nonce: nonce
         });
-        const signedTx = await web3.eth.accounts.signTransaction({
-            to: constantConfig[args.networkId].swapFactoryContract, 
-            data,
-            gas,
-            gasPrice,
-            nonce, 
-            chainId: args.networkId
-          },
-          pKey
-        );
-        console.log(`Old data value: ${await contractInstance.methods.data().call()}`);
-        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-        console.log(`Transaction hash: ${receipt.transactionHash}`);
-        console.log(`New data value: ${await contractInstance.methods.data().call()}`);
+        // const signedTx = await web3.eth.accounts.signTransaction({
+        //     to: constantConfig[args.networkId].swapFactoryContract, 
+        //     data,
+        //     gas,
+        //     gasPrice,
+        //     nonce, 
+        //     chainId: args.networkId
+        //   },
+        //   pKey
+        // );
+        // console.log(`Old data value: ${await contractInstance.methods.data().call()}`);
+        // const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        // console.log(`Transaction hash: ${receipt.transactionHash}`);
+        // console.log(`New data value: ${await contractInstance.methods.data().call()}`);
 
-        return receipt;
+        //return receipt;
 
     }
     
