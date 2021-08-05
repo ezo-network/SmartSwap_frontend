@@ -41,7 +41,21 @@ const requestValidations = {
       cexApiKey: string().required('Required - Your specific API key to the CEX of your choice'),
       cexApiSecret: string().required('Required - Your specific API key secret to the CEX of your choice'),
     })
-  })
+  }),
+
+  updateTransactionHashRequest: object({
+    body: object({
+      txid: string().required('Transaction Hash is required.'),
+      docId: string().required('Document Id is required.'),
+    })
+  }),
+
+  getContractAddressRequest: object({
+    query: object({
+      docId: string().required('Document Id is required.'),
+    })
+  }),
+
 }
 
 export default requestValidations;

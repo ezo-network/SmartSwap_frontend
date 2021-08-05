@@ -143,48 +143,62 @@ const swapProviderController = {
         }
     },
 
-    addSwapProvider: async(contractInstance, args, web3) => {
-        console.log("here in the add swap provider");
-        const pKey = "fcadd0454cbb882c0f5462b8e7acf61df233bf12aa3711c08be4f6f5a62fc6d2";
-        console.log(contractInstance);
-        const tx = contractInstance.methods.addSwapProvider({
-            _nativeToken: args.tokenA.address,
-            _foreignToken: args.tokenB.address,
-            _nativeTokenReceiver: args.walletAddresses.toSend,
-            _foreignTokenReceiver: args.walletAddresses.toReceive,
-            _feeAmountLimit: web3.utils.toBN(web3.utils.toWei((args.gasAndFeeAmount).toString()))
+    addSwapProvider: async(event, networkId) => {
+        //console.log(event);
+        let usp = await SwapProvider.updateOne({
+            txid: event.transactionHash,
+            networkId: networkId
+        }, {
+            smartContractAddress: event.returnValues.spContract 
         });
+        //console.log(usp);
+    },
 
-        const data = tx.encodeABI();
+    updateTransactionHash: async(req: Request, res: Response) => {
+        try {
+            const { 
+                txid,
+                docId    
+            } = req.body;
 
-        const gas = await tx.estimateGas({from: "0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8"});
-        const gasPrice = await web3.eth.getGasPrice();
-        const nonce = await web3.eth.getTransactionCount("0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8");
-        
-        console.log({
-            "tx": tx,
-            "data": data,
-            gas: gas,
-            gasPrice: gasPrice,
-            nonce: nonce
-        });
-        // const signedTx = await web3.eth.accounts.signTransaction({
-        //     to: constantConfig[args.networkId].swapFactoryContract, 
-        //     data,
-        //     gas,
-        //     gasPrice,
-        //     nonce, 
-        //     chainId: args.networkId
-        //   },
-        //   pKey
-        // );
-        // console.log(`Old data value: ${await contractInstance.methods.data().call()}`);
-        // const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-        // console.log(`Transaction hash: ${receipt.transactionHash}`);
-        // console.log(`New data value: ${await contractInstance.methods.data().call()}`);
+            let usp = await SwapProvider.updateOne({
+                _id: docId
+            }, {
+                txid: txid
+            });
 
-        //return receipt;
+            if(usp.ok == 1){
+                return res.status(200).json({
+                    "Message": "Record updated"
+                });
+            }
 
+        }  catch (err) {
+            err['errorOrigin'] = "updateTransactionHash";
+            return res.status(500).json({ message: err });
+        }
+    },
+
+    getContractAddress: async(req: Request, res: Response) => {
+        try {
+            const {
+                docId    
+            } = req.query;
+
+            let sp = await SwapProvider.findOne({
+                _id: docId
+            }).exec();
+
+            if(sp){
+                return res.status(200).json({
+                    smartContractAddress: sp.smartContractAddress
+                });
+            }
+
+        }  catch (err) {
+            err['errorOrigin'] = "getContractAddress";
+            return res.status(500).json({ message: err });
+        }        
     }
     
 }

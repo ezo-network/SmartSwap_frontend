@@ -1,6 +1,6 @@
 {
     "restartable": "rs",
-    "ignore": [".git", "node_modules/", "dist/", "coverage/"],
+    "ignore": [".git", "node_modules/", "dist/", "coverage/", "src/api/v1/listners/ethBlock.json", "src/api/v1/listners/bscBlock.json"],
     "watch": ["src/"],
     "execMap": {
         "ts": "node -r ts-node/register"

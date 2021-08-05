@@ -246,6 +246,17 @@ export default class LiquidityProvider extends PureComponent {
                     console.log({
                         "Contract response:": response
                     });
+
+                    if(response.status == 1){
+                        // update tx hash to db
+                        let args = {
+                            data: {
+                                docId: response.data._id,
+                                txid: response.transactionHash
+                            }
+                        }
+                    }
+
                     // this.init()
                     this.setState({
                         confirmed: true,
@@ -257,8 +268,6 @@ export default class LiquidityProvider extends PureComponent {
                 }
             );
         }
-
-
     }
     
     render() {
