@@ -1,5 +1,6 @@
 import uniqueValidator from 'mongoose-unique-validator';
 import mongoose, { Schema, Document } from 'mongoose';
+import { number } from 'yup/lib/locale';
 
 export interface WalletAddresses extends Document {
     toSend: string
@@ -150,21 +151,26 @@ const SwapProvider: Schema = new mongoose.Schema({
     },
     smartContractAddress: {
         type: String,
-        required: true,
+        required: false,
         default: null
     },
     txid:{
         type: String,
-        required: true,
+        required: false,
         default: null
     },
     active: {
         type: Boolean,
         required: true,
         default: true
+    },
+    fromBlock: {
+        type: Number,
+        default: null,
+        required: false
     }
 }, {
-    timestamps: true,
+    timestamps: true, toJSON: {getters: true}
 });
 
 SwapProvider.plugin(uniqueValidator);

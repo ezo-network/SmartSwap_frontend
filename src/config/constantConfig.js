@@ -19,6 +19,7 @@ data.allowedNetwork = [97, 42];
 // data[97].tokenGateWay = "0x23C9523DC77441eFb878c57D426190E8b9586AF3";
 
 data[97].swapFactoryContract = "0x309208d15fba3207be6c760771ca3b4846e1be93";
+data[97].swapFactoryContract = "0x832FA4611744983565A83e1EBE2d105a5D5195f7";
 data[97].explorer = "https://testnet.bscscan.com";
 
 // priceFeed 0x9326BFA02ADD2366b30bacB125260Af641031331

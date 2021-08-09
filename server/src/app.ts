@@ -5,6 +5,7 @@ import cors from "cors";
 // Mongoose
 import mongoose from 'mongoose';
 import ETHListner = require('./api/v1/listners/ethListner');
+import BSCListner = require('./api/v1/listners/bscListner');
 
 mongoose.connect(db.url, db.configs);
 
@@ -22,5 +23,6 @@ app.listen(port, host, () => {
     routes(app);
 
     // listners
-    ETHListner
+    //ETHListner;
+    //BSCListner;
 });

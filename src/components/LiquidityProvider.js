@@ -1,8 +1,7 @@
 import React, { PureComponent } from "react";
-import data, { tokenDetails } from "../config/constantConfig";
+import { tokenDetails } from "../config/constantConfig";
 import Web3 from 'web3';
 import web3Config from "../config/web3Config";
-import { PrePath } from "../constants";
 import Collapse from "@kunukn/react-collapse";
 import InputRange from 'react-input-range';
 import CONSTANT from '../constants';
@@ -11,6 +10,10 @@ import constantConfig from '../config/constantConfig';
 import notificationConfig from '../config/notificationConfig';
 import AxiosRequest from "../helper/axiosRequest";
 import SwapFactoryContract from '../helper/swapFactoryContract';
+import { LoopCircleLoading } from 'react-loadingg';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 var _ = require('lodash');
 
 export default class LiquidityProvider extends PureComponent {
@@ -23,7 +26,6 @@ export default class LiquidityProvider extends PureComponent {
             isOpen1: false,
             isOpen2: false,
             btnClick: false,
-            web3: null,
             selectedTokenA: 'ETH',
             selectedTokenB: 'BNB',
             // input fields
@@ -37,11 +39,11 @@ export default class LiquidityProvider extends PureComponent {
             gasAndFeeAmount: 45000,
             spProfitPercent: 0.3,
             accumulateFundsLimit: 0.3,
-            stopRepeatsMode: null,
-            stopRepeatsOnDate: 'April 2,2021',
+            stopRepeatsMode: 3,
+            stopRepeatsOnDate: new Date(),
             stopRepeatsAfterCalls: 200,
-            withdrawMode: null,
-            withdrawOnDate: 'April 2,2021',
+            withdrawMode: 3,
+            withdrawOnDate: new Date(),
             withdrawAfterCalls: 250,
             cexApiKey: null,
             cexApiSecret: null,
@@ -49,7 +51,10 @@ export default class LiquidityProvider extends PureComponent {
             smartSwapContractAddress: 'Deploy contract to get this address.',
             confirmed: false,
             deployed: false,
-            deployButtonText: "DEPLOY SMART CONTRACT"
+            deployButtonText: "DEPLOY SMART CONTRACT",
+            loadingIcon: false,
+            errorMessage: null,
+            serverError: null
         }
     }
 
@@ -79,10 +84,6 @@ export default class LiquidityProvider extends PureComponent {
                 new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_BINANCE)
             ),
         });
-
-        {
-            // this.openPopup('About');
-        } // temporary popup on
 
         this.setState({
             loading: true,
@@ -174,109 +175,245 @@ export default class LiquidityProvider extends PureComponent {
         // set this to disable deploy button
         this.setState({
             deployed: true,
-            deployButtonText: "Deploying..."
+            loadingIcon: true,
+            deployButtonText: "Deploying...",
+            errorMessage: null
         });
 
         console.log(`deploying contact on network - ${web3Config.getNetworkId()}`)
-        console.log(this.state.spProfitPercent);
 
-        let args = {
+        let args = {};
+        if(Number(this.state.stopRepeatsMode) == 1){
+            console.log('Stop mode 1');
+            Object.assign(args, {
+                stopRepeatsOnDate: this.state.stopRepeatsOnDate,
+                stopRepeatsAfterCalls: null
+            });
+        }
+
+        if(Number(this.state.stopRepeatsMode) == 2){
+            console.log('Stop mode 2');
+            Object.assign(args, {
+                stopRepeatsOnDate: null,
+                stopRepeatsAfterCalls: this.state.stopRepeatsAfterCalls
+            });            
+        }
+
+        if(Number(this.state.stopRepeatsMode) == 3){
+            console.log('Stop mode 3');
+            Object.assign(args, {
+                stopRepeatsOnDate: null,
+                stopRepeatsAfterCalls: null
+            }); 
+        }
+
+        if(Number(this.state.withdrawMode) == 1){
+            console.log('Stop mode 1');
+            Object.assign(args, {
+                withdrawOnDate: this.state.withdrawOnDate,
+                withdrawAfterCalls: null
+            });
+        }
+
+        if(Number(this.state.withdrawMode) == 2){
+            console.log('Stop mode 2');
+            Object.assign(args, {
+                withdrawOnDate: null,
+                withdrawAfterCalls: this.state.withdrawAfterCalls
+            });            
+        }
+
+        if(Number(this.state.withdrawMode) == 3){
+            console.log('Stop mode 3');
+            Object.assign(args, {
+                withdrawOnDate: null,
+                withdrawAfterCalls: null
+            }); 
+        }
+        
+
+        let finalArgs = {
+            data: Object.assign(args, {
+                spAccount: this.state.spAccount,
+                networkId: this.state.networkId,
+                tokenA: this.state.tokenA,
+                tokenB: this.state.tokenB,
+                amountA: this.state.amountA === null ? ('').toString() : this.state.amountA,
+                walletAddressToSend: this.state.walletAddressToSend === null ? ('').toString() : this.state.walletAddressToSend,
+                walletAddressToReceive: this.state.walletAddressToReceive === null ? ('').toString() : this.state.walletAddressToReceive,
+                gasAndFeeAmount: this.state.gasAndFeeAmount,
+                spProfitPercent: this.state.spProfitPercent,
+                accumulateFundsLimit: this.state.accumulateFundsLimit,
+                stopRepeatsMode: this.state.stopRepeatsMode,
+                withdrawMode: this.state.withdrawMode,
+                cexApiKey: this.state.cexApiKey === null ? ('').toString() : this.state.cexApiKey,
+                cexApiSecret: this.state.cexApiSecret === null ? ('').toString() : this.state.cexApiSecret
+            }),
             // data: {
-            //     spAccount: this.state.spAccount,
-            //     networkId: this.state.networkId,
-            //     tokenA: this.state.tokenA,
-            //     tokenB: this.state.tokenB,
-            //     amountA: this.state.amountA,
-            //     walletAddressToSend: this.state.walletAddressToSend,
-            //     walletAddressToReceive: this.state.walletAddressToReceive,
-            //     gasAndFeeAmount: this.state.gasAndFeeAmount,
-            //     spProfitPercent: this.state.spProfitPercent,
-            //     accumulateFundsLimit: this.state.accumulateFundsLimit,
-            //     stopRepeatsMode: this.state.stopRepeatsMode,
-            //     stopRepeatsOnDate: this.state.stopRepeatsOnDate,
-            //     stopRepeatsAfterCalls: this.state.stopRepeatsAfterCalls,
-            //     withdrawMode: this.state.withdrawMode,
-            //     withdrawOnDate: this.state.withdrawOnDate,
-            //     withdrawAfterCalls: this.state.withdrawAfterCalls,
-            //     cexApiKey: this.state.cexApiKey,
-            //     cexApiSecret: this.state.cexApiSecret
-            // },
-            data: {
-                spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
-                networkId: 42,
-                tokenA: '0x0000000000000000000000000000000000000002',
-                tokenB: '0x0000000000000000000000000000000000000001',
-                amountA: 100,
-                walletAddressToSend: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
-                walletAddressToReceive: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
-                gasAndFeeAmount: 10,
-                spProfitPercent: 0.3,
-                accumulateFundsLimit: 0.5,
-                stopRepeatsMode: 3,
-                stopRepeatsOnDate: 'April 2,2021',
-                stopRepeatsAfterCalls: 0,
-                withdrawMode: 3,
-                withdrawOnDate: 'April 2,2021',
-                withdrawAfterCalls: 0,
-                cexApiKey: '00000000ab',
-                cexApiSecret: '00000000yz'
-            },            
+            //     spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+            //     networkId: 42,
+            //     tokenA: '0x0000000000000000000000000000000000000002',
+            //     tokenB: '0x0000000000000000000000000000000000000001',
+            //     amountA: 100,
+            //     walletAddressToSend: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+            //     walletAddressToReceive: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+            //     gasAndFeeAmount: 10,
+            //     spProfitPercent: 0.3,
+            //     accumulateFundsLimit: 0.5,
+            //     stopRepeatsMode: 3,
+            //     stopRepeatsOnDate: 'April 2,2021',
+            //     stopRepeatsAfterCalls: 0,
+            //     withdrawMode: 3,
+            //     withdrawOnDate: 'April 2,2021',
+            //     withdrawAfterCalls: 0,
+            //     cexApiKey: '00000000ab',
+            //     cexApiSecret: '00000000yz'
+            // },            
             path: 'become-swap-provider',
             method: 'POST'
         };
 
-        let response = await AxiosRequest.request(args);
+        console.log(finalArgs)
 
-        if(response.status == 201){
-            console.log('record created!');
-            let networkID = response.data.networkId;
-            let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), this.state.networkId);
-            swapFactory.addSwapProvider(
-                response.data.tokenA.address,
-                response.data.tokenB.address,
-                response.data.walletAddresses.toSend,
-                response.data.walletAddresses.toReceive,
-                response.data.gasAndFeeAmount,
-                (hash) => {
-                    this.setState({
-                        txid: response.data._id,
-                    });
-                },
-                (response) => {
-                    console.log({
-                        "Contract response:": response
-                    });
-
-                    if(response.status == 1){
-                        // update tx hash to db
-                        let args = {
-                            data: {
-                                docId: response.data._id,
-                                txid: response.transactionHash
+        try{
+            let response = await AxiosRequest.request(finalArgs);
+            console.log(response);
+            if(response.status === 201){
+                console.log('record created!');
+                let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), this.state.networkId);
+                swapFactory.addSwapProvider(
+                    response.data.tokenA.address,
+                    response.data.tokenB.address,
+                    response.data.walletAddresses.toSend,
+                    response.data.walletAddresses.toReceive,
+                    response.data.gasAndFeeAmount.$numberDecimal,
+                    async(hash) => {
+                        this.setState({
+                            txid: response.data._id,
+                        });
+                    },
+                    async(response) => {
+                    
+                        console.log({
+                            "Contract response:": response
+                        });
+    
+                        if(response.status === 1){
+                            // update tx hash to db
+                            let args = {
+                                data: {
+                                    docId: this.state.txid,
+                                    txid: response.transactionHash,
+                                    blockNumber: response.blockNumber,
+                                    networkId: this.state.networkId
+                                },
+                                path: 'update-tx-hash',
+                                method: 'POST'
                             }
+                            response = await AxiosRequest.request(args);
+    
+                            if(response.status === 200){
+                                this.setState({
+                                    smartSwapContractAddress: response.data['smartContractAddress'],
+                                    confirmed: true,
+                                    deployButtonText: "Contract Deployed",
+                                    loadingIcon: false
+                                });
+                                notificationConfig.success('Swap provider Added');
+                            }
+    
+                            // this.setState({
+                            //     deployButtonText: "Getting smart contract address..."
+                            // });
+                            // await this.asyncInterval(10000);
+    
                         }
+                        
                     }
-
-                    // this.init()
-                    this.setState({
-                        confirmed: true,
-                        deployButtonText: "Contract Deployed"
-                        // showLedger: true,
-                        // wrapBox: "success"
-                    });
-                    notificationConfig.success('Swap provider Added');
-                }
-            );
+                );
+            }
+    
+    
+    
+            if(response.status === 400){
+                this.setState({
+                    loadingIcon: false,
+                    deployButtonText: "DEPLOY SMART CONTRACT",
+                    deployed: false,
+                    errorMessage: response.data[0]
+                });
+                notificationConfig.error('Something went wrong!');
+            }
+    
+            if(response.status === 401){
+                this.setState({
+                    loadingIcon: false,
+                    deployButtonText: "DEPLOY SMART CONTRACT",
+                    deployed: false,
+                    serverError: response.data.errorMessage.error
+                });
+                notificationConfig.error('Something went wrong!');
+            }
+        } catch(err){
+            console.log(err);
+            notificationConfig.error('Server Error!');
+            this.setState({
+                loadingIcon: false,
+                deployButtonText: "DEPLOY SMART CONTRACT",
+                deployed: false
+            });
         }
+        
+
     }
     
+    asyncInterval = async(ms, triesLeft = 10) => {
+        return new Promise((resolve, reject) => {
+            const interval = setInterval(async() => {
+                let args = {
+                    path: `get-contract-address?docId=${this.state.txid}`,
+                    method: 'GET'
+                }
+                let response = await this.getContractAddress(args);
+                if ( response !== null) {
+                    resolve();
+                    clearInterval(interval);
+                    this.setState({
+                        smartSwapContractAddress: response
+                    });
+                } else if (triesLeft <= 1) {
+                    reject();
+                    clearInterval(interval);
+                }
+                triesLeft--;
+            }, ms);
+        });
+    }
+
+    getContractAddress = async(args) => {
+        let response = await AxiosRequest.request(args);
+        console.log({
+            getContractAddress: response
+        });
+        return response.data.smartContractAddress;
+    }
+
     render() {
+
+        const smallError = {
+            fontSize: "13px",
+            lineHeight: "20px" 
+        };
 
         return (
             <div className="main-Popup wallet-Popup" id="LiquidityProvider">
                 <div className="container-Grid">
                     <div className="LiProTitle01">Become a Swap Provider</div>
-
+                    { this.state.serverError !== null && 
+                        <div className="error-Msg">
+                            <label>{this.state.serverError}</label>
+                        </div>
+                    }                       
                     <div className="LiProFormMbox">
 
                         <div className="LiProfSbox01">
@@ -292,6 +429,12 @@ export default class LiquidityProvider extends PureComponent {
                                     <div className="LiproInput01">
                                         <input type="text" defaultValue='' placeholder="Amount" onChange={event => this.setState({amountA: event.target.value})}  />
                                     </div>
+                                    <br></br>
+                                    { this.state.errorMessage !== null && this.state.errorMessage.includes("amountA") && 
+                                    <div className="error-Msg" style={smallError}>
+                                        <label>{this.state.errorMessage}</label>
+                                    </div>
+                                    }                                    
                                 </div>
                                 <div className="bspSBX01">
                                     <div className="LiproDropdown">
@@ -303,8 +446,8 @@ export default class LiquidityProvider extends PureComponent {
                                             <Collapse isOpen={this.state.isOpen1} className={"collapse-css-transition"} >
                                                 {
                                                     Object.keys(this.state.coinList).map((coin)=>(
-                                                        this.state.selectedTokenA != this.state.coinList[coin]['symbol'] && 
-                                                        (this.state.coinList[coin]['approveRequire'] == false) &&
+                                                        this.state.selectedTokenA !== this.state.coinList[coin]['symbol'] && 
+                                                        (this.state.coinList[coin]['approveRequire'] === false) &&
                                                         <button 
                                                             onClick={() => {
                                                                 this.changeTokenA(this.state.coinList[coin]['symbol']);
@@ -333,8 +476,8 @@ export default class LiquidityProvider extends PureComponent {
                                     <Collapse isOpen={this.state.isOpen2} className={"collapse-css-transition"} >
                                     {
                                         Object.keys(this.state.coinList).map((coin)=>(
-                                            (this.state.selectedTokenB != this.state.coinList[coin]['symbol']) && 
-                                            (this.state.coinList[coin]['approveRequire'] == false) &&
+                                            (this.state.selectedTokenB !== this.state.coinList[coin]['symbol']) && 
+                                            (this.state.coinList[coin]['approveRequire'] === false) &&
                                             <button 
                                                 onClick={() => {
                                                     this.changeTokenB(this.state.coinList[coin]['symbol']);
@@ -348,18 +491,30 @@ export default class LiquidityProvider extends PureComponent {
                                     </Collapse>
                                 </div>
                             </div>
-                        </div>
+                        </div>                        
                         <div className="LiProfSbox01">
                             <div className="LiProLable">Wallet address that send token A<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Enter the wallet that will become a Swap Provider" aria-hidden="true"></i></i></div>
                             <div className="LiproInput01">
                                 <input type="text" defaultValue='' onChange={event => this.setState({walletAddressToSend: event.target.value})}  />
                             </div>
+                            <br></br>
+                            { this.state.errorMessage !== null && this.state.errorMessage.includes("walletAddressToSend") && 
+                            <div className="error-Msg" style={smallError}>
+                                <label>{this.state.errorMessage}</label>
+                            </div>
+                            }                                                               
                         </div>
                         <div className="LiProfSbox02">
                             <div className="LiProLable">Wallet address that receive token B<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Enter the wallet that receives SP results and rewards, on same CEX such Binacne it may be the same wallet address as the one that send token A, but on some other CEX they may have two different wallets, one to send fund our and another to receive fund in." aria-hidden="true"></i></i></div>
                             <div className="LiproInput01">
                                 <input type="text" defaultValue='' onChange={event => this.setState({walletAddressToReceive: event.target.value})}   />
                             </div>
+                            <br></br>
+                            { this.state.errorMessage !== null && this.state.errorMessage.includes("walletAddressToReceive") && 
+                            <div className="error-Msg" style={smallError}>
+                                <label>{this.state.errorMessage}</label>
+                            </div>
+                            }                                   
                         </div>
 
                         <div className='spacerLine'></div>
@@ -374,7 +529,12 @@ export default class LiquidityProvider extends PureComponent {
                                     formatLabel={value => `$${value}`}
                                     onChange={value => this.setState({ gasAndFeeAmount: value })} />
                             </div>
-
+                            <br></br>
+                            { this.state.errorMessage !== null && this.state.errorMessage.includes("gasAndFeeAmount") && 
+                            <div className="error-Msg" style={smallError}>
+                                <label>{this.state.errorMessage}</label>
+                            </div>
+                            }       
                         </div>
 
                         <div className='spacerLine'></div>
@@ -394,6 +554,12 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                     <span>%</span>
                                 </div>
                                 <div className="smlInfotxt01">[0.161754 BNB/ETH]</div>
+                                <br></br>
+                                { this.state.errorMessage !== null && this.state.errorMessage.includes("spProfitPercent") && 
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                                }                                
                             </div>
                         </div>
 
@@ -409,6 +575,12 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                     <span>%</span>
                                 </div>
                                 <div className="smlInfotxt02">Based on minimum 10% accumulation, expect to pay 10x gas cost  </div>
+                                <br></br>
+                                { this.state.errorMessage !== null && this.state.errorMessage.includes("accumulateFundsLimit") && 
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                                }    
                             </div>
                         </div>
 
@@ -446,19 +618,27 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
 
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio" checked id="s01" name="s11" value="s01" onChange={event => this.setState({stopRepeatsMode: 1})} />
+                                        <input type="radio" checked id="s01" name="s11" value="s01" onChange={event => this.setState({stopRepeatsMode: 1})} checked={this.state.stopRepeatsMode === 1}/>
                                         <label htmlFor="s01"></label>
                                     </div> 
                                     <div className='LiProFlexBX01 padFixer01'>
                                         <div className="LiproInput01">
-                                            <input type="text" defaultValue={this.state.stopRepeatsOnDate} onChange={event => this.setState({stopRepeatsOnDate: event.target.value})}  />
+                                            <DatePicker
+                                                selected={this.state.stopRepeatsOnDate}
+                                                onChange={(date) => this.setState({stopRepeatsOnDate: date})}
+                                                peekNextMonth
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                dateFormat="dd/MM/yyyy"
+                                            />
                                             <i class="fas fa-calendar-alt FlyICO"></i>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio"  id="s02" name="s11" value="s02" onChange={event => this.setState({stopRepeatsMode: 2})} />
+                                        <input type="radio"  id="s02" name="s11" value="s02" onChange={event => this.setState({stopRepeatsMode: 2})} checked={this.state.stopRepeatsMode === 2}/>
                                         <label htmlFor="s02"></label>
                                     </div> 
                                     <div className="LiProFlexBX01 padFixer01">
@@ -471,7 +651,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio"  id="s03" name="s11" value="s03" onChange={event => this.setState({stopRepeatsMode: 3})} />
+                                        <input type="radio"  id="s03" name="s11" value="s03" onChange={event => this.setState({stopRepeatsMode: 3})} checked={this.state.stopRepeatsMode === 3}/>
                                         <label htmlFor="s03"></label>
                                     </div> 
                                     <div className="LiProFlexBX01 padFixer01">
@@ -490,19 +670,27 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             <div className="LiProfSbox02"> 
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio" checked id="s04" name="s12" value="s04" onChange={event => this.setState({withdrawMode: 1})} />
+                                        <input type="radio" checked id="s04" name="s12" value="s04" onChange={event => this.setState({withdrawMode: 1})} checked={this.state.withdrawMode === 1}/>
                                         <label htmlFor="s04"></label>
                                     </div> 
                                     <div className='LiProFlexBX01 padFixer01'>
                                         <div className="LiproInput01">
-                                            <input type="text" defaultValue={this.state.withdrawOnDate} onChange={event => this.setState({withdrawOnDate: event.target.value})}/>
+                                            <DatePicker
+                                                selected={this.state.withdrawOnDate}
+                                                onChange={(date) => this.setState({withdrawOnDate: date})}
+                                                peekNextMonth
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                dateFormat="dd/MM/yyyy"
+                                            />
                                             <i class="fas fa-calendar-alt FlyICO"></i>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio"  id="s05" name="s12" value="s05" onChange={event => this.setState({withdrawMode: 2})}  />
+                                        <input type="radio"  id="s05" name="s12" value="s05" onChange={event => this.setState({withdrawMode: 2})} checked={this.state.withdrawMode === 2}/>
                                         <label htmlFor="s05"></label>
                                     </div> 
                                     <div className="LiProFlexBX01 padFixer01">
@@ -515,14 +703,13 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio"  id="s06" name="s12" value="s06" onChange={event => this.setState({withdrawMode: 3})}  />
+                                        <input type="radio"  id="s06" name="s12" value="s06" onChange={event => this.setState({withdrawMode: 3})} checked={this.state.withdrawMode === 3}/>
                                         <label htmlFor="s06"></label>
                                     </div> 
                                     <div className="LiProFlexBX01 padFixer01">
                                        <div className="LipRTitle01">Never stop<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Run SP repeats non-stop as long as there is funds available in your CEX account " aria-hidden="true"></i></i></div>
                                     </div>
                                 </div>
- 
                             </div>
                         </div>
 
@@ -540,6 +727,12 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 <div className="LiproInput01">
                                     <input type="text" defaultValue='' onChange={event => this.setState({cexApiKey: event.target.value})} />
                                 </div>
+                                <br></br>
+                                { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") && 
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                                }                                
                             </div>
                         </div>
 
@@ -552,6 +745,12 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 <div className="LiproInput01">
                                     <input type="text" defaultValue='' onChange={event => this.setState({cexApiSecret: event.target.value})}  />
                                 </div>
+                                <br></br>
+                                { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiSecret") && 
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                                }
                             </div>
                         </div>
 
@@ -563,15 +762,25 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             ? 
                             (<div className="LiProfSbox03">
                                 <div className='LiProformBTNbar'>
-                                    
-                                    <button onClick={this.connectWallet.bind(this)}>CONNECT YOUR WALLET</button>
+                                    <button 
+                                        onClick={this.connectWallet.bind(this)}
+                                    >CONNECT YOUR WALLET</button>
                                 </div>
                             </div>) 
                             : 
                             (<div className="LiProfSbox03">
-                                <div className='LiProformBTNbar'>                                    
-                                    <button onClick={this.deployContract.bind(this)} disabled={this.state.deployed}>
-                                        {this.state.deployButtonText}
+                                <div className='LiProformBTNbar'>
+                                    <button 
+                                        onClick={this.deployContract.bind(this)} disabled={this.state.deployed}
+                                    >
+                                        {this.state.deployButtonText} 
+                                        {this.state.loadingIcon === true &&
+                                            <LoopCircleLoading
+                                                height={'20px'}
+                                                width={'20px'}
+                                                color={'#ffffff'}
+                                            />
+                                        }
                                     </button>
                                 </div>
                             </div>)

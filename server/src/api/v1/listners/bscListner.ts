@@ -7,13 +7,13 @@ import swapFactoryAbi from "../../../abis/swapFactory.json";
 import swapProviderController from "../controllers/swapProvider.controller";
 import { AbiItem } from 'web3-utils';
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/v3/b06e3282ffb44f07a3ba3efb7faa8d29'));
-const address = constantConfig[42].swapFactoryContract;
+const web3 = new Web3(new Web3.providers.HttpProvider('https://data-seed-prebsc-2-s3.binance.org:8545'));
+const address = constantConfig[97].swapFactoryContract;
 const abi = swapFactoryAbi;
 const SWAP_INSTANCE = new web3.eth.Contract(abi as AbiItem[], address);
 
 async function listenEvents() {
-    fs.readFile(path.resolve(__dirname, './ethBlock.json'), async(err, blockData) => {
+    fs.readFile(path.resolve(__dirname, './bscBlock.json'), async(err, blockData) => {
         if (err) {
             return;
         }
@@ -22,8 +22,7 @@ async function listenEvents() {
         let lastcheckBlock = blockData["lastblock"];
         const latest = await web3.eth.getBlockNumber();
         blockData["lastblock"] = latest;
-        console.log("ETH", {Last:lastcheckBlock, New:latest})
-        
+        console.log("BSC", {Last:lastcheckBlock, New:latest})
         SWAP_INSTANCE.getPastEvents('AddSwapProvider', {
             fromBlock: lastcheckBlock,
             toBlock: latest // You can also specify 'latest'          
@@ -33,28 +32,17 @@ async function listenEvents() {
             }
         }).catch((err) => console.error(err));
 
-        fs.writeFile(path.resolve(__dirname, './ethBlock.json'), JSON.stringify(blockData), (err) => {
+        fs.writeFile(path.resolve(__dirname, './bscBlock.json'), JSON.stringify(blockData), (err) => {
             if (err) console.log(err);
         });
     });
 }
 
 async function addSwapProvider(eventData) {
-    await swapProviderController.addSwapProvider(eventData, 42);
+    await swapProviderController.addSwapProvider(eventData, 97);
 }
 
-export default async function fetchEvent(args) {
-    SWAP_INSTANCE.getPastEvents('AddSwapProvider', {
-        //filter: {swapProvider: "0xfcbdf7e5ef8ba15fb9a5d2464cf4af7d35fd6987"},
-        fromBlock: args.blockNumber,
-        toBlock: args.blockNumber
-    }, function(error, events){ console.log(events); })
-    .then(function(events){
-        console.log(events) // same results as the optional callback above
-    });
-}
-
-// new CronJob("*/40 * * * * *", async function() {
-//     console.log("Listning event on ETH Chain: AddSwapProvider")
-//     await listenEvents();
-// }, undefined, true, "GMT");
+new CronJob("*/30 * * * * *", async function() {
+    console.log("Listning event on BSC Chain: AddSwapProvider")
+    await listenEvents();
+}, undefined, true, "GMT");
