@@ -10,6 +10,7 @@ import constantConfig from '../config/constantConfig';
 import notificationConfig from '../config/notificationConfig';
 import AxiosRequest from "../helper/axiosRequest";
 import SwapFactoryContract from '../helper/swapFactoryContract';
+import SPContract from '../helper/spContract';
 import { LoopCircleLoading } from 'react-loadingg';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -54,7 +55,9 @@ export default class LiquidityProvider extends PureComponent {
             deployButtonText: "DEPLOY SMART CONTRACT",
             loadingIcon: false,
             errorMessage: null,
-            serverError: null
+            serverError: null,
+            isActiveContractExist: false,
+            spData: null
         }
     }
 
@@ -68,9 +71,14 @@ export default class LiquidityProvider extends PureComponent {
         window.ethereum.on('networkChanged', networkId => {
             console.log('networkChanged', networkId);
             this.setState({
-                web3: null
+                web3: null,
+                confirmed: false,
+                isActiveContractExist: false,
+                spData: null,
+                smartSwapContractAddress: null
             });
         });
+        
 
     }
 
@@ -99,6 +107,7 @@ export default class LiquidityProvider extends PureComponent {
         let collapse = "isOpen" + index;
         this.setState(prevState => ({
             [collapse]: !prevState[collapse] }));
+        this.toggleActiveContractSection();
     };
 
     changeTokenA(token) {
@@ -108,6 +117,7 @@ export default class LiquidityProvider extends PureComponent {
             selectedTokenA: token,
             tokenA: this.state.coinList[token]['address'],
         });
+        //this.toggleActiveContractSection();
     };
 
     changeTokenB(token) {
@@ -117,7 +127,33 @@ export default class LiquidityProvider extends PureComponent {
             selectedTokenB: token,
             tokenB: this.state.coinList[token]['address'],
         });
+        //this.toggleActiveContractSection();
     };
+
+    toggleActiveContractSection(){
+        if(this.state.spData !== null){
+            const activeContractAddress = this.state.spData.find(obj => {
+                return obj.networkId === this.state.networkId;
+            }).smartContractAddress;
+            
+            if(activeContractAddress){
+                notificationConfig.success('Active contract found.');   
+                this.setState({
+                    confirmed: true,
+                    isActiveContractExist: true,
+                    smartSwapContractAddress: activeContractAddress,
+                    deployed: true
+                });
+            } else {
+                this.setState({
+                    confirmed: false,
+                    isActiveContractExist: false,
+                    smartSwapContractAddress: null,
+                    deployed: false
+                });
+            }
+        }
+    }
 
     async connectWallet() {
         this.setState({ btnClick: true });
@@ -149,6 +185,8 @@ export default class LiquidityProvider extends PureComponent {
             networkId: networkId,
             spAccount: web3Config.getAddress()
         });
+        
+        await this.getActiveContracts();
     }
 
     async initInstance() {
@@ -366,7 +404,62 @@ export default class LiquidityProvider extends PureComponent {
         
 
     }
+
+
+    dispatchEventHandler(inputRef, value){
+        const valueSetter = Object.getOwnPropertyDescriptor(inputRef, 'value').set;
+        const prototype = Object.getPrototypeOf(inputRef);
+        const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+        if (valueSetter && valueSetter !== prototypeValueSetter) {
+            prototypeValueSetter.call(inputRef, value);
+        } else {
+            valueSetter.call(inputRef, value);
+        }
+        inputRef.dispatchEvent(new Event('input', { bubbles: true }));
+    }
     
+    async getActiveContracts(){
+
+        let args = {
+            data: {
+                spAccount: this.state.spAccount
+            },
+            path: 'active-contracts',
+            method: 'POST'
+        }
+
+        try{
+            let response = await AxiosRequest.request(args);
+            if(response.status === 200){
+                const activeContractAddress = response.data.find(obj => {
+                    if(obj.networkId === this.state.networkId){
+                        this.dispatchEventHandler(this.amountA, obj.tokenA.consumedAmount.$numberDecimal);
+                        this.dispatchEventHandler(this.walletAddressToReceive, obj.walletAddresses.toReceive);
+                        this.dispatchEventHandler(this.walletAddressToSend, obj.walletAddresses.toSend);
+                        return true;
+                    }
+                }).smartContractAddress;
+                if(activeContractAddress){
+                    notificationConfig.success('Active contract found.');   
+                    this.setState({
+                        spData: response.data,
+                        confirmed: true,
+                        isActiveContractExist: true,
+                        smartSwapContractAddress: activeContractAddress,
+                        deployed: true
+                    });
+                }
+            } else if(response.status === 404){
+                notificationConfig.error('No active contract.');
+            } else {
+                console.log(response);
+            }
+
+        } catch(err){
+            console.log(err);
+        }
+    }
+
     asyncInterval = async(ms, triesLeft = 10) => {
         return new Promise((resolve, reject) => {
             const interval = setInterval(async() => {
@@ -398,6 +491,38 @@ export default class LiquidityProvider extends PureComponent {
         return response.data.smartContractAddress;
     }
 
+    reAuthrizeFeeAndGasLimit = async() => {
+        let newLimit = this.state.gasAndFeeAmount
+        let spContract = new SPContract(web3Config.getWeb3(), this.state.networkId, this.state.smartSwapContractAddress);
+        spContract.setFeeAmountLimit(
+            newLimit, 
+            async(hash) => {},
+            async(response) => {
+                console.log({
+                    "SP Contract response:": response
+                });
+        
+                if(response.status === 1){
+                    this.setState({
+                        gasAndFeeAmount: newLimit
+                    });
+
+                    //spContract.getFeeAmountLimit();
+                    await AxiosRequest.request({
+                        data: {
+                            smartContractAddress: this.state.smartSwapContractAddress,
+                            gasAndFeeAmount: newLimit
+                        },
+                        path: "update",
+                        method: "POST"
+                    });
+
+
+                    notificationConfig.success('NEW GAS AND FEES LIMIT SET');
+                }
+        });
+    }
+
     render() {
 
         const smallError = {
@@ -427,7 +552,13 @@ export default class LiquidityProvider extends PureComponent {
                             <div className="bspMBX01 smFixer06">
                                 <div className="bspSBX01">
                                     <div className="LiproInput01">
-                                        <input type="text" defaultValue='' placeholder="Amount" onChange={event => this.setState({amountA: event.target.value})}  />
+                                        <input 
+                                            type="text" 
+                                            defaultValue='' 
+                                            placeholder="Amount" 
+                                            onChange={event => this.setState({amountA: event.target.value})}  
+                                            ref={(input)=> this.amountA = input}
+                                        />
                                     </div>
                                     <br></br>
                                     { this.state.errorMessage !== null && this.state.errorMessage.includes("amountA") && 
@@ -495,7 +626,12 @@ export default class LiquidityProvider extends PureComponent {
                         <div className="LiProfSbox01">
                             <div className="LiProLable">Wallet address that send token A<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Enter the wallet that will become a Swap Provider" aria-hidden="true"></i></i></div>
                             <div className="LiproInput01">
-                                <input type="text" defaultValue='' onChange={event => this.setState({walletAddressToSend: event.target.value})}  />
+                                <input 
+                                    type="text" 
+                                    defaultValue='' 
+                                    onChange={event => this.setState({walletAddressToSend: event.target.value})}  
+                                    ref={(input)=> this.walletAddressToSend = input}
+                                />
                             </div>
                             <br></br>
                             { this.state.errorMessage !== null && this.state.errorMessage.includes("walletAddressToSend") && 
@@ -507,7 +643,12 @@ export default class LiquidityProvider extends PureComponent {
                         <div className="LiProfSbox02">
                             <div className="LiProLable">Wallet address that receive token B<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Enter the wallet that receives SP results and rewards, on same CEX such Binacne it may be the same wallet address as the one that send token A, but on some other CEX they may have two different wallets, one to send fund our and another to receive fund in." aria-hidden="true"></i></i></div>
                             <div className="LiproInput01">
-                                <input type="text" defaultValue='' onChange={event => this.setState({walletAddressToReceive: event.target.value})}   />
+                                <input 
+                                    type="text" 
+                                    defaultValue='' 
+                                    onChange={event => this.setState({walletAddressToReceive: event.target.value})}   
+                                    ref={(input)=> this.walletAddressToReceive = input}
+                                />
                             </div>
                             <br></br>
                             { this.state.errorMessage !== null && this.state.errorMessage.includes("walletAddressToReceive") && 
@@ -527,7 +668,9 @@ export default class LiquidityProvider extends PureComponent {
                                     minValue={100}
                                     value={this.state.gasAndFeeAmount}
                                     formatLabel={value => `$${value}`}
-                                    onChange={value => this.setState({ gasAndFeeAmount: value })} />
+                                    onChange={value => this.setState({ gasAndFeeAmount: value })} 
+                                    ref={(input)=> this.gasAndFeeAmount = input}
+                                />
                             </div>
                             <br></br>
                             { this.state.errorMessage !== null && this.state.errorMessage.includes("gasAndFeeAmount") && 
@@ -550,7 +693,12 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                             </div>
                             <div className="LiProfSbox02">
                                 <div className="LiproInput01 withLable01">
-                                    <input type="text" defaultValue={this.state.spProfitPercent} onChange={event => this.setState({spProfitPercent: event.target.value})} />
+                                    <input 
+                                        type="text" 
+                                        defaultValue={this.state.spProfitPercent} 
+                                        onChange={event => this.setState({spProfitPercent: event.target.value})} 
+                                        ref={(input)=> this.spProfitPercent = input}
+                                    />
                                     <span>%</span>
                                 </div>
                                 <div className="smlInfotxt01">[0.161754 BNB/ETH]</div>
@@ -571,7 +719,12 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             </div>
                             <div className="LiProfSbox02">
                                 <div className="LiproInput01 withLable01">
-                                    <input type="text" defaultValue={this.state.accumulateFundsLimit} onChange={event => this.setState({accumulateFundsLimit: event.target.value})} />
+                                    <input 
+                                        type="text" 
+                                        defaultValue={this.state.accumulateFundsLimit} 
+                                        onChange={event => this.setState({accumulateFundsLimit: event.target.value})} 
+                                        ref={(input)=> this.accumulateFundsLimit = input}
+                                    />
                                     <span>%</span>
                                 </div>
                                 <div className="smlInfotxt02">Based on minimum 10% accumulation, expect to pay 10x gas cost  </div>
@@ -631,6 +784,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                                 showYearDropdown
                                                 dropdownMode="select"
                                                 dateFormat="dd/MM/yyyy"
+                                                ref={(input)=> this.accumulateFundsLimit = input}
                                             />
                                             <i class="fas fa-calendar-alt FlyICO"></i>
                                         </div>
@@ -819,7 +973,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div>
                                 </div>
                                 <div className='spContrlSSBX02'>
-                                    <button className='spContrlBTN01'>AUTHORIZE NEW LIMIT</button>
+                                    <button className='spContrlBTN01' onClick={this.reAuthrizeFeeAndGasLimit.bind(this)}>AUTHORIZE NEW LIMIT</button>
                                 </div> 
                             </div> 
                         </div>

@@ -10,8 +10,10 @@ export default function (app: Express) {
   // swap provider register
   app.post("/become-swap-provider", validateRequest(requestValidations.becomeSwapProviderRequest), swapProviderController.becomeSwapProvider);
   app.post("/update-tx-hash", validateRequest(requestValidations.updateTransactionHashRequest), swapProviderController.updateTransactionHash);
+  app.post("/update", validateRequest(requestValidations.updateRequest), swapProviderController.update);
   app.get("/get-contract-address", validateRequest(requestValidations.getContractAddressRequest), swapProviderController.getContractAddress);
   app.get("/event", swapProviderController.addSwapProvider);
+  app.post("/active-contracts", validateRequest(requestValidations.getActiveContractsRequest), swapProviderController.getActiveContracts);
   //app.post("/become-swap-provider", becomeSwapProvider);
 
 

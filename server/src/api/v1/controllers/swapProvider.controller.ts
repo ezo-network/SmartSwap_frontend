@@ -184,6 +184,41 @@ const swapProviderController = {
         //console.log(usp);
     },
 
+    update: async(req: Request, res: Response) => {
+        try{
+            const request = req.body;
+
+            let filter = {};
+            
+            if ('gasAndFeeAmount' in request){
+                Object.assign(filter, {
+                    gasAndFeeAmount: request['gasAndFeeAmount']
+                });
+           }
+            
+            console.log(filter);
+            
+            
+            let usp = await SwapProvider.updateOne({
+                smartContractAddress: request.smartContractAddress
+            }, filter);
+            
+            // let sp:ISwapProvider = await SwapProvider.findOne({
+            //     smartContractAddress: request.smartContractAddress
+            // });
+            
+            if(usp.ok == 1){
+                return res.status(200).json({
+                    "Message": "Record updated"
+                });
+            }
+        
+        }  catch (err) {
+            err['errorOrigin'] = "update";
+            return res.status(500).json({ message: err });
+        }
+    },
+
     updateTransactionHash: async(req: Request, res: Response) => {
         try {
             const { 
@@ -271,6 +306,30 @@ const swapProviderController = {
             return matchedEvent;
 
         }).catch((err) => console.error(err));;
+    },
+
+    getActiveContracts: async(req: Request, res: Response) => {
+        const {
+            spAccount
+        } = req.body;
+
+        try{
+            const activeContracts = await SwapProvider.find({
+                'walletAddresses.spAccount' : spAccount
+            }).exec();
+
+            if(activeContracts.length > 0){
+                res.status(200).json(activeContracts);
+            } else {
+                res.status(404).json({ errorMessage: {
+                    error: "No active contract found." 
+                }});
+            }
+
+        } catch(err){
+            err['errorOrigin'] = "getContractAddress";
+            return res.status(500).json({ message: err });
+        }
     }
     
 }

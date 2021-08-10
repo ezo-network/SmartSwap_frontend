@@ -56,6 +56,19 @@ const requestValidations = {
     })
   }),
 
+  getActiveContractsRequest: object({
+    body: object({
+      spAccount: string().required('sp wallet address is required.')
+    })
+  }),
+  
+  updateRequest: object({
+    body: object({
+      smartContractAddress: string().required("smartContractAddress is required to update swap provider"),
+      gasAndFeeAmount: number().nullable()
+    })
+  })
+
 }
 
 export default requestValidations;

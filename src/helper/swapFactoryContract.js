@@ -129,7 +129,7 @@ class SwapFactoryContract extends EventEmitter {
         console.log(payload);
         console.log(this.swapFactoryAddress);
 
-        this.sendTransaction(payload, 0, "120000", this.swapFactoryAddress, txCb, receiptCb)
+        this.sendTransaction(payload, 0, "400680", this.swapFactoryAddress, txCb, receiptCb)
     }
 
     async estimateSwapGasFee(tokenA, tokenB, amount, swapAmount, fee, gasLimit, estGasCb) {
