@@ -5865,3 +5865,11 @@ button.LicSBTN01:hover, a.LicSBTN01:hover{ text-decoration: underline; color: #9
 
 .spContrlInputBX .LicCopyBTN.v2{ right: -6px; top: 0px;}
 .spContrlInputBX .LicCopyBTN.v2 .fas{ background-color: transparent; font-size: 24px;}
+
+
+
+.spscFix01{ width:100%; display:flex; align-items:center; justify-content:flex-start;}
+.spscFix01 .LipRadioFix01{ width:50%; }
+.spscFix01 .LipRadioFix01 .LipRTitle01{ font-size: 14px; line-height: 24px; padding-right: 30px;}
+
+

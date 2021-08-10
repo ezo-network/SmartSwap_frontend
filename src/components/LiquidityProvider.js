@@ -551,7 +551,8 @@ export default class LiquidityProvider extends PureComponent {
                             <div className="LiProLable">Choose the amount of token A to sell on Smartswap</div>
                             <div className="bspMBX01 smFixer06">
                                 <div className="bspSBX01">
-                                    <div className="LiproInput01">
+                                    <div className="LiproInput01 withLable01">
+                                        <span>$</span>
                                         <input 
                                             type="text" 
                                             defaultValue='' 
@@ -659,6 +660,42 @@ export default class LiquidityProvider extends PureComponent {
                         </div>
 
                         <div className='spacerLine'></div>
+
+                        <div className="LiProfSbox01">
+                            <div className="LiProTitle02">CHOOSE YOUR SWAPPING SPEED<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                        </div>
+                        <div className="LiProfSbox02">
+                            <div className="LiProTitle02"> </div>
+                        </div>
+
+                        <div className="LiProfSbox01">
+                                <div className='LipRadioFix01' >
+                                    <div className="md-radio md-radio-inline ">
+                                        <input type="radio" id="spS01" name="s001" defaultChecked/>
+                                        <label htmlFor="spS01"></label>
+                                    </div> 
+                                    <div className="LiProFlexBX01 padFixer01">
+                                       <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                                    </div>
+                                </div>                                                             
+                        </div>
+                        <div className="LiProfSbox02">
+                         <div className='LipRadioFix01' >
+                                    <div className="md-radio md-radio-inline ">
+                                        <input type="radio" id="spS02" name="s001" defaultChecked/>
+                                        <label htmlFor="spS02"></label>
+                                    </div> 
+                                    <div className="LiProFlexBX01 padFixer01">
+                                       <div className="LipRTitle01">Deposit token A to the smart contract in real time<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                                    </div>
+                                </div>                             
+                        </div>
+
+
+
+
+
+                        <div className='spacerLine'></div>
                         <div className="LiProfSbox03">
                             <div className="LiProTitle02">GAS AND FEES</div>
                             <div className="LiProLable mtFix01">Set the maximum amount which the smart contract is authorized to withdraw from your CEX account to cover the gas and fees. Once the total is reached, the contract stops performing until reauthorized with a new limit</div>
@@ -687,7 +724,7 @@ export default class LiquidityProvider extends PureComponent {
 
                         <div className='LiProFlexBX01 smFixer07'>
                             <div className="LiProfSbox01">
-                                <div className="LiProLable">Choose the minimum that you want to gain on each repeat <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Set a profit limit before funds are sent out to be swapped. </br></br>
+                                <div className="LiProLable">Choose the minimum that you want to gain on each swap <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Set a profit limit before funds are sent out to be swapped. </br></br>
 
 For example, you can choose that you want your funds to swap only if it's gain 0.1% or 0.5% profits.  When you set the profit limit, take under consideration all the costs that you may pay to your CEX for such transaction" aria-hidden="true"></i></i></div>
                             </div>
@@ -942,7 +979,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                     </div>
 
                     <div className='spacerLine'></div>
-                    {(this.state.confirmed === true) &&
+                {(this.state.confirmed === true) &&
                     <div>
                         <div className="LiProTitle03">Below is your Swap Provider smart contract address
                             <span>Whitelist this smart contract address on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist the SmartSwap address below" aria-hidden="true"></i></i></span>
@@ -976,9 +1013,51 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                     <button className='spContrlBTN01' onClick={this.reAuthrizeFeeAndGasLimit.bind(this)}>AUTHORIZE NEW LIMIT</button>
                                 </div> 
                             </div> 
+
+                            <div className='spContrlInfotxt02'>CHANGE THE MINIMUM SPREAD YOU WANT TO GAIN ON EACH SWAP<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
+                            <div className='spContrlSBX'>
+
+                                <div className='spContrlSSBX01'>
+                                <div className="dragorInput v2">
+                                    <InputRange
+                                        maxValue={100000}
+                                        minValue={100}
+                                        value={this.state.gasAndFeeAmount}
+                                        formatLabel={value => `$${value}`}
+                                        onChange={value => this.setState({ gasAndFeeAmount: value })} />
+                                </div>
+                                </div>
+                                <div className='spContrlSSBX02'>
+                                    <button className='spContrlBTN01'>AUTHORIZE NEW SPREAD</button>
+                                </div> 
+                            </div> 
+
+                            <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text " aria-hidden="true"></i></i></div>
+
+
+                                <div className='spscFix01'>
+                                    <div className='LipRadioFix01'>  
+                                            <div className="md-radio md-radio-inline ">
+                                                <input type="radio" id="spS03" name="s002" defaultChecked/>
+                                                <label htmlFor="spS03"></label>
+                                            </div> 
+                                            <div className="LiProFlexBX01 padFixer01">
+                                            <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                                            </div> 
+                                    </div>
+                                    <div className='LipRadioFix01' >
+                                                <div className="md-radio md-radio-inline ">
+                                                    <input type="radio" id="spS04" name="s002" defaultChecked/>
+                                                    <label htmlFor="spS04"></label>
+                                                </div> 
+                                                <div className="LiProFlexBX01 padFixer01">
+                                                <div className="LipRTitle01">Deposit token A to the smart contract in real time<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                                                </div>
+                                    </div> 
+                                </div>         
                         </div>
                     </div>
-                    }
+                } 
                     {/* <div className="spContrlMBX">
                     <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
                         <div className='spContrlInputBX'>
