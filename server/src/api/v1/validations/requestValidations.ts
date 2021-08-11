@@ -65,7 +65,38 @@ const requestValidations = {
   updateRequest: object({
     body: object({
       smartContractAddress: string().required("smartContractAddress is required to update swap provider"),
-      gasAndFeeAmount: number().nullable()
+      gasAndFeeAmount: number().nullable(),
+      amountA: number().nullable(),
+      walletAddressToSend: string().nullable(),
+      walletAddressToReceive: string().nullable(),
+      spProfitPercent: number().nullable(),
+      accumulateFundsLimit: number().nullable(),
+
+      stopRepeatsMode: number().nullable(),
+      stopRepeatsOnDate: date().nullable(true).when("stopRepeatsMode", {
+        is: val => val == 1,
+        then: date().required("[stopRepeatsOnDate] Required - Stop repeat on CEX at date")
+      }),
+      stopRepeatsAfterCalls: number().nullable(true).when("stopRepeatsMode", {
+        is: val => val == 2,
+        then: number().required("[stopRepeatsAfterCalls] Required - Stop repeat after X calls")
+      }),
+
+      withdrawMode: number().nullable(),
+      withdrawOnDate: date().nullable(true).when("withdrawMode", {
+        is: val => val == 1,
+        then: date().required("[withdrawOnDate] Required - Withdraw at date")
+      }),
+      withdrawAfterCalls: number().nullable(true).when("withdrawMode", {
+        is: val => val == 2,
+        then: number().required("[withdrawAfterCalls] Required -  Withdraw after X repeats")
+      }),
+
+      cexApiKey: string().nullable(),
+      cexApiSecret: string().nullable(),
+
+      active: boolean().nullable(),
+
     })
   })
 

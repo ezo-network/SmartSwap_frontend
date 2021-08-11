@@ -52,7 +52,9 @@ export default class LiquidityProvider extends PureComponent {
             smartSwapContractAddress: 'Deploy contract to get this address.',
             confirmed: false,
             deployed: false,
+            updating: false,
             deployButtonText: "DEPLOY SMART CONTRACT",
+            updateButtonText: "UPDATE SMART CONTRACT",
             loadingIcon: false,
             errorMessage: null,
             serverError: null,
@@ -116,6 +118,8 @@ export default class LiquidityProvider extends PureComponent {
             tokenB: this.state.coinList[this.state.selectedTokenA]['address'],
             selectedTokenA: token,
             tokenA: this.state.coinList[token]['address'],
+            networkId: web3Config.getNetworkId(),
+            spAccount: web3Config.getAddress()
         });
         //this.toggleActiveContractSection();
     };
@@ -126,6 +130,8 @@ export default class LiquidityProvider extends PureComponent {
             tokenA: this.state.coinList[this.state.selectedTokenB]['address'],
             selectedTokenB: token,
             tokenB: this.state.coinList[token]['address'],
+            networkId: web3Config.getNetworkId(),
+            spAccount: web3Config.getAddress()
         });
         //this.toggleActiveContractSection();
     };
@@ -406,19 +412,30 @@ export default class LiquidityProvider extends PureComponent {
     }
 
 
-    dispatchEventHandler(inputRef, value){
-        const valueSetter = Object.getOwnPropertyDescriptor(inputRef, 'value').set;
+    dispatchEventHandler(inputRef, value, type='value', eventType='input'){
+        const valueSetter = Object.getOwnPropertyDescriptor(inputRef, type).set;
         const prototype = Object.getPrototypeOf(inputRef);
-        const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+        const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, type).set;
         if (valueSetter && valueSetter !== prototypeValueSetter) {
             prototypeValueSetter.call(inputRef, value);
         } else {
             valueSetter.call(inputRef, value);
         }
-        inputRef.dispatchEvent(new Event('input', { bubbles: true }));
+
+        if(eventType == 'mousemove'){
+            inputRef.dispatchEvent(new MouseEvent(eventType, { bubbles: true }));
+        } else {
+            inputRef.dispatchEvent(new Event(eventType, { bubbles: true }));
+        }
+        
     }
     
     async getActiveContracts(){
+
+        this.setState({
+            deployed: true,
+            deployButtonText: 'Getting active contract'
+        });
 
         let args = {
             data: {
@@ -431,25 +448,86 @@ export default class LiquidityProvider extends PureComponent {
         try{
             let response = await AxiosRequest.request(args);
             if(response.status === 200){
-                const activeContractAddress = response.data.find(obj => {
+                const isactiveContractExist = response.data.find(obj => {
                     if(obj.networkId === this.state.networkId){
-                        this.dispatchEventHandler(this.amountA, obj.tokenA.consumedAmount.$numberDecimal);
+                        this.setState({
+                            isActiveContractExist: true
+                        });
+
+                        this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
                         this.dispatchEventHandler(this.walletAddressToReceive, obj.walletAddresses.toReceive);
                         this.dispatchEventHandler(this.walletAddressToSend, obj.walletAddresses.toSend);
+                        this.dispatchEventHandler(this.spProfitPercent, obj.spProfitPercent);
+                        this.dispatchEventHandler(this.accumulateFundsLimit, obj.accumulateFundsLimit);
+                        this.dispatchEventHandler(this.cexApiKey, obj.cexData.key);
+                        this.dispatchEventHandler(this.cexApiSecret, obj.cexData.secret);
+                        
+                        if(obj.stopRepeats.mode == 3){
+                            this.dispatchEventHandler(this.stopRepeatsMode3, obj.stopRepeats.mode, 'checked', 'click');
+                        }
+
+                        if(obj.stopRepeats.mode == 2){
+                            this.dispatchEventHandler(this.stopRepeatsMode2, obj.stopRepeats.mode, 'checked', 'click');
+                            this.dispatchEventHandler(this.stopRepeatsAfterCalls, obj.stopRepeats.afterCalls);
+                        }
+                        
+                        if(obj.stopRepeats.mode == 1){
+                            this.dispatchEventHandler(this.stopRepeatsMode1, obj.stopRepeats.mode, 'checked', 'click');
+                            //this.dispatchEventHandler(this.stopRepeatsOnDate, obj.stopRepeats.onDate);
+                        }
+
+
+                        if(obj.withdraw.mode == 3){
+                            this.dispatchEventHandler(this.withdrawMode3, obj.withdraw.mode, 'checked', 'click');
+                        }
+                        
+                        if(obj.withdraw.mode == 2){
+                            this.dispatchEventHandler(this.withdrawMode2, obj.withdraw.mode, 'checked', 'click');
+                            this.dispatchEventHandler(this.withdrawAfterCalls, obj.withdraw.afterCalls);
+                            this.setState({
+                                withdrawOnDate: null
+                            });
+                        }
+                        
+                        if(obj.withdraw.mode == 1){
+                            this.dispatchEventHandler(this.withdrawMode1, obj.withdraw.mode, 'checked', 'click');
+                            //this.dispatchEventHandler(this.withdrawOnDate, obj.withdraw.onDate);
+                            this.setState({
+                                afterCalls: null
+                            });
+                        }
+
+                        //this.dispatchEventHandler(this.gasAndFeeAmount, obj.gasAndFeeAmount.$numberDecimal, 'value', 'mousemove');
+
+                        
+
                         return true;
+                    } else {
+                        return false;
                     }
-                }).smartContractAddress;
-                if(activeContractAddress){
+                })
+
+                if(isactiveContractExist){
                     notificationConfig.success('Active contract found.');   
                     this.setState({
                         spData: response.data,
                         confirmed: true,
                         isActiveContractExist: true,
-                        smartSwapContractAddress: activeContractAddress,
+                        smartSwapContractAddress: isactiveContractExist.smartContractAddress,
                         deployed: true
                     });
+                } else {
+                    this.setState({
+                        deployed: false,
+                        deployButtonText: 'DEPLOY SMART CONTRACT'
+                    });
+                    notificationConfig.error('No active contract for the selected network.');                    
                 }
             } else if(response.status === 404){
+                this.setState({
+                    deployed: false,
+                    deployButtonText: 'DEPLOY SMART CONTRACT'
+                });                
                 notificationConfig.error('No active contract.');
             } else {
                 console.log(response);
@@ -492,35 +570,149 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     reAuthrizeFeeAndGasLimit = async() => {
-        let newLimit = this.state.gasAndFeeAmount
-        let spContract = new SPContract(web3Config.getWeb3(), this.state.networkId, this.state.smartSwapContractAddress);
-        spContract.setFeeAmountLimit(
-            newLimit, 
-            async(hash) => {},
-            async(response) => {
-                console.log({
-                    "SP Contract response:": response
-                });
-        
-                if(response.status === 1){
-                    this.setState({
-                        gasAndFeeAmount: newLimit
+        if(this.state.deployed){
+            let newLimit = this.state.gasAndFeeAmount
+            let spContract = new SPContract(web3Config.getWeb3(), this.state.networkId, this.state.smartSwapContractAddress);
+            spContract.setFeeAmountLimit(
+                newLimit, 
+                async(hash) => {},
+                async(response) => {
+                    console.log({
+                        "SP Contract response:": response
                     });
-
-                    //spContract.getFeeAmountLimit();
-                    await AxiosRequest.request({
-                        data: {
-                            smartContractAddress: this.state.smartSwapContractAddress,
+            
+                    if(response.status === 1){
+                        this.setState({
                             gasAndFeeAmount: newLimit
-                        },
-                        path: "update",
-                        method: "POST"
-                    });
+                        });
+    
+                        //spContract.getFeeAmountLimit();
+                        await AxiosRequest.request({
+                            data: {
+                                smartContractAddress: this.state.smartSwapContractAddress,
+                                gasAndFeeAmount: newLimit
+                            },
+                            path: "update",
+                            method: "POST"
+                        });
+    
+    
+                        notificationConfig.success('NEW GAS AND FEES LIMIT SET');
+                    }
+            });
+        }
+    }
 
-
-                    notificationConfig.success('NEW GAS AND FEES LIMIT SET');
-                }
+    updateContract = async() => {
+        this.setState({
+            updating: true,
+            loadingIcon: true
         });
+
+        let args = {};
+        if(Number(this.state.stopRepeatsMode) == 1){
+            console.log('Stop mode 1');
+            Object.assign(args, {
+                stopRepeatsOnDate: this.state.stopRepeatsOnDate,
+                stopRepeatsAfterCalls: null
+            });
+        }
+
+        if(Number(this.state.stopRepeatsMode) == 2){
+            console.log('Stop mode 2');
+            Object.assign(args, {
+                stopRepeatsOnDate: null,
+                stopRepeatsAfterCalls: this.state.stopRepeatsAfterCalls
+            });            
+        }
+
+        if(Number(this.state.stopRepeatsMode) == 3){
+            console.log('Stop mode 3');
+            Object.assign(args, {
+                stopRepeatsOnDate: null,
+                stopRepeatsAfterCalls: null
+            }); 
+        }
+
+        if(Number(this.state.withdrawMode) == 1){
+            console.log('Stop mode 1');
+            Object.assign(args, {
+                withdrawOnDate: this.state.withdrawOnDate,
+                withdrawAfterCalls: null
+            });
+        }
+
+        if(Number(this.state.withdrawMode) == 2){
+            console.log('Stop mode 2');
+            Object.assign(args, {
+                withdrawOnDate: null,
+                withdrawAfterCalls: this.state.withdrawAfterCalls
+            });            
+        }
+
+        if(Number(this.state.withdrawMode) == 3){
+            console.log('Stop mode 3');
+            Object.assign(args, {
+                withdrawOnDate: null,
+                withdrawAfterCalls: null
+            }); 
+        }
+        
+
+        let finalArgs = {
+            data: Object.assign(args, {
+                smartContractAddress: this.state.smartSwapContractAddress,
+                amountA: this.state.amountA === null ? ('').toString() : this.state.amountA,
+                walletAddressToSend: this.state.walletAddressToSend === null ? ('').toString() : this.state.walletAddressToSend,
+                walletAddressToReceive: this.state.walletAddressToReceive === null ? ('').toString() : this.state.walletAddressToReceive,
+                spProfitPercent: this.state.spProfitPercent,
+                accumulateFundsLimit: this.state.accumulateFundsLimit,
+                stopRepeatsMode: this.state.stopRepeatsMode,
+                withdrawMode: this.state.withdrawMode,
+                cexApiKey: this.state.cexApiKey === null ? ('').toString() : this.state.cexApiKey,
+                cexApiSecret: this.state.cexApiSecret === null ? ('').toString() : this.state.cexApiSecret
+            }),
+            // data: {
+            //     spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+            //     networkId: 42,
+            //     tokenA: '0x0000000000000000000000000000000000000002',
+            //     tokenB: '0x0000000000000000000000000000000000000001',
+            //     amountA: 100,
+            //     walletAddressToSend: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+            //     walletAddressToReceive: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
+            //     gasAndFeeAmount: 10,
+            //     spProfitPercent: 0.3,
+            //     accumulateFundsLimit: 0.5,
+            //     stopRepeatsMode: 3,
+            //     stopRepeatsOnDate: 'April 2,2021',
+            //     stopRepeatsAfterCalls: 0,
+            //     withdrawMode: 3,
+            //     withdrawOnDate: 'April 2,2021',
+            //     withdrawAfterCalls: 0,
+            //     cexApiKey: '00000000ab',
+            //     cexApiSecret: '00000000yz'
+            // },            
+            path: 'update',
+            method: 'POST'
+        };
+
+        console.log(finalArgs);
+        try{
+            let response = await AxiosRequest.request(finalArgs);
+            if(response.status == 200){
+                setTimeout(async() => {
+                    console.log('Updated');
+                    notificationConfig.success('Contract updated successfully');
+                    this.setState({
+                        updating: false,
+                        loadingIcon: false
+                    });
+                }, 3000);
+            }
+        } catch(err){
+            notificationConfig.error('Something went wrong!');
+        }
+
     }
 
     render() {
@@ -661,41 +853,36 @@ export default class LiquidityProvider extends PureComponent {
 
                         <div className='spacerLine'></div>
 
-                        <div className="LiProfSbox01">
-                            <div className="LiProTitle02">CHOOSE YOUR SWAPPING SPEED<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
-                        </div>
-                        <div className="LiProfSbox02">
-                            <div className="LiProTitle02"> </div>
-                        </div>
-
-                        <div className="LiProfSbox01">
-                                <div className='LipRadioFix01' >
-                                    <div className="md-radio md-radio-inline ">
-                                        <input type="radio" id="spS01" name="s001" defaultChecked/>
-                                        <label htmlFor="spS01"></label>
-                                    </div> 
-                                    <div className="LiProFlexBX01 padFixer01">
-                                       <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
-                                    </div>
-                                </div>                                                             
-                        </div>
-                        <div className="LiProfSbox02">
-                         <div className='LipRadioFix01' >
-                                    <div className="md-radio md-radio-inline ">
-                                        <input type="radio" id="spS02" name="s001" defaultChecked/>
-                                        <label htmlFor="spS02"></label>
-                                    </div> 
-                                    <div className="LiProFlexBX01 padFixer01">
-                                       <div className="LipRTitle01">Deposit token A to the smart contract in real time<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
-                                    </div>
-                                </div>                             
-                        </div>
-
-
-
-
-
+                        <div className="LiProfSbox01">	
+                            <div className="LiProTitle02">CHOOSE YOUR SWAPPING SPEED<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>	
+                        </div>	
+                        <div className="LiProfSbox02">	
+                            <div className="LiProTitle02"> </div>	
+                        </div>	
+                        <div className="LiProfSbox01">	
+                                <div className='LipRadioFix01' >	
+                                    <div className="md-radio md-radio-inline ">	
+                                        <input type="radio" id="spS01" name="s001" defaultChecked/>	
+                                        <label htmlFor="spS01"></label>	
+                                    </div> 	
+                                    <div className="LiProFlexBX01 padFixer01">	
+                                       <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>	
+                                    </div>	
+                                </div>                                                             	
+                        </div>	
+                        <div className="LiProfSbox02">	
+                         <div className='LipRadioFix01' >	
+                                    <div className="md-radio md-radio-inline ">	
+                                        <input type="radio" id="spS02" name="s001" defaultChecked/>	
+                                        <label htmlFor="spS02"></label>	
+                                    </div> 	
+                                    <div className="LiProFlexBX01 padFixer01">	
+                                       <div className="LipRTitle01">Deposit token A to the smart contract in real time<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>	
+                                    </div>	
+                                </div>                             	
+                        </div>	
                         <div className='spacerLine'></div>
+
                         <div className="LiProfSbox03">
                             <div className="LiProTitle02">GAS AND FEES</div>
                             <div className="LiProLable mtFix01">Set the maximum amount which the smart contract is authorized to withdraw from your CEX account to cover the gas and fees. Once the total is reached, the contract stops performing until reauthorized with a new limit</div>
@@ -732,7 +919,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                 <div className="LiproInput01 withLable01">
                                     <input 
                                         type="text" 
-                                        defaultValue={this.state.spProfitPercent} 
+                                        placeholder={this.state.spProfitPercent} 
                                         onChange={event => this.setState({spProfitPercent: event.target.value})} 
                                         ref={(input)=> this.spProfitPercent = input}
                                     />
@@ -758,7 +945,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 <div className="LiproInput01 withLable01">
                                     <input 
                                         type="text" 
-                                        defaultValue={this.state.accumulateFundsLimit} 
+                                        placeholder={this.state.accumulateFundsLimit} 
                                         onChange={event => this.setState({accumulateFundsLimit: event.target.value})} 
                                         ref={(input)=> this.accumulateFundsLimit = input}
                                     />
@@ -808,7 +995,15 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
 
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio" checked id="s01" name="s11" value="s01" onChange={event => this.setState({stopRepeatsMode: 1})} checked={this.state.stopRepeatsMode === 1}/>
+                                        <input 
+                                            type="radio" 
+                                            id="s01" 
+                                            name="s11" 
+                                            value="s01" 
+                                            onChange={event => this.setState({stopRepeatsMode: 1})} 
+                                            checked={this.state.stopRepeatsMode === 1}
+                                            ref={(input)=> this.stopRepeatsMode1 = input}
+                                        />
                                         <label htmlFor="s01"></label>
                                     </div> 
                                     <div className='LiProFlexBX01 padFixer01'>
@@ -821,7 +1016,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                                 showYearDropdown
                                                 dropdownMode="select"
                                                 dateFormat="dd/MM/yyyy"
-                                                ref={(input)=> this.accumulateFundsLimit = input}
+                                                ref={(input)=> this.stopRepeatsOnDate = input}
                                             />
                                             <i class="fas fa-calendar-alt FlyICO"></i>
                                         </div>
@@ -829,12 +1024,25 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio"  id="s02" name="s11" value="s02" onChange={event => this.setState({stopRepeatsMode: 2})} checked={this.state.stopRepeatsMode === 2}/>
+                                        <input 
+                                            type="radio"  
+                                            id="s02" 
+                                            name="s11" 
+                                            value="s02" 
+                                            onChange={event => this.setState({stopRepeatsMode: 2})} 
+                                            checked={this.state.stopRepeatsMode === 2}
+                                            ref={(input)=> this.stopRepeatsMode2 = input}
+                                        />
                                         <label htmlFor="s02"></label>
                                     </div> 
                                     <div className="LiProFlexBX01 padFixer01">
                                         <div className="LiproInput01 withLable02">
-                                            <input type="text" defaultValue={this.state.stopRepeatsAfterCalls} onChange={event => this.setState({stopRepeatsAfterCalls: event.target.value})} />
+                                            <input 
+                                                type="text" 
+                                                placeholder={this.state.stopRepeatsAfterCalls} 
+                                                onChange={event => this.setState({stopRepeatsAfterCalls: event.target.value})} 
+                                                ref={(input)=> this.stopRepeatsAfterCalls = input}
+                                            />
                                             <div className="FlyICO02">Days</div>
                                             <span>Repeat</span>
                                         </div>
@@ -842,7 +1050,15 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio"  id="s03" name="s11" value="s03" onChange={event => this.setState({stopRepeatsMode: 3})} checked={this.state.stopRepeatsMode === 3}/>
+                                        <input 
+                                            type="radio" 
+                                            id="s03" 
+                                            name="s11" 
+                                            value="s03" 
+                                            onChange={event => this.setState({stopRepeatsMode: 3})} 
+                                            checked={this.state.stopRepeatsMode === 3}
+                                            ref={(input)=> this.stopRepeatsMode3 = input}
+                                        />
                                         <label htmlFor="s03"></label>
                                     </div> 
                                     <div className="LiProFlexBX01 padFixer01">
@@ -861,7 +1077,15 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             <div className="LiProfSbox02"> 
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio" checked id="s04" name="s12" value="s04" onChange={event => this.setState({withdrawMode: 1})} checked={this.state.withdrawMode === 1}/>
+                                        <input 
+                                            type="radio" 
+                                            id="s04" 
+                                            name="s12" 
+                                            value="s04" 
+                                            onChange={event => this.setState({withdrawMode: 1})} 
+                                            checked={this.state.withdrawMode === 1}
+                                            ref={(input)=> this.withdrawMode1 = input}
+                                        />
                                         <label htmlFor="s04"></label>
                                     </div> 
                                     <div className='LiProFlexBX01 padFixer01'>
@@ -874,6 +1098,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                                 showYearDropdown
                                                 dropdownMode="select"
                                                 dateFormat="dd/MM/yyyy"
+                                                ref={(input)=> this.withdrawOnDate = input}
                                             />
                                             <i class="fas fa-calendar-alt FlyICO"></i>
                                         </div>
@@ -881,12 +1106,25 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio"  id="s05" name="s12" value="s05" onChange={event => this.setState({withdrawMode: 2})} checked={this.state.withdrawMode === 2}/>
+                                        <input 
+                                            type="radio" 
+                                            id="s05" 
+                                            name="s12" 
+                                            value="s05" 
+                                            onChange={event => this.setState({withdrawMode: 2})} 
+                                            checked={this.state.withdrawMode === 2}
+                                            ref={(input)=> this.withdrawMode2 = input}
+                                        />
                                         <label htmlFor="s05"></label>
                                     </div> 
                                     <div className="LiProFlexBX01 padFixer01">
                                         <div className="LiproInput01 withLable02">
-                                            <input type="text" defaultValue={this.state.withdrawAfterCalls} onChange={event => this.setState({withdrawAfterCalls: event.target.value})}  />
+                                            <input 
+                                                type="text" 
+                                                placeholder={this.state.withdrawAfterCalls} 
+                                                onChange={event => this.setState({withdrawAfterCalls: event.target.value})}  
+                                                ref={(input)=> this.withdrawAfterCalls = input}
+                                            />
                                             <div className="FlyICO02">Days</div>
                                             <span>Repeat</span>
                                         </div>
@@ -894,7 +1132,15 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input type="radio"  id="s06" name="s12" value="s06" onChange={event => this.setState({withdrawMode: 3})} checked={this.state.withdrawMode === 3}/>
+                                        <input 
+                                            type="radio" 
+                                            id="s06" 
+                                            name="s12" 
+                                            value="s06" 
+                                            onChange={event => this.setState({withdrawMode: 3})} 
+                                            checked={this.state.withdrawMode === 3}
+                                            ref={(input)=> this.withdrawMode3 = input}
+                                        />
                                         <label htmlFor="s06"></label>
                                     </div> 
                                     <div className="LiProFlexBX01 padFixer01">
@@ -916,7 +1162,12 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             </div>
                             <div className="LiProfSbox02">
                                 <div className="LiproInput01">
-                                    <input type="text" defaultValue='' onChange={event => this.setState({cexApiKey: event.target.value})} />
+                                    <input 
+                                        type="text" 
+                                        defaultValue='' 
+                                        onChange={event => this.setState({cexApiKey: event.target.value})} 
+                                        ref={(input)=> this.cexApiKey = input}
+                                    />
                                 </div>
                                 <br></br>
                                 { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") && 
@@ -934,7 +1185,12 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             </div>
                             <div className="LiProfSbox02">
                                 <div className="LiproInput01">
-                                    <input type="text" defaultValue='' onChange={event => this.setState({cexApiSecret: event.target.value})}  />
+                                    <input 
+                                        type="text" 
+                                        defaultValue='' 
+                                        onChange={event => this.setState({cexApiSecret: event.target.value})} 
+                                        ref={(input)=> this.cexApiSecret = input}
+                                    />
                                 </div>
                                 <br></br>
                                 { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiSecret") && 
@@ -945,41 +1201,62 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                             </div>
                         </div>
 
-                        {
-                            (this.state.web3 === null ||
-                            constantConfig.tokenDetails[
-                                this.state.selectedTokenA
-                            ].networkId !== web3Config.getNetworkId())
-                            ? 
-                            (<div className="LiProfSbox03">
-                                <div className='LiProformBTNbar'>
-                                    <button 
-                                        onClick={this.connectWallet.bind(this)}
-                                    >CONNECT YOUR WALLET</button>
-                                </div>
-                            </div>) 
-                            : 
-                            (<div className="LiProfSbox03">
-                                <div className='LiProformBTNbar'>
-                                    <button 
-                                        onClick={this.deployContract.bind(this)} disabled={this.state.deployed}
-                                    >
-                                        {this.state.deployButtonText} 
-                                        {this.state.loadingIcon === true &&
-                                            <LoopCircleLoading
-                                                height={'20px'}
-                                                width={'20px'}
-                                                color={'#ffffff'}
-                                            />
-                                        }
-                                    </button>
-                                </div>
-                            </div>)
-                        }
+                        {( () => {
+                            if((this.state.web3 === null ||
+                                constantConfig.tokenDetails[
+                                    this.state.selectedTokenA
+                                ].networkId !== web3Config.getNetworkId())) {
+                                    return (<div className="LiProfSbox03">
+                                        <div className='LiProformBTNbar'>
+                                            <button 
+                                                onClick={this.connectWallet.bind(this)}
+                                            >CONNECT YOUR WALLET</button>
+                                        </div>
+                                    </div>) 
+
+                                } else if (
+                                    (this.state.web3 !== null || constantConfig.tokenDetails[this.state.selectedTokenA].networkId === web3Config.getNetworkId()) 
+                                    && this.state.isActiveContractExist === true) {
+                                        return (
+                                            <div className="LiProfSbox03">
+                                                <div className='LiProformBTNbar'>
+                                                    <button onClick={this.updateContract.bind(this)} disabled={this.state.updating}>
+                                                        {this.state.updateButtonText}                                                         
+                                                        {this.state.loadingIcon === true &&
+                                                            <LoopCircleLoading
+                                                                height={'20px'}
+                                                                width={'20px'}
+                                                                color={'#ffffff'}
+                                                            />
+                                                        }
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) 
+                                } else{
+                                    return (<div className="LiProfSbox03">
+                                        <div className='LiProformBTNbar'>
+                                            <button 
+                                                onClick={this.deployContract.bind(this)} disabled={this.state.deployed}
+                                            >
+                                                {this.state.deployButtonText} 
+                                                {this.state.loadingIcon === true &&
+                                                    <LoopCircleLoading
+                                                        height={'20px'}
+                                                        width={'20px'}
+                                                        color={'#ffffff'}
+                                                    />
+                                                }
+                                            </button>
+                                        </div>
+                                    </div>)
+                                }
+                            }
+                        )()}
                     </div>
 
                     <div className='spacerLine'></div>
-                {(this.state.confirmed === true) &&
+                    {(this.state.confirmed === true) &&
                     <div>
                         <div className="LiProTitle03">Below is your Swap Provider smart contract address
                             <span>Whitelist this smart contract address on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist the SmartSwap address below" aria-hidden="true"></i></i></span>
@@ -1014,50 +1291,60 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div> 
                             </div> 
 
-                            <div className='spContrlInfotxt02'>CHANGE THE MINIMUM SPREAD YOU WANT TO GAIN ON EACH SWAP<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
-                            <div className='spContrlSBX'>
-
-                                <div className='spContrlSSBX01'>
-                                <div className="dragorInput v2">
-                                    <InputRange
-                                        maxValue={100000}
-                                        minValue={100}
-                                        value={this.state.gasAndFeeAmount}
-                                        formatLabel={value => `$${value}`}
-                                        onChange={value => this.setState({ gasAndFeeAmount: value })} />
-                                </div>
-                                </div>
-                                <div className='spContrlSSBX02'>
-                                    <button className='spContrlBTN01'>AUTHORIZE NEW SPREAD</button>
-                                </div> 
-                            </div> 
-
-                            <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text " aria-hidden="true"></i></i></div>
-
-
-                                <div className='spscFix01'>
-                                    <div className='LipRadioFix01'>  
-                                            <div className="md-radio md-radio-inline ">
-                                                <input type="radio" id="spS03" name="s002" defaultChecked/>
-                                                <label htmlFor="spS03"></label>
-                                            </div> 
-                                            <div className="LiProFlexBX01 padFixer01">
-                                            <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
-                                            </div> 
-                                    </div>
-                                    <div className='LipRadioFix01' >
-                                                <div className="md-radio md-radio-inline ">
-                                                    <input type="radio" id="spS04" name="s002" defaultChecked/>
-                                                    <label htmlFor="spS04"></label>
-                                                </div> 
-                                                <div className="LiProFlexBX01 padFixer01">
-                                                <div className="LipRTitle01">Deposit token A to the smart contract in real time<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
-                                                </div>
-                                    </div> 
-                                </div>         
+                            <div className='spContrlInfotxt02'>
+                                CHANGE THE MINIMUM SPREAD YOU WANT TO GAIN ON EACH SWAP
+                                <i className="help-circle">
+                                    <i 
+                                        className="fas fa-question-circle protip" 
+                                        data-pt-position="top" 
+                                        data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." 
+                                        aria-hidden="true"></i>
+                                </i>
+                            </div>	
+                            <div className='spContrlSBX'>	
+                                <div className='spContrlSSBX01'>	
+                                <div className="dragorInput v2">	
+                                    <InputRange	
+                                        maxValue={100000}	
+                                        minValue={100}	
+                                        value={this.state.gasAndFeeAmount}	
+                                        formatLabel={value => `$${value}`}	
+                                        onChange={value => this.setState({ gasAndFeeAmount: value })} />	
+                                </div>	
+                                </div>	
+                                <div className='spContrlSSBX02'>	
+                                    <button className='spContrlBTN01'>AUTHORIZE NEW SPREAD</button>	
+                                </div> 	
+                            </div> 	
+                            <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED<i className="help-circle">
+                                <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text " aria-hidden="true"></i></i>
+                            </div>	
+                            <div className='spscFix01'>	
+                                <div className='LipRadioFix01'>  	
+                                        <div className="md-radio md-radio-inline ">	
+                                            <input type="radio" id="spS03" name="s002" defaultChecked/>	
+                                            <label htmlFor="spS03"></label>	
+                                        </div> 	
+                                        <div className="LiProFlexBX01 padFixer01">	
+                                        <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>	
+                                        </div> 	
+                                </div>	
+                                <div className='LipRadioFix01' >	
+                                    <div className="md-radio md-radio-inline ">	
+                                        <input type="radio" id="spS04" name="s002" defaultChecked/>	
+                                        <label htmlFor="spS04"></label>	
+                                    </div> 	
+                                    <div className="LiProFlexBX01 padFixer01">	
+                                        <div className="LipRTitle01">
+                                            Deposit token A to the smart contract in real time<i className="help-circle">
+                                                <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i>
+                                        </div>	
+                                    </div>	
+                                </div> 	
+                            </div>         	
                         </div>
                     </div>
-                } 
+                    }
                     {/* <div className="spContrlMBX">
                     <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
                         <div className='spContrlInputBX'>

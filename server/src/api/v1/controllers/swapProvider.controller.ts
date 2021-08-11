@@ -194,8 +194,92 @@ const swapProviderController = {
                 Object.assign(filter, {
                     gasAndFeeAmount: request['gasAndFeeAmount']
                 });
-           }
-            
+            }
+
+            if ('amountA' in request){
+                Object.assign(filter, {
+                    'tokenA.recievedAmount': request['amountA']
+                });
+            }
+
+            if ('walletAddressToSend' in request){
+                Object.assign(filter, {
+                    'walletAddresses.toSend': request['walletAddressToSend']
+                });
+            }
+
+            if ('spProfitPercent' in request){
+                Object.assign(filter, {
+                    spProfitPercent: request['spProfitPercent']
+                });
+            }
+
+
+            if ('accumulateFundsLimit' in request){
+                Object.assign(filter, {
+                    accumulateFundsLimit: request['accumulateFundsLimit']
+                });
+            }
+
+            if ('cexApiKey' in request){
+                Object.assign(filter, {
+                    'cexData.key': request['cexApiKey']
+                });
+            }
+
+            if ('cexApiSecret' in request){
+                Object.assign(filter, {
+                    'cexData.secret': request['cexApiSecret']
+                });
+            }
+
+
+            if ('withdrawMode' in request){
+                Object.assign(filter, {
+                    'withdraw.mode': request['withdrawMode']
+                });
+
+                if(request['withdrawMode'] == 1){
+                    Object.assign(filter, {
+                        'withdraw.onDate': request['withdrawOnDate']
+                    });                    
+                }
+
+                if(request['withdrawMode'] == 2){
+                    Object.assign(filter, {
+                        'withdraw.afterCalls': request['withdrawAfterCalls']
+                    });                    
+                }
+
+            }
+
+
+            if ('stopRepeatsMode' in request){
+                Object.assign(filter, {
+                    'stopRepeats.mode': request['stopRepeatsMode']
+                });
+
+                if(request['stopRepeatsMode'] == 1){
+                    Object.assign(filter, {
+                        'stopRepeats.onDate': request['stopRepeatsOnDate']
+                    });                    
+                }
+
+                if(request['stopRepeatsMode'] == 2){
+                    Object.assign(filter, {
+                        'stopRepeats.afterCalls': request['stopRepeatsAfterCalls']
+                    });                    
+                }
+
+            }
+
+            if ('active' in request){
+                Object.assign(filter, {
+                    active: request['active']
+                });
+            }
+
+
             console.log(filter);
             
             
@@ -236,6 +320,9 @@ const swapProviderController = {
             console.log(args);
 
             let event = await swapProviderController.fetchEvent(args);
+
+
+            console.log("updaing event:", event);
 
             let usp = await SwapProvider.updateOne({
                 _id: docId
@@ -284,9 +371,7 @@ const swapProviderController = {
         const provider = Number(args.networkId) === 42 ? ETH_PROVIDER : BSC_PROVIDER;
         const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
         const address = constantConfig[args.networkId].swapFactoryContract;
-        const SWAP_INSTANCE = new web3.eth.Contract(swapFactoryAbi as AbiItem[], address);        
-
-        console.log(args.blockNumber);
+        const SWAP_INSTANCE = new web3.eth.Contract(swapFactoryAbi as AbiItem[], address);
         
         return await SWAP_INSTANCE.getPastEvents('AddSwapProvider', {
             //filter: {swapProvider: "0xfcbdf7e5ef8ba15fb9a5d2464cf4af7d35fd6987"},
@@ -294,7 +379,7 @@ const swapProviderController = {
             toBlock: Number(args.blockNumber)
         }).then(async(events) => {
             let matchedEvent; 
-            //console.log("sadasd", events) // same results as the optional callback above
+            console.log("matchedEvent", events) // same results as the optional callback above
             for (let i = 0; i < events.length; i++) {
                 if(events[i]['transactionHash'] == args.txhash){
                     console.log("matched event:", events[i]);
@@ -305,7 +390,7 @@ const swapProviderController = {
 
             return matchedEvent;
 
-        }).catch((err) => console.error(err));;
+        }).catch((err) => console.error(err));
     },
 
     getActiveContracts: async(req: Request, res: Response) => {
