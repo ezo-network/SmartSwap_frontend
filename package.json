@@ -11,6 +11,7 @@
         "axios": "^0.19.2",
         "big-number": "^2.0.0",
         "bootstrap": "^4.5.3",
+        "dateformat": "^4.5.1",
         "ethereumjs-util": "^7.0.7",
         "ethers": "^5.0.21",
         "flux": "^3.1.3",

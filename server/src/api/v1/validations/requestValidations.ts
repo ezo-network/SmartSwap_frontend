@@ -14,6 +14,7 @@ const requestValidations = {
       walletAddressToSend: string().required('[walletAddressToSend] Required - Wallet address that send token A.'),
       walletAddressToReceive: string().required('[walletAddressToReceive] Required - Wallet address that receive token B.'),
       gasAndFeeAmount: number().required('[gasAndFeeAmount] Set the maximum amount which the smart contract is authorized to withdraw from your CEX account to cover the gas and fees.'),
+      swapSpeedMode: string().required('[swapSpeedMode] CHOOSE YOUR SWAPPING SPEED.'),
       spProfitPercent: number().required('[spProfitPercent] Required - The minimum profit % that you want to gain on each repeat'),
       accumulateFundsLimit: number().required('[accumulateFundsLimit] Required - Choose the minimum % of funds to accumulate before calming it back to your CEX account'),
 
@@ -65,13 +66,13 @@ const requestValidations = {
   updateRequest: object({
     body: object({
       smartContractAddress: string().required("smartContractAddress is required to update swap provider"),
-      gasAndFeeAmount: number().nullable(),
-      amountA: number().nullable(),
-      walletAddressToSend: string().nullable(),
-      walletAddressToReceive: string().nullable(),
-      spProfitPercent: number().nullable(),
-      accumulateFundsLimit: number().nullable(),
-
+      gasAndFeeAmount: number().nullable(true),
+      swapSpeedMode: string().nullable(true),
+      amountA: number().nullable(true),
+      walletAddressToSend: string().nullable(true),
+      walletAddressToReceive: string().nullable(true),
+      spProfitPercent: number().nullable(true),
+      accumulateFundsLimit: number().nullable(true),
       stopRepeatsMode: number().nullable(),
       stopRepeatsOnDate: date().nullable(true).when("stopRepeatsMode", {
         is: val => val == 1,
@@ -92,10 +93,12 @@ const requestValidations = {
         then: number().required("[withdrawAfterCalls] Required -  Withdraw after X repeats")
       }),
 
-      cexApiKey: string().nullable(),
-      cexApiSecret: string().nullable(),
+      cexApiKey: string().nullable(true),
+      cexApiSecret: string().nullable(true),
 
-      active: boolean().nullable(),
+      active: boolean().nullable(true),
+
+      spreadAmount: number().nullable(true)
 
     })
   })

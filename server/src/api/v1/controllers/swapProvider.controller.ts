@@ -40,7 +40,7 @@ const swapProviderController = {
                 gasAndFeeAmount, spProfitPercent, accumulateFundsLimit, 
                 stopRepeatsMode, stopRepeatsOnDate, stopRepeatsAfterCalls,
                 withdrawMode, withdrawOnDate, withdrawAfterCalls,
-                cexApiKey, cexApiSecret, txid, smartContractAddress         
+                cexApiKey, cexApiSecret, txid, smartContractAddress, swapSpeedMode      
             } = req.body;
             
             // SP exist?
@@ -71,6 +71,7 @@ const swapProviderController = {
                 },
                 networkId,
                 gasAndFeeAmount,
+                swapSpeedMode,
                 spProfitPercent,
                 accumulateFundsLimit,
                 stopRepeats: {
@@ -196,6 +197,18 @@ const swapProviderController = {
                 });
             }
 
+            if ('swapSpeedMode' in request){
+                Object.assign(filter, {
+                    swapSpeedMode: request['swapSpeedMode']
+                });
+            }
+
+            if ('spreadAmount' in request){
+                Object.assign(filter, {
+                    spreadAmount: request['spreadAmount']
+                });
+            }
+            
             if ('amountA' in request){
                 Object.assign(filter, {
                     'tokenA.recievedAmount': request['amountA']

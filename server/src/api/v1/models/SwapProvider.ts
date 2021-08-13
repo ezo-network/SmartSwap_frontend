@@ -55,7 +55,11 @@ export interface ISwapProvider extends Document {
     cexData: CexData,
     smartContractAddress?: string,
     txid?: string,
-    active: boolean
+    active: boolean,
+    swapSpeedMode: {
+        type: Number,
+        enum : [1,2]
+    }
 };
 
 const SwapProvider: Schema = new mongoose.Schema({
@@ -106,6 +110,17 @@ const SwapProvider: Schema = new mongoose.Schema({
     gasAndFeeAmount: {
         type: Schema.Types.Decimal128,
         required: true,  
+    },
+    swapSpeedMode: {
+        type: String,
+        required: true,
+        enum : ['UPFRONT','REALTIME'],
+        default: 'UPFRONT'
+    },
+    spreadAmount: {
+        type: Schema.Types.Decimal128,
+        required: false,     
+        default: 0          
     },
     spProfitPercent:{
         type: Number,

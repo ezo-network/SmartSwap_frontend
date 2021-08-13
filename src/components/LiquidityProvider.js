@@ -14,6 +14,7 @@ import SPContract from '../helper/spContract';
 import { LoopCircleLoading } from 'react-loadingg';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DateFormat from "dateformat";
 
 var _ = require('lodash');
 
@@ -37,7 +38,12 @@ export default class LiquidityProvider extends PureComponent {
             amountA: null,
             walletAddressToSend: null,
             walletAddressToReceive: null,
-            gasAndFeeAmount: 45000,
+            gasAndFeeAmount: 0,
+            minGasAndFeeAmount: 0,
+            maxGasAndFeeAmount: 0,
+            minStepForGasAndFeeAmount: 0,
+            swapSpeedMode: 'UPFRONT',
+            spreadAmount: 100,
             spProfitPercent: 0.3,
             accumulateFundsLimit: 0.3,
             stopRepeatsMode: 3,
@@ -53,14 +59,19 @@ export default class LiquidityProvider extends PureComponent {
             confirmed: false,
             deployed: false,
             updating: false,
+            reAuthrizeing: false,
             deployButtonText: "DEPLOY SMART CONTRACT",
             updateButtonText: "UPDATE SMART CONTRACT",
             loadingIcon: false,
             errorMessage: null,
             serverError: null,
             isActiveContractExist: false,
-            spData: null
+            spData: null,
+            contractCreatedAt: ''
         }
+
+        // preserve the initial state in a new object
+        this.baseState = this.state
     }
 
     componentWillReceiveProps(newProps) {
@@ -77,8 +88,37 @@ export default class LiquidityProvider extends PureComponent {
                 confirmed: false,
                 isActiveContractExist: false,
                 spData: null,
-                smartSwapContractAddress: null
+                smartSwapContractAddress: null,
+                spAccount: null
             });
+            this.setState(this.baseState);
+        });
+
+        // detect Network account change
+        window.ethereum.on('chainChanged', networkId => {
+            console.log('chainChanged', networkId);
+            this.setState({
+                web3: null,
+                confirmed: false,
+                isActiveContractExist: false,
+                spData: null,
+                smartSwapContractAddress: null,
+                spAccount: null
+            });
+            this.setState(this.baseState);
+        });        
+
+        window.ethereum.on('accountsChanged', accounts => {
+            console.log('account Changed');
+            this.setState({
+                web3: null,
+                confirmed: false,
+                isActiveContractExist: false,
+                spData: null,
+                smartSwapContractAddress: null,
+                spAccount: web3Config.getAddress()
+            });
+            this.setState(this.baseState);
         });
         
 
@@ -192,7 +232,27 @@ export default class LiquidityProvider extends PureComponent {
             spAccount: web3Config.getAddress()
         });
         
+        this.setGasFeeAndAmountMinMaxRanges(networkId);
+        
         await this.getActiveContracts();
+
+    }
+
+    setGasFeeAndAmountMinMaxRanges(networkID){
+        if(networkID == 97){
+            this.setState({
+                minGasAndFeeAmount: 0.5,
+                maxGasAndFeeAmount: 500,
+                minStepForGasAndFeeAmount: 0.5
+            })
+        }
+        if(networkID == 42){
+            this.setState({
+                minGasAndFeeAmount: 0.05,
+                maxGasAndFeeAmount: 50,
+                minStepForGasAndFeeAmount: 0.05
+            })
+        }        
     }
 
     async initInstance() {
@@ -286,6 +346,7 @@ export default class LiquidityProvider extends PureComponent {
                 walletAddressToSend: this.state.walletAddressToSend === null ? ('').toString() : this.state.walletAddressToSend,
                 walletAddressToReceive: this.state.walletAddressToReceive === null ? ('').toString() : this.state.walletAddressToReceive,
                 gasAndFeeAmount: this.state.gasAndFeeAmount,
+                swapSpeedMode: this.state.swapSpeedMode,
                 spProfitPercent: this.state.spProfitPercent,
                 accumulateFundsLimit: this.state.accumulateFundsLimit,
                 stopRepeatsMode: this.state.stopRepeatsMode,
@@ -429,7 +490,7 @@ export default class LiquidityProvider extends PureComponent {
         }
         
     }
-    
+
     async getActiveContracts(){
 
         this.setState({
@@ -449,7 +510,7 @@ export default class LiquidityProvider extends PureComponent {
             let response = await AxiosRequest.request(args);
             if(response.status === 200){
                 const isactiveContractExist = response.data.find(obj => {
-                    if(obj.networkId === this.state.networkId){
+                    if((obj.networkId == this.state.networkId) && (this.state.spAccount == obj.walletAddresses.spAccount)){
                         this.setState({
                             isActiveContractExist: true
                         });
@@ -496,6 +557,21 @@ export default class LiquidityProvider extends PureComponent {
                                 afterCalls: null
                             });
                         }
+                        
+                        if(obj.swapSpeedMode == 'UPFRONT'){
+                            this.dispatchEventHandler(this.swapSpeedMode1, obj.swapSpeedMode, 'checked', 'click');                            
+                            //this.dispatchEventHandler(this.swapSpeedMode3, obj.swapSpeedMode, 'checked', 'click');                            
+                        }
+
+                        if(obj.swapSpeedMode == 'REALTIME'){
+                            this.dispatchEventHandler(this.swapSpeedMode2, obj.swapSpeedMode, 'checked', 'click');
+                            //this.dispatchEventHandler(this.swapSpeedMode4, obj.swapSpeedMode, 'checked', 'click');
+                        }
+
+
+                        this.setState({
+                            contractCreatedAt: obj.createdAt
+                        });
 
                         //this.dispatchEventHandler(this.gasAndFeeAmount, obj.gasAndFeeAmount.$numberDecimal, 'value', 'mousemove');
 
@@ -571,6 +647,9 @@ export default class LiquidityProvider extends PureComponent {
 
     reAuthrizeFeeAndGasLimit = async() => {
         if(this.state.deployed){
+            this.setState({
+                reAuthrizeing: true                
+            });
             let newLimit = this.state.gasAndFeeAmount
             let spContract = new SPContract(web3Config.getWeb3(), this.state.networkId, this.state.smartSwapContractAddress);
             spContract.setFeeAmountLimit(
@@ -595,9 +674,13 @@ export default class LiquidityProvider extends PureComponent {
                             path: "update",
                             method: "POST"
                         });
-    
-    
+
                         notificationConfig.success('NEW GAS AND FEES LIMIT SET');
+
+                        this.setState({
+                            reAuthrizeing: false                
+                        });
+
                     }
             });
         }
@@ -657,7 +740,7 @@ export default class LiquidityProvider extends PureComponent {
                 withdrawAfterCalls: null
             }); 
         }
-        
+
 
         let finalArgs = {
             data: Object.assign(args, {
@@ -670,7 +753,8 @@ export default class LiquidityProvider extends PureComponent {
                 stopRepeatsMode: this.state.stopRepeatsMode,
                 withdrawMode: this.state.withdrawMode,
                 cexApiKey: this.state.cexApiKey === null ? ('').toString() : this.state.cexApiKey,
-                cexApiSecret: this.state.cexApiSecret === null ? ('').toString() : this.state.cexApiSecret
+                cexApiSecret: this.state.cexApiSecret === null ? ('').toString() : this.state.cexApiSecret,
+                swapSpeedMode: this.state.swapSpeedMode === null ? 'UPFRONT' : this.state.swapSpeedMode
             }),
             // data: {
             //     spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
@@ -714,6 +798,56 @@ export default class LiquidityProvider extends PureComponent {
         }
 
     }
+
+    reAuthrizeSpreadLimit = async() => {
+        if(this.state.deployed){
+            this.setState({
+                reAuthrizeing: true                
+            });
+            let newLimit = this.state.spreadAmount;
+            //spContract.getFeeAmountLimit();
+            await AxiosRequest.request({
+                data: {
+                    smartContractAddress: this.state.smartSwapContractAddress,
+                    spreadAmount: newLimit
+                },
+                path: "update",
+                method: "POST"
+            });
+            notificationConfig.success('NEW SPREAD LIMIT SET');    
+            this.setState({
+                reAuthrizeing: false                
+            });        
+        }
+    }
+
+    updateSwapSpeedMode = async(mode) => {
+        if(this.state.deployed){
+            this.setState({
+                updating: true,
+                reAuthrizeing: true
+            });
+            let swapSpeedMode = mode;
+            await AxiosRequest.request({
+                data: {
+                    smartContractAddress: this.state.smartSwapContractAddress,
+                    swapSpeedMode: swapSpeedMode
+                },
+                path: "update",
+                method: "POST"
+            });
+            notificationConfig.success('Swap speed mode updated.');    
+            this.setState({
+                updating: false,
+                reAuthrizeing: false              
+            });       
+        }   
+        this.setState({
+            swapSpeedMode: mode              
+        });
+    }
+
+
 
     render() {
 
@@ -862,7 +996,15 @@ export default class LiquidityProvider extends PureComponent {
                         <div className="LiProfSbox01">	
                                 <div className='LipRadioFix01' >	
                                     <div className="md-radio md-radio-inline ">	
-                                        <input type="radio" id="spS01" name="s001" defaultChecked/>	
+                                        <input 
+                                            type="radio" 
+                                            id="spS01" 
+                                            name="s001" 
+                                            // defaultChecked
+                                            onChange = {() => { this.updateSwapSpeedMode('UPFRONT');} }
+                                            checked={this.state.swapSpeedMode === 'UPFRONT'}
+                                            ref={(input)=> this.swapSpeedMode1 = input}
+                                        />	
                                         <label htmlFor="spS01"></label>	
                                     </div> 	
                                     <div className="LiProFlexBX01 padFixer01">	
@@ -873,7 +1015,15 @@ export default class LiquidityProvider extends PureComponent {
                         <div className="LiProfSbox02">	
                          <div className='LipRadioFix01' >	
                                     <div className="md-radio md-radio-inline ">	
-                                        <input type="radio" id="spS02" name="s001" defaultChecked/>	
+                                        <input 
+                                            type="radio" 
+                                            id="spS02" 
+                                            name="s002" 
+                                            //defaultChecked
+                                            onChange = {() => { this.updateSwapSpeedMode('REALTIME');} }
+                                            checked={this.state.swapSpeedMode === 'REALTIME'}
+                                            ref={(input)=> this.swapSpeedMode2 = input}
+                                            />	
                                         <label htmlFor="spS02"></label>	
                                     </div> 	
                                     <div className="LiProFlexBX01 padFixer01">	
@@ -881,6 +1031,13 @@ export default class LiquidityProvider extends PureComponent {
                                     </div>	
                                 </div>                             	
                         </div>	
+                        {
+                            this.state.errorMessage !== null && this.state.errorMessage.includes("swapSpeedMode") && 
+                            <div className="error-Msg" style={smallError}>
+                                <label>{this.state.errorMessage}</label>
+                            </div>
+                        }
+
                         <div className='spacerLine'></div>
 
                         <div className="LiProfSbox03">
@@ -888,10 +1045,11 @@ export default class LiquidityProvider extends PureComponent {
                             <div className="LiProLable mtFix01">Set the maximum amount which the smart contract is authorized to withdraw from your CEX account to cover the gas and fees. Once the total is reached, the contract stops performing until reauthorized with a new limit</div>
                             <div className="dragorInput v2">
                                 <InputRange
-                                    maxValue={100000}
-                                    minValue={100}
+                                    step={this.state.minStepForGasAndFeeAmount}
+                                    maxValue={this.state.maxGasAndFeeAmount}
+                                    minValue={this.state.minGasAndFeeAmount}
                                     value={this.state.gasAndFeeAmount}
-                                    formatLabel={value => `$${value}`}
+                                    formatLabel={value => this.state.selectedTokenA + ` ${value}`}
                                     onChange={value => this.setState({ gasAndFeeAmount: value })} 
                                     ref={(input)=> this.gasAndFeeAmount = input}
                                 />
@@ -1270,7 +1428,7 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 <a href="#" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                             </div>
                             <div className='spContrlInfotxt'>
-                            Created at April 6,2021 05:21:36pm UTC &nbsp;&nbsp;&nbsp;&nbsp; Balance:  425.563 BNB | $4,846 USDT
+                            Created at {DateFormat(this.state.contractCreatedAt, "dddd, mmmm dS, yyyy, h:MM:ss TT")} &nbsp;&nbsp;&nbsp;&nbsp; Balance:  425.563 {this.state.selectedTokenA} | $4,846 USDT
                                 <span>Withdraw all funds back to your CEX account</span>
                             </div>
                             <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
@@ -1279,15 +1437,21 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 <div className='spContrlSSBX01'>
                                 <div className="dragorInput v2">
                                     <InputRange
-                                        maxValue={100000}
-                                        minValue={100}
+                                        step={this.state.minStepForGasAndFeeAmount}
+                                        maxValue={this.state.maxGasAndFeeAmount}
+                                        minValue={this.state.minGasAndFeeAmount}
                                         value={this.state.gasAndFeeAmount}
-                                        formatLabel={value => `$${value}`}
+                                        formatLabel={value => this.state.selectedTokenA + ` ${value}`}
                                         onChange={value => this.setState({ gasAndFeeAmount: value })} />
                                 </div>
                                 </div>
                                 <div className='spContrlSSBX02'>
-                                    <button className='spContrlBTN01' onClick={this.reAuthrizeFeeAndGasLimit.bind(this)}>AUTHORIZE NEW LIMIT</button>
+                                    <button 
+                                        className='spContrlBTN01'
+                                        onClick={this.reAuthrizeFeeAndGasLimit.bind(this)}
+                                        disabled={this.state.reAuthrizeing}>
+                                        AUTHORIZE NEW LIMIT
+                                    </button>
                                 </div> 
                             </div> 
 
@@ -1305,24 +1469,38 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 <div className='spContrlSSBX01'>	
                                 <div className="dragorInput v2">	
                                     <InputRange	
-                                        maxValue={100000}	
-                                        minValue={100}	
-                                        value={this.state.gasAndFeeAmount}	
-                                        formatLabel={value => `$${value}`}	
-                                        onChange={value => this.setState({ gasAndFeeAmount: value })} />	
-                                </div>	
-                                </div>	
-                                <div className='spContrlSSBX02'>	
-                                    <button className='spContrlBTN01'>AUTHORIZE NEW SPREAD</button>	
-                                </div> 	
-                            </div> 	
+                                        step={0.05}
+                                        maxValue={1}
+                                        minValue={0.2}
+                                        value={this.state.spreadAmount}	
+                                        formatLabel={value => `${value.toFixed(2)}%`}	
+                                        onChange={value => this.setState({ spreadAmount: value })} />	
+                                </div>
+                                </div>
+                                <div className='spContrlSSBX02'>
+                                    <button 
+                                        className='spContrlBTN01' 
+                                        onClick={this.reAuthrizeSpreadLimit.bind(this)}
+                                        disabled={this.state.reAuthrizeing}>
+                                            AUTHORIZE NEW SPREAD
+                                    </button>
+                                </div>
+                            </div>
                             <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED<i className="help-circle">
                                 <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text " aria-hidden="true"></i></i>
-                            </div>	
-                            <div className='spscFix01'>	
+                            </div>
+                            <div className='spscFix01'>
                                 <div className='LipRadioFix01'>  	
                                         <div className="md-radio md-radio-inline ">	
-                                            <input type="radio" id="spS03" name="s002" defaultChecked/>	
+                                            <input 
+                                                type="radio" 
+                                                id="spS03" 
+                                                name="s003" 
+                                                //defaultChecked
+                                                onChange = {() => { this.updateSwapSpeedMode('UPFRONT');} }
+                                                checked={this.state.swapSpeedMode === 'UPFRONT'}
+                                                ref={(input)=> this.swapSpeedMode3 = input}
+                                            />                                            
                                             <label htmlFor="spS03"></label>	
                                         </div> 	
                                         <div className="LiProFlexBX01 padFixer01">	
@@ -1331,7 +1509,15 @@ to your CEX account<i className="help-circle"><i className="fas fa-question-circ
                                 </div>	
                                 <div className='LipRadioFix01' >	
                                     <div className="md-radio md-radio-inline ">	
-                                        <input type="radio" id="spS04" name="s002" defaultChecked/>	
+                                        <input 
+                                            type="radio" 
+                                            id="spS04" 
+                                            name="s004" 
+                                            //defaultChecked
+                                            onChange = {() => { this.updateSwapSpeedMode('REALTIME');} }
+                                            checked={this.state.swapSpeedMode === 'REALTIME'}
+                                            ref={(input)=> this.swapSpeedMode4 = input}
+                                        />
                                         <label htmlFor="spS04"></label>	
                                     </div> 	
                                     <div className="LiProFlexBX01 padFixer01">	
