@@ -1,0 +1,4109 @@
+@font-face {
+  font-family: 'icomoon';
+  src: url("../fonts/icomoon.eot");
+  src: url("../fonts//icomoon.eot") format("embedded-opentype"), url("../fonts/icomoon.ttf") format("truetype"), url("../fonts/icomoon.woff") format("woff"), url("../fonts/icomoon.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-filter_alt:before {
+  content: "\e901";
+}
+
+.icon-navigate_before:before {
+  content: "\e903";
+}
+
+.icon-cheveron-left:before {
+  content: "\e902";
+}
+
+.icon-caret-down:before {
+  content: "\e900";
+}
+
+.icon-checkmark:before {
+  content: "\ea10";
+}
+
+.icon-chevron-left1:before {
+  content: "\e909";
+}
+
+.icon-chevron-right:before {
+  content: "\e90b";
+}
+
+.icon-filter1:before {
+  content: "\e905";
+}
+
+/*animation*/
+@-webkit-keyframes fadein {
+  0% {
+    opacity: .4;
+  }
+  50% {
+    opacity: .8;
+  }
+  100% {
+    opacity: 1;
+    background: none;
+  }
+}
+@keyframes fadein {
+  0% {
+    opacity: .4;
+  }
+  50% {
+    opacity: .8;
+  }
+  100% {
+    opacity: 1;
+    background: none;
+  }
+}
+
+@-webkit-keyframes sticky {
+  0% {
+    top: -100px;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+@keyframes sticky {
+  0% {
+    top: -100px;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+@-webkit-keyframes fadeworksIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeworksIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeInMenu {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.01;
+  }
+  20% {
+    opacity: 0.02;
+  }
+  30% {
+    opacity: 0.05;
+  }
+  40% {
+    opacity: 0.06;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 0.4;
+  }
+  70% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInMenu {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.01;
+  }
+  20% {
+    opacity: 0.02;
+  }
+  30% {
+    opacity: 0.05;
+  }
+  40% {
+    opacity: 0.06;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 0.4;
+  }
+  70% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes wow {
+  from {
+    opacity: 0;
+    position: relative;
+    top: 200px;
+  }
+  to {
+    opacity: 1;
+    position: relative;
+    top: 0px;
+  }
+}
+
+@keyframes wow {
+  from {
+    opacity: 0;
+    position: relative;
+    top: 200px;
+  }
+  to {
+    opacity: 1;
+    position: relative;
+    top: 0px;
+  }
+}
+
+@-webkit-keyframes buttonVideo {
+  from {
+    opacity: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  to {
+    opacity: 100;
+    background-color: rgba(41, 128, 185, 0.5);
+  }
+}
+
+@keyframes buttonVideo {
+  from {
+    opacity: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  to {
+    opacity: 100;
+    background-color: rgba(41, 128, 185, 0.5);
+  }
+}
+
+@keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInMenu {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/*
+@keyframes fadeOut {
+      0%{
+        opacity: 1;
+       
+    }
+    
+    100%{
+        
+        opacity: 0;
+      
+       
+        
+    }
+}*/
+@-webkit-keyframes expand {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+@keyframes expand {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes fadeInMenu {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.01;
+  }
+  20% {
+    opacity: 0.02;
+  }
+  30% {
+    opacity: 0.05;
+  }
+  40% {
+    opacity: 0.06;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 0.4;
+  }
+  70% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+html {
+  font-size: 62.5%;
+}
+
+* {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: 16px;
+  margin: auto;
+  /*   height: 4000px;*/
+  background-image: url(../imgs/options.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+input {
+  background: none;
+  border: none;
+}
+
+input:focus {
+  outline: 0;
+}
+
+button {
+  background: none;
+  border: none;
+}
+
+button:focus {
+  outline: 0;
+}
+
+a {
+  text-decoration: none;
+  display: inline-block;
+}
+
+img {
+  display: block;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.btnwallet {
+  border-radius: 8px;
+  background-color: #4fa8eb;
+  color: #fff;
+  font-family: 'Kanit', sans-serif;
+  padding: 3.3rem 11.4rem;
+  font-size: 30px;
+  cursor: pointer;
+  -ms-flex-item-align: end;
+      align-self: flex-end;
+  text-transform: uppercase;
+  font-weight: bold;
+  -webkit-box-shadow: 0px -1px 11px 2px #4fa8eb;
+          box-shadow: 0px -1px 11px 2px #4fa8eb;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.btnwallet:hover {
+  -webkit-transform: scale(1.02);
+          transform: scale(1.02);
+}
+
+#selectcoins, #selectoins2 {
+  cursor: pointer;
+  background-color: #0e2954;
+  width: 108px !important;
+  border-top-right-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+}
+
+.dd-select {
+  border-top-right-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+}
+
+.dd-selected, .dd-select {
+  cursor: pointer;
+  background-color: #0e2954;
+  border-color: #0e2954 !important;
+  width: 108px !important;
+  background-color: transparent !important;
+  height: 70px;
+  padding-left: 20px;
+}
+
+.dd-options {
+  width: 100% !important;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  border: none !important;
+}
+
+.dd-option {
+  height: 70px;
+  background-color: #173564;
+  border-bottom: 1px solid #0e2954 !important;
+}
+
+.dd-pointer {
+  right: 30px !important;
+  top: 54% !important;
+}
+
+.dd-option-selected {
+  background-color: #173564 !important;
+}
+
+.dd-pointer-down {
+  border-top: solid 5px #fff !important;
+}
+
+#selectcoins .dd-pointer-up {
+  border-bottom: solid 5px #fff !important;
+}
+
+#selectoins2 .dd-pointer-up {
+  border-bottom: solid 5px #fff !important;
+}
+
+.dd-option img.dd-option-image {
+  margin-left: 21px !important;
+  margin-top: 10px !important;
+}
+
+.welcomepage {
+  height: 100vh;
+  background-image: url(../imgs/bkgroundwelcom.png);
+  background-size: cover;
+  background-position: -70px center;
+  opacity: 1;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.welcomepage.hide {
+  opacity: 0;
+}
+
+.welcomepage form {
+  width: 1600px;
+  max-width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -ms-flex-item-align: end;
+      align-self: flex-end;
+  height: 500px;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-line-pack: center;
+      align-content: center;
+  justify-items: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 100vh;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.welcomepage form .input-button {
+  border-radius: 8px;
+  background-color: #4fa8eb;
+  width: 430px;
+  max-width: 100%;
+  text-align: center;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  -ms-flex-item-align: end;
+      align-self: flex-end;
+  -webkit-box-shadow: 0px -1px 11px 2px #4fa8eb;
+          box-shadow: 0px -1px 11px 2px #4fa8eb;
+  -webkit-transition: .3s;
+  transition: .3s;
+  cursor: pointer;
+}
+
+.welcomepage form .input-button:hover {
+  -webkit-transform: scale(1.05);
+          transform: scale(1.05);
+}
+
+.welcomepage form .input-button .welcomeBtn {
+  padding: 2.2rem 0;
+  font-size: 30px;
+  font-family: "Kanit";
+  color: white;
+  font-weight: bold;
+  line-height: 1.2;
+  text-align: center;
+  font-family: 'Kanit', sans-serif;
+  text-transform: uppercase;
+  width: 100%;
+  cursor: pointer;
+}
+
+header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  width: 100%;
+  margin: auto;
+  padding: 2rem 2rem;
+  position: relative;
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #122b54;
+}
+
+header .menubar a {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 130px;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+header .menubar span {
+  color: #fff;
+}
+
+.form-freeze form {
+  width: 900px;
+  margin: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin-top: 15rem;
+}
+
+.form-freeze form.plusWidth {
+  width: 70%;
+}
+
+.form-freeze .input-group {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  position: relative;
+}
+
+.form-freeze .input-group input {
+  width: 320px;
+  background-color: #fff;
+  padding: 2.1rem  0;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  font-size: 24px;
+  color: #000;
+  padding-left: 2rem;
+  font-weight: bold;
+}
+
+.form-freeze .input-group input::-webkit-input-placeholder {
+  font-size: 24px;
+  font-family: 'Kanit', sans-serif;
+  color: #9fb2d0;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.form-freeze .input-group input:-ms-input-placeholder {
+  font-size: 24px;
+  font-family: 'Kanit', sans-serif;
+  color: #9fb2d0;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.form-freeze .input-group input::-ms-input-placeholder {
+  font-size: 24px;
+  font-family: 'Kanit', sans-serif;
+  color: #9fb2d0;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.form-freeze .input-group input::placeholder {
+  font-size: 24px;
+  font-family: 'Kanit', sans-serif;
+  color: #9fb2d0;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.form-freeze .input-group .cta.noborder {
+  border-bottom-right-radius: 0;
+}
+
+.form-freeze .input-group .cta .dropIcon {
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.form-freeze .input-group .cta .dropIcon.rotate {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+.form-freeze .input-group .cta, .form-freeze .input-group .bnb {
+  width: 110px;
+  background-color: #0e2954;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  position: relative;
+  cursor: pointer;
+  display: none !important;
+}
+
+.form-freeze .input-group .cta img, .form-freeze .input-group .bnb img {
+  margin-right: 3rem;
+  display: inline-block;
+}
+
+.form-freeze .input-group .cta span, .form-freeze .input-group .bnb span {
+  /*   margin-left: 1.5rem;
+                display: inline-block;
+                cursor: pointer;
+                font-size: 18px;*/
+  color: #fff;
+  /*  position: absolute;
+                top: 0;
+                right: 0;
+                @include centerElement();
+                left: 60%;*/
+}
+
+.form-freeze .input-group .cta ul, .form-freeze .input-group .bnb ul {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.form-freeze .input-group .cta ul li, .form-freeze .input-group .bnb ul li {
+  height: 100%;
+  border-bottom-right-radius: 8px;
+}
+
+.form-freeze .input-group .cta ul li:nth-child(2), .form-freeze .input-group .bnb ul li:nth-child(2) {
+  background-color: #173564;
+}
+
+.form-freeze .input-group .bnb {
+  position: absolute;
+  right: 0;
+  bottom: -24px;
+  top: 70px;
+  height: 70px;
+  opacity: 0;
+  background-color: #173564;
+  z-index: 999;
+}
+
+.form-freeze .input-group .bnb.show {
+  opacity: 1;
+  border-top-right-radius: 0;
+}
+
+.form-freeze .input-group .bnb .dummyspan {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.form-freeze .input-group .youhave {
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #31548b;
+  display: inline-block;
+  text-transform: capitalize;
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+}
+
+.form-freeze .input-group .youhave b {
+  font-weight: normal;
+  color: #fff;
+}
+
+.form-freeze .input-group .txtrightsend {
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #31548b;
+  display: inline-block;
+  text-transform: capitalize;
+  position: absolute;
+  bottom: -23px;
+  right: 0;
+  display: none;
+}
+
+.form-freeze .input-group .txtrightsend.show {
+  display: block;
+}
+
+.form-freeze .input-group .txtrightsend b {
+  font-weight: normal;
+  color: #fff;
+}
+
+.form-freeze .bthinput {
+  position: relative;
+}
+
+.form-freeze .bthinput .btnwallet {
+  font-size: 24px;
+  padding: 1.75rem 15.8rem;
+  display: block;
+  letter-spacing: .75px;
+}
+
+.form-freeze .bthinput .txtunfreeze {
+  position: absolute;
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #31548b;
+  bottom: -25px;
+  display: none;
+}
+
+.form-freeze .bthinput .txtunfreeze.show {
+  display: block;
+}
+
+.form-freeze .bthinput .txtunfreeze img {
+  position: absolute;
+  top: -3px;
+  right: 25px;
+  cursor: pointer;
+}
+
+.form-freeze .bthinput .txtunfreeze b {
+  color: #fff;
+  display: inline-block;
+  margin-left: 1.5rem;
+  color: #fff;
+  font-weight: 400;
+}
+
+.form-freeze .bthinput .freeze {
+  padding: 1.75rem 17.25rem;
+}
+
+.form-freeze .bthinput .freeze.chStyle {
+  background-color: #ff1e63;
+  -webkit-box-shadow: 0px -1px 8px 2px #ff1e63;
+          box-shadow: 0px -1px 8px 2px #ff1e63;
+  padding: 1.75rem 15.5rem;
+}
+
+.form-freeze .bthinput > a {
+  position: absolute;
+  right: 0;
+  bottom: -25px;
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #ff1e63;
+  letter-spacing: .5px;
+}
+
+.form-freeze .bthinput > a.color {
+  color: #4fa8eb;
+}
+
+.content {
+  color: #fff;
+  text-align: center;
+  margin-top: 14rem;
+}
+
+.content h1 {
+  font-family: 'Kanit', sans-serif;
+  font-size: 50px;
+  font-weight: bold;
+}
+
+.content p {
+  font-size: 21px;
+  font-family: 'Lato', sans-serif;
+  color: #4fa8eb;
+  width: 1280px;
+  margin: auto;
+  margin-top: 1.5rem;
+}
+
+.unfreeze-formcontent .unfreezeform {
+  width: 1360px;
+  max-width: 100%;
+  margin: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin-top: 15rem;
+}
+
+.unfreeze-formcontent .input-group {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  position: relative;
+}
+
+.unfreeze-formcontent .input-group input {
+  width: 320px;
+  background-color: #fff;
+  padding: 2.1rem  0;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  font-size: 24px;
+  color: #000;
+  padding-left: 2rem;
+  font-weight: bold;
+}
+
+.unfreeze-formcontent .input-group input::-webkit-input-placeholder {
+  font-size: 24px;
+  font-family: 'Kanit', sans-serif;
+  color: #9fb2d0;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.unfreeze-formcontent .input-group input:-ms-input-placeholder {
+  font-size: 24px;
+  font-family: 'Kanit', sans-serif;
+  color: #9fb2d0;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.unfreeze-formcontent .input-group input::-ms-input-placeholder {
+  font-size: 24px;
+  font-family: 'Kanit', sans-serif;
+  color: #9fb2d0;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.unfreeze-formcontent .input-group input::placeholder {
+  font-size: 24px;
+  font-family: 'Kanit', sans-serif;
+  color: #9fb2d0;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.unfreeze-formcontent .input-group .cta.noborder {
+  border-bottom-right-radius: 0;
+}
+
+.unfreeze-formcontent .input-group .cta .dropIcon {
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.unfreeze-formcontent .input-group .cta .dropIcon.rotate {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+.unfreeze-formcontent .input-group .cta, .unfreeze-formcontent .input-group .bnb {
+  width: 110px;
+  background-color: #0e2954;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  position: relative;
+  cursor: pointer;
+  display: none !important;
+}
+
+.unfreeze-formcontent .input-group .cta img, .unfreeze-formcontent .input-group .bnb img {
+  margin-right: 3rem;
+  display: inline-block;
+}
+
+.unfreeze-formcontent .input-group .cta span, .unfreeze-formcontent .input-group .bnb span {
+  /*   margin-left: 1.5rem;
+                display: inline-block;
+                cursor: pointer;
+                font-size: 18px;*/
+  color: #fff;
+  /*  position: absolute;
+                top: 0;
+                right: 0;
+                @include centerElement();
+                left: 60%;*/
+}
+
+.unfreeze-formcontent .input-group .cta ul, .unfreeze-formcontent .input-group .bnb ul {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.unfreeze-formcontent .input-group .cta ul li, .unfreeze-formcontent .input-group .bnb ul li {
+  height: 100%;
+  border-bottom-right-radius: 8px;
+}
+
+.unfreeze-formcontent .input-group .cta ul li:nth-child(2), .unfreeze-formcontent .input-group .bnb ul li:nth-child(2) {
+  background-color: #173564;
+}
+
+.unfreeze-formcontent .input-group .bnb {
+  position: absolute;
+  right: 0;
+  bottom: -24px;
+  top: 70px;
+  height: 70px;
+  opacity: 0;
+  background-color: #173564;
+  z-index: 999;
+}
+
+.unfreeze-formcontent .input-group .bnb.show {
+  opacity: 1;
+  border-top-right-radius: 0;
+}
+
+.unfreeze-formcontent .input-group .bnb .dummyspan {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.unfreeze-formcontent .input-group .youhave {
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #31548b;
+  display: inline-block;
+  text-transform: capitalize;
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+}
+
+.unfreeze-formcontent .input-group .youhave b {
+  font-weight: normal;
+  color: #fff;
+}
+
+.unfreeze-formcontent .input-group .txtrightsend {
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #31548b;
+  display: inline-block;
+  text-transform: capitalize;
+  position: absolute;
+  bottom: -23px;
+  right: 0;
+}
+
+.unfreeze-formcontent .input-group .txtrightsend.show {
+  display: block;
+}
+
+.unfreeze-formcontent .input-group .txtrightsend b {
+  font-weight: normal;
+  color: #fff;
+}
+
+.unfreeze-formcontent .bthinput {
+  position: relative;
+}
+
+.unfreeze-formcontent .bthinput .btnwallet {
+  font-size: 24px;
+  padding: 1.75rem 15.8rem;
+  display: block;
+  letter-spacing: .75px;
+}
+
+.unfreeze-formcontent .bthinput .txtunfreeze {
+  position: absolute;
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #31548b;
+  bottom: -25px;
+}
+
+.unfreeze-formcontent .bthinput .txtunfreeze.show {
+  display: block;
+}
+
+.unfreeze-formcontent .bthinput .txtunfreeze img {
+  position: absolute;
+  top: -3px;
+  right: 25px;
+  cursor: pointer;
+}
+
+.unfreeze-formcontent .bthinput .txtunfreeze b {
+  color: #fff;
+  display: inline-block;
+  margin-left: 1.5rem;
+  color: #fff;
+  font-weight: 400;
+}
+
+.unfreeze-formcontent .bthinput .freeze {
+  padding: 1.75rem 17.25rem;
+}
+
+.unfreeze-formcontent .bthinput .unfreezebtn {
+  background-color: #ff1e63;
+  -webkit-box-shadow: 0px -1px 8px 2px #ff1e63;
+          box-shadow: 0px -1px 8px 2px #ff1e63;
+  padding: 1.75rem 15.5rem;
+}
+
+.unfreeze-formcontent .bthinput .switch-un-freeze {
+  position: absolute;
+  right: 0;
+  bottom: -25px;
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #4fa8eb;
+  letter-spacing: .5px;
+}
+
+.unfreeze-formcontent .bthinput .switch-un-freeze.color {
+  color: #4fa8eb;
+}
+
+.unfreeze-formcontent .recieve {
+  position: relative;
+}
+
+.unfreeze-formcontent .recieve .txtrightsendreceive {
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
+  color: #31548b;
+  display: inline-block;
+  text-transform: capitalize;
+  position: absolute;
+  bottom: -25px;
+  right: 0;
+}
+
+.unfreeze-formcontent .recieve .txtrightsendreceive b {
+  color: #fff;
+  font-weight: 400;
+  display: inline-block;
+  margin-left: .5px;
+}
+
+.unfreeze-formcontent .recieve .txtrightsendreceive.show {
+  display: block;
+}
+
+.unfreeze-formcontent .recieve input {
+  background-color: #224782;
+}
+
+.unfreeze-formcontent .recieve.show {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.content {
+  color: #fff;
+  text-align: center;
+  margin-top: 14rem;
+}
+
+.content h1 {
+  font-family: 'Kanit', sans-serif;
+  font-size: 50px;
+  font-weight: bold;
+}
+
+.content p {
+  font-size: 21px;
+  font-family: 'Lato', sans-serif;
+  color: #4fa8eb;
+  width: 1280px;
+  margin: auto;
+  margin-top: 1.5rem;
+}
+
+/*some changes in select box */
+.unfreeze-formcontent #selectcoins .dd-select {
+  padding-left: 10px;
+}
+
+.unfreeze-formcontent #selectcoins .dd-pointer {
+  right: 20px !important;
+}
+
+.unfreeze-formcontent #selectcoins .dd-option img.dd-option-image {
+  margin-left: 15px !important;
+}
+
+.popupsuccess {
+  background-color: #020e22;
+  width: 1359px;
+  max-width: 100%;
+  padding: 10.1rem 0;
+  border-radius: 20px;
+  position: relative;
+  -webkit-box-shadow: 0px -1px 5px 2px #020e22;
+          box-shadow: 0px -1px 5px 2px #020e22;
+  /*center element in center of the screen */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  z-index: 9999999;
+}
+
+.popupsuccess h2 {
+  font-size: 36px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
+.popupsuccess h2 span {
+  color: #4fa8eb;
+}
+
+.howtoadd {
+  position: relative;
+  color: #4fa8eb;
+  font-family: 'Kanit', sans-serif;
+  text-align: center;
+  margin: 0;
+}
+
+.howtoadd img {
+  position: relative;
+  top: -10px;
+  cursor: pointer;
+  display: inline;
+}
+
+.closepopup {
+  position: absolute;
+  top: 30px;
+  right: 35px;
+  cursor: pointer;
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+.closepopup:hover {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim, .lootableclose .points .availabletable .cardsview .card .ctaCard .clickclaim, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim, .loottableopen .points .availabletable .cardsview .card .ctaCard .clickclaim, .lootableboxview .points .availabletable .cardsview .card .ctaCard .clickclaim {
+  display: inline-block;
+  border-radius: 5px;
+  background-color: #4fa8eb;
+  text-decoration: none;
+  color: #fff;
+  font-size: 16px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+  padding: 1.1rem 4.41rem;
+  -webkit-box-shadow: 1px 0px 8px 0px #4fa8eb;
+          box-shadow: 1px 0px 8px 0px #4fa8eb;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  /* width: 100%; */
+  margin: auto;
+  font-weight: 600;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim:hover, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim:hover, .lootableclose .points .availabletable .cardsview .card .ctaCard .clickclaim:hover, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim:hover, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim:hover, .loottableopen .points .availabletable .cardsview .card .ctaCard .clickclaim:hover, .lootableboxview .points .availabletable .cardsview .card .ctaCard .clickclaim:hover {
+  -webkit-transform: scale(1.08);
+          transform: scale(1.08);
+  background-color: transparent;
+  border: 1px solid #4fa8eb;
+  color: #fff;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  color: #01ea01;
+  color: #01ea01;
+}
+
+.lootableclose .points .availabletable .gridview .pagination, .lootableclose .points .availabletable .cardsview .pagination, .loottableopen .points .availabletable .gridview .pagination, .loottableopen .points .availabletable .cardsview .pagination, .lootableboxview .points .availabletable .cardsview .pagination {
+  width: 1360px;
+  margin: auto;
+  color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-top: 3rem;
+  font-family: 'Lato', sans-serif;
+}
+
+.lootableclose .points .availabletable .gridview .pagination > div, .lootableclose .points .availabletable .cardsview .pagination > div, .loottableopen .points .availabletable .gridview .pagination > div, .loottableopen .points .availabletable .cardsview .pagination > div, .lootableboxview .points .availabletable .cardsview .pagination > div {
+  display: inline-block;
+}
+
+.lootableclose .points .availabletable .gridview .pagination > div span, .lootableclose .points .availabletable .cardsview .pagination > div span, .loottableopen .points .availabletable .gridview .pagination > div span, .loottableopen .points .availabletable .cardsview .pagination > div span, .lootableboxview .points .availabletable .cardsview .pagination > div span {
+  cursor: pointer;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetleft, .lootableclose .points .availabletable .cardsview .pagination .resetleft, .loottableopen .points .availabletable .gridview .pagination .resetleft, .loottableopen .points .availabletable .cardsview .pagination .resetleft, .lootableboxview .points .availabletable .cardsview .pagination .resetleft {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetleft span:nth-child(2), .lootableclose .points .availabletable .cardsview .pagination .resetleft span:nth-child(2), .loottableopen .points .availabletable .gridview .pagination .resetleft span:nth-child(2), .loottableopen .points .availabletable .cardsview .pagination .resetleft span:nth-child(2), .lootableboxview .points .availabletable .cardsview .pagination .resetleft span:nth-child(2) {
+  position: relative;
+  left: -13px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countleft, .lootableclose .points .availabletable .cardsview .pagination .countleft, .loottableopen .points .availabletable .gridview .pagination .countleft, .loottableopen .points .availabletable .cardsview .pagination .countleft, .lootableboxview .points .availabletable .cardsview .pagination .countleft {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countleft span, .lootableclose .points .availabletable .cardsview .pagination .countleft span, .loottableopen .points .availabletable .gridview .pagination .countleft span, .loottableopen .points .availabletable .cardsview .pagination .countleft span, .lootableboxview .points .availabletable .cardsview .pagination .countleft span {
+  color: #1d3b6d;
+  font-weight: bold;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countright, .lootableclose .points .availabletable .cardsview .pagination .countright, .loottableopen .points .availabletable .gridview .pagination .countright, .loottableopen .points .availabletable .cardsview .pagination .countright, .lootableboxview .points .availabletable .cardsview .pagination .countright {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetright, .lootableclose .points .availabletable .cardsview .pagination .resetright, .loottableopen .points .availabletable .gridview .pagination .resetright, .loottableopen .points .availabletable .cardsview .pagination .resetright, .lootableboxview .points .availabletable .cardsview .pagination .resetright {
+  position: relative;
+  top: 5px;
+  left: 10px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetright span:nth-child(2), .lootableclose .points .availabletable .cardsview .pagination .resetright span:nth-child(2), .loottableopen .points .availabletable .gridview .pagination .resetright span:nth-child(2), .loottableopen .points .availabletable .cardsview .pagination .resetright span:nth-child(2), .lootableboxview .points .availabletable .cardsview .pagination .resetright span:nth-child(2) {
+  position: relative;
+  left: -13px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers, .lootableclose .points .availabletable .cardsview .pagination .numbers, .loottableopen .points .availabletable .gridview .pagination .numbers, .loottableopen .points .availabletable .cardsview .pagination .numbers, .lootableboxview .points .availabletable .cardsview .pagination .numbers {
+  margin: 0 2rem;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers span, .lootableclose .points .availabletable .cardsview .pagination .numbers span, .loottableopen .points .availabletable .gridview .pagination .numbers span, .loottableopen .points .availabletable .cardsview .pagination .numbers span, .lootableboxview .points .availabletable .cardsview .pagination .numbers span {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 24px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers span.active, .lootableclose .points .availabletable .cardsview .pagination .numbers span.active, .loottableopen .points .availabletable .gridview .pagination .numbers span.active, .loottableopen .points .availabletable .cardsview .pagination .numbers span.active, .lootableboxview .points .availabletable .cardsview .pagination .numbers span.active {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #4fa8eb;
+  background-color: rgba(76, 183, 208, 0);
+  color: #4fa8eb;
+}
+
+.lootableclose .points {
+  font-family: 'Kanit', sans-serif;
+  padding-top: 5rem;
+}
+
+.lootableclose .points.show {
+  display: block;
+}
+
+.lootableclose .points .prizimg {
+  margin: auto;
+}
+
+.lootableclose .points .pointsLogo h2 {
+  font-size: 50px;
+  color: #4fa8eb;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.lootableclose .points .pointsLogo h2 span {
+  color: #fff;
+}
+
+.lootableclose .points .frozen {
+  font-size: 21px;
+  font-family: "Lato";
+  color: #4fa8eb;
+  line-height: 1.714;
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  width: 1360px;
+  max-width: 100%;
+  margin: auto;
+  margin-top: 3rem;
+  font-weight: 400;
+}
+
+.lootableclose .points .input-search {
+  width: 1360px;
+  max-width: 100%;
+  margin: auto;
+  margin-top: 8rem;
+  padding: 3rem 0;
+  border-top: 2px solid #132e5d;
+  border-bottom: 2px solid #132e5d;
+  padding-bottom: 2rem;
+}
+
+.lootableclose .points .input-search form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding-left: 2.4rem;
+  position: relative;
+}
+
+.lootableclose .points .input-search form .searchimg {
+  margin-right: 1.5rem;
+  cursor: pointer;
+}
+
+.lootableclose .points .input-search form input {
+  width: 90%;
+  color: #fff;
+  font-size: 20px;
+}
+
+.lootableclose .points .input-search form input::-webkit-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.lootableclose .points .input-search form input:-ms-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.lootableclose .points .input-search form input::-ms-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.lootableclose .points .input-search form input::placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.lootableclose .points .input-search form .tokensymbol {
+  position: absolute;
+  top: 14px;
+  left: 143px;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #fff;
+  letter-spacing: .5px;
+}
+
+.lootableclose .points .input-search form .tokensymbol.hide {
+  opacity: 0;
+  z-index: -1;
+}
+
+.lootableclose .points .input-search form .searchfilter {
+  margin-right: 5rem;
+  cursor: pointer;
+  color: #fff;
+  font-size: 24px;
+  position: relative;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .input-search form .searchfilter.changeColor {
+  color: #4fa8eb;
+}
+
+.lootableclose .points .input-search form p {
+  color: #fff;
+  margin-right: auto;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 300;
+}
+
+.lootableclose .points .input-search form p > span {
+  color: #4fa8eb;
+  font-weight: bold;
+}
+
+.lootableclose .points .input-search .searchbtn {
+  position: relative;
+}
+
+.lootableclose .points .input-search .searchbtn::after {
+  position: absolute;
+  content: "";
+  top: 0px;
+  left: -19px;
+  width: 2px;
+  height: 60px;
+  background-color: #132e5d;
+}
+
+.lootableclose .points .input-search .searchbtn button {
+  padding: 1rem 10.1rem;
+  border-radius: 5px;
+  font-size: 24px;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .input-search .searchbtn button:hover {
+  background-color: transparent;
+  color: #fff;
+  -webkit-transform: scale(1.05);
+          transform: scale(1.05);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  border: 1px solid #4fa8eb;
+}
+
+.lootableclose .points .input-search .filtersearch {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  max-height: 0;
+  overflow: hidden;
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+.lootableclose .points .input-search .filtersearch.show {
+  max-height: 1000px;
+  margin-top: 4rem;
+  -webkit-transition: max-height .3s linear;
+  transition: max-height .3s linear;
+  overflow: visible;
+}
+
+.lootableclose .points .input-search .filtersearch .column1, .lootableclose .points .input-search .filtersearch .column2, .lootableclose .points .input-search .filtersearch .column3 {
+  width: 355px;
+  max-width: 100%;
+  position: relative;
+}
+
+.lootableclose .points .input-search .filtersearch .column1::after, .lootableclose .points .input-search .filtersearch .column2::after, .lootableclose .points .input-search .filtersearch .column3::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 15px;
+  width: 2px;
+  height: 100%;
+  background-color: #132e5d;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 {
+  width: 21.6%;
+  color: #fff;
+  padding-top: 3rem;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1 {
+  margin-bottom: 1.8rem;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1, .lootableclose .points .input-search .filtersearch .column4 .col2 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1 p, .lootableclose .points .input-search .filtersearch .column4 .col2 p {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  letter-spacing: .5px;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1 p::first-letter, .lootableclose .points .input-search .filtersearch .column4 .col2 p::first-letter {
+  text-transform: capitalize;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1 .inputcheckbox, .lootableclose .points .input-search .filtersearch .column4 .col2 .inputcheckbox {
+  position: relative;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1 .inputcheckbox input, .lootableclose .points .input-search .filtersearch .column4 .col2 .inputcheckbox input {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+  left: 1px;
+  z-index: 9999;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1 .inputcheckbox input:checked ~ span::after, .lootableclose .points .input-search .filtersearch .column4 .col2 .inputcheckbox input:checked ~ span::after {
+  display: block;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1 .inputcheckbox span, .lootableclose .points .input-search .filtersearch .column4 .col2 .inputcheckbox span {
+  display: block;
+  border-style: solid;
+  border-radius: 3px;
+  background-color: rgba(249, 248, 254, 0);
+  border: 2px solid #4fa8eb;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  z-index: -1;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col1 .inputcheckbox span::after, .lootableclose .points .input-search .filtersearch .column4 .col2 .inputcheckbox span::after {
+  content: "\ea10";
+  font-family: 'icomoon' !important;
+  position: relative;
+  top: -7px;
+  font-size: 20px;
+  display: none;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col2 p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  width: 50px;
+  margin-top: 2rem;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .tableview {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  background-color: #1e3d74;
+  cursor: pointer;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .tableview.brightness {
+  background-color: #4fa8eb;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .tableview:hover {
+  background-color: #4fa8eb;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .grid {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 19px;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  cursor: pointer;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .grid span {
+  display: block;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .grid span.light {
+  background-color: #1e3d74 !important;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .grid .part1 span {
+  width: 6px;
+  height: 5px;
+  background-color: #4fa8eb;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .grid .part1 span:nth-child(2) {
+  margin: .2rem 0;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .grid .part2 span {
+  width: 12px;
+  height: 5px;
+  background-color: #4fa8eb;
+}
+
+.lootableclose .points .input-search .filtersearch .column4 .col3 .grid .part2 span:nth-child(2) {
+  margin: .2rem 0;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select {
+  border-radius: 8px;
+  width: 323px;
+  line-height: normal;
+  height: auto;
+  float: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  padding: 1.9rem  0px;
+  padding-left: 2rem;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select.open {
+  border-radius: 0;
+  background-color: #ecd237;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select.open .list {
+  margin-top: 0;
+  border-radius: 0;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select .list {
+  width: 100%;
+  background-color: #4fa8eb;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select .list li {
+  color: #fff;
+  background-color: transparent;
+  font-family: 'Lato', sans-serif;
+  border-bottom: 1px solid #fff;
+  font-size: 16px;
+  font-weight: 400;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select .list li:hover {
+  background-color: #c0c2ce;
+  color: #fff;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select .list li:last-child {
+  border-bottom: none;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select .current {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #051632;
+  font-weight: 500;
+}
+
+.lootableclose .points .input-search .filtersearch > div .nice-select::after {
+  content: "\e900";
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  border: none;
+  width: auto;
+  height: auto;
+  -webkit-transform: none;
+          transform: none;
+  -webkit-transform-origin: center;
+          transform-origin: center;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .input-search .filtersearch > div .input-group {
+  width: 323px;
+  padding: 1.8rem 0;
+  background-color: #fff;
+  border-radius: 8px;
+  padding-left: 2rem;
+  margin-top: 1rem;
+}
+
+.lootableclose .points .input-search .filtersearch > div .input-group input {
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.lootableclose .points .input-search .filtersearch > div .input-group input::-webkit-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.lootableclose .points .input-search .filtersearch > div .input-group input:-ms-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.lootableclose .points .input-search .filtersearch > div .input-group input::-ms-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.lootableclose .points .input-search .filtersearch > div .input-group input::placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.lootableclose .points .availabletable {
+  padding-bottom: 10rem;
+}
+
+.lootableclose .points .availabletable h2 {
+  text-align: center;
+  font-size: 30px;
+  font-family: "Kanit";
+  color: white;
+  font-weight: bold;
+  font-family: 'Kanit', sans-serif;
+  text-transform: uppercase;
+  margin: 5rem 0;
+}
+
+.lootableclose .points .availabletable .gridview.hide {
+  display: none;
+}
+
+.lootableclose .points .availabletable .gridview .maintable {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  width: 1360px;
+  margin: auto;
+}
+
+.lootableclose .points .availabletable .gridview .maintable > div {
+  width: calc(100% / 6);
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .bondlyspan {
+  display: inline-block;
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  margin-right: 2.3rem;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken > div, .lootableclose .points .availabletable .gridview .maintable .tokenvalue > div, .lootableclose .points .availabletable .gridview .maintable .eligibletoken > div, .lootableclose .points .availabletable .gridview .maintable .pointstokens > div, .lootableclose .points .availabletable .gridview .maintable .pointvalue > div, .lootableclose .points .availabletable .gridview .maintable .claimtokens > div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 50px;
+  color: #fff;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+  border-right: 1px solid #000;
+  padding-left: 1.65rem;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken > div .cell, .lootableclose .points .availabletable .gridview .maintable .tokenvalue > div .cell, .lootableclose .points .availabletable .gridview .maintable .eligibletoken > div .cell, .lootableclose .points .availabletable .gridview .maintable .pointstokens > div .cell, .lootableclose .points .availabletable .gridview .maintable .pointvalue > div .cell, .lootableclose .points .availabletable .gridview .maintable .claimtokens > div .cell {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  letter-spacing: .25px;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken h3, .lootableclose .points .availabletable .gridview .maintable .tokenvalue h3, .lootableclose .points .availabletable .gridview .maintable .eligibletoken h3, .lootableclose .points .availabletable .gridview .maintable .pointstokens h3, .lootableclose .points .availabletable .gridview .maintable .pointvalue h3, .lootableclose .points .availabletable .gridview .maintable .claimtokens h3 {
+  font-size: 18px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-weight: 500;
+  text-transform: capitalize;
+  width: 226px;
+  background-image: -ms-linear-gradient(90deg, #132e5d 0%, #0c234a 100%);
+  -webkit-box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.05);
+          box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid #000;
+  width: 100%;
+  border-right: 1px solid #000;
+  position: relative;
+  padding: 2.35rem 0;
+  padding-left: 2rem;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken h3 img, .lootableclose .points .availabletable .gridview .maintable .airdroptoken h3 span, .lootableclose .points .availabletable .gridview .maintable .tokenvalue h3 img, .lootableclose .points .availabletable .gridview .maintable .tokenvalue h3 span, .lootableclose .points .availabletable .gridview .maintable .eligibletoken h3 img, .lootableclose .points .availabletable .gridview .maintable .eligibletoken h3 span, .lootableclose .points .availabletable .gridview .maintable .pointstokens h3 img, .lootableclose .points .availabletable .gridview .maintable .pointstokens h3 span, .lootableclose .points .availabletable .gridview .maintable .pointvalue h3 img, .lootableclose .points .availabletable .gridview .maintable .pointvalue h3 span, .lootableclose .points .availabletable .gridview .maintable .claimtokens h3 img, .lootableclose .points .availabletable .gridview .maintable .claimtokens h3 span {
+  position: absolute;
+  top: 30px;
+  right: 21px;
+  cursor: pointer;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken h3 .tokenpopup, .lootableclose .points .availabletable .gridview .maintable .tokenvalue h3 .tokenpopup, .lootableclose .points .availabletable .gridview .maintable .eligibletoken h3 .tokenpopup, .lootableclose .points .availabletable .gridview .maintable .pointstokens h3 .tokenpopup, .lootableclose .points .availabletable .gridview .maintable .pointvalue h3 .tokenpopup, .lootableclose .points .availabletable .gridview .maintable .claimtokens h3 .tokenpopup {
+  left: 115px;
+  top: 19px;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken h3 .tokenspan, .lootableclose .points .availabletable .gridview .maintable .tokenvalue h3 .tokenspan, .lootableclose .points .availabletable .gridview .maintable .eligibletoken h3 .tokenspan, .lootableclose .points .availabletable .gridview .maintable .pointstokens h3 .tokenspan, .lootableclose .points .availabletable .gridview .maintable .pointvalue h3 .tokenspan, .lootableclose .points .availabletable .gridview .maintable .claimtokens h3 .tokenspan {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row1, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row1, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row1, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row1, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row1, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 {
+  background-color: #132e5d;
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #000;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row1 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row1 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row1 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row1 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row1 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 .bondlyspan {
+  background-color: #1740b1;
+  position: relative;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row1 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row1 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row1 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row1 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row1 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 .bondlyspan img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row2, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row2, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row2, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row2, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row2, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 {
+  background-color: #0c234a;
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #000;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row2 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row2 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row2 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row2 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row2 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 .bondlyspan {
+  background-color: #393939;
+  position: relative;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row2 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row2 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row2 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row2 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row2 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 .bondlyspan img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  top: 55%;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row3, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row3, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row3, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row3, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row3, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row3 {
+  background-color: #132e5d;
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #000;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row3 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row3 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row3 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row3 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row3 .bondlyspan, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row3 .bondlyspan {
+  background-color: #fff;
+  position: relative;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .airdroptoken .row3 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .tokenvalue .row3 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .eligibletoken .row3 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .pointstokens .row3 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .pointvalue .row3 .bondlyspan img, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row3 .bondlyspan img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  top: 41%;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .tokenvalue > div, .lootableclose .points .availabletable .gridview .maintable .eligibletoken > div, .lootableclose .points .availabletable .gridview .maintable .pointstokens > div, .lootableclose .points .availabletable .gridview .maintable .pointvalue > div, .lootableclose .points .availabletable .gridview .maintable .claimtokens > div {
+  padding-left: 2.1rem;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens {
+  padding-left: 0;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens h3 {
+  text-align: center;
+  padding-left: 0;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens .row3, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row1, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 {
+  padding-left: 0;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens > div, .lootableclose .points .availabletable .gridview .maintable .claimtokens h3 {
+  border-right: none;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens .claimed {
+  text-align: center;
+  width: 100%;
+  font-size: 16px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+  font-weight: bold;
+  letter-spacing: .25px;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .blondyfullwidth {
+  border-bottom: 1px solid #000;
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+  background-color: #0c234a !important;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .blondyfullwidth .cell {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  letter-spacing: .25px;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .blondyfullwidth__1 .bondlyspan {
+  background-color: #1740b1;
+  position: relative;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .blondyfullwidth__1 .bondlyspan img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.lootableclose .points .availabletable .gridview .maintable .blondyfullwidth__2 {
+  width: 712.31px;
+  max-width: 100%;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .blondyfullwidth__2 .soldout {
+  font-size: 16px;
+  font-family: "Kanit";
+  color: #ff1e63;
+  font-weight: bold;
+  font-family: 'Kanit', sans-serif;
+  text-transform: uppercase;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .tokenfullywidth, .lootableclose .points .availabletable .gridview .maintable .blondyfullwidth {
+  width: 1359px;
+  background-color: #132e5d;
+  color: #fff;
+  padding-left: 1.5rem;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .tokenfullywidth__1, .lootableclose .points .availabletable .gridview .maintable .blondyfullwidth__1 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .tokenfullywidth {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  padding: 1.65rem 0;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .tokenfullywidth p, .lootableclose .points .availabletable .gridview .maintable .tokenfullywidth a {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .tokenfullywidth a {
+  color: #4fa8eb;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .tokenfullywidth p {
+  position: relative;
+  width: 135px;
+  letter-spacing: .5px;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .tokenfullywidth p::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 12px;
+  width: 4px;
+  height: 85%;
+  background-color: #051632;
+}
+
+.lootableclose .points .availabletable .cardsview {
+  max-width: 1360px;
+  margin: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  display: none;
+}
+
+.lootableclose .points .availabletable .cardsview.show {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.lootableclose .points .availabletable .cardsview .card {
+  width: 23.1%;
+}
+
+.lootableclose .points .availabletable .cardsview .card .top {
+  background-color: #0d244c;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding-top: 3rem;
+  padding-bottom: 2rem;
+}
+
+.lootableclose .points .availabletable .cardsview .card .bottom {
+  background-image: -ms-linear-gradient(90deg, #132e5d 0%, #0c234a 100%);
+  padding: 1rem 2.5rem;
+  padding-bottom: 3rem;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.lootableclose .points .availabletable .cardsview .card .imgcard {
+  border-radius: 50%;
+  background-color: #1840b1;
+  width: 165px;
+  height: 165px;
+  position: relative;
+  margin: auto;
+}
+
+.lootableclose .points .availabletable .cardsview .card .imgcard img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.lootableclose .points .availabletable .cardsview .card .headingcard {
+  font-size: 24px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: .8rem;
+}
+
+.lootableclose .points .availabletable .cardsview .card .properties {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin: 2rem 0;
+}
+
+.lootableclose .points .availabletable .cardsview .card .properties ul li {
+  font-size: 14px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 1.8rem;
+  letter-spacing: .5px;
+  font-weight: 500;
+}
+
+.lootableclose .points .availabletable .cardsview .card .properties ul:nth-child(1) li:nth-child(1) {
+  position: relative;
+}
+
+.lootableclose .points .availabletable .cardsview .card .properties ul:nth-child(1) li:nth-child(1) img {
+  position: absolute;
+  top: -6px;
+  right: 6px;
+  cursor: pointer;
+}
+
+.lootableclose .points .availabletable .cardsview .card .properties ul:nth-child(2) li {
+  font-weight: 400;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+}
+
+.lootableclose .points .availabletable .cardsview .card .ctaCard {
+  color: #fff !important;
+  position: relative;
+}
+
+.lootableclose .points .availabletable .cardsview .card .ctaCard::after {
+  /* position: absolute;
+                    content: "";
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(#000,.05);
+                    z-index: -1;*/
+}
+
+.lootableclose .points .availabletable .cardsview .card .ctaCard .clickclaim {
+  padding: 1.1rem 6.81rem;
+  width: 100%;
+}
+
+.lootableclose .points .availabletable .cardsview .card:nth-child(2) .top .imgcard {
+  background-color: #272727;
+}
+
+.lootableclose .points .availabletable .cardsview .card:nth-child(3) .top .imgcard {
+  background-color: #fff;
+}
+
+.lootableclose .points .availabletable .cardsview .card:nth-child(3) .bottom .ctaCard p {
+  font-size: 16px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: .5px;
+  height: 46px;
+}
+
+.lootableclose .points .availabletable .cardsview .card:nth-child(4) .imgcard h3 {
+  color: #fff;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+  padding-top: 15rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.lootableclose .points .availabletable .cardsview .card:nth-child(4) .properties h3 {
+  text-transform: uppercase;
+  color: #4fa8eb;
+  font-size: 22px;
+  text-align: center;
+  padding-bottom: 10.6rem;
+  cursor: pointer;
+}
+
+.lootableclose .points .availabletable .cardsview .pagination {
+  width: 100%;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim, .lootableclose .points .availabletable .cardsview .card .ctaCard .clickclaim, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim, .loottableopen .points .availabletable .cardsview .card .ctaCard .clickclaim, .lootableboxview .points .availabletable .cardsview .card .ctaCard .clickclaim {
+  display: inline-block;
+  border-radius: 5px;
+  background-color: #4fa8eb;
+  text-decoration: none;
+  color: #fff;
+  font-size: 16px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+  padding: 1.1rem 4.41rem;
+  -webkit-box-shadow: 1px 0px 8px 0px #4fa8eb;
+          box-shadow: 1px 0px 8px 0px #4fa8eb;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  /* width: 100%; */
+  margin: auto;
+  font-weight: 600;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim:hover, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim:hover, .lootableclose .points .availabletable .cardsview .card .ctaCard .clickclaim:hover, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim:hover, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim:hover, .loottableopen .points .availabletable .cardsview .card .ctaCard .clickclaim:hover, .lootableboxview .points .availabletable .cardsview .card .ctaCard .clickclaim:hover {
+  -webkit-transform: scale(1.08);
+          transform: scale(1.08);
+  background-color: transparent;
+  border: 1px solid #4fa8eb;
+  color: #fff;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  color: #01ea01;
+  color: #01ea01;
+}
+
+.lootableclose .points .availabletable .gridview .pagination, .lootableclose .points .availabletable .cardsview .pagination, .loottableopen .points .availabletable .gridview .pagination, .loottableopen .points .availabletable .cardsview .pagination, .lootableboxview .points .availabletable .cardsview .pagination {
+  width: 1360px;
+  margin: auto;
+  color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-top: 3rem;
+  font-family: 'Lato', sans-serif;
+}
+
+.lootableclose .points .availabletable .gridview .pagination > div, .lootableclose .points .availabletable .cardsview .pagination > div, .loottableopen .points .availabletable .gridview .pagination > div, .loottableopen .points .availabletable .cardsview .pagination > div, .lootableboxview .points .availabletable .cardsview .pagination > div {
+  display: inline-block;
+}
+
+.lootableclose .points .availabletable .gridview .pagination > div span, .lootableclose .points .availabletable .cardsview .pagination > div span, .loottableopen .points .availabletable .gridview .pagination > div span, .loottableopen .points .availabletable .cardsview .pagination > div span, .lootableboxview .points .availabletable .cardsview .pagination > div span {
+  cursor: pointer;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetleft, .lootableclose .points .availabletable .cardsview .pagination .resetleft, .loottableopen .points .availabletable .gridview .pagination .resetleft, .loottableopen .points .availabletable .cardsview .pagination .resetleft, .lootableboxview .points .availabletable .cardsview .pagination .resetleft {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetleft span:nth-child(2), .lootableclose .points .availabletable .cardsview .pagination .resetleft span:nth-child(2), .loottableopen .points .availabletable .gridview .pagination .resetleft span:nth-child(2), .loottableopen .points .availabletable .cardsview .pagination .resetleft span:nth-child(2), .lootableboxview .points .availabletable .cardsview .pagination .resetleft span:nth-child(2) {
+  position: relative;
+  left: -13px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countleft, .lootableclose .points .availabletable .cardsview .pagination .countleft, .loottableopen .points .availabletable .gridview .pagination .countleft, .loottableopen .points .availabletable .cardsview .pagination .countleft, .lootableboxview .points .availabletable .cardsview .pagination .countleft {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countleft span, .lootableclose .points .availabletable .cardsview .pagination .countleft span, .loottableopen .points .availabletable .gridview .pagination .countleft span, .loottableopen .points .availabletable .cardsview .pagination .countleft span, .lootableboxview .points .availabletable .cardsview .pagination .countleft span {
+  color: #1d3b6d;
+  font-weight: bold;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countright, .lootableclose .points .availabletable .cardsview .pagination .countright, .loottableopen .points .availabletable .gridview .pagination .countright, .loottableopen .points .availabletable .cardsview .pagination .countright, .lootableboxview .points .availabletable .cardsview .pagination .countright {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetright, .lootableclose .points .availabletable .cardsview .pagination .resetright, .loottableopen .points .availabletable .gridview .pagination .resetright, .loottableopen .points .availabletable .cardsview .pagination .resetright, .lootableboxview .points .availabletable .cardsview .pagination .resetright {
+  position: relative;
+  top: 5px;
+  left: 10px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetright span:nth-child(2), .lootableclose .points .availabletable .cardsview .pagination .resetright span:nth-child(2), .loottableopen .points .availabletable .gridview .pagination .resetright span:nth-child(2), .loottableopen .points .availabletable .cardsview .pagination .resetright span:nth-child(2), .lootableboxview .points .availabletable .cardsview .pagination .resetright span:nth-child(2) {
+  position: relative;
+  left: -13px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers, .lootableclose .points .availabletable .cardsview .pagination .numbers, .loottableopen .points .availabletable .gridview .pagination .numbers, .loottableopen .points .availabletable .cardsview .pagination .numbers, .lootableboxview .points .availabletable .cardsview .pagination .numbers {
+  margin: 0 2rem;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers span, .lootableclose .points .availabletable .cardsview .pagination .numbers span, .loottableopen .points .availabletable .gridview .pagination .numbers span, .loottableopen .points .availabletable .cardsview .pagination .numbers span, .lootableboxview .points .availabletable .cardsview .pagination .numbers span {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 24px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers span.active, .lootableclose .points .availabletable .cardsview .pagination .numbers span.active, .loottableopen .points .availabletable .gridview .pagination .numbers span.active, .loottableopen .points .availabletable .cardsview .pagination .numbers span.active, .lootableboxview .points .availabletable .cardsview .pagination .numbers span.active {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #4fa8eb;
+  background-color: rgba(76, 183, 208, 0);
+  color: #4fa8eb;
+}
+
+.loottableopen .points {
+  font-family: 'Kanit', sans-serif;
+  padding-top: 5rem;
+}
+
+.loottableopen .points.show {
+  display: block;
+}
+
+.loottableopen .points .prizimg {
+  margin: auto;
+}
+
+.loottableopen .points .pointsLogo h2 {
+  font-size: 50px;
+  color: #4fa8eb;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.loottableopen .points .pointsLogo h2 span {
+  color: #fff;
+}
+
+.loottableopen .points .frozen {
+  font-size: 21px;
+  font-family: "Lato";
+  color: #4fa8eb;
+  line-height: 1.714;
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  width: 1360px;
+  max-width: 100%;
+  margin: auto;
+  margin-top: 3rem;
+  font-weight: 400;
+}
+
+.loottableopen .points .input-search {
+  width: 1360px;
+  max-width: 100%;
+  margin: auto;
+  margin-top: 8rem;
+  padding: 3rem 0;
+  border-top: 2px solid #132e5d;
+  border-bottom: 2px solid #132e5d;
+  padding-bottom: 2rem;
+}
+
+.loottableopen .points .input-search form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding-left: 2.4rem;
+  position: relative;
+}
+
+.loottableopen .points .input-search form .searchimg {
+  margin-right: 1.5rem;
+  cursor: pointer;
+}
+
+.loottableopen .points .input-search form input {
+  width: 90%;
+  color: #fff;
+  font-size: 20px;
+}
+
+.loottableopen .points .input-search form input::-webkit-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.loottableopen .points .input-search form input:-ms-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.loottableopen .points .input-search form input::-ms-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.loottableopen .points .input-search form input::placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.loottableopen .points .input-search form .tokensymbol {
+  position: absolute;
+  top: 14px;
+  left: 143px;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #fff;
+  letter-spacing: .5px;
+}
+
+.loottableopen .points .input-search form .tokensymbol.hide {
+  opacity: 0;
+  z-index: -1;
+}
+
+.loottableopen .points .input-search form .searchfilter {
+  margin-right: 5rem;
+  cursor: pointer;
+  color: #fff;
+  font-size: 24px;
+  position: relative;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.loottableopen .points .input-search form .searchfilter.changeColor {
+  color: #4fa8eb;
+}
+
+.loottableopen .points .input-search form p {
+  color: #fff;
+  margin-right: auto;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 300;
+}
+
+.loottableopen .points .input-search form p > span {
+  color: #4fa8eb;
+  font-weight: bold;
+}
+
+.loottableopen .points .input-search .searchbtn {
+  position: relative;
+}
+
+.loottableopen .points .input-search .searchbtn::after {
+  position: absolute;
+  content: "";
+  top: 0px;
+  left: -19px;
+  width: 2px;
+  height: 60px;
+  background-color: #132e5d;
+}
+
+.loottableopen .points .input-search .searchbtn button {
+  padding: 1rem 10.1rem;
+  border-radius: 5px;
+  font-size: 24px;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.loottableopen .points .input-search .searchbtn button:hover {
+  background-color: transparent;
+  color: #fff;
+  -webkit-transform: scale(1.05);
+          transform: scale(1.05);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  border: 1px solid #4fa8eb;
+}
+
+.loottableopen .points .input-search .filtersearchopen {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.loottableopen .points .input-search .filtersearchopen.show {
+  max-height: 1000px;
+  margin-top: 4rem;
+  -webkit-transition: max-height .3s linear;
+  transition: max-height .3s linear;
+  overflow: visible;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column1, .loottableopen .points .input-search .filtersearchopen .column2, .loottableopen .points .input-search .filtersearchopen .column3 {
+  width: 355px;
+  max-width: 100%;
+  position: relative;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column1::after, .loottableopen .points .input-search .filtersearchopen .column2::after, .loottableopen .points .input-search .filtersearchopen .column3::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 15px;
+  width: 2px;
+  height: 100%;
+  background-color: #132e5d;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 {
+  width: 21.6%;
+  color: #fff;
+  padding-top: 3rem;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1 {
+  margin-bottom: 1.8rem;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1, .loottableopen .points .input-search .filtersearchopen .column4 .col2 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1 p, .loottableopen .points .input-search .filtersearchopen .column4 .col2 p {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  letter-spacing: .5px;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1 p::first-letter, .loottableopen .points .input-search .filtersearchopen .column4 .col2 p::first-letter {
+  text-transform: capitalize;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox, .loottableopen .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox {
+  position: relative;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox input, .loottableopen .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox input {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+  left: 1px;
+  z-index: 9999;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox input:checked ~ span::after, .loottableopen .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox input:checked ~ span::after {
+  display: block;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox span, .loottableopen .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox span {
+  display: block;
+  border-style: solid;
+  border-radius: 3px;
+  background-color: rgba(249, 248, 254, 0);
+  border: 2px solid #4fa8eb;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  z-index: -1;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox span::after, .loottableopen .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox span::after {
+  content: "\ea10";
+  font-family: 'icomoon' !important;
+  position: relative;
+  top: -7px;
+  font-size: 20px;
+  display: none;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col2 p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  width: 50px;
+  margin-top: 2rem;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .tableview {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  background-color: #1e3d74;
+  cursor: pointer;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .tableview.brightness {
+  background-color: #4fa8eb;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .tableview:hover {
+  background-color: #4fa8eb;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .grid {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 19px;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  cursor: pointer;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .grid span {
+  display: block;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .grid span.light {
+  background-color: #1e3d74 !important;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .grid .part1 span {
+  width: 6px;
+  height: 5px;
+  background-color: #4fa8eb;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .grid .part1 span:nth-child(2) {
+  margin: .2rem 0;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .grid .part2 span {
+  width: 12px;
+  height: 5px;
+  background-color: #4fa8eb;
+}
+
+.loottableopen .points .input-search .filtersearchopen .column4 .col3 .grid .part2 span:nth-child(2) {
+  margin: .2rem 0;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select {
+  border-radius: 8px;
+  width: 323px;
+  line-height: normal;
+  height: auto;
+  float: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  padding: 1.9rem  0px;
+  padding-left: 2rem;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select.open {
+  border-radius: 0;
+  background-color: #ecd237;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select.open .list {
+  margin-top: 0;
+  border-radius: 0;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select .list {
+  width: 100%;
+  background-color: #4fa8eb;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select .list li {
+  color: #fff;
+  background-color: transparent;
+  font-family: 'Lato', sans-serif;
+  border-bottom: 1px solid #fff;
+  font-size: 16px;
+  font-weight: 400;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select .list li:hover {
+  background-color: #c0c2ce;
+  color: #fff;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select .list li:last-child {
+  border-bottom: none;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select .current {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #051632;
+  font-weight: 500;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .nice-select::after {
+  content: "\e900";
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  border: none;
+  width: auto;
+  height: auto;
+  -webkit-transform: none;
+          transform: none;
+  -webkit-transform-origin: center;
+          transform-origin: center;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .input-group {
+  width: 323px;
+  padding: 1.8rem 0;
+  background-color: #fff;
+  border-radius: 8px;
+  padding-left: 2rem;
+  margin-top: 1rem;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .input-group input {
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .input-group input::-webkit-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .input-group input:-ms-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .input-group input::-ms-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.loottableopen .points .input-search .filtersearchopen > div .input-group input::placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.loottableopen .points .availabletable {
+  padding-bottom: 10rem;
+}
+
+.loottableopen .points .availabletable h2 {
+  text-align: center;
+  font-size: 30px;
+  font-family: "Kanit";
+  color: white;
+  font-weight: bold;
+  font-family: 'Kanit', sans-serif;
+  text-transform: uppercase;
+  margin: 5rem 0;
+}
+
+.loottableopen .points .availabletable .gridview.hide {
+  display: none;
+}
+
+.loottableopen .points .availabletable .gridview .maintable {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  width: 1360px;
+  margin: auto;
+}
+
+.loottableopen .points .availabletable .gridview .maintable > div {
+  width: calc(100% / 6);
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .bondlyspan {
+  display: inline-block;
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  margin-right: 2.3rem;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken > div, .loottableopen .points .availabletable .gridview .maintable .tokenvalue > div, .loottableopen .points .availabletable .gridview .maintable .eligibletoken > div, .loottableopen .points .availabletable .gridview .maintable .pointstokens > div, .loottableopen .points .availabletable .gridview .maintable .pointvalue > div, .loottableopen .points .availabletable .gridview .maintable .claimtokens > div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 50px;
+  color: #fff;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+  border-right: 1px solid #000;
+  padding-left: 1.65rem;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken > div .cell, .loottableopen .points .availabletable .gridview .maintable .tokenvalue > div .cell, .loottableopen .points .availabletable .gridview .maintable .eligibletoken > div .cell, .loottableopen .points .availabletable .gridview .maintable .pointstokens > div .cell, .loottableopen .points .availabletable .gridview .maintable .pointvalue > div .cell, .loottableopen .points .availabletable .gridview .maintable .claimtokens > div .cell {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  letter-spacing: .25px;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken h3, .loottableopen .points .availabletable .gridview .maintable .tokenvalue h3, .loottableopen .points .availabletable .gridview .maintable .eligibletoken h3, .loottableopen .points .availabletable .gridview .maintable .pointstokens h3, .loottableopen .points .availabletable .gridview .maintable .pointvalue h3, .loottableopen .points .availabletable .gridview .maintable .claimtokens h3 {
+  font-size: 18px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-weight: 500;
+  text-transform: capitalize;
+  width: 226px;
+  background-image: -ms-linear-gradient(90deg, #132e5d 0%, #0c234a 100%);
+  -webkit-box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.05);
+          box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid #000;
+  width: 100%;
+  border-right: 1px solid #000;
+  position: relative;
+  padding: 2.35rem 0;
+  padding-left: 2rem;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken h3 img, .loottableopen .points .availabletable .gridview .maintable .airdroptoken h3 span, .loottableopen .points .availabletable .gridview .maintable .tokenvalue h3 img, .loottableopen .points .availabletable .gridview .maintable .tokenvalue h3 span, .loottableopen .points .availabletable .gridview .maintable .eligibletoken h3 img, .loottableopen .points .availabletable .gridview .maintable .eligibletoken h3 span, .loottableopen .points .availabletable .gridview .maintable .pointstokens h3 img, .loottableopen .points .availabletable .gridview .maintable .pointstokens h3 span, .loottableopen .points .availabletable .gridview .maintable .pointvalue h3 img, .loottableopen .points .availabletable .gridview .maintable .pointvalue h3 span, .loottableopen .points .availabletable .gridview .maintable .claimtokens h3 img, .loottableopen .points .availabletable .gridview .maintable .claimtokens h3 span {
+  position: absolute;
+  top: 30px;
+  right: 21px;
+  cursor: pointer;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken h3 .tokenpopup, .loottableopen .points .availabletable .gridview .maintable .tokenvalue h3 .tokenpopup, .loottableopen .points .availabletable .gridview .maintable .eligibletoken h3 .tokenpopup, .loottableopen .points .availabletable .gridview .maintable .pointstokens h3 .tokenpopup, .loottableopen .points .availabletable .gridview .maintable .pointvalue h3 .tokenpopup, .loottableopen .points .availabletable .gridview .maintable .claimtokens h3 .tokenpopup {
+  left: 115px;
+  top: 19px;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken h3 .tokenspan, .loottableopen .points .availabletable .gridview .maintable .tokenvalue h3 .tokenspan, .loottableopen .points .availabletable .gridview .maintable .eligibletoken h3 .tokenspan, .loottableopen .points .availabletable .gridview .maintable .pointstokens h3 .tokenspan, .loottableopen .points .availabletable .gridview .maintable .pointvalue h3 .tokenspan, .loottableopen .points .availabletable .gridview .maintable .claimtokens h3 .tokenspan {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row1, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row1, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row1, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row1, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row1, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 {
+  background-color: #132e5d;
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #000;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row1 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row1 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row1 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row1 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row1 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 .bondlyspan {
+  background-color: #1740b1;
+  position: relative;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row1 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row1 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row1 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row1 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row1 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 .bondlyspan img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row2, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row2, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row2, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row2, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row2, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 {
+  background-color: #0c234a;
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #000;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row2 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row2 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row2 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row2 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row2 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 .bondlyspan {
+  background-color: #393939;
+  position: relative;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row2 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row2 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row2 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row2 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row2 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 .bondlyspan img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  top: 55%;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row3, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row3, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row3, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row3, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row3, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row3 {
+  background-color: #132e5d;
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #000;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row3 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row3 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row3 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row3 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row3 .bondlyspan, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row3 .bondlyspan {
+  background-color: #fff;
+  position: relative;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .airdroptoken .row3 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .tokenvalue .row3 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .eligibletoken .row3 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .pointstokens .row3 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .pointvalue .row3 .bondlyspan img, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row3 .bondlyspan img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  top: 41%;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .tokenvalue > div, .loottableopen .points .availabletable .gridview .maintable .eligibletoken > div, .loottableopen .points .availabletable .gridview .maintable .pointstokens > div, .loottableopen .points .availabletable .gridview .maintable .pointvalue > div, .loottableopen .points .availabletable .gridview .maintable .claimtokens > div {
+  padding-left: 2.1rem;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .claimtokens {
+  padding-left: 0;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .claimtokens h3 {
+  text-align: center;
+  padding-left: 0;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .claimtokens .row3, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 {
+  padding-left: 0;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .claimtokens > div, .loottableopen .points .availabletable .gridview .maintable .claimtokens h3 {
+  border-right: none;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .claimtokens .claimed {
+  text-align: center;
+  width: 100%;
+  font-size: 16px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+  font-weight: bold;
+  letter-spacing: .25px;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .blondyfullwidth {
+  border-bottom: 1px solid #000;
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+  background-color: #0c234a !important;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .blondyfullwidth .cell {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  letter-spacing: .25px;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .blondyfullwidth__1 .bondlyspan {
+  background-color: #1740b1;
+  position: relative;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .blondyfullwidth__1 .bondlyspan img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.loottableopen .points .availabletable .gridview .maintable .blondyfullwidth__2 {
+  width: 712.31px;
+  max-width: 100%;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .blondyfullwidth__2 .soldout {
+  font-size: 16px;
+  font-family: "Kanit";
+  color: #ff1e63;
+  font-weight: bold;
+  font-family: 'Kanit', sans-serif;
+  text-transform: uppercase;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .tokenfullywidth, .loottableopen .points .availabletable .gridview .maintable .blondyfullwidth {
+  width: 1359px;
+  background-color: #132e5d;
+  color: #fff;
+  padding-left: 1.5rem;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .tokenfullywidth__1, .loottableopen .points .availabletable .gridview .maintable .blondyfullwidth__1 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .tokenfullywidth {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  padding: 1.65rem 0;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .tokenfullywidth p, .loottableopen .points .availabletable .gridview .maintable .tokenfullywidth a {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .tokenfullywidth a {
+  color: #4fa8eb;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .tokenfullywidth p {
+  position: relative;
+  width: 135px;
+  letter-spacing: .5px;
+}
+
+.loottableopen .points .availabletable .gridview .maintable .tokenfullywidth p::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 12px;
+  width: 4px;
+  height: 85%;
+  background-color: #051632;
+}
+
+.loottableopen .points .availabletable .cardsview {
+  max-width: 1360px;
+  margin: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  display: none;
+}
+
+.loottableopen .points .availabletable .cardsview.show {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.loottableopen .points .availabletable .cardsview .card {
+  width: 23.1%;
+}
+
+.loottableopen .points .availabletable .cardsview .card .top {
+  background-color: #0d244c;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding-top: 3rem;
+  padding-bottom: 2rem;
+}
+
+.loottableopen .points .availabletable .cardsview .card .bottom {
+  background-image: -ms-linear-gradient(90deg, #132e5d 0%, #0c234a 100%);
+  padding: 1rem 2.5rem;
+  padding-bottom: 3rem;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.loottableopen .points .availabletable .cardsview .card .imgcard {
+  border-radius: 50%;
+  background-color: #1840b1;
+  width: 165px;
+  height: 165px;
+  position: relative;
+  margin: auto;
+}
+
+.loottableopen .points .availabletable .cardsview .card .imgcard img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.loottableopen .points .availabletable .cardsview .card .headingcard {
+  font-size: 24px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: .8rem;
+}
+
+.loottableopen .points .availabletable .cardsview .card .properties {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin: 2rem 0;
+}
+
+.loottableopen .points .availabletable .cardsview .card .properties ul li {
+  font-size: 14px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 1.8rem;
+  letter-spacing: .5px;
+  font-weight: 500;
+}
+
+.loottableopen .points .availabletable .cardsview .card .properties ul:nth-child(1) li:nth-child(1) {
+  position: relative;
+}
+
+.loottableopen .points .availabletable .cardsview .card .properties ul:nth-child(1) li:nth-child(1) img {
+  position: absolute;
+  top: -6px;
+  right: 6px;
+  cursor: pointer;
+}
+
+.loottableopen .points .availabletable .cardsview .card .properties ul:nth-child(2) li {
+  font-weight: 400;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+}
+
+.loottableopen .points .availabletable .cardsview .card .ctaCard {
+  color: #fff !important;
+  position: relative;
+}
+
+.loottableopen .points .availabletable .cardsview .card .ctaCard::after {
+  /* position: absolute;
+                    content: "";
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(#000,.05);
+                    z-index: -1;*/
+}
+
+.loottableopen .points .availabletable .cardsview .card .ctaCard .clickclaim {
+  padding: 1.1rem 6.81rem;
+  width: 100%;
+}
+
+.loottableopen .points .availabletable .cardsview .card:nth-child(2) .top .imgcard {
+  background-color: #272727;
+}
+
+.loottableopen .points .availabletable .cardsview .card:nth-child(3) .top .imgcard {
+  background-color: #fff;
+}
+
+.loottableopen .points .availabletable .cardsview .card:nth-child(3) .bottom .ctaCard p {
+  font-size: 16px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: .5px;
+  height: 46px;
+}
+
+.loottableopen .points .availabletable .cardsview .card:nth-child(4) .imgcard h3 {
+  color: #fff;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+  padding-top: 15rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.loottableopen .points .availabletable .cardsview .card:nth-child(4) .properties h3 {
+  text-transform: uppercase;
+  color: #4fa8eb;
+  font-size: 22px;
+  text-align: center;
+  padding-bottom: 10.6rem;
+  cursor: pointer;
+}
+
+.loottableopen .points .availabletable .cardsview .pagination {
+  width: 100%;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim, .lootableclose .points .availabletable .cardsview .card .ctaCard .clickclaim, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim, .loottableopen .points .availabletable .cardsview .card .ctaCard .clickclaim, .lootableboxview .points .availabletable .cardsview .card .ctaCard .clickclaim {
+  display: inline-block;
+  border-radius: 5px;
+  background-color: #4fa8eb;
+  text-decoration: none;
+  color: #fff;
+  font-size: 16px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+  padding: 1.1rem 4.41rem;
+  -webkit-box-shadow: 1px 0px 8px 0px #4fa8eb;
+          box-shadow: 1px 0px 8px 0px #4fa8eb;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  /* width: 100%; */
+  margin: auto;
+  font-weight: 600;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableclose .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim:hover, .lootableclose .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim:hover, .lootableclose .points .availabletable .cardsview .card .ctaCard .clickclaim:hover, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row1 .clickclaim:hover, .loottableopen .points .availabletable .gridview .maintable .claimtokens .row2 .clickclaim:hover, .loottableopen .points .availabletable .cardsview .card .ctaCard .clickclaim:hover, .lootableboxview .points .availabletable .cardsview .card .ctaCard .clickclaim:hover {
+  -webkit-transform: scale(1.08);
+          transform: scale(1.08);
+  background-color: transparent;
+  border: 1px solid #4fa8eb;
+  color: #fff;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  color: #01ea01;
+  color: #01ea01;
+}
+
+.lootableclose .points .availabletable .gridview .pagination, .lootableclose .points .availabletable .cardsview .pagination, .loottableopen .points .availabletable .gridview .pagination, .loottableopen .points .availabletable .cardsview .pagination, .lootableboxview .points .availabletable .cardsview .pagination {
+  width: 1360px;
+  margin: auto;
+  color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-top: 3rem;
+  font-family: 'Lato', sans-serif;
+}
+
+.lootableclose .points .availabletable .gridview .pagination > div, .lootableclose .points .availabletable .cardsview .pagination > div, .loottableopen .points .availabletable .gridview .pagination > div, .loottableopen .points .availabletable .cardsview .pagination > div, .lootableboxview .points .availabletable .cardsview .pagination > div {
+  display: inline-block;
+}
+
+.lootableclose .points .availabletable .gridview .pagination > div span, .lootableclose .points .availabletable .cardsview .pagination > div span, .loottableopen .points .availabletable .gridview .pagination > div span, .loottableopen .points .availabletable .cardsview .pagination > div span, .lootableboxview .points .availabletable .cardsview .pagination > div span {
+  cursor: pointer;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetleft, .lootableclose .points .availabletable .cardsview .pagination .resetleft, .loottableopen .points .availabletable .gridview .pagination .resetleft, .loottableopen .points .availabletable .cardsview .pagination .resetleft, .lootableboxview .points .availabletable .cardsview .pagination .resetleft {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetleft span:nth-child(2), .lootableclose .points .availabletable .cardsview .pagination .resetleft span:nth-child(2), .loottableopen .points .availabletable .gridview .pagination .resetleft span:nth-child(2), .loottableopen .points .availabletable .cardsview .pagination .resetleft span:nth-child(2), .lootableboxview .points .availabletable .cardsview .pagination .resetleft span:nth-child(2) {
+  position: relative;
+  left: -13px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countleft, .lootableclose .points .availabletable .cardsview .pagination .countleft, .loottableopen .points .availabletable .gridview .pagination .countleft, .loottableopen .points .availabletable .cardsview .pagination .countleft, .lootableboxview .points .availabletable .cardsview .pagination .countleft {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countleft span, .lootableclose .points .availabletable .cardsview .pagination .countleft span, .loottableopen .points .availabletable .gridview .pagination .countleft span, .loottableopen .points .availabletable .cardsview .pagination .countleft span, .lootableboxview .points .availabletable .cardsview .pagination .countleft span {
+  color: #1d3b6d;
+  font-weight: bold;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .countright, .lootableclose .points .availabletable .cardsview .pagination .countright, .loottableopen .points .availabletable .gridview .pagination .countright, .loottableopen .points .availabletable .cardsview .pagination .countright, .lootableboxview .points .availabletable .cardsview .pagination .countright {
+  position: relative;
+  top: 5px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetright, .lootableclose .points .availabletable .cardsview .pagination .resetright, .loottableopen .points .availabletable .gridview .pagination .resetright, .loottableopen .points .availabletable .cardsview .pagination .resetright, .lootableboxview .points .availabletable .cardsview .pagination .resetright {
+  position: relative;
+  top: 5px;
+  left: 10px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .resetright span:nth-child(2), .lootableclose .points .availabletable .cardsview .pagination .resetright span:nth-child(2), .loottableopen .points .availabletable .gridview .pagination .resetright span:nth-child(2), .loottableopen .points .availabletable .cardsview .pagination .resetright span:nth-child(2), .lootableboxview .points .availabletable .cardsview .pagination .resetright span:nth-child(2) {
+  position: relative;
+  left: -13px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers, .lootableclose .points .availabletable .cardsview .pagination .numbers, .loottableopen .points .availabletable .gridview .pagination .numbers, .loottableopen .points .availabletable .cardsview .pagination .numbers, .lootableboxview .points .availabletable .cardsview .pagination .numbers {
+  margin: 0 2rem;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers span, .lootableclose .points .availabletable .cardsview .pagination .numbers span, .loottableopen .points .availabletable .gridview .pagination .numbers span, .loottableopen .points .availabletable .cardsview .pagination .numbers span, .lootableboxview .points .availabletable .cardsview .pagination .numbers span {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 24px;
+}
+
+.lootableclose .points .availabletable .gridview .pagination .numbers span.active, .lootableclose .points .availabletable .cardsview .pagination .numbers span.active, .loottableopen .points .availabletable .gridview .pagination .numbers span.active, .loottableopen .points .availabletable .cardsview .pagination .numbers span.active, .lootableboxview .points .availabletable .cardsview .pagination .numbers span.active {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #4fa8eb;
+  background-color: rgba(76, 183, 208, 0);
+  color: #4fa8eb;
+}
+
+.lootableboxview .points {
+  font-family: 'Kanit', sans-serif;
+  padding-top: 5rem;
+}
+
+.lootableboxview .points.show {
+  display: block;
+}
+
+.lootableboxview .points .prizimg {
+  margin: auto;
+}
+
+.lootableboxview .points .pointsLogo h2 {
+  font-size: 50px;
+  color: #4fa8eb;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.lootableboxview .points .pointsLogo h2 span {
+  color: #fff;
+}
+
+.lootableboxview .points .frozen {
+  font-size: 21px;
+  font-family: "Lato";
+  color: #4fa8eb;
+  line-height: 1.714;
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  width: 1360px;
+  max-width: 100%;
+  margin: auto;
+  margin-top: 3rem;
+  font-weight: 400;
+}
+
+.lootableboxview .points .input-search {
+  width: 1360px;
+  max-width: 100%;
+  margin: auto;
+  margin-top: 8rem;
+  padding: 3rem 0;
+  border-top: 2px solid #132e5d;
+  border-bottom: 2px solid #132e5d;
+  padding-bottom: 2rem;
+}
+
+.lootableboxview .points .input-search form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding-left: 2.4rem;
+  position: relative;
+}
+
+.lootableboxview .points .input-search form .searchimg {
+  margin-right: 1.5rem;
+  cursor: pointer;
+}
+
+.lootableboxview .points .input-search form input {
+  width: 90%;
+  color: #fff;
+  font-size: 20px;
+}
+
+.lootableboxview .points .input-search form input::-webkit-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search form input:-ms-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search form input::-ms-input-placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search form input::placeholder {
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search form .tokensymbol {
+  position: absolute;
+  top: 14px;
+  left: 143px;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: #fff;
+  letter-spacing: .5px;
+}
+
+.lootableboxview .points .input-search form .tokensymbol.hide {
+  opacity: 0;
+  z-index: -1;
+}
+
+.lootableboxview .points .input-search form .searchfilter {
+  margin-right: 5rem;
+  cursor: pointer;
+  color: #fff;
+  font-size: 24px;
+  position: relative;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableboxview .points .input-search form .searchfilter.changeColor {
+  color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search form p {
+  color: #fff;
+  margin-right: auto;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 300;
+}
+
+.lootableboxview .points .input-search form p > span {
+  color: #4fa8eb;
+  font-weight: bold;
+}
+
+.lootableboxview .points .input-search .searchbtn {
+  position: relative;
+}
+
+.lootableboxview .points .input-search .searchbtn::after {
+  position: absolute;
+  content: "";
+  top: 0px;
+  left: -19px;
+  width: 2px;
+  height: 60px;
+  background-color: #132e5d;
+}
+
+.lootableboxview .points .input-search .searchbtn button {
+  padding: 1rem 10.1rem;
+  border-radius: 5px;
+  font-size: 24px;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableboxview .points .input-search .searchbtn button:hover {
+  background-color: transparent;
+  color: #fff;
+  -webkit-transform: scale(1.05);
+          transform: scale(1.05);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  border: 1px solid #4fa8eb;
+}
+
+.lootableboxview .points .input-search .filtersearchopen {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.lootableboxview .points .input-search .filtersearchopen.show {
+  max-height: 1000px;
+  margin-top: 4rem;
+  -webkit-transition: max-height .3s linear;
+  transition: max-height .3s linear;
+  overflow: visible;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column1, .lootableboxview .points .input-search .filtersearchopen .column2, .lootableboxview .points .input-search .filtersearchopen .column3 {
+  width: 355px;
+  max-width: 100%;
+  position: relative;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column1::after, .lootableboxview .points .input-search .filtersearchopen .column2::after, .lootableboxview .points .input-search .filtersearchopen .column3::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 15px;
+  width: 2px;
+  height: 100%;
+  background-color: #132e5d;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 {
+  width: 21.6%;
+  color: #fff;
+  padding-top: 3rem;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1 {
+  margin-bottom: 1.8rem;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1, .lootableboxview .points .input-search .filtersearchopen .column4 .col2 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1 p, .lootableboxview .points .input-search .filtersearchopen .column4 .col2 p {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  letter-spacing: .5px;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1 p::first-letter, .lootableboxview .points .input-search .filtersearchopen .column4 .col2 p::first-letter {
+  text-transform: capitalize;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox, .lootableboxview .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox {
+  position: relative;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox input, .lootableboxview .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox input {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+  left: 1px;
+  z-index: 9999;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox input:checked ~ span::after, .lootableboxview .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox input:checked ~ span::after {
+  display: block;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox span, .lootableboxview .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox span {
+  display: block;
+  border-style: solid;
+  border-radius: 3px;
+  background-color: rgba(249, 248, 254, 0);
+  border: 2px solid #4fa8eb;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  z-index: -1;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col1 .inputcheckbox span::after, .lootableboxview .points .input-search .filtersearchopen .column4 .col2 .inputcheckbox span::after {
+  content: "\ea10";
+  font-family: 'icomoon' !important;
+  position: relative;
+  top: -7px;
+  font-size: 20px;
+  display: none;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col2 p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  width: 50px;
+  margin-top: 2rem;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .tableview {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  background-color: #1e3d74;
+  cursor: pointer;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .tableview.brightness {
+  background-color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .tableview:hover {
+  background-color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .grid {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 19px;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  cursor: pointer;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .grid span {
+  display: block;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .grid span.light {
+  background-color: #1e3d74 !important;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .grid .part1 span {
+  width: 6px;
+  height: 5px;
+  background-color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .grid .part1 span:nth-child(2) {
+  margin: .2rem 0;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .grid .part2 span {
+  width: 12px;
+  height: 5px;
+  background-color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search .filtersearchopen .column4 .col3 .grid .part2 span:nth-child(2) {
+  margin: .2rem 0;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select {
+  border-radius: 8px;
+  width: 323px;
+  line-height: normal;
+  height: auto;
+  float: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  padding: 1.9rem  0px;
+  padding-left: 2rem;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select.open {
+  border-radius: 0;
+  background-color: #ecd237;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select.open .list {
+  margin-top: 0;
+  border-radius: 0;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select .list {
+  width: 100%;
+  background-color: #4fa8eb;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select .list li {
+  color: #fff;
+  background-color: transparent;
+  font-family: 'Lato', sans-serif;
+  border-bottom: 1px solid #fff;
+  font-size: 16px;
+  font-weight: 400;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select .list li:hover {
+  background-color: #c0c2ce;
+  color: #fff;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select .list li:last-child {
+  border-bottom: none;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select .current {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #051632;
+  font-weight: 500;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .nice-select::after {
+  content: "\e900";
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  border: none;
+  width: auto;
+  height: auto;
+  -webkit-transform: none;
+          transform: none;
+  -webkit-transform-origin: center;
+          transform-origin: center;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .input-group {
+  width: 323px;
+  padding: 1.8rem 0;
+  background-color: #fff;
+  border-radius: 8px;
+  padding-left: 2rem;
+  margin-top: 1rem;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .input-group input {
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .input-group input::-webkit-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .input-group input:-ms-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .input-group input::-ms-input-placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.lootableboxview .points .input-search .filtersearchopen > div .input-group input::placeholder {
+  font-size: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #aebcd3;
+}
+
+.lootableboxview .points .availabletable {
+  padding-bottom: 10rem;
+}
+
+.lootableboxview .points .availabletable h2 {
+  text-align: center;
+  font-size: 30px;
+  font-family: "Kanit";
+  color: white;
+  font-weight: bold;
+  font-family: 'Kanit', sans-serif;
+  text-transform: uppercase;
+  margin: 5rem 0;
+}
+
+.lootableboxview .points .availabletable .cardsview {
+  max-width: 1360px;
+  margin: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.lootableboxview .points .availabletable .cardsview.show {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.lootableboxview .points .availabletable .cardsview .card {
+  width: 23.1%;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .top {
+  background-color: #0d244c;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding-top: 3rem;
+  padding-bottom: 2rem;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .bottom {
+  background-image: -ms-linear-gradient(90deg, #132e5d 0%, #0c234a 100%);
+  padding: 1rem 2.5rem;
+  padding-bottom: 3rem;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .imgcard {
+  border-radius: 50%;
+  background-color: #1840b1;
+  width: 165px;
+  height: 165px;
+  position: relative;
+  margin: auto;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .imgcard img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.lootableboxview .points .availabletable .cardsview .card .headingcard {
+  font-size: 24px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: .8rem;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .properties {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin: 2rem 0;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .properties ul li {
+  font-size: 14px;
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 1.8rem;
+  letter-spacing: .5px;
+  font-weight: 500;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .properties ul:nth-child(1) li:nth-child(1) {
+  position: relative;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .properties ul:nth-child(1) li:nth-child(1) img {
+  position: absolute;
+  top: -6px;
+  right: 6px;
+  cursor: pointer;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .properties ul:nth-child(2) li {
+  font-weight: 400;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .ctaCard {
+  color: #fff !important;
+  position: relative;
+}
+
+.lootableboxview .points .availabletable .cardsview .card .ctaCard::after {
+  /* position: absolute;
+                    content: "";
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(#000,.05);
+                    z-index: -1;*/
+}
+
+.lootableboxview .points .availabletable .cardsview .card .ctaCard .clickclaim {
+  padding: 1.1rem 6.81rem;
+  width: 100%;
+}
+
+.lootableboxview .points .availabletable .cardsview .card:nth-child(2) .top .imgcard {
+  background-color: #272727;
+}
+
+.lootableboxview .points .availabletable .cardsview .card:nth-child(3) .top .imgcard {
+  background-color: #fff;
+}
+
+.lootableboxview .points .availabletable .cardsview .card:nth-child(3) .bottom .ctaCard p {
+  font-size: 16px;
+  font-family: 'Kanit', sans-serif;
+  color: #4fa8eb;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: .5px;
+  height: 46px;
+}
+
+.lootableboxview .points .availabletable .cardsview .card:nth-child(4) .imgcard h3 {
+  color: #fff;
+  font-size: 18px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  font-weight: bold;
+  padding-top: 15rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.lootableboxview .points .availabletable .cardsview .card:nth-child(4) .properties h3 {
+  text-transform: uppercase;
+  color: #4fa8eb;
+  font-size: 22px;
+  text-align: center;
+  padding-bottom: 10.6rem;
+  cursor: pointer;
+}
+
+.lootableboxview .points .availabletable .cardsview .pagination {
+  width: 100%;
+}
+/*# sourceMappingURL=main.css.map */
