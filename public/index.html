@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon1.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
+      integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag=="
+      crossorigin="anonymous"
+    />
+    <title>SmartSwap</title>
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!--======================= CSS =====================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="%PUBLIC_URL%/css/boilerplate.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="%PUBLIC_URL%/css/protip.min02.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="%PUBLIC_URL%/css/animate.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="%PUBLIC_URL%/css/jquery.mCustomScrollbar.css?v=1.12"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="%PUBLIC_URL%/css/smartswap-style.css?v=1.14"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="%PUBLIC_URL%/css/smartswap-responsive.css?v=1.12"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+  <script src="%PUBLIC_URL%/js/bs-collaps.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"
+    integrity="sha512-Eak/29OTpb36LLo2r47IpVzPBLXnAMPAVypbSZiZ4Qkf8p/7S/XRG5xp7OKWPPYfJT6metI+IORkR5G8F900+g=="
+    crossorigin="anonymous"
+  ></script>
+  <script src="%PUBLIC_URL%/js/protip.min.js"></script>
+  <script src="%PUBLIC_URL%/js/jquery.mCustomScrollbar.concat.min.js"></script>
+  <script src="%PUBLIC_URL%/js/custom.js"></script>
+  <script
+    type="text/javascript"
+    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+  ></script>
+  <link
+    rel="stylesheet"
+    href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+    crossorigin="anonymous"
+  />
+  <!--======================= SlickSlider Slide =====================-->
+  <script>
+    $(document).ready(function () {
+      wow = new WOW({
+        boxClass: "wow", // default
+        animateClass: "animated", // default
+        offset: 0, // default
+        mobile: true, // default
+        live: true, // default
+      });
+      wow.init();
+      $(".qr-Scan").hover(function (e) {
+        e.preventDefault();
+        $(".qr-boxPopup").fadeIn(300, function () {
+          $(this).focus();
+        });
+      });
+      $(".qr-boxPopup").on("blur", function () {
+        $(this).fadeOut();
+      });
+      $(".gas-Est").hover(function (e) {
+        e.preventDefault();
+        $(".text-Popup").fadeIn(300, function () {
+          $(this).focus();
+        });
+      });
+      $(".text-Popup").on("blur", function () {
+        $(this).fadeOut();
+      });
+      //   $(".Setting").click(function(){
+      //         $(".estimate-Popup").fadeIn();
+      //        });
+      //     $(".estimate-Popup .close-Icon").click(function(){
+      //         $(".estimate-Popup").fadeOut();
+      //     });
+      // $("#change-Token").click(function () {
+      //     $("#receiveCurPop").fadeIn();
+      // });
+      $("#receiveCurPop .close-Icon").click(function () {
+        $("#receiveCurPop").fadeOut();
+      });
+      $("#wallet-Popup .close-Icon").click(function () {
+        $("#wallet-Popup").fadeOut();
+      });
+      // $("#change-Market").click(function () {
+      //     $("#sendCurPop").fadeIn();
+      // });
+      $("#sendCurPop .close-Icon").click(function () {
+        $("#sendCurPop").fadeOut();
+      });
+      $(".smartSwap .mobile-sub .close-Icon").click(function () {
+        $(".smartSwap .mobile-sub").fadeOut();
+      });
+      // $("#limitSwap").click(function () {
+      //   $(".side-Popup").addClass("active");
+      // });
+      // $(".side-Popup .close-Icon").click(function () {
+      //   $(".side-Popup").removeClass("active");
+      // });
+      // Custom Protip Function
+      $(".protipNp").each(function () {
+        var title = $(this).attr("data-pt-title");
+        var html = "<div class='mmProtip ani-1' >" + title + " </div>";
+        $(this).append(html);
+      });
+      $.protip();
+      setTimeout(function () {
+        new window.google.translate.TranslateElement(
+          { pageLanguage: "en" },
+          "google_translate_element"
+        );
+      }, 1000);
+      $(".tab-Link").click(function () {
+        $(".tab-Link").removeClass("active");
+        $(this).addClass("active");
+        $(".tab-Content").hide();
+        $("#" + $(this).attr("data-id")).fadeIn("slow");
+      });
+
+      // $(".tab-Link .sendCurPop").click(function () {
+      //     $(".tab-Link .sendCurPop").removeClass("active")
+      //     $(this).addClass("active")
+      //     $(".tab-Content .sendCurPop").hide();
+      //     $("#" + $(this).attr("data-id")).fadeIn("slow");
+      // });
+      // $(".tab-Link .receiveCurPop").click(function () {
+      //     $(".tab-Link .receiveCurPop").removeClass("active")
+      //     $(this).addClass("active")
+      //     $(".tab-Content .receiveCurPop").hide();
+      //     $("#" + $(this).attr("data-id")).fadeIn("slow");
+      // });
+      (function ($) {
+        $(window)
+          .resize(function () {
+            if ($(this).width() > 768) {
+              $(
+                ".wallet-Popup, .side-Popup, #security-DigitalPopup, .menuSideBarContainer"
+              ).mCustomScrollbar(); //apply scrollbar with your options
+            } else {
+              $(
+                ".wallet-Popup, .side-Popup, #security-DigitalPopup, .menuSideBarContainer"
+              ).mCustomScrollbar("destroy"); //destroy scrollbar
+            }
+          })
+          .trigger("resize");
+      })(jQuery);
+    });
+    $(window).scroll(function () {
+      var scroll = $(window).scrollTop();
+      if (scroll >= 50) {
+        $(".header").addClass("fixed");
+      } else {
+        $(".header").removeClass("fixed");
+      }
+    });
+    var menuOpen = false;
+    var menuOpen2 = false;
+    $("#DotMenu").click(function () {
+      $(".menuSideBar").animate({ right: "0", opacity: "1" }, 500);
+      menuOpen = true;
+      event.stopPropagation();
+    });
+    $(".main, .MenuClose").click(function (e) {
+      if (menuOpen) {
+        if (!$(e.target).is(".menuSideBar *, .menuSideBar")) {
+          $(".menuSideBar").animate({ right: "-100%", opacity: "0" }, 500);
+        }
+      }
+    });
+    $(".MenuClose, .footerV2-LanBoxLink").click(function (e) {
+      if (menuOpen) {
+        $(".menuSideBar").animate({ right: "-100%", opacity: "0" }, 500);
+      }
+    });
+ 
+  </script>
+</html>

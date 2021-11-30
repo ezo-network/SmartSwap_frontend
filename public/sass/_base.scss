@@ -1,0 +1,397 @@
+//helopers classes 
+@font-face {
+  font-family: 'icomoon';
+  src:  url('../fonts/icomoon.eot');
+  src:  url('../fonts//icomoon.eot') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf') format('truetype'),
+    url('../fonts/icomoon.woff') format('woff'),
+    url('../fonts/icomoon.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-filter_alt:before {
+  content: "\e901";
+}
+.icon-navigate_before:before {
+  content: "\e903";
+}
+.icon-cheveron-left:before {
+  content: "\e902";
+}
+.icon-caret-down:before {
+  content: "\e900";
+}
+.icon-checkmark:before {
+  content: "\ea10";
+}
+
+
+.icon-chevron-left1:before {
+  content: "\e909";
+}
+.icon-chevron-right:before {
+  content: "\e90b";
+}
+
+
+.icon-filter1:before {
+  content: "\e905";
+}
+
+
+
+
+
+//overlay 
+@mixin overlay(){
+    content: "";
+    position: absolute;
+   top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	z-index: -1;
+    
+}
+
+//Center Elements
+
+
+@mixin centerElement(){
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%)
+}
+
+//Draw Circle element 
+
+
+@mixin circleBackground($WH,$brdradius,$color){
+	
+	width: $WH#{px};
+	border-radius:$brdradius;
+	height: $WH#{px};
+	background-color: $color;
+}
+
+
+//Mixins for responsive layout 
+
+$px : "px";
+
+@mixin max($width){
+    @media  (max-width:$width#{$px}){
+        @content
+    }
+}
+    
+@mixin min($width){
+    @media (min-width:$width#{$px}){
+            @content
+            }
+        }
+    
+@mixin media($width1,$width2){
+        @media (min-width:$width1#{$px}) and (max-width:$width2#{$px}){@content}
+        }
+
+/*animation*/
+
+@keyframes fadein{
+    
+    
+    0%{
+        opacity: .4;
+    }
+    
+    50%{
+        opacity: .8
+    }
+    
+    100%{
+        opacity: 1;
+        background: none;
+    }
+}
+
+//sticky
+
+@keyframes sticky{
+    
+    0%{
+        top: -100px;
+    }
+    100%{
+        top: 0;
+    }
+}
+//hide works 
+
+@keyframes fadeworksIn{
+    
+    0%{
+        opacity: 0;
+       
+    }
+    
+    100%{
+        
+        opacity: 1;
+       
+        
+    }
+}
+
+@keyframes fadeInMenu {
+    0% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.01;
+    }
+    20% {
+        opacity: 0.02;
+    }
+    30% {
+        opacity: 0.05;
+    }
+    40% {
+        opacity: 0.06;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    60% {
+        opacity: 0.4;
+    }
+    70% {
+        opacity: 0.6;
+    }
+    80% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.85;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+
+
+@keyframes wow {
+    
+    
+    from {
+        opacity: 0;
+        position: relative;
+        top: 200px;
+    }
+    
+    to{
+        opacity: 1;
+        position: relative;
+        top: 0px;
+    }
+    
+    
+}
+
+
+@keyframes buttonVideo{
+    
+    from {
+        opacity: 0;
+        background-color: rgba(#fff,.5);
+    }
+    
+    to{
+        opacity: 100;
+        background-color: rgba(#2980b9,.5);
+    }
+}
+
+
+
+
+ @keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to { 
+        transform: rotate(360deg);
+    }
+}
+ 
+
+ @-webkit-keyframes rotate {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to { 
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+
+
+
+
+@keyframes fadeInMenu {
+      0%{
+        opacity: 0;
+       
+    }
+    
+    100%{
+        
+        opacity: 1;
+      
+       
+        
+    }
+}
+
+/*
+@keyframes fadeOut {
+      0%{
+        opacity: 1;
+       
+    }
+    
+    100%{
+        
+        opacity: 0;
+      
+       
+        
+    }
+}*/
+
+
+@keyframes expand {
+    
+    0%{
+        width: 0;
+    }
+    
+    100%{
+        width: 100%;
+    }
+}
+
+@keyframes fadeInMenu {
+    0% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.01;
+    }
+    20% {
+        opacity: 0.02;
+    }
+    30% {
+        opacity: 0.05;
+    }
+    40% {
+        opacity: 0.06;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    60% {
+        opacity: 0.4;
+    }
+    70% {
+        opacity: 0.6;
+    }
+    80% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.85;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+
+
+
+
+
+html{
+    font-size: 62.5%;
+    
+}
+
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    
+}
+
+
+body{
+    
+    font-size: 16px;
+    margin: auto;
+ /*   height: 4000px;*/
+    background-image: url(../imgs/options.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    
+    
+   
+}
+input{
+    background: none;
+    
+    border: none;
+    &:focus{
+        outline: 0;
+    }
+}
+button{
+    background: none;
+    border: none;
+    &:focus{
+        outline: 0;
+    }
+}
+a{
+    text-decoration: none;
+    display: inline-block;
+}
+img{
+    display: block;
+}
+ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}

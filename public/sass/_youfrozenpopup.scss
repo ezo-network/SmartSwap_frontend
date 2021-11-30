@@ -1,0 +1,79 @@
+.popupsuccess{
+    
+    background-color: #020e22;
+      width: 1359px;
+
+    max-width: 100%;
+        padding: 10.1rem 0;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0px -1px 5px 2px #020e22;
+    /*center element in center of the screen */
+    
+    
+    @include centerElement();
+    z-index: 9999999;
+    
+
+}
+
+
+
+
+.popupsuccess h2{
+    
+    
+      font-size: 36px;
+ font-family: 'Kanit', sans-serif;
+  color: rgb( 255, 255, 255 );
+  font-weight: bold;
+    text-align: center;
+    
+}
+
+
+
+.popupsuccess h2 span{
+    
+    color: #4fa8eb;
+}
+
+.howtoadd{
+    
+    position: relative;
+     color: #4fa8eb;
+    font-family: 'Kanit', sans-serif;
+    text-align: center;
+    margin: 0;
+    
+    
+}
+
+
+.howtoadd img{
+    
+    position: relative;
+    top: -10px;
+    cursor: pointer;
+    display: inline;
+    
+    
+}
+
+.closepopup{
+        position: absolute;
+    top: 30px;
+    right: 35px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.closepopup:hover {
+    
+    transform: rotate(180deg)
+}
+
+
+
+
+

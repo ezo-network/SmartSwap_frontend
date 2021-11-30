@@ -1,0 +1,23 @@
+
+   .btnwallet{
+            
+            border-radius: 8px;
+              background-color: rgb( 79, 168, 235 );
+            color: #fff;
+            font-family: 'Kanit', sans-serif;
+            padding: 3.3rem 11.4rem;
+            font-size: 30px;
+            cursor: pointer;
+            align-self: flex-end;
+            
+            text-transform: uppercase;
+            font-weight: bold;
+             box-shadow: 0px -1px 11px 2px #4fa8eb;
+        transition: .5s;
+        &:hover{
+            
+            transform: scale(1.02);
+   
+        }
+
+        }

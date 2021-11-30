@@ -1,0 +1,75 @@
+
+#selectcoins,#selectoins2{
+    
+    cursor: pointer;
+    background-color: #0e2954;
+    width: 108px !important;
+       border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+ 
+   
+}
+.dd-select{
+    border-top-right-radius: 8px !important; 
+   border-bottom-right-radius: 8px !important;
+}
+.dd-selected,.dd-select{
+        
+        cursor: pointer;
+    background-color: #0e2954;
+    border-color: #0e2954!important;
+    width: 108px !important;
+   
+ background-color: transparent !important;
+    height: 70px;
+    padding-left: 20px;
+    
+    
+    }
+
+
+
+
+.dd-options{
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.dd-option{
+    
+    height: 70px;
+    background-color: #173564;
+   border-bottom: 1px solid #0e2954 !important;
+}
+.dd-pointer{
+    right: 30px !important;
+    top: 54% !important;
+}
+.dd-option-selected{
+    
+    background-color: #173564 !important;
+}
+
+.dd-pointer-down{
+    
+        border-top: solid 5px #fff !important;
+}
+
+#selectcoins .dd-pointer-up{
+    
+     border-bottom: solid 5px #fff !important;
+}
+#selectoins2 .dd-pointer-up{
+    
+    border-bottom: solid 5px #fff !important;
+}
+
+.dd-option img.dd-option-image{
+    
+        margin-left: 21px !important;
+    margin-top: 10px !important
+}
+
+
+

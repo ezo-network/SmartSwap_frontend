@@ -1,0 +1,66 @@
+.welcomepage{
+    
+  height: 100vh;
+    background-image: url(../imgs/bkgroundwelcom.png);
+    background-size: cover;
+    background-position: -70px center;
+    opacity: 1;
+    transition: .5s;
+   
+
+
+    &.hide{
+        opacity: 0;
+    }
+    
+    
+    form{
+        width: 1600px;
+        max-width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-self: flex-end;
+        height: 500px;
+    flex-direction: column;
+    align-content: center;
+    justify-items: center;
+    align-items: center;
+        height: 100vh;
+        justify-content: center;
+        .input-button{
+            border-radius: 8px;
+              background-color: rgb( 79, 168, 235 );
+               
+            width: 430px;
+            max-width: 100%;
+            text-align: center;
+            align-items: flex-end;
+            align-self: flex-end;
+            box-shadow: 0px -1px 11px 2px #4fa8eb;
+            transition: .3s;
+            cursor: pointer;
+            &:hover{
+                transform: scale(1.05);
+            }
+               .welcomeBtn{
+       padding: 2.2rem 0;
+              font-size: 30px;
+          font-family: "Kanit";
+          color: rgb( 255, 255, 255 );
+          font-weight: bold;
+          line-height: 1.2;
+          text-align: center;
+            font-family: 'Kanit', sans-serif;
+                   text-transform: uppercase;
+                   width: 100%;
+                   cursor: pointer;
+                   
+                   
+
+        }
+        }
+     
+    }
+    
+    
+}
