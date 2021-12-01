@@ -59,7 +59,9 @@ class SPContract extends EventEmitter {
     }
 
     async setFeeAmountLimit(amount, txCb, receiptCb) {
-        amount = web3Js.utils.toBN(web3Js.utils.toWei((amount).toString()));
+        amount = web3Js.utils.toWei((amount).toString());
+        amount = web3Js.utils.toHex(amount);
+        amount = amount.slice(2);
         var payload = `0x8c90c121${this.pad32Bytes(amount)}`
         console.log(payload);
         console.log(this.contractAddress);
