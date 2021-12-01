@@ -18,6 +18,8 @@ export default class RightSideMenu extends PureComponent {
       web3: newProps.web3,
       web3Config: newProps.web3Config,
     });
+    // remove this line when stop testing on swap provider
+    //this.props.openPopup("LiquidityProvider")
   }
 
   showWithId(popup, id) {
@@ -76,7 +78,7 @@ export default class RightSideMenu extends PureComponent {
                 <a
                   href="#"
                   onClick={() => {
-                    // this.props.openPopup("LiquidityProvider");
+                    this.props.openPopup("LiquidityProvider");
                   }}
                 >
                   Become an Swap Provider (SP){" "}

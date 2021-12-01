@@ -146,6 +146,20 @@ class SwapFactoryContract extends EventEmitter {
         this.sendTransaction(payload, amountNew, "270000", this.swapFactoryAddress, txCb, receiptCb)
     }
 
+    async addSwapProvider(nativeToken, foreignToken, nativeTokenReceiver, foreignTokenReceiver, feeAmountLimit, txCb, receiptCb) {
+        let _nativeToken = nativeToken.replace("0x", "");
+        let _foreignToken = foreignToken.replace("0x", "");
+        let _nativeTokenReceiver = nativeTokenReceiver.replace("0x", "");
+        let _foreignTokenReceiver = foreignTokenReceiver.replace("0x", "");
+        let _feeAmountLimit = web3Js.utils.toBN(web3Js.utils.toWei((feeAmountLimit).toString()));
+
+        var payload = `0xd104451a${this.pad32Bytes(_nativeToken)}${this.pad32Bytes(_foreignToken)}${this.pad32Bytes(_nativeTokenReceiver)}${this.pad32Bytes(_foreignTokenReceiver)}${this.pad32Bytes(_feeAmountLimit)}`
+        console.log(payload);
+        console.log(this.swapFactoryAddress);
+
+        this.sendTransaction(payload, 0, "400680", this.swapFactoryAddress, txCb, receiptCb)
+    }
+
     async estimateSwapGasFee(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, gasLimit, estGasCb) {
         // let fee = await this.swapFactoryInstance.processingFee();
         // fee = web3Js.utils.hexToNumberString(fee._hex);
