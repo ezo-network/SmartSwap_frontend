@@ -20,15 +20,16 @@ CONSTANT.currencyAddresses = {
 // ------------------------------------------mainnet-config-start----------------------------------------------
 
 CONSTANT.NETWORK_ID = {
-    "ETHEREUM": 1,
-    "BINANCE": 56,
-    "1": "ETHEREUM",
-    "56": "BINANCE"
+    'ETHEREUM': Number(process.env.REACT_APP_ETH_CHAIN_ID),
+    'BINANCE': Number(process.env.REACT_APP_BSC_CHAIN_ID)
 }
 
-CONSTANT.RPC_PROVIDER_ETHEREUM = 'wss://mainnet.infura.io/ws/v3/0bc569339d39467c9c1840a2f5c6615f';
+CONSTANT['NETWORK_ID'][Number(process.env.REACT_APP_ETH_CHAIN_ID)] = "ETHEREUM";
+CONSTANT['NETWORK_ID'][Number(process.env.REACT_APP_BSC_CHAIN_ID)] = "BINANCE";
 
-CONSTANT.RPC_PROVIDER_BINANCE = 'https://bsc-dataseed.binance.org';
+CONSTANT.RPC_PROVIDER_ETHEREUM = 'wss://kovan.infura.io/ws/v3/d86e5c556a9f4e5d84c5319ab1d174be';
+
+CONSTANT.RPC_PROVIDER_BINANCE = 'https://data-seed-prebsc-2-s3.binance.org:8545';
 
 // ------------------------------------------mainnet-config-end----------------------------------------------
 // ------------------------------------------testnet-config-start----------------------------------------------
