@@ -300,6 +300,12 @@ export default class Home extends PureComponent {
             `url(${res.data.result.backGroundImage})`
           );
           r.style.setProperty("--swap-btn-color", res.data.result.swapButton);
+          var style = document.createElement('style');
+          style.type = 'text/css';
+          style.innerHTML = `* { font-family: ${res.data.result.fontStyle} !important; }`;
+          document.getElementsByTagName('head')[0].appendChild(style);
+          // r.style.setProperty("font-family", res.data.result.fontStyle, "important");
+          // window.document.body.setAttribute('style', 'font-family:Arial !important');
           this.setState({
             cloneData: {
               bgimage: res.data.result.backGroundImage,
@@ -749,6 +755,9 @@ export default class Home extends PureComponent {
       // console.log("Company Fees Calculated Amount * Company Fees / 10000: ", (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryBinance)) / 10000)
       // console.log("Licensee Fees Calculated Amount * Licensee Fees / 10000: ", (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementBinance, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.BINANCE].swapFactoryContract)) / 10000)
       // console.log("----------------------------------Fee calculation Logs End -----------------------------------------")
+      console.log((
+        (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryBinance)) / 10000
+      ))
       return {
         totalFees: (
           // web3Js.utils.toWei(
@@ -1648,7 +1657,7 @@ export default class Home extends PureComponent {
     // const response = await fetch(url);
     // const json = await response.json();
 
-    var userTxs = json.data;
+    var userTxs = (json.data).reverse();
     var userTxsUI = [];
     var userPendingTxsUI = [];
 
@@ -1959,7 +1968,7 @@ export default class Home extends PureComponent {
                                     className="faux-Link"
                                     id="change-Market"
                                     onClick={() => {
-                                      this.openPopup("sendCurPop");
+                                      // this.openPopup("sendCurPop");
                                     }}
                                   ></a>
                                 </div>
@@ -2041,7 +2050,7 @@ export default class Home extends PureComponent {
                                     href="javascript:void(0);"
                                     className="faux-Link"
                                     onClick={() => {
-                                      this.openPopup("receiveCurPop");
+                                      // this.openPopup("receiveCurPop");
                                     }}
                                   ></a>
                                 </div>

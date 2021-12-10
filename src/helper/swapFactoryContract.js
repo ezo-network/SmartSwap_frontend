@@ -101,7 +101,7 @@ class SwapFactoryContract extends EventEmitter {
         return s;
     }
 
-    async swap(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, processingFees, txCb, receiptCb) {
+    async swap(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, txCb, receiptCb) {
         // let fee = await this.swapFactoryInstance.processingFee();
         // let fee = web3Js.utils.toWei(0.1);
         // fee = web3Js.utils.hexToNumberString(fee._hex);

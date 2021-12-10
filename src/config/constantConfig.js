@@ -13,7 +13,7 @@ data.allowedNetwork = [Number(process.env.REACT_APP_ETH_CHAIN_ID), Number(proces
 // data[97].frozenTokenContract = "0xac7Fcf3907Eb1B4bC70C5Aee18856a25a32C1c7F";
 // data[97].tokenGateWay = "0x23C9523DC77441eFb878c57D426190E8b9586AF3";
 
-data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].reimbursementContract = "0xd26132cca2d9e0b4901c7ad4de2b16364624f85a";
+data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].reimbursementContract = process.env.REACT_APP_BSC_REIMBURSEMENT_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].swapFactoryContract = process.env.REACT_APP_BSC_SMART_SWAP_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].explorer = "https://bscscan.com";
 
@@ -21,7 +21,7 @@ data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].explorer = "https://bscscan.com
 // data[42].frozenTokenContract = "0x0A3EefA17Ef03dc9Ef34B68d2A2F1178C959a237";
 // data[42].tokenGateWay = "0xaEb8818Df09F0476c8160935Ec61978B34eC3151";
 
-data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].reimbursementContract = "0x96d1e9D25bD949b6811e2844ACa63CB3Cfce68AF";
+data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].reimbursementContract = process.env.REACT_APP_ETH_REIMBURSEMENT_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].swapFactoryContract = process.env.REACT_APP_ETH_SMARTSWAP_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].explorer = "https://etherscan.io";
 
