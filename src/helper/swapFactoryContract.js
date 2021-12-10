@@ -151,7 +151,8 @@ class SwapFactoryContract extends EventEmitter {
         let _foreignToken = foreignToken.replace("0x", "");
         let _nativeTokenReceiver = nativeTokenReceiver.replace("0x", "");
         let _foreignTokenReceiver = foreignTokenReceiver.replace("0x", "");
-        let _feeAmountLimit = web3Js.utils.toBN(web3Js.utils.toWei((feeAmountLimit).toString()));
+        let _feeAmountLimit = web3Js.utils.toHex(web3Js.utils.toWei((feeAmountLimit).toString()));
+        _feeAmountLimit = _feeAmountLimit.replace("0x", "");
 
         var payload = `0xd104451a${this.pad32Bytes(_nativeToken)}${this.pad32Bytes(_foreignToken)}${this.pad32Bytes(_nativeTokenReceiver)}${this.pad32Bytes(_foreignTokenReceiver)}${this.pad32Bytes(_feeAmountLimit)}`
         console.log(payload);

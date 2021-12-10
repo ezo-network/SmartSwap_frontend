@@ -3,7 +3,7 @@ import { response } from 'express';
 import { log, constants } from "../../../config";
 
 const Config = {
-    baseUrl: `http://${constants.host}:${constants.port}`,
+    baseUrl: `http://${constants.SERVER_HOST}:${constants.SERVER_PORT}`,
 };
 
 export default class axiosRequest {

@@ -45,7 +45,7 @@ export default class LiquidityProvider extends PureComponent {
             swapSpeedMode: 'UPFRONT',
             spreadAmount: 100,
             spProfitPercent: 0.3,
-            accumulateFundsLimit: 0.3,
+            accumulateFundsLimit: 100,
             stopRepeatsMode: 3,
             stopRepeatsOnDate: new Date(),
             stopRepeatsAfterCalls: 200,

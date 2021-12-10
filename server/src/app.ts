@@ -9,8 +9,8 @@ import BSCListner = require('./api/v1/listners/bscListner');
 
 mongoose.connect(db.url, db.configs);
 
-const port = constants.port as number;
-const host = constants.host as string;
+const port = constants.SERVER_PORT as number;
+const host = constants.SERVER_HOST as string;
 const app = express();
 
 app.use(express.json());
