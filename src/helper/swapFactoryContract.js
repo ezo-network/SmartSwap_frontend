@@ -127,7 +127,7 @@ class SwapFactoryContract extends EventEmitter {
         console.log(Number(fee.totalFees) - (Number(fee.processingFees) * 10 ** 18))
         console.log("------------------------------------fees-end-------------------------------------")
 
-        let fees = web3Js.utils.toHex(Number(fee.totalFees) - (Number(fee.processingFees) * 10 ** 18)).replace("0x", "");
+        let fees = web3Js.utils.toHex(((Number(fee.companyFees) + Number(fee.reimbursementFees)) * 10 ** 18).toFixed()).replace("0x", "");
         console.log(fees)
 
         let newamount = web3Js.utils.toHex(swapAmount).replace("0x", "");
@@ -189,7 +189,10 @@ class SwapFactoryContract extends EventEmitter {
         receiver = receiver.replace("0x", "");
         licensee = licensee.replace("0x", "");
 
-        let fees = web3Js.utils.toHex(Number(fee.totalFees) - (Number(fee.processingFees) * 10 ** 18)).replace("0x", "");
+        console.log("--------------------fees------------------------")
+        console.log(fee)
+        console.log("--------------------fees------------------------")
+        let fees = web3Js.utils.toHex(((Number(fee.companyFees) + Number(fee.reimbursementFees)) * 10 ** 18).toFixed()).replace("0x", "");
         // var encodeABI = `${pad32Bytes(requestId)}${pad32Bytes(price)}`;
 
         console.log("------------------------------------fees-start-------------------------------------")

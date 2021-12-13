@@ -747,6 +747,12 @@ export default class Home extends PureComponent {
             (this.state.currencyPrices["ETH"] / this.state.currencyPrices["BNB"])).toFixed(0)).toString()
         )
       )
+      let companyFees = (
+        (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryBinance)) / 10000
+      )
+      let reimbursementFees = (
+        (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementBinance, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.BINANCE].swapFactoryContract)) / 10000
+      )
       // console.log("----------------------------------Fee calculation Logs Start -----------------------------------------")
       // console.log("Company Fees : ", await this.getCompanyFees(this.state.instanceSwapFactoryBinance))
       // console.log("License Address : ", this.state.licenseeAddress[networkId])
@@ -763,16 +769,15 @@ export default class Home extends PureComponent {
           // web3Js.utils.toWei(
           ((prcsFees
             +
-            (
-              (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryBinance)) / 10000
-            )
+            companyFees
             +
-            (
-              (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementBinance, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.BINANCE].swapFactoryContract)) / 10000
-            )) * 10 ** 18).toFixed()
+            reimbursementFees
+          ) * 10 ** 18).toFixed()
           // )
         ),
-        processingFees: prcsFees
+        processingFees: prcsFees,
+        companyFees: companyFees,
+        reimbursementFees: reimbursementFees
       }
     } else if (networkId === 1 || networkId === 42) {
       let prcsFees = Number(
@@ -781,6 +786,12 @@ export default class Home extends PureComponent {
             web3Js.utils.toWei("5", "gwei") *
             (this.state.currencyPrices["BNB"] / this.state.currencyPrices["ETH"])).toFixed(0)).toString()
         )
+      )
+      let companyFees = (
+        (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryEthereum)) / 10000
+      )
+      let reimbursementFees = (
+        (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementEthereum, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].swapFactoryContract)) / 10000
       )
       // console.log("----------------------------------Fee calculation Logs Start -----------------------------------------")
       // console.log("Company Fees : ", await this.getCompanyFees(this.state.instanceSwapFactoryEthereum))
@@ -796,16 +807,15 @@ export default class Home extends PureComponent {
           // web3Js.utils.toWei(
           ((prcsFees
             +
-            (
-              (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryEthereum)) / 10000
-            )
+            companyFees
             +
-            (
-              (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementEthereum, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].swapFactoryContract)) / 10000
-            )) * 10 ** 18).toFixed()
+            reimbursementFees
+          ) * 10 ** 18).toFixed()
           // )
         ),
-        processingFees: prcsFees
+        processingFees: prcsFees,
+        companyFees: companyFees,
+        reimbursementFees: reimbursementFees
       }
     }
   }

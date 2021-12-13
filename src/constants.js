@@ -2,7 +2,7 @@ var CONSTANT = function () { }
 
 CONSTANT.COINGECKO_URL = "https://api.coingecko.com/api/v3";
 
-CONSTANT.PrePath = "https://smartswap.exchange";
+CONSTANT.PrePath = "http://bswap.info";
 // CONSTANT.PrePath = "http://localhost:3000";
 
 CONSTANT.API_URL = "https://api.smartswap.exchange";
@@ -28,4 +28,4 @@ CONSTANT.RPC_PROVIDER_ETHEREUM = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 
 
 CONSTANT.RPC_PROVIDER_BINANCE = Number(process.env.REACT_APP_BSC_CHAIN_ID) === 56 ? 'https://bsc-dataseed.binance.org' : 'https://data-seed-prebsc-1-s1.binance.org:8545';
 
-module.exports = CONSTANT;
+export default CONSTANT;

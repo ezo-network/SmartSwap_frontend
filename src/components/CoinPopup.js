@@ -1,10 +1,12 @@
 import React, { PureComponent } from "react";
 import data, { tokenDetails } from "../config/constantConfig";
 import web3Config from "../config/web3Config";
-import { PrePath } from "../constants";
+import CONSTANT from "../constants";
 
+
+const PrePath = CONSTANT.PrePath;
 export default class CoinPopup extends PureComponent {
-    constructor(props){
+    constructor(props) {
         super();
         this.state = {
             web3: props.web3,
@@ -13,14 +15,14 @@ export default class CoinPopup extends PureComponent {
         }
     }
 
-    componentWillReceiveProps(newProps){
+    componentWillReceiveProps(newProps) {
         this.setState({
             web3: newProps.web3,
             web3Config: newProps.web3Config
         })
     }
 
-    componentDidMount(){
+    componentDidMount() {
         // console.log(this.state.coinList)
     }
 
@@ -50,7 +52,7 @@ export default class CoinPopup extends PureComponent {
                                 {
                                     Object.keys(this.state.coinList).map((key) => {
                                         // [Number(key), obj[key]]
-                                        if(key === this.props.opositeSelectedCurrrency || this.state.coinList[key].networkId === this.state.coinList[this.props.opositeSelectedCurrrency].networkId){
+                                        if (key === this.props.opositeSelectedCurrrency || this.state.coinList[key].networkId === this.state.coinList[this.props.opositeSelectedCurrrency].networkId) {
                                             return null
                                         } else {
                                             return (
@@ -58,98 +60,98 @@ export default class CoinPopup extends PureComponent {
                                                     <div className="img-Box">
                                                         <span className="round-Bg">
                                                             <span className="icon-Box icon16">
-                                                                <img src={PrePath+"/images/currencies/"+ this.state.coinList[key].iconName +".png"}/>
+                                                                <img src={PrePath + "/images/currencies/" + this.state.coinList[key].iconName + ".png"} />
                                                             </span>
                                                         </span>
                                                         <div className="title-Name">{key}</div>
                                                     </div>
-                                                    <a href="javascript:void(0);" className="faux-Link" onClick={()=>this.props.setCurrency(key)}></a>
+                                                    <a href="javascript:void(0);" className="faux-Link" onClick={() => this.props.setCurrency(key)}></a>
                                                 </div>
                                             )
                                         }
-                                    })   
+                                    })
                                 }
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon16"></span></span>
+                                        className="icon-Box icon16"></span></span>
                                         <div className="title-Name">SMART</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon01"></span></span>
+                                        className="icon-Box icon01"></span></span>
                                         <div className="title-Name">ZERO/1</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon02"></span></span>
+                                        className="icon-Box icon02"></span></span>
                                         <div className="title-Name">Secured Tether USD</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon05"></span></span>
+                                        className="icon-Box icon05"></span></span>
                                         <div className="title-Name">Paxos Standard</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon06"></span></span>
+                                        className="icon-Box icon06"></span></span>
                                         <div className="title-Name">StatusNetwork</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon07"></span></span>
+                                        className="icon-Box icon07"></span></span>
                                         <div className="title-Name">HuobiToken</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon08"></span></span>
+                                        className="icon-Box icon08"></span></span>
                                         <div className="title-Name">ChainLink Token</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon09"></span></span>
+                                        className="icon-Box icon09"></span></span>
                                         <div className="title-Name">OmiseGO</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon10"></span></span>
+                                        className="icon-Box icon10"></span></span>
                                         <div className="title-Name">BAT</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon11"></span></span>
+                                        className="icon-Box icon11"></span></span>
                                         <div className="title-Name">IOSToken</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                                 <div className="wallet-Bx ani-1 coming-Soon">
                                     <div className="img-Box"><span className="round-Bg"><span
-                                                className="icon-Box icon12"></span></span>
+                                        className="icon-Box icon12"></span></span>
                                         <div className="title-Name">Dai Stablecoin v1.0</div>
                                     </div>
                                     <a href="javascript:void(0);" className="faux-Link"></a>
                                 </div>
                             </div>
                         </div>
-                    </div> 
-                     
+                    </div>
+
                 </div>
                 <a href="javascript:void(0);" className="close-Icon"></a>
             </div>
