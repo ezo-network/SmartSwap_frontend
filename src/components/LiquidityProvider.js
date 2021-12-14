@@ -141,6 +141,8 @@ export default class LiquidityProvider extends PureComponent {
             await this.initInstance();
         });
 
+        this.setGasFeeAndAmountMinMaxRanges();
+
     }
 
     resetForm(){
@@ -176,6 +178,7 @@ export default class LiquidityProvider extends PureComponent {
             spAccount: web3Config.getAddress()
         });
         //this.toggleActiveContractSection();
+        this.setGasFeeAndAmountMinMaxRanges(this.state.coinList[this.state.selectedTokenB]['networkId']);
     };
 
     changeTokenB(token) {
@@ -188,6 +191,7 @@ export default class LiquidityProvider extends PureComponent {
             spAccount: web3Config.getAddress()
         });
         //this.toggleActiveContractSection();
+        this.setGasFeeAndAmountMinMaxRanges(this.state.coinList[this.state.selectedTokenB]['networkId']);
     };
 
     toggleActiveContractSection(){
@@ -255,8 +259,8 @@ export default class LiquidityProvider extends PureComponent {
 
     }
 
-    setGasFeeAndAmountMinMaxRanges(networkID){
-        if(networkID == Number(process.env.REACT_APP_BSC_CHAIN_ID)){
+    setGasFeeAndAmountMinMaxRanges(networkID=CONSTANT.NETWORK_ID.ETHEREUM){
+        if(networkID == CONSTANT.NETWORK_ID.BINANCE){
             this.setState({
                 minGasAndFeeAmount: 0.5,
                 gasAndFeeAmount: 0.5,
@@ -266,7 +270,7 @@ export default class LiquidityProvider extends PureComponent {
                 selectedTokenB: 'ETH',
             })
         }
-        if(networkID == Number(process.env.REACT_APP_ETH_CHAIN_ID)){
+        if(networkID == CONSTANT.NETWORK_ID.ETHEREUM){
             this.setState({
                 minGasAndFeeAmount: 0.05,
                 gasAndFeeAmount: 0.05,
@@ -673,7 +677,8 @@ export default class LiquidityProvider extends PureComponent {
             this.setState({
                 reAuthrizeing: true                
             });
-            let newLimit = this.state.gasAndFeeAmount
+            let newLimit = this.state.gasAndFeeAmount;
+
             let spContract = new SPContract(web3Config.getWeb3(), this.state.networkId, this.state.smartSwapContractAddress);
             spContract.setFeeAmountLimit(
                 newLimit, 
