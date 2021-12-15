@@ -191,6 +191,10 @@ export default class Home extends PureComponent {
   };
   componentWillMount = async () => {
     await this.fetchPrice();
+    // setInterval(async () => {
+    //   await this.fetchPrice();
+    // }, 300000)
+
   };
   componentDidMount = async () => {
     this.setState({
@@ -1492,10 +1496,10 @@ export default class Home extends PureComponent {
       {
         selectedSendCurrency: selectedReceiveCurrency,
         selectedReceiveCurrency: selectedSendCurrency,
+        sendFundAmount: "",
+        estimatedGasFee: "0"
       },
       async () => {
-        if (this.state.sendFundAmount !== "")
-          await this.setAmount(this.state.sendFundAmount);
         this.forceUpdate();
       }
     );
@@ -3490,7 +3494,7 @@ export default class Home extends PureComponent {
                             to="/"
                             className="ssBtn02"
                             onClick={() => {
-                              // this.openPopup("LiquidityProvider");
+                              this.openPopup("LiquidityProvider");
                             }}
                           >
                             <span>BECOME A SWAP PROVIDER</span>{" "}

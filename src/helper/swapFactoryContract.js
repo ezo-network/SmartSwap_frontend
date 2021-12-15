@@ -76,15 +76,6 @@ class SwapFactoryContract extends EventEmitter {
             tx['gasLimit'] = '0x186A0'
         }
 
-        // const tx2 = {
-        //     to: to,
-        //     data: payload,
-        //     gasPrice: web3Js.utils.toHex(web3Js.utils.toWei(gasPrice, "gwei")),
-        //     value: web3Js.utils.toHex(value)
-        // };
-
-        // console.log((await this.web3.getSigner(0).estimateGas(tx2))._hex)
-
         this.web3.getSigner(0).sendTransaction(tx).then(result => {
             txCb(result.hash)
             result.wait().then(async (receipt) => {
@@ -102,47 +93,19 @@ class SwapFactoryContract extends EventEmitter {
     }
 
     async swap(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, txCb, receiptCb) {
-        // let fee = await this.swapFactoryInstance.processingFee();
-        // let fee = web3Js.utils.toWei(0.1);
-        // fee = web3Js.utils.hexToNumberString(fee._hex);
-        // amount = BigNumber(amount).add(fee);
-        // amount = amount.toString();
-
-        console.log(amount)
-        console.log(swapAmount)
-        console.log(fee)
-
-        console.log((Number(amount) + Number(fee.totalFees)).toString())
         let amountNew = (Number(amount) + Number(fee.totalFees)).toString();
 
         let receiver = web3Config.getAddress();
         let licensee = licenseeAddress;
-        let isInvestment = false;
-        let minimumAmountToClaim = 0;
-        let limitPice = 0;
-
-        console.log("------------------------------------fees-start-------------------------------------")
-        console.log(fee.totalFees)
-        console.log((Number(fee.processingFees) * 10 ** 18))
-        console.log(Number(fee.totalFees) - (Number(fee.processingFees) * 10 ** 18))
-        console.log("------------------------------------fees-end-------------------------------------")
-
         let fees = web3Js.utils.toHex(((Number(fee.companyFees) + Number(fee.reimbursementFees)) * 10 ** 18).toFixed()).replace("0x", "");
-        console.log(fees)
 
         let newamount = web3Js.utils.toHex(swapAmount).replace("0x", "");
         tokenA = tokenA.replace("0x", "");
         tokenB = tokenB.replace("0x", "");
         receiver = receiver.replace("0x", "");
         licensee = licensee.replace("0x", "");
-        // var encodeABI = `${pad32Bytes(requestId)}${pad32Bytes(price)}`;
 
         var payload = `0xe0e45f0e${this.pad32Bytes(tokenA)}${this.pad32Bytes(tokenB)}${this.pad32Bytes(receiver)}${this.pad32Bytes(newamount)}${this.pad32Bytes(licensee)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(fees)}`
-
-        // let payload = `0xdf791e50${this.pad32Bytes(tokenA)}${this.pad32Bytes(tokenB)}${this.pad32Bytes(newamount)}`;
-
-        // let payload = await this.swapFactoryInstance.populateTransaction.swap(tokenA, tokenB, receiver, swapAmount, licensee, isInvestment, minimumAmountToClaim, limitPice);
-        console.log(payload)
         this.sendTransaction(payload, amountNew, "270000", this.swapFactoryAddress, txCb, receiptCb)
     }
 
@@ -162,11 +125,6 @@ class SwapFactoryContract extends EventEmitter {
     }
 
     async estimateSwapGasFee(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, gasLimit, estGasCb) {
-        // let fee = await this.swapFactoryInstance.processingFee();
-        // fee = web3Js.utils.hexToNumberString(fee._hex);
-        // amount = BigNumber(amount).add(fee);
-        // amount = amount.toString();
-
         let amountNew = (Number(amount) + Number(fee.totalFees)).toString();
 
         let receiver = web3Config.getAddress();
@@ -189,16 +147,7 @@ class SwapFactoryContract extends EventEmitter {
         receiver = receiver.replace("0x", "");
         licensee = licensee.replace("0x", "");
 
-        console.log("--------------------fees------------------------")
-        console.log(fee)
-        console.log("--------------------fees------------------------")
         let fees = web3Js.utils.toHex(((Number(fee.companyFees) + Number(fee.reimbursementFees)) * 10 ** 18).toFixed()).replace("0x", "");
-        // var encodeABI = `${pad32Bytes(requestId)}${pad32Bytes(price)}`;
-
-        console.log("------------------------------------fees-start-------------------------------------")
-        console.log(this.pad32Bytes(fees))
-        console.log("------------------------------------fees-end-------------------------------------")
-
         var payload = `0xe0e45f0e${this.pad32Bytes(tokenA)}${this.pad32Bytes(tokenB)}${this.pad32Bytes(receiver)}${this.pad32Bytes(newamount)}${this.pad32Bytes(licensee)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(fees)}`
 
         const tx = {
@@ -232,25 +181,6 @@ class SwapFactoryContract extends EventEmitter {
         this.sendTransaction(payload.data, 0, "150000", tokenAddress, txCb, receiptCb);
 
     }
-
-    // async approveJNTRTokenForSwapFactory(txCb,receiptCb){
-    //     let highApproval = web3Js.utils.toWei("10000000000000");
-    //     let payload = await this.JNTRTokenInstance.populateTransaction.approve("0x001667842cc59cadb0a335bf7c7f77b3c75f41c2",highApproval);
-    //     this.sendTransaction(payload.data,0,"150000",txCb,receiptCb);
-    // }
-
-    // async approveJNTRETokenForSwapFactory(txCb,receiptCb){
-    //     let highApproval = web3Js.utils.toWei("10000000000000");
-    //     let payload = await this.JNTRETokenInstance.populateTransaction.approve("0xeaf41806fcc2a3893a662dbba7a111630f9f6704",highApproval);
-    //     this.sendTransaction(payload.data,0,"150000",txCb,receiptCb);
-    // }
-
-    // async approveJNTRBTokenForSwapFactory(txCb,receiptCb){
-    //     let highApproval = web3Js.utils.toWei("10000000000000");
-    //     let payload = await this.JNTRBTokenInstance.populateTransaction.approve("0x001667842cc59cadb0a335bf7c7f77b3c75f41c2",highApproval);
-    //     this.sendTransaction(payload.data,0,"150000",txCb,receiptCb);
-    // }
-
 
     handleActions(action) {
         switch (action.type) { }
