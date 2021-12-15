@@ -4218,14 +4218,14 @@ input[type="checkbox"] {
   text-transform: uppercase;
   font-weight: 700;
 }
-.ssBtn02:hover span {
+/* .ssBtn02:hover span {
   display: none;
-}
-.ssBtn02:hover:before {
+} */
+/* .ssBtn02:hover:before {
   border-color: #41a7dc;
   color: #41a7dc;
   content: "Coming Soon";
-}
+} */
 /* .ssBtn02:hover {
   border-color: #41a7dc;
   color: #41a7dc;
