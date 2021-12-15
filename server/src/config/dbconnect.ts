@@ -8,7 +8,7 @@ const mongoOpts: ConnectionOptions = {
 };
 
 const mongoConfig = {
-    url: constants.DB_HOST,
+    url: constants.DB_URL as string,
     configs: mongoOpts,
 }
 
