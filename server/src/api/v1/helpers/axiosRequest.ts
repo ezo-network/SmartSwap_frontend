@@ -2,10 +2,6 @@ import axios from 'axios';
 import { response } from 'express';
 import { log, constants } from "../../../config";
 
-const Config = {
-    baseUrl: `http://${constants.SERVER_HOST}:${constants.SERVER_PORT}`,
-};
-
 export default class axiosRequest {
 
     static async request(args) {
@@ -13,7 +9,7 @@ export default class axiosRequest {
         try {
 
             let path = `/${args.path}`;
-            const url = `${Config.baseUrl}${path}`;
+            const url = `${args.baseUrl}${path}`;
             let options = {
                 method: args.method || 'GET',
                 url,
