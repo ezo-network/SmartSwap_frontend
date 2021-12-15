@@ -1,10 +1,5 @@
 import axios from 'axios';
 
-const Config = {
-    baseUrlSandbox: 'http://localhost:4006',
-    baseUrlLive: 'http://localhost:4006',
-};
-
 export default class axiosRequest {
 
     static async request(args) {
@@ -12,7 +7,7 @@ export default class axiosRequest {
         try {
 
             let path = `/${args.path}`;
-            const url = `${Config.baseUrlSandbox}${path}`;
+            const url = `${process.env.REACT_APP_API_HOST}${path}`;
             let options = {
                 method: args.method || 'GET',
                 url,
@@ -27,7 +22,6 @@ export default class axiosRequest {
             if (args.data) {
                 options.data = args.data;
             }
-            console.log(options);
 
             return await axios.request(options).then(response => {
                 return response;
