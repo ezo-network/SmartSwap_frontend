@@ -8,7 +8,7 @@ const mongoOpts: ConnectionOptions = {
 };
 
 const mongoConfig = {
-    url: `mongodb://${constants.DB_HOST}:${constants.DB_PORT}/${constants.DB_NAME}`,
+    url: constants.DB_HOST,
     configs: mongoOpts,
 }
 
