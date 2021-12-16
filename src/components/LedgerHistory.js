@@ -7,7 +7,9 @@ export default function LedgerHistory(props) {
         <div className="transaction-histroryWrap">
             <div className="transaction-histroryBox">
                 <div className="Title02 orange-Color">Send</div>
-                <div className="trasaction-Amt"> {props.sentAmount} {props.sentCurrency} <span>({(Number(props.sentAmount) * Number(props.filledAprice)).toFixed(2)})</span> </div>
+                <div className="trasaction-Amt"> {props.sentAmount} {props.sentCurrency}
+                    {/* <span>({(Number(props.sentAmount) * Number(props.filledAprice)).toFixed(2)})</span>  */}
+                </div>
                 <div className="trasaction-Date">{props.sentTxTime}</div>
                 <div className="trasaction-Box">
                     <div className="trasaction-Status"><span className="icon-Box"><i className="fas fa-check-circle"></i></span>Transaction Submitted</div>
@@ -20,7 +22,9 @@ export default function LedgerHistory(props) {
                 {props.oracleTx !== undefined ? (
                     <div>
                         <div className="Title02 green-Color">Received <span></span></div>
-                        <div className="trasaction-Amt"> {props.recivedAmount} {props.recivedCurrency} <span>({(Number(props.recivedAmount) * Number(props.filledBprice)).toFixed(2)})</span> </div>
+                        <div className="trasaction-Amt"> {props.recivedAmount} {props.recivedCurrency}
+                            {/* <span>({(Number(props.recivedAmount) * Number(props.filledBprice)).toFixed(2)})</span>  */}
+                        </div>
                         <div className="trasaction-Date">{props.recivedTxTime}</div>
                         <div className="trasaction-Box">
                             <div className="trasaction-Status"><span className="icon-Box"><i className="fas fa-check-circle"></i></span>Funds wired to your wallet </div>

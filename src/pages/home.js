@@ -45,6 +45,7 @@ import SBLogo08 from "../assets/images/sb-ICO-08.png";
 import SBLogo09 from "../assets/images/sb-ICO-09.png";
 import SBLogo010 from "../assets/images/sb-ICO-010.png";
 import SBLogo011 from "../assets/images/sb-ICO-011.png";
+import BigNumber from "big-number/big-number";
 
 const responsive = {
   desktop: {
@@ -566,7 +567,7 @@ export default class Home extends PureComponent {
   async fetchTransactionStatus(hash) {
     // let url = CONSTANT.API_URL + "/ledger/" + "0xcaba174a8ec3edd18e14d7dfc79e68fd0ae4193f";
 
-    let url = CONSTANT.API_URL + "/ledger/tx/" + hash;
+    let url = process.env.REACT_APP_LEDGER_HOST + "ledger/tx/" + hash;
 
     console.log(url);
 
@@ -578,7 +579,7 @@ export default class Home extends PureComponent {
           // console.log(res.data)
           let result = res.data;
           console.log(result);
-          if (result.resp_code === 1) {
+          if (result.data.claimStatus === "CLAIMED" && result.data.status === "FULFILLED") {
             console.log(result.data);
             // if (result.data.length > 0) {
             //     result.data.map((ele) => {
@@ -586,18 +587,24 @@ export default class Home extends PureComponent {
 
             //     })
             // }
-            if (result.data.sentTx === this.state.txIdSent) {
+            if (result.data.txHash === this.state.txIdSent) {
               console.log("in end");
               console.log("oracle tx start");
-              console.log(result.data.oracleTx);
-              if (result.data.oracleTx !== undefined) {
+              console.log(result.data.relationship.claim.approveHash);
+              if (result.data.relationship.claim.approveHash !== undefined || result.data.relationship.claim.approveHash !== null) {
                 let txLinkReturn =
-                  constantConfig[result.data.recivedChainId].explorer +
+                  constantConfig[(result.data.chainId === 1 || result.data.chainId === 42) ? process.env.REACT_APP_BSC_CHAIN_ID : process.env.REACT_APP_ETH_CHAIN_ID].explorer +
                   "/tx/" +
-                  result.data.oracleTx;
+                  result.data.relationship.claim.approveHash;
+
+                result.data["recivedAmount"] = "0";
+                result.data.counterParties.map(async (elementCounterParties, key) => {
+                  let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
+                  result.data["recivedAmount"] = Number(result.data["recivedAmount"]) + Number(rcAmount);
+                })
 
                 this.updateLedgerAfterResponse(
-                  result.data.oracleTx,
+                  result.data.relationship.claim.approveHash,
                   txLinkReturn,
                   result.data.recivedAmount
                 );
@@ -1636,9 +1643,9 @@ export default class Home extends PureComponent {
       {
         isSendingOrder: false,
         txSentStatus: "Success",
-        txSentTime: new Date().toUTCString(),
+        // txSentTime: new Date().toUTCString(),
         tokenReceive: "2",
-        txReceiveTime: new Date().toUTCString(),
+        // txReceiveTime: new Date().toUTCString(),
         txIdReceive: hash,
         whichButton: "4",
         txLinkReturn: txLinkReturn,
@@ -1656,7 +1663,7 @@ export default class Home extends PureComponent {
   async fetchedUserTransaction(address) {
     // var userTxs = StableCoinStore.getFetchedUserTxs();
     this.setState({ loadingHistory: true })
-    let url = `https://api.smartswap.exchange/ledger/` + address;
+    let url = process.env.REACT_APP_LEDGER_HOST + 'ledger/' + (address).toLocaleLowerCase();
 
     let json;
     await axios
@@ -1724,24 +1731,33 @@ export default class Home extends PureComponent {
           constantConfig.addressByToken[element.tokenB].symbol;
 
         element["sentTxLink"] =
-          constantConfig[element.sentChainId].explorer +
+          constantConfig[element.chainId].explorer +
           "/tx/" +
-          element.sentTx;
+          element.txHash;
 
-        if (element.oracleTx !== undefined && element.oracleTx !== null) {
+        if (element.relationship.claim.approveHash !== undefined && element.relationship.claim.approveHash !== null) {
           element["recivedTxLink"] =
-            constantConfig[element.recivedChainId].explorer +
+            constantConfig[(element.chainId === 1 || element.chainId === 42) ? process.env.REACT_APP_BSC_CHAIN_ID : process.env.REACT_APP_ETH_CHAIN_ID].explorer +
             "/tx/" +
-            element.oracleTx;
+            element.relationship.claim.approveHash;
+          element["oracleTx"] = element.relationship.claim.approveHash;
         }
+
+
+
+        element["recivedAmount"] = "0";
+        element.counterParties.map(async (elementCounterParties, key) => {
+          let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
+          element["recivedAmount"] = Number(element["recivedAmount"]) + Number(rcAmount);
+        })
 
         userTxsUI.push(
           // <LedgerHistory />
           <LedgerHistory
-            sentAmount={element.sentAmount}
+            sentAmount={web3Js.utils.fromWei(element.processAmount)}
             sentCurrency={element.sentCurrency}
             sentAPrice={element.sentAPrice}
-            sentTx={element.sentTx}
+            sentTx={element.txHash}
             sentTxLink={element.sentTxLink}
             filledBprice={element.filledBprice}
             recivedAmount={element.recivedAmount}
@@ -1753,14 +1769,14 @@ export default class Home extends PureComponent {
             filledAprice={element.filledAprice}
           />
         );
-        if (element.oracleTx === undefined || element.oracleTx === null) {
+        if (element.relationship.claim.approveHash === undefined && element.relationship.claim.approveHash === null) {
           userPendingTxsUI.push(
             // <LedgerHistory />
             <LedgerHistory
-              sentAmount={element.sentAmount}
+              sentAmount={web3Js.utils.fromWei(element.processAmount)}
               sentCurrency={element.sentCurrency}
               sentAPrice={element.sentAPrice}
-              sentTx={element.sentTx}
+              sentTx={element.txHash}
               sentTxLink={element.sentTxLink}
               filledBprice={element.filledBprice}
               recivedAmount={element.recivedAmount}
@@ -2455,7 +2471,7 @@ export default class Home extends PureComponent {
                                   <div className="trasaction-Amt">
                                     {this.state.actualSendFundAmount}{" "}
                                     {this.state.selectedSendCurrency}
-                                    <span>({this.state.sendFundAmount})</span>
+                                    {/* <span>({this.state.sendFundAmount})</span> */}
                                   </div>
                                   <div className="trasaction-Date">
                                     {this.state.txSentTime}

@@ -112,7 +112,7 @@ export default class LiquidityProvider extends PureComponent {
 
             this.resetForm();
         });
-        
+
 
     }
 
@@ -137,7 +137,7 @@ export default class LiquidityProvider extends PureComponent {
             loading: true,
             tokenA: this.state.coinList[this.state.selectedTokenA]['address'],
             tokenB: this.state.coinList[this.state.selectedTokenB]['address']
-        }, async() => {
+        }, async () => {
             await this.initInstance();
         });
 
@@ -145,7 +145,7 @@ export default class LiquidityProvider extends PureComponent {
 
     }
 
-    resetForm(){
+    resetForm() {
         this.setState(this.baseState);
         this.dispatchEventHandler(this.amountA, '');
         this.dispatchEventHandler(this.walletAddressToSend, '');
@@ -164,7 +164,8 @@ export default class LiquidityProvider extends PureComponent {
     toggle = index => {
         let collapse = "isOpen" + index;
         this.setState(prevState => ({
-            [collapse]: !prevState[collapse] }));
+            [collapse]: !prevState[collapse]
+        }));
         this.toggleActiveContractSection();
     };
 
@@ -194,13 +195,13 @@ export default class LiquidityProvider extends PureComponent {
         this.setGasFeeAndAmountMinMaxRanges(this.state.coinList[this.state.selectedTokenB]['networkId']);
     };
 
-    toggleActiveContractSection(){
-        if(this.state.spData !== null){
+    toggleActiveContractSection() {
+        if (this.state.spData !== null) {
             const activeContractAddress = this.state.spData.find(obj => {
                 return obj.networkId === this.state.networkId;
             }).smartContractAddress;
-            
-            if(activeContractAddress){
+
+            if (activeContractAddress) {
                 //notificationConfig.success('Active contract found.');   
                 this.setState({
                     confirmed: true,
@@ -252,15 +253,15 @@ export default class LiquidityProvider extends PureComponent {
             networkId: networkId,
             spAccount: web3Config.getAddress()
         });
-        
+
         this.setGasFeeAndAmountMinMaxRanges(networkId);
-        
+
         await this.getActiveContracts();
 
     }
 
-    setGasFeeAndAmountMinMaxRanges(networkID=CONSTANT.NETWORK_ID.ETHEREUM){
-        if(networkID == CONSTANT.NETWORK_ID.BINANCE){
+    setGasFeeAndAmountMinMaxRanges(networkID = CONSTANT.NETWORK_ID.ETHEREUM) {
+        if (networkID == CONSTANT.NETWORK_ID.BINANCE) {
             this.setState({
                 minGasAndFeeAmount: 0.5,
                 gasAndFeeAmount: 0.5,
@@ -270,16 +271,16 @@ export default class LiquidityProvider extends PureComponent {
                 selectedTokenB: 'ETH',
             })
         }
-        if(networkID == CONSTANT.NETWORK_ID.ETHEREUM){
+        if (networkID == CONSTANT.NETWORK_ID.ETHEREUM) {
             this.setState({
                 minGasAndFeeAmount: 0.05,
                 gasAndFeeAmount: 0.05,
                 maxGasAndFeeAmount: 50,
                 minStepForGasAndFeeAmount: 0.05,
                 selectedTokenA: 'ETH',
-                selectedTokenB: 'BNB',                
+                selectedTokenB: 'BNB',
             })
-        }        
+        }
     }
 
     async initInstance() {
@@ -301,8 +302,8 @@ export default class LiquidityProvider extends PureComponent {
         });
     }
 
-    async deployContract(event){
-        
+    async deployContract(event) {
+
         // set this to disable deploy button
         this.setState({
             deployed: true,
@@ -314,7 +315,7 @@ export default class LiquidityProvider extends PureComponent {
         console.log(`deploying contact on network - ${web3Config.getNetworkId()}`)
 
         let args = {};
-        if(Number(this.state.stopRepeatsMode) == 1){
+        if (Number(this.state.stopRepeatsMode) == 1) {
             console.log('Stop mode 1');
             Object.assign(args, {
                 stopRepeatsOnDate: this.state.stopRepeatsOnDate,
@@ -322,23 +323,23 @@ export default class LiquidityProvider extends PureComponent {
             });
         }
 
-        if(Number(this.state.stopRepeatsMode) == 2){
+        if (Number(this.state.stopRepeatsMode) == 2) {
             console.log('Stop mode 2');
             Object.assign(args, {
                 stopRepeatsOnDate: null,
                 stopRepeatsAfterCalls: this.state.stopRepeatsAfterCalls
-            });            
+            });
         }
 
-        if(Number(this.state.stopRepeatsMode) == 3){
+        if (Number(this.state.stopRepeatsMode) == 3) {
             console.log('Stop mode 3');
             Object.assign(args, {
                 stopRepeatsOnDate: null,
                 stopRepeatsAfterCalls: null
-            }); 
+            });
         }
 
-        if(Number(this.state.withdrawMode) == 1){
+        if (Number(this.state.withdrawMode) == 1) {
             console.log('Stop mode 1');
             Object.assign(args, {
                 withdrawOnDate: this.state.withdrawOnDate,
@@ -346,22 +347,22 @@ export default class LiquidityProvider extends PureComponent {
             });
         }
 
-        if(Number(this.state.withdrawMode) == 2){
+        if (Number(this.state.withdrawMode) == 2) {
             console.log('Stop mode 2');
             Object.assign(args, {
                 withdrawOnDate: null,
                 withdrawAfterCalls: this.state.withdrawAfterCalls
-            });            
+            });
         }
 
-        if(Number(this.state.withdrawMode) == 3){
+        if (Number(this.state.withdrawMode) == 3) {
             console.log('Stop mode 3');
             Object.assign(args, {
                 withdrawOnDate: null,
                 withdrawAfterCalls: null
-            }); 
+            });
         }
-        
+
 
         let finalArgs = {
             data: Object.assign(args, {
@@ -407,10 +408,10 @@ export default class LiquidityProvider extends PureComponent {
 
         console.log(finalArgs)
 
-        try{
+        try {
             let response = await AxiosRequest.request(finalArgs);
             console.log(response);
-            if(response.status === 201){
+            if (response.status === 201) {
                 console.log('record created!');
                 let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), this.state.networkId);
                 swapFactory.addSwapProvider(
@@ -419,18 +420,18 @@ export default class LiquidityProvider extends PureComponent {
                     response.data.walletAddresses.toSend,
                     response.data.walletAddresses.toReceive,
                     response.data.gasAndFeeAmount.$numberDecimal,
-                    async(hash) => {
+                    async (hash) => {
                         this.setState({
                             txid: response.data._id,
                         });
                     },
-                    async(response) => {
-                    
+                    async (response) => {
+
                         console.log({
                             "Contract response:": response
                         });
-    
-                        if(response.status === 1){
+
+                        if (response.status === 1) {
                             // update tx hash to db
                             let args = {
                                 data: {
@@ -443,8 +444,8 @@ export default class LiquidityProvider extends PureComponent {
                                 method: 'POST'
                             }
                             response = await AxiosRequest.request(args);
-    
-                            if(response.status === 200){
+
+                            if (response.status === 200) {
                                 this.setState({
                                     smartSwapContractAddress: response.data['smartContractAddress'],
                                     confirmed: true,
@@ -453,21 +454,21 @@ export default class LiquidityProvider extends PureComponent {
                                 });
                                 notificationConfig.success('Swap provider Added');
                             }
-    
+
                             // this.setState({
                             //     deployButtonText: "Getting smart contract address..."
                             // });
                             // await this.asyncInterval(10000);
-    
+
                         }
-                        
+
                     }
                 );
             }
-    
-    
-    
-            if(response.status === 400){
+
+
+
+            if (response.status === 400) {
                 this.setState({
                     loadingIcon: false,
                     deployButtonText: "DEPLOY SMART CONTRACT",
@@ -476,8 +477,8 @@ export default class LiquidityProvider extends PureComponent {
                 });
                 notificationConfig.error('Something went wrong!');
             }
-    
-            if(response.status === 401){
+
+            if (response.status === 401) {
                 this.setState({
                     loadingIcon: false,
                     deployButtonText: "DEPLOY SMART CONTRACT",
@@ -486,7 +487,7 @@ export default class LiquidityProvider extends PureComponent {
                 });
                 notificationConfig.error('Something went wrong!');
             }
-        } catch(err){
+        } catch (err) {
             console.log(err);
             notificationConfig.error('Server Error!');
             this.setState({
@@ -495,12 +496,12 @@ export default class LiquidityProvider extends PureComponent {
                 deployed: false
             });
         }
-        
+
 
     }
 
 
-    dispatchEventHandler(inputRef, value, type='value', eventType='input'){
+    dispatchEventHandler(inputRef, value, type = 'value', eventType = 'input') {
         const valueSetter = Object.getOwnPropertyDescriptor(inputRef, type).set;
         const prototype = Object.getPrototypeOf(inputRef);
         const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, type).set;
@@ -510,15 +511,15 @@ export default class LiquidityProvider extends PureComponent {
             valueSetter.call(inputRef, value);
         }
 
-        if(eventType == 'mousemove'){
+        if (eventType == 'mousemove') {
             inputRef.dispatchEvent(new MouseEvent(eventType, { bubbles: true }));
         } else {
             inputRef.dispatchEvent(new Event(eventType, { bubbles: true }));
         }
-        
+
     }
 
-    async getActiveContracts(){
+    async getActiveContracts() {
 
         this.setState({
             deployed: true,
@@ -533,11 +534,11 @@ export default class LiquidityProvider extends PureComponent {
             method: 'POST'
         }
 
-        try{
+        try {
             let response = await AxiosRequest.request(args);
-            if(response.status === 200){
+            if (response.status === 200) {
                 const isactiveContractExist = response.data.find(obj => {
-                    if((obj.networkId == this.state.networkId) && (this.state.spAccount == obj.walletAddresses.spAccount)){
+                    if ((obj.networkId == this.state.networkId) && (this.state.spAccount == obj.walletAddresses.spAccount)) {
                         this.setState({
                             isActiveContractExist: true
                         });
@@ -549,48 +550,48 @@ export default class LiquidityProvider extends PureComponent {
                         this.dispatchEventHandler(this.accumulateFundsLimit, obj.accumulateFundsLimit);
                         this.dispatchEventHandler(this.cexApiKey, obj.cexData.key);
                         this.dispatchEventHandler(this.cexApiSecret, obj.cexData.secret);
-                        
-                        if(obj.stopRepeats.mode == 3){
+
+                        if (obj.stopRepeats.mode == 3) {
                             this.dispatchEventHandler(this.stopRepeatsMode3, obj.stopRepeats.mode, 'checked', 'click');
                         }
 
-                        if(obj.stopRepeats.mode == 2){
+                        if (obj.stopRepeats.mode == 2) {
                             this.dispatchEventHandler(this.stopRepeatsMode2, obj.stopRepeats.mode, 'checked', 'click');
                             this.dispatchEventHandler(this.stopRepeatsAfterCalls, obj.stopRepeats.afterCalls);
                         }
-                        
-                        if(obj.stopRepeats.mode == 1){
+
+                        if (obj.stopRepeats.mode == 1) {
                             this.dispatchEventHandler(this.stopRepeatsMode1, obj.stopRepeats.mode, 'checked', 'click');
                             //this.dispatchEventHandler(this.stopRepeatsOnDate, obj.stopRepeats.onDate);
                         }
 
 
-                        if(obj.withdraw.mode == 3){
+                        if (obj.withdraw.mode == 3) {
                             this.dispatchEventHandler(this.withdrawMode3, obj.withdraw.mode, 'checked', 'click');
                         }
-                        
-                        if(obj.withdraw.mode == 2){
+
+                        if (obj.withdraw.mode == 2) {
                             this.dispatchEventHandler(this.withdrawMode2, obj.withdraw.mode, 'checked', 'click');
                             this.dispatchEventHandler(this.withdrawAfterCalls, obj.withdraw.afterCalls);
                             this.setState({
                                 withdrawOnDate: null
                             });
                         }
-                        
-                        if(obj.withdraw.mode == 1){
+
+                        if (obj.withdraw.mode == 1) {
                             this.dispatchEventHandler(this.withdrawMode1, obj.withdraw.mode, 'checked', 'click');
                             //this.dispatchEventHandler(this.withdrawOnDate, obj.withdraw.onDate);
                             this.setState({
                                 afterCalls: null
                             });
                         }
-                        
-                        if(obj.swapSpeedMode == 'UPFRONT'){
-                            this.dispatchEventHandler(this.swapSpeedMode1, obj.swapSpeedMode, 'checked', 'click');                            
+
+                        if (obj.swapSpeedMode == 'UPFRONT') {
+                            this.dispatchEventHandler(this.swapSpeedMode1, obj.swapSpeedMode, 'checked', 'click');
                             //this.dispatchEventHandler(this.swapSpeedMode3, obj.swapSpeedMode, 'checked', 'click');                            
                         }
 
-                        if(obj.swapSpeedMode == 'REALTIME'){
+                        if (obj.swapSpeedMode == 'REALTIME') {
                             this.dispatchEventHandler(this.swapSpeedMode2, obj.swapSpeedMode, 'checked', 'click');
                             //this.dispatchEventHandler(this.swapSpeedMode4, obj.swapSpeedMode, 'checked', 'click');
                         }
@@ -602,7 +603,7 @@ export default class LiquidityProvider extends PureComponent {
 
                         //this.dispatchEventHandler(this.gasAndFeeAmount, obj.gasAndFeeAmount.$numberDecimal, 'value', 'mousemove');
 
-                        
+
 
                         return true;
                     } else {
@@ -610,8 +611,8 @@ export default class LiquidityProvider extends PureComponent {
                     }
                 })
 
-                if(isactiveContractExist){
-                    notificationConfig.success('Active contract found.');   
+                if (isactiveContractExist) {
+                    notificationConfig.success('Active contract found.');
                     this.setState({
                         spData: response.data,
                         confirmed: true,
@@ -624,32 +625,32 @@ export default class LiquidityProvider extends PureComponent {
                         deployed: false,
                         deployButtonText: 'DEPLOY SMART CONTRACT'
                     });
-                    notificationConfig.error('No active contract for the selected network.');                    
+                    notificationConfig.error('No active contract for the selected network.');
                 }
-            } else if(response.status === 404){
+            } else if (response.status === 404) {
                 this.setState({
                     deployed: false,
                     deployButtonText: 'DEPLOY SMART CONTRACT'
-                });                
+                });
                 notificationConfig.error('No active contract.');
             } else {
                 console.log(response);
             }
 
-        } catch(err){
+        } catch (err) {
             console.log(err);
         }
     }
 
-    asyncInterval = async(ms, triesLeft = 10) => {
+    asyncInterval = async (ms, triesLeft = 10) => {
         return new Promise((resolve, reject) => {
-            const interval = setInterval(async() => {
+            const interval = setInterval(async () => {
                 let args = {
                     path: `get-contract-address?docId=${this.state.txid}`,
                     method: 'GET'
                 }
                 let response = await this.getContractAddress(args);
-                if ( response !== null) {
+                if (response !== null) {
                     resolve();
                     clearInterval(interval);
                     this.setState({
@@ -664,7 +665,7 @@ export default class LiquidityProvider extends PureComponent {
         });
     }
 
-    getContractAddress = async(args) => {
+    getContractAddress = async (args) => {
         let response = await AxiosRequest.request(args);
         console.log({
             getContractAddress: response
@@ -672,27 +673,27 @@ export default class LiquidityProvider extends PureComponent {
         return response.data.smartContractAddress;
     }
 
-    reAuthrizeFeeAndGasLimit = async() => {
-        if(this.state.deployed){
+    reAuthrizeFeeAndGasLimit = async () => {
+        if (this.state.deployed) {
             this.setState({
-                reAuthrizeing: true                
+                reAuthrizeing: true
             });
             let newLimit = this.state.gasAndFeeAmount;
 
             let spContract = new SPContract(web3Config.getWeb3(), this.state.networkId, this.state.smartSwapContractAddress);
             spContract.setFeeAmountLimit(
-                newLimit, 
-                async(hash) => {},
-                async(response) => {
+                newLimit,
+                async (hash) => { },
+                async (response) => {
                     console.log({
                         "SP Contract response:": response
                     });
-            
-                    if(response.status === 1){
+
+                    if (response.status === 1) {
                         this.setState({
                             gasAndFeeAmount: newLimit
                         });
-    
+
                         //spContract.getFeeAmountLimit();
                         await AxiosRequest.request({
                             data: {
@@ -706,22 +707,22 @@ export default class LiquidityProvider extends PureComponent {
                         notificationConfig.success('NEW GAS AND FEES LIMIT SET');
 
                         this.setState({
-                            reAuthrizeing: false                
+                            reAuthrizeing: false
                         });
 
                     }
-            });
+                });
         }
     }
 
-    updateContract = async() => {
+    updateContract = async () => {
         this.setState({
             updating: true,
             loadingIcon: true
         });
 
         let args = {};
-        if(Number(this.state.stopRepeatsMode) == 1){
+        if (Number(this.state.stopRepeatsMode) == 1) {
             console.log('Stop mode 1');
             Object.assign(args, {
                 stopRepeatsOnDate: this.state.stopRepeatsOnDate,
@@ -729,23 +730,23 @@ export default class LiquidityProvider extends PureComponent {
             });
         }
 
-        if(Number(this.state.stopRepeatsMode) == 2){
+        if (Number(this.state.stopRepeatsMode) == 2) {
             console.log('Stop mode 2');
             Object.assign(args, {
                 stopRepeatsOnDate: null,
                 stopRepeatsAfterCalls: this.state.stopRepeatsAfterCalls
-            });            
+            });
         }
 
-        if(Number(this.state.stopRepeatsMode) == 3){
+        if (Number(this.state.stopRepeatsMode) == 3) {
             console.log('Stop mode 3');
             Object.assign(args, {
                 stopRepeatsOnDate: null,
                 stopRepeatsAfterCalls: null
-            }); 
+            });
         }
 
-        if(Number(this.state.withdrawMode) == 1){
+        if (Number(this.state.withdrawMode) == 1) {
             console.log('Stop mode 1');
             Object.assign(args, {
                 withdrawOnDate: this.state.withdrawOnDate,
@@ -753,20 +754,20 @@ export default class LiquidityProvider extends PureComponent {
             });
         }
 
-        if(Number(this.state.withdrawMode) == 2){
+        if (Number(this.state.withdrawMode) == 2) {
             console.log('Stop mode 2');
             Object.assign(args, {
                 withdrawOnDate: null,
                 withdrawAfterCalls: this.state.withdrawAfterCalls
-            });            
+            });
         }
 
-        if(Number(this.state.withdrawMode) == 3){
+        if (Number(this.state.withdrawMode) == 3) {
             console.log('Stop mode 3');
             Object.assign(args, {
                 withdrawOnDate: null,
                 withdrawAfterCalls: null
-            }); 
+            });
         }
 
 
@@ -809,10 +810,10 @@ export default class LiquidityProvider extends PureComponent {
         };
 
         console.log(finalArgs);
-        try{
+        try {
             let response = await AxiosRequest.request(finalArgs);
-            if(response.status == 200){
-                setTimeout(async() => {
+            if (response.status == 200) {
+                setTimeout(async () => {
                     console.log('Updated');
                     notificationConfig.success('Contract updated successfully');
                     this.setState({
@@ -821,16 +822,16 @@ export default class LiquidityProvider extends PureComponent {
                     });
                 }, 3000);
             }
-        } catch(err){
+        } catch (err) {
             notificationConfig.error('Something went wrong!');
         }
 
     }
 
-    reAuthrizeSpreadLimit = async() => {
-        if(this.state.deployed){
+    reAuthrizeSpreadLimit = async () => {
+        if (this.state.deployed) {
             this.setState({
-                reAuthrizeing: true                
+                reAuthrizeing: true
             });
             let newLimit = this.state.spreadAmount;
             //spContract.getFeeAmountLimit();
@@ -842,15 +843,15 @@ export default class LiquidityProvider extends PureComponent {
                 path: "update",
                 method: "POST"
             });
-            notificationConfig.success('NEW SPREAD LIMIT SET');    
+            notificationConfig.success('NEW SPREAD LIMIT SET');
             this.setState({
-                reAuthrizeing: false                
-            });        
+                reAuthrizeing: false
+            });
         }
     }
 
-    updateSwapSpeedMode = async(mode) => {
-        if(this.state.deployed){
+    updateSwapSpeedMode = async (mode) => {
+        if (this.state.deployed) {
             this.setState({
                 updating: true,
                 reAuthrizeing: true
@@ -864,14 +865,14 @@ export default class LiquidityProvider extends PureComponent {
                 path: "update",
                 method: "POST"
             });
-            notificationConfig.success('Swap speed mode updated.');    
+            notificationConfig.success('Swap speed mode updated.');
             this.setState({
                 updating: false,
-                reAuthrizeing: false              
-            });       
-        }   
+                reAuthrizeing: false
+            });
+        }
         this.setState({
-            swapSpeedMode: mode              
+            swapSpeedMode: mode
         });
     }
 
@@ -881,18 +882,18 @@ export default class LiquidityProvider extends PureComponent {
 
         const smallError = {
             fontSize: "13px",
-            lineHeight: "20px" 
+            lineHeight: "20px"
         };
 
         return (
             <div className="main-Popup wallet-Popup" id="LiquidityProvider">
                 <div className="container-Grid">
                     <div className="LiProTitle01">Become a Swap Provider</div>
-                    { this.state.serverError !== null && 
+                    {this.state.serverError !== null &&
                         <div className="error-Msg">
                             <label>{this.state.serverError}</label>
                         </div>
-                    }                       
+                    }
                     <div className="LiProFormMbox">
 
                         <div className="LiProfSbox01">
@@ -905,22 +906,22 @@ export default class LiquidityProvider extends PureComponent {
                             <div className="LiProLable">Choose the amount of token A to sell on Smartswap</div>
                             <div className="bspMBX01 smFixer06">
                                 <div className="bspSBX01">
-                                    <div className="LiproInput01 withLable01">
+                                    <div className="LiproInput01 withLable01" style={{ marginTop: "12px" }}>
                                         <span>$</span>
-                                        <input 
-                                            type="text" 
-                                            defaultValue='' 
-                                            placeholder="Amount" 
-                                            onChange={event => this.setState({amountA: event.target.value})}  
-                                            ref={(input)=> this.amountA = input}
+                                        <input
+                                            type="text"
+                                            defaultValue=''
+                                            placeholder="Amount"
+                                            onChange={event => this.setState({ amountA: event.target.value })}
+                                            ref={(input) => this.amountA = input}
                                         />
                                     </div>
                                     <br></br>
-                                    { this.state.errorMessage !== null && this.state.errorMessage.includes("amountA") && 
-                                    <div className="error-Msg" style={smallError}>
-                                        <label>{this.state.errorMessage}</label>
-                                    </div>
-                                    }                                    
+                                    {this.state.errorMessage !== null && this.state.errorMessage.includes("amountA") &&
+                                        <div className="error-Msg" style={smallError}>
+                                            <label>{this.state.errorMessage}</label>
+                                        </div>
+                                    }
                                 </div>
                                 <div className="bspSBX01">
                                     <div className="LiproDropdown">
@@ -931,13 +932,13 @@ export default class LiquidityProvider extends PureComponent {
                                         <div className="ddContainer">
                                             <Collapse isOpen={this.state.isOpen1} className={"collapse-css-transition"} >
                                                 {
-                                                    Object.keys(this.state.coinList).map((coin)=>(
-                                                        this.state.selectedTokenA !== this.state.coinList[coin]['symbol'] && 
+                                                    Object.keys(this.state.coinList).map((coin) => (
+                                                        this.state.selectedTokenA !== this.state.coinList[coin]['symbol'] &&
                                                         (this.state.coinList[coin]['approveRequire'] === false) &&
-                                                        <button 
+                                                        <button
                                                             onClick={() => {
                                                                 this.changeTokenA(this.state.coinList[coin]['symbol']);
-                                                            }}  
+                                                            }}
                                                             key={this.state.coinList[coin]['symbol']} className='LiproDDbtn01'
                                                         >
                                                             <div className="ddIconBX"> <span> <img src={this.state.coinList[coin]['icon']} alt="" /></span> {this.state.coinList[coin]['symbol']}</div>
@@ -960,87 +961,87 @@ export default class LiquidityProvider extends PureComponent {
                                 </button>
                                 <div className="ddContainer">
                                     <Collapse isOpen={this.state.isOpen2} className={"collapse-css-transition"} >
-                                    {
-                                        Object.keys(this.state.coinList).map((coin)=>(
-                                            (this.state.selectedTokenB !== this.state.coinList[coin]['symbol']) && 
-                                            (this.state.coinList[coin]['approveRequire'] === false) &&
-                                            <button 
-                                                onClick={() => {
-                                                    this.changeTokenB(this.state.coinList[coin]['symbol']);
-                                                }} 
-                                                key={this.state.coinList[coin]['symbol']} className='LiproDDbtn01'
-                                            >
-                                                <div className="ddIconBX"> <span> <img src={this.state.coinList[coin]['icon']} alt="" /></span> {this.state.coinList[coin]['symbol']}</div>
-                                            </button>
-                                        ))
-                                    }
+                                        {
+                                            Object.keys(this.state.coinList).map((coin) => (
+                                                (this.state.selectedTokenB !== this.state.coinList[coin]['symbol']) &&
+                                                (this.state.coinList[coin]['approveRequire'] === false) &&
+                                                <button
+                                                    onClick={() => {
+                                                        this.changeTokenB(this.state.coinList[coin]['symbol']);
+                                                    }}
+                                                    key={this.state.coinList[coin]['symbol']} className='LiproDDbtn01'
+                                                >
+                                                    <div className="ddIconBX"> <span> <img src={this.state.coinList[coin]['icon']} alt="" /></span> {this.state.coinList[coin]['symbol']}</div>
+                                                </button>
+                                            ))
+                                        }
                                     </Collapse>
                                 </div>
                             </div>
-                        </div>                        
+                        </div>
                         <div className="LiProfSbox01">
                             <div className="LiProLable">Wallet address that send token A<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Enter the wallet that will become a Swap Provider" aria-hidden="true"></i></i></div>
                             <div className="LiproInput01">
-                                <input 
-                                    type="text" 
-                                    defaultValue='' 
-                                    onChange={event => this.setState({walletAddressToSend: event.target.value})}  
-                                    ref={(input)=> this.walletAddressToSend = input}
+                                <input
+                                    type="text"
+                                    defaultValue=''
+                                    onChange={event => this.setState({ walletAddressToSend: event.target.value })}
+                                    ref={(input) => this.walletAddressToSend = input}
                                 />
                             </div>
                             <br></br>
-                            { this.state.errorMessage !== null && this.state.errorMessage.includes("walletAddressToSend") && 
-                            <div className="error-Msg" style={smallError}>
-                                <label>{this.state.errorMessage}</label>
-                            </div>
-                            }                                                               
+                            {this.state.errorMessage !== null && this.state.errorMessage.includes("walletAddressToSend") &&
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                            }
                         </div>
                         <div className="LiProfSbox02">
                             <div className="LiProLable">Wallet address that receive token B<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Enter the wallet that receives SP results and rewards, on same CEX such Binacne it may be the same wallet address as the one that send token A, but on some other CEX they may have two different wallets, one to send fund our and another to receive fund in." aria-hidden="true"></i></i></div>
                             <div className="LiproInput01">
-                                <input 
-                                    type="text" 
-                                    defaultValue='' 
-                                    onChange={event => this.setState({walletAddressToReceive: event.target.value})}   
-                                    ref={(input)=> this.walletAddressToReceive = input}
+                                <input
+                                    type="text"
+                                    defaultValue=''
+                                    onChange={event => this.setState({ walletAddressToReceive: event.target.value })}
+                                    ref={(input) => this.walletAddressToReceive = input}
                                 />
                             </div>
                             <br></br>
-                            { this.state.errorMessage !== null && this.state.errorMessage.includes("walletAddressToReceive") && 
-                            <div className="error-Msg" style={smallError}>
-                                <label>{this.state.errorMessage}</label>
-                            </div>
-                            }                                   
+                            {this.state.errorMessage !== null && this.state.errorMessage.includes("walletAddressToReceive") &&
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                            }
                         </div>
 
                         <div className='spacerLine'></div>
 
-                        <div className="LiProfSbox01">	
-                            <div className="LiProTitle02">CHOOSE YOUR SWAPPING SPEED<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>	
-                        </div>	
-                        <div className="LiProfSbox02">	
-                            <div className="LiProTitle02"> </div>	
-                        </div>	
-                        <div className="LiProfSbox01">	
-                                <div className='LipRadioFix01' >	
-                                    <div className="md-radio md-radio-inline ">	
-                                        <input 
-                                            type="radio" 
-                                            id="spS01" 
-                                            name="s001" 
-                                            // defaultChecked
-                                            onChange = {() => { this.updateSwapSpeedMode('UPFRONT');} }
-                                            checked={this.state.swapSpeedMode === 'UPFRONT'}
-                                            ref={(input)=> this.swapSpeedMode1 = input}
-                                        />	
-                                        <label htmlFor="spS01"></label>	
-                                    </div> 	
-                                    <div className="LiProFlexBX01 padFixer01">	
-                                       <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>	
-                                    </div>	
-                                </div>                                                             	
-                        </div>	
-                        <div className="LiProfSbox02">	
+                        <div className="LiProfSbox01">
+                            <div className="LiProTitle02">CHOOSE YOUR SWAPPING SPEED<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                        </div>
+                        <div className="LiProfSbox02">
+                            <div className="LiProTitle02"> </div>
+                        </div>
+                        <div className="LiProfSbox01">
+                            <div className='LipRadioFix01' >
+                                <div className="md-radio md-radio-inline ">
+                                    <input
+                                        type="radio"
+                                        id="spS01"
+                                        name="s001"
+                                        // defaultChecked
+                                        onChange={() => { this.updateSwapSpeedMode('UPFRONT'); }}
+                                        checked={this.state.swapSpeedMode === 'UPFRONT'}
+                                        ref={(input) => this.swapSpeedMode1 = input}
+                                    />
+                                    <label htmlFor="spS01"></label>
+                                </div>
+                                <div className="LiProFlexBX01 padFixer01">
+                                    <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* <div className="LiProfSbox02">	
                          <div className='LipRadioFix01' >	
                                     <div className="md-radio md-radio-inline ">	
                                         <input 
@@ -1058,9 +1059,9 @@ export default class LiquidityProvider extends PureComponent {
                                        <div className="LipRTitle01">Deposit token A to the smart contract in real time<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>	
                                     </div>	
                                 </div>                             	
-                        </div>	
+                        </div>	 */}
                         {
-                            this.state.errorMessage !== null && this.state.errorMessage.includes("swapSpeedMode") && 
+                            this.state.errorMessage !== null && this.state.errorMessage.includes("swapSpeedMode") &&
                             <div className="error-Msg" style={smallError}>
                                 <label>{this.state.errorMessage}</label>
                             </div>
@@ -1078,21 +1079,21 @@ export default class LiquidityProvider extends PureComponent {
                                     minValue={this.state.minGasAndFeeAmount}
                                     value={this.state.gasAndFeeAmount}
                                     formatLabel={value => this.state.selectedTokenA + ` ${value}`}
-                                    onChange={value => this.setState({ gasAndFeeAmount: value })} 
-                                    ref={(input)=> this.gasAndFeeAmount = input}
+                                    onChange={value => this.setState({ gasAndFeeAmount: value })}
+                                    ref={(input) => this.gasAndFeeAmount = input}
                                 />
                             </div>
                             <br></br>
-                            { this.state.errorMessage !== null && this.state.errorMessage.includes("gasAndFeeAmount") && 
-                            <div className="error-Msg" style={smallError}>
-                                <label>{this.state.errorMessage}</label>
-                            </div>
-                            }       
+                            {this.state.errorMessage !== null && this.state.errorMessage.includes("gasAndFeeAmount") &&
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                            }
                         </div>
 
                         <div className='spacerLine'></div>
                         <div className="LiProfSbox03">
-                            <div className="LiProTitle02">REPEAT</div>
+                            {/* <div className="LiProTitle02">REPEAT</div> */}
                         </div>
 
                         <div className='LiProFlexBX01 smFixer07'>
@@ -1103,21 +1104,21 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                             </div>
                             <div className="LiProfSbox02">
                                 <div className="LiproInput01 withLable01">
-                                    <input 
-                                        type="text" 
-                                        placeholder={this.state.spProfitPercent} 
-                                        onChange={event => this.setState({spProfitPercent: event.target.value})} 
-                                        ref={(input)=> this.spProfitPercent = input}
+                                    <input
+                                        type="text"
+                                        placeholder={this.state.spProfitPercent}
+                                        onChange={event => this.setState({ spProfitPercent: event.target.value })}
+                                        ref={(input) => this.spProfitPercent = input}
                                     />
                                     <span>%</span>
                                 </div>
-                                <div className="smlInfotxt01">[0.161754 BNB/ETH]</div>
+                                {/* <div className="smlInfotxt01">[0.161754 BNB/ETH]</div> */}
                                 <br></br>
-                                { this.state.errorMessage !== null && this.state.errorMessage.includes("spProfitPercent") && 
-                                <div className="error-Msg" style={smallError}>
-                                    <label>{this.state.errorMessage}</label>
-                                </div>
-                                }                                
+                                {this.state.errorMessage !== null && this.state.errorMessage.includes("spProfitPercent") &&
+                                    <div className="error-Msg" style={smallError}>
+                                        <label>{this.state.errorMessage}</label>
+                                    </div>
+                                }
                             </div>
                         </div>
 
@@ -1129,20 +1130,20 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                             <div className="LiProfSbox02">
                                 <div className="LiproInput01 withLable01">
                                     <span>$</span>
-                                    <input 
-                                        type="text" 
-                                        placeholder={this.state.accumulateFundsLimit} 
-                                        onChange={event => this.setState({accumulateFundsLimit: event.target.value})} 
-                                        ref={(input)=> this.accumulateFundsLimit = input}
+                                    <input
+                                        type="text"
+                                        placeholder={this.state.accumulateFundsLimit}
+                                        onChange={event => this.setState({ accumulateFundsLimit: event.target.value })}
+                                        ref={(input) => this.accumulateFundsLimit = input}
                                     />
                                 </div>
-                                <div className="smlInfotxt02">Based on minimum 10% accumulation, expect to pay 10x gas cost  </div>
+                                {/* <div className="smlInfotxt02">Based on minimum 10% accumulation, expect to pay 10x gas cost  </div> */}
                                 <br></br>
-                                { this.state.errorMessage !== null && this.state.errorMessage.includes("accumulateFundsLimit") && 
-                                <div className="error-Msg" style={smallError}>
-                                    <label>{this.state.errorMessage}</label>
-                                </div>
-                                }    
+                                {this.state.errorMessage !== null && this.state.errorMessage.includes("accumulateFundsLimit") &&
+                                    <div className="error-Msg" style={smallError}>
+                                        <label>{this.state.errorMessage}</label>
+                                    </div>
+                                }
                             </div>
                         </div>
 
@@ -1172,36 +1173,36 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                             <div className="LiProTitle02">WITHDRAW</div>
                         </div>
 
-                        <div className='LiProFlexBX01 tabFixer smFixer02' style={{alignItems: 'flex-start'}}>
-                            <div className="LiProfSbox01" style={{paddingTop: '10px'}}>
+                        <div className='LiProFlexBX01 tabFixer smFixer02' style={{ alignItems: 'flex-start' }}>
+                            <div className="LiProfSbox01" style={{ paddingTop: '10px' }}>
                                 <div className="LiProLable">Stop repeat on CEX <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="This option denotes how many transactions you approve as a Swap Provider. Once the limit is reached, the API stops performing any repeats. Once the repeat stops, there is no way to change the process besides deploying a new Swap Provider contract with new rules." aria-hidden="true"></i></i></div>
                             </div>
                             <div className="LiProfSbox02">
 
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input 
-                                            type="radio" 
-                                            id="s01" 
-                                            name="s11" 
-                                            value="s01" 
-                                            onChange={event => this.setState({stopRepeatsMode: 1})} 
+                                        <input
+                                            type="radio"
+                                            id="s01"
+                                            name="s11"
+                                            value="s01"
+                                            onChange={event => this.setState({ stopRepeatsMode: 1 })}
                                             checked={this.state.stopRepeatsMode === 1}
-                                            ref={(input)=> this.stopRepeatsMode1 = input}
+                                            ref={(input) => this.stopRepeatsMode1 = input}
                                         />
                                         <label htmlFor="s01"></label>
-                                    </div> 
+                                    </div>
                                     <div className='LiProFlexBX01 padFixer01'>
                                         <div className="LiproInput01">
                                             <DatePicker
                                                 selected={this.state.stopRepeatsOnDate}
-                                                onChange={(date) => this.setState({stopRepeatsOnDate: date})}
+                                                onChange={(date) => this.setState({ stopRepeatsOnDate: date })}
                                                 peekNextMonth
                                                 showMonthDropdown
                                                 showYearDropdown
                                                 dropdownMode="select"
                                                 dateFormat="dd/MM/yyyy"
-                                                ref={(input)=> this.stopRepeatsOnDate = input}
+                                                ref={(input) => this.stopRepeatsOnDate = input}
                                             />
                                             <i class="fas fa-calendar-alt FlyICO"></i>
                                         </div>
@@ -1209,24 +1210,24 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input 
-                                            type="radio"  
-                                            id="s02" 
-                                            name="s11" 
-                                            value="s02" 
-                                            onChange={event => this.setState({stopRepeatsMode: 2})} 
+                                        <input
+                                            type="radio"
+                                            id="s02"
+                                            name="s11"
+                                            value="s02"
+                                            onChange={event => this.setState({ stopRepeatsMode: 2 })}
                                             checked={this.state.stopRepeatsMode === 2}
-                                            ref={(input)=> this.stopRepeatsMode2 = input}
+                                            ref={(input) => this.stopRepeatsMode2 = input}
                                         />
                                         <label htmlFor="s02"></label>
-                                    </div> 
+                                    </div>
                                     <div className="LiProFlexBX01 padFixer01">
                                         <div className="LiproInput01 withLable02">
-                                            <input 
-                                                type="text" 
-                                                placeholder={this.state.stopRepeatsAfterCalls} 
-                                                onChange={event => this.setState({stopRepeatsAfterCalls: event.target.value})} 
-                                                ref={(input)=> this.stopRepeatsAfterCalls = input}
+                                            <input
+                                                type="text"
+                                                placeholder={this.state.stopRepeatsAfterCalls}
+                                                onChange={event => this.setState({ stopRepeatsAfterCalls: event.target.value })}
+                                                ref={(input) => this.stopRepeatsAfterCalls = input}
                                             />
                                             {/* <div className="FlyICO02">Days</div> */}
                                             <span>Repeats</span>
@@ -1235,55 +1236,55 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input 
-                                            type="radio" 
-                                            id="s03" 
-                                            name="s11" 
-                                            value="s03" 
-                                            onChange={event => this.setState({stopRepeatsMode: 3})} 
+                                        <input
+                                            type="radio"
+                                            id="s03"
+                                            name="s11"
+                                            value="s03"
+                                            onChange={event => this.setState({ stopRepeatsMode: 3 })}
                                             checked={this.state.stopRepeatsMode === 3}
-                                            ref={(input)=> this.stopRepeatsMode3 = input}
+                                            ref={(input) => this.stopRepeatsMode3 = input}
                                         />
                                         <label htmlFor="s03"></label>
-                                    </div> 
+                                    </div>
                                     <div className="LiProFlexBX01 padFixer01">
-                                       <div className="LipRTitle01">Never stop<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Run SP repeats non-stop as long as there is funds available in your CEX account " aria-hidden="true"></i></i></div>
+                                        <div className="LipRTitle01">Never stop<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Run SP repeats non-stop as long as there is funds available in your CEX account " aria-hidden="true"></i></i></div>
                                     </div>
                                 </div>
- 
+
                             </div>
                         </div>
 
 
-                        <div className='LiProFlexBX01 tabFixer smFixer02'  style={{alignItems: 'flex-start'}}>
-                            <div className="LiProfSbox01" style={{paddingTop: '10px'}}>
+                        {/* <div className='LiProFlexBX01 tabFixer smFixer02' style={{ alignItems: 'flex-start' }}>
+                            <div className="LiProfSbox01" style={{ paddingTop: '10px' }}>
                                 <div className="LiProLable">Withdraw from Smartswap<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="This option denotes how long you wish your funds to be used as a Swap Provider. Once the limit is reached, the API stops performing any repeats. Once the repeat stop, there is no way to change it besides to deploy a new swap provider contract with new rules." aria-hidden="true"></i></i></div>
                             </div>
-                            <div className="LiProfSbox02"> 
+                            <div className="LiProfSbox02">
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input 
-                                            type="radio" 
-                                            id="s04" 
-                                            name="s12" 
-                                            value="s04" 
-                                            onChange={event => this.setState({withdrawMode: 1})} 
+                                        <input
+                                            type="radio"
+                                            id="s04"
+                                            name="s12"
+                                            value="s04"
+                                            onChange={event => this.setState({ withdrawMode: 1 })}
                                             checked={this.state.withdrawMode === 1}
-                                            ref={(input)=> this.withdrawMode1 = input}
+                                            ref={(input) => this.withdrawMode1 = input}
                                         />
                                         <label htmlFor="s04"></label>
-                                    </div> 
+                                    </div>
                                     <div className='LiProFlexBX01 padFixer01'>
                                         <div className="LiproInput01">
                                             <DatePicker
                                                 selected={this.state.withdrawOnDate}
-                                                onChange={(date) => this.setState({withdrawOnDate: date})}
+                                                onChange={(date) => this.setState({ withdrawOnDate: date })}
                                                 peekNextMonth
                                                 showMonthDropdown
                                                 showYearDropdown
                                                 dropdownMode="select"
                                                 dateFormat="dd/MM/yyyy"
-                                                ref={(input)=> this.withdrawOnDate = input}
+                                                ref={(input) => this.withdrawOnDate = input}
                                             />
                                             <i class="fas fa-calendar-alt FlyICO"></i>
                                         </div>
@@ -1291,49 +1292,49 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input 
-                                            type="radio" 
-                                            id="s05" 
-                                            name="s12" 
-                                            value="s05" 
-                                            onChange={event => this.setState({withdrawMode: 2})} 
+                                        <input
+                                            type="radio"
+                                            id="s05"
+                                            name="s12"
+                                            value="s05"
+                                            onChange={event => this.setState({ withdrawMode: 2 })}
                                             checked={this.state.withdrawMode === 2}
-                                            ref={(input)=> this.withdrawMode2 = input}
+                                            ref={(input) => this.withdrawMode2 = input}
                                         />
                                         <label htmlFor="s05"></label>
-                                    </div> 
+                                    </div>
                                     <div className="LiProFlexBX01 padFixer01">
                                         <div className="LiproInput01 withLable02">
-                                            <input 
-                                                type="text" 
-                                                placeholder={this.state.withdrawAfterCalls} 
-                                                onChange={event => this.setState({withdrawAfterCalls: event.target.value})}  
-                                                ref={(input)=> this.withdrawAfterCalls = input}
+                                            <input
+                                                type="text"
+                                                placeholder={this.state.withdrawAfterCalls}
+                                                onChange={event => this.setState({ withdrawAfterCalls: event.target.value })}
+                                                ref={(input) => this.withdrawAfterCalls = input}
                                             />
-                                            {/* <div className="FlyICO02">Days</div> */}
+                                            
                                             <span>Repeats</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='LipRadioFix01' >
                                     <div className="md-radio md-radio-inline ">
-                                        <input 
-                                            type="radio" 
-                                            id="s06" 
-                                            name="s12" 
-                                            value="s06" 
-                                            onChange={event => this.setState({withdrawMode: 3})} 
+                                        <input
+                                            type="radio"
+                                            id="s06"
+                                            name="s12"
+                                            value="s06"
+                                            onChange={event => this.setState({ withdrawMode: 3 })}
                                             checked={this.state.withdrawMode === 3}
-                                            ref={(input)=> this.withdrawMode3 = input}
+                                            ref={(input) => this.withdrawMode3 = input}
                                         />
                                         <label htmlFor="s06"></label>
-                                    </div> 
+                                    </div>
                                     <div className="LiProFlexBX01 padFixer01">
-                                       <div className="LipRTitle01">Never stop<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Run SP repeats non-stop as long as there is funds available in your CEX account " aria-hidden="true"></i></i></div>
+                                        <div className="LipRTitle01">Never stop<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Run SP repeats non-stop as long as there is funds available in your CEX account " aria-hidden="true"></i></i></div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className='spacerLine'></div>
                         {/* <div className="LiProfSbox03">
@@ -1347,19 +1348,19 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                             </div>
                             <div className="LiProfSbox02">
                                 <div className="LiproInput01">
-                                    <input 
-                                        type="text" 
-                                        defaultValue='' 
-                                        onChange={event => this.setState({cexApiKey: event.target.value})} 
-                                        ref={(input)=> this.cexApiKey = input}
+                                    <input
+                                        type="text"
+                                        defaultValue=''
+                                        onChange={event => this.setState({ cexApiKey: event.target.value })}
+                                        ref={(input) => this.cexApiKey = input}
                                     />
                                 </div>
                                 <br></br>
-                                { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") && 
-                                <div className="error-Msg" style={smallError}>
-                                    <label>{this.state.errorMessage}</label>
-                                </div>
-                                }                                
+                                {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") &&
+                                    <div className="error-Msg" style={smallError}>
+                                        <label>{this.state.errorMessage}</label>
+                                    </div>
+                                }
                             </div>
                         </div>
 
@@ -1370,61 +1371,43 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                             </div>
                             <div className="LiProfSbox02">
                                 <div className="LiproInput01">
-                                    <input 
-                                        type="text" 
-                                        defaultValue='' 
-                                        onChange={event => this.setState({cexApiSecret: event.target.value})} 
-                                        ref={(input)=> this.cexApiSecret = input}
+                                    <input
+                                        type="text"
+                                        defaultValue=''
+                                        onChange={event => this.setState({ cexApiSecret: event.target.value })}
+                                        ref={(input) => this.cexApiSecret = input}
                                     />
                                 </div>
                                 <br></br>
-                                { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiSecret") && 
-                                <div className="error-Msg" style={smallError}>
-                                    <label>{this.state.errorMessage}</label>
-                                </div>
+                                {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiSecret") &&
+                                    <div className="error-Msg" style={smallError}>
+                                        <label>{this.state.errorMessage}</label>
+                                    </div>
                                 }
                             </div>
                         </div>
 
-                        {( () => {
-                            if((this.state.web3 === null ||
+                        {(() => {
+                            if ((this.state.web3 === null ||
                                 constantConfig.tokenDetails[
                                     this.state.selectedTokenA
                                 ].networkId !== web3Config.getNetworkId())) {
-                                    return (<div className="LiProfSbox03">
-                                        <div className='LiProformBTNbar'>
-                                            <button 
-                                                onClick={this.connectWallet.bind(this)}
-                                            >CONNECT YOUR WALLET</button>
-                                        </div>
-                                    </div>) 
+                                return (<div className="LiProfSbox03">
+                                    <div className='LiProformBTNbar'>
+                                        <button
+                                            onClick={this.connectWallet.bind(this)}
+                                        >CONNECT YOUR WALLET</button>
+                                    </div>
+                                </div>)
 
-                                } else if (
-                                    (this.state.web3 !== null || constantConfig.tokenDetails[this.state.selectedTokenA].networkId === web3Config.getNetworkId()) 
-                                    && this.state.isActiveContractExist === true) {
-                                        return (
-                                            <div className="LiProfSbox03">
-                                                <div className='LiProformBTNbar'>
-                                                    <button onClick={this.updateContract.bind(this)} disabled={this.state.updating}>
-                                                        {this.state.updateButtonText}                                                         
-                                                        {this.state.loadingIcon === true &&
-                                                            <LoopCircleLoading
-                                                                height={'20px'}
-                                                                width={'20px'}
-                                                                color={'#ffffff'}
-                                                            />
-                                                        }
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) 
-                                } else{
-                                    return (<div className="LiProfSbox03">
+                            } else if (
+                                (this.state.web3 !== null || constantConfig.tokenDetails[this.state.selectedTokenA].networkId === web3Config.getNetworkId())
+                                && this.state.isActiveContractExist === true) {
+                                return (
+                                    <div className="LiProfSbox03">
                                         <div className='LiProformBTNbar'>
-                                            <button 
-                                                onClick={this.deployContract.bind(this)} disabled={this.state.deployed}
-                                            >
-                                                {this.state.deployButtonText} 
+                                            <button onClick={this.updateContract.bind(this)} disabled={this.state.updating}>
+                                                {this.state.updateButtonText}
                                                 {this.state.loadingIcon === true &&
                                                     <LoopCircleLoading
                                                         height={'20px'}
@@ -1434,129 +1417,147 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                                 }
                                             </button>
                                         </div>
-                                    </div>)
-                                }
+                                    </div>
+                                )
+                            } else {
+                                return (<div className="LiProfSbox03">
+                                    <div className='LiProformBTNbar'>
+                                        <button
+                                            onClick={this.deployContract.bind(this)} disabled={this.state.deployed}
+                                        >
+                                            {this.state.deployButtonText}
+                                            {this.state.loadingIcon === true &&
+                                                <LoopCircleLoading
+                                                    height={'20px'}
+                                                    width={'20px'}
+                                                    color={'#ffffff'}
+                                                />
+                                            }
+                                        </button>
+                                    </div>
+                                </div>)
                             }
+                        }
                         )()}
                     </div>
 
                     <div className='spacerLine'></div>
                     {(this.state.confirmed === true) &&
-                    <div>
-                        <div className="LiProTitle03">Below is your Swap Provider smart contract address
-                            <span>Whitelist this smart contract address on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist the SmartSwap address below" aria-hidden="true"></i></i></span>
-                        </div>
-
-                        <div className="spContrlMBX">
-                            <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
-                            <div className='spContrlInputBX'>
-                                <i>></i>
-                                <input type="text" value={this.state.smartSwapContractAddress} /> 
-                                <a href="#" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
+                        <div>
+                            <div className="LiProTitle03">Below is your Swap Provider smart contract address
+                                <span>Whitelist this smart contract address on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist the SmartSwap address below" aria-hidden="true"></i></i></span>
                             </div>
-                            <div className='spContrlInfotxt'>
-                            Created at {DateFormat(this.state.contractCreatedAt, "dddd, mmmm dS, yyyy, h:MM:ss TT")} &nbsp;&nbsp;&nbsp;&nbsp; Balance:  425.563 {this.state.selectedTokenA} | $4,846 USDT
-                                <span>Withdraw all funds back to your CEX account</span>
-                            </div>
-                            <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
-                            <div className='spContrlSBX'>
 
-                                <div className='spContrlSSBX01'>
-                                <div className="dragorInput v2">
-                                    <InputRange
-                                        step={this.state.minStepForGasAndFeeAmount}
-                                        maxValue={this.state.maxGasAndFeeAmount}
-                                        minValue={this.state.minGasAndFeeAmount}
-                                        value={this.state.gasAndFeeAmount}
-                                        formatLabel={value => this.state.selectedTokenA + ` ${value}`}
-                                        onChange={value => this.setState({ gasAndFeeAmount: value })} />
+                            <div className="spContrlMBX">
+                                <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
+                                <div className='spContrlInputBX'>
+                                    <i>></i>
+                                    <input type="text" value={this.state.smartSwapContractAddress} />
+                                    <a href="#" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                                 </div>
+                                <div className='spContrlInfotxt'>
+                                    Created at {DateFormat(this.state.contractCreatedAt, "dddd, mmmm dS, yyyy, h:MM:ss TT")} &nbsp;&nbsp;&nbsp;&nbsp; Balance:  425.563 {this.state.selectedTokenA} | $4,846 USDT
+                                    <span>Withdraw all funds back to your CEX account</span>
                                 </div>
-                                <div className='spContrlSSBX02'>
-                                    <button 
-                                        className='spContrlBTN01'
-                                        onClick={this.reAuthrizeFeeAndGasLimit.bind(this)}
-                                        disabled={this.state.reAuthrizeing}>
-                                        AUTHORIZE NEW LIMIT
-                                    </button>
-                                </div> 
-                            </div> 
+                                <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
+                                <div className='spContrlSBX'>
 
-                            <div className='spContrlInfotxt02'>
-                                CHANGE THE MINIMUM SPREAD YOU WANT TO GAIN ON EACH SWAP
-                                <i className="help-circle">
-                                    <i 
-                                        className="fas fa-question-circle protip" 
-                                        data-pt-position="top" 
-                                        data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." 
-                                        aria-hidden="true"></i>
-                                </i>
-                            </div>	
-                            <div className='spContrlSBX'>	
-                                <div className='spContrlSSBX01'>	
-                                <div className="dragorInput v2">	
-                                    <InputRange	
-                                        step={0.05}
-                                        maxValue={1}
-                                        minValue={0.2}
-                                        value={this.state.spreadAmount}	
-                                        formatLabel={value => `${value.toFixed(2)}%`}	
-                                        onChange={value => this.setState({ spreadAmount: value })} />	
+                                    <div className='spContrlSSBX01'>
+                                        <div className="dragorInput v2">
+                                            <InputRange
+                                                step={this.state.minStepForGasAndFeeAmount}
+                                                maxValue={this.state.maxGasAndFeeAmount}
+                                                minValue={this.state.minGasAndFeeAmount}
+                                                value={this.state.gasAndFeeAmount}
+                                                formatLabel={value => this.state.selectedTokenA + ` ${value}`}
+                                                onChange={value => this.setState({ gasAndFeeAmount: value })} />
+                                        </div>
+                                    </div>
+                                    <div className='spContrlSSBX02'>
+                                        <button
+                                            className='spContrlBTN01'
+                                            onClick={this.reAuthrizeFeeAndGasLimit.bind(this)}
+                                            disabled={this.state.reAuthrizeing}>
+                                            AUTHORIZE NEW LIMIT
+                                        </button>
+                                    </div>
                                 </div>
+
+                                <div className='spContrlInfotxt02'>
+                                    CHANGE THE MINIMUM SPREAD YOU WANT TO GAIN ON EACH SWAP
+                                    <i className="help-circle">
+                                        <i
+                                            className="fas fa-question-circle protip"
+                                            data-pt-position="top"
+                                            data-pt-title="Authorize more funds to gas and fees to keep your SP contract active."
+                                            aria-hidden="true"></i>
+                                    </i>
                                 </div>
-                                <div className='spContrlSSBX02'>
-                                    <button 
-                                        className='spContrlBTN01' 
-                                        onClick={this.reAuthrizeSpreadLimit.bind(this)}
-                                        disabled={this.state.reAuthrizeing}>
+                                <div className='spContrlSBX'>
+                                    <div className='spContrlSSBX01'>
+                                        <div className="dragorInput v2">
+                                            <InputRange
+                                                step={0.05}
+                                                maxValue={1}
+                                                minValue={0.2}
+                                                value={this.state.spreadAmount}
+                                                formatLabel={value => `${value.toFixed(2)}%`}
+                                                onChange={value => this.setState({ spreadAmount: value })} />
+                                        </div>
+                                    </div>
+                                    <div className='spContrlSSBX02'>
+                                        <button
+                                            className='spContrlBTN01'
+                                            onClick={this.reAuthrizeSpreadLimit.bind(this)}
+                                            disabled={this.state.reAuthrizeing}>
                                             AUTHORIZE NEW SPREAD
-                                    </button>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED<i className="help-circle">
+                                    <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text " aria-hidden="true"></i></i>
+                                </div>
+                                <div className='spscFix01'>
+                                    <div className='LipRadioFix01'>
+                                        <div className="md-radio md-radio-inline ">
+                                            <input
+                                                type="radio"
+                                                id="spS03"
+                                                name="s003"
+                                                //defaultChecked
+                                                onChange={() => { this.updateSwapSpeedMode('UPFRONT'); }}
+                                                checked={this.state.swapSpeedMode === 'UPFRONT'}
+                                                ref={(input) => this.swapSpeedMode3 = input}
+                                            />
+                                            <label htmlFor="spS03"></label>
+                                        </div>
+                                        <div className="LiProFlexBX01 padFixer01">
+                                            <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                                        </div>
+                                    </div>
+                                    <div className='LipRadioFix01' >
+                                        <div className="md-radio md-radio-inline ">
+                                            <input
+                                                type="radio"
+                                                id="spS04"
+                                                name="s004"
+                                                //defaultChecked
+                                                onChange={() => { this.updateSwapSpeedMode('REALTIME'); }}
+                                                checked={this.state.swapSpeedMode === 'REALTIME'}
+                                                ref={(input) => this.swapSpeedMode4 = input}
+                                            />
+                                            <label htmlFor="spS04"></label>
+                                        </div>
+                                        <div className="LiProFlexBX01 padFixer01">
+                                            <div className="LipRTitle01">
+                                                Deposit token A to the smart contract in real time<i className="help-circle">
+                                                    <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED<i className="help-circle">
-                                <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text " aria-hidden="true"></i></i>
-                            </div>
-                            <div className='spscFix01'>
-                                <div className='LipRadioFix01'>  	
-                                        <div className="md-radio md-radio-inline ">	
-                                            <input 
-                                                type="radio" 
-                                                id="spS03" 
-                                                name="s003" 
-                                                //defaultChecked
-                                                onChange = {() => { this.updateSwapSpeedMode('UPFRONT');} }
-                                                checked={this.state.swapSpeedMode === 'UPFRONT'}
-                                                ref={(input)=> this.swapSpeedMode3 = input}
-                                            />                                            
-                                            <label htmlFor="spS03"></label>	
-                                        </div> 	
-                                        <div className="LiProFlexBX01 padFixer01">	
-                                        <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>	
-                                        </div> 	
-                                </div>	
-                                <div className='LipRadioFix01' >	
-                                    <div className="md-radio md-radio-inline ">	
-                                        <input 
-                                            type="radio" 
-                                            id="spS04" 
-                                            name="s004" 
-                                            //defaultChecked
-                                            onChange = {() => { this.updateSwapSpeedMode('REALTIME');} }
-                                            checked={this.state.swapSpeedMode === 'REALTIME'}
-                                            ref={(input)=> this.swapSpeedMode4 = input}
-                                        />
-                                        <label htmlFor="spS04"></label>	
-                                    </div> 	
-                                    <div className="LiProFlexBX01 padFixer01">	
-                                        <div className="LipRTitle01">
-                                            Deposit token A to the smart contract in real time<i className="help-circle">
-                                                <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i>
-                                        </div>	
-                                    </div>	
-                                </div> 	
-                            </div>         	
                         </div>
-                    </div>
                     }
                     {/* <div className="spContrlMBX">
                     <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
