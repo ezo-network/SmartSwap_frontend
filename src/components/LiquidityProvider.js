@@ -838,12 +838,12 @@ export default class LiquidityProvider extends PureComponent {
             this.setState({
                 reAuthrizeing: true
             });
-            let newLimit = this.state.spreadAmount;
+            let newLimit = this.state.spProfitPercent;
             //spContract.getFeeAmountLimit();
             await AxiosRequest.request({
                 data: {
                     smartContractAddress: this.state.smartSwapContractAddress,
-                    spreadAmount: newLimit
+                    spProfitPercent: newLimit
                 },
                 path: "update",
                 method: "POST"
@@ -1480,9 +1480,9 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                                 step={0.05}
                                                 maxValue={1}
                                                 minValue={0.2}
-                                                value={this.state.spreadAmount}
-                                                formatLabel={value => `${value.toFixed(2)}%`}
-                                                onChange={value => this.setState({ spreadAmount: value })} />
+                                                value={this.state.spProfitPercent}
+                                                formatLabel={value => `${Number(value).toFixed(2)}%`}
+                                                onChange={value => this.setState({ spProfitPercent: value })} />
                                         </div>
                                     </div>
                                     <div className='spContrlSSBX02'>
