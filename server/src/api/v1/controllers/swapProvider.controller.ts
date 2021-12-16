@@ -35,8 +35,8 @@ const swapProviderController = {
                 walletAddressToSend, walletAddressToReceive, 
                 gasAndFeeAmount, spProfitPercent, accumulateFundsLimit, 
                 stopRepeatsMode, stopRepeatsOnDate, stopRepeatsAfterCalls,
-                withdrawMode, withdrawOnDate, withdrawAfterCalls,
-                cexApiKey, cexApiSecret, txid, smartContractAddress, swapSpeedMode      
+                withdrawMode, withdrawOnDate, withdrawAfterCalls, 
+                txid, smartContractAddress, swapSpeedMode      
             } = req.body;
             
             // SP exist?
@@ -79,10 +79,6 @@ const swapProviderController = {
                     mode: withdrawMode,
                     onDate: withdrawOnDate,
                     afterCalls: withdrawAfterCalls
-                },
-                cexData: {
-                    key: cexApiKey,
-                    secret: cexApiSecret
                 }
             };
             const swapProvider = await new SwapProvider(spArgs).save();
