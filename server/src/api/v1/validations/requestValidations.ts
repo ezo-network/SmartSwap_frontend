@@ -37,8 +37,8 @@ const requestValidations = {
         is: val => val == 2,
         then: number().required("[withdrawAfterCalls] Required -  Withdraw after X repeats")
       }),
-      cexApiKey: string().required('[cexApiKey] Required - Your specific API key to the CEX of your choice'),
-      cexApiSecret: string().required('[cexApiSecret] Required - Your specific API key secret to the CEX of your choice'),
+      // cexApiKey: string().required('[cexApiKey] Required - Your specific API key to the CEX of your choice'),
+      // cexApiSecret: string().required('[cexApiSecret] Required - Your specific API key secret to the CEX of your choice'),
     })
   }),
 

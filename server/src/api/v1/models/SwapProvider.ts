@@ -157,11 +157,13 @@ const SwapProvider: Schema = new mongoose.Schema({
     cexData: {
         key: {
             type: String,
-            required: true,  
+            required: false,
+            default: null
         },
         secret: {
             type: String,
-            required: true,  
+            required: false,
+            default: null
         },
     },
     smartContractAddress: {

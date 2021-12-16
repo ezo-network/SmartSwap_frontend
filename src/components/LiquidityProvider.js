@@ -61,7 +61,7 @@ export default class LiquidityProvider extends PureComponent {
             updating: false,
             reAuthrizeing: false,
             deployButtonText: "DEPLOY SMART CONTRACT",
-            updateButtonText: "UPDATE SMART CONTRACT",
+            updateButtonText: "UPDATE API KEYS",
             loadingIcon: false,
             errorMessage: null,
             serverError: null,
@@ -73,10 +73,10 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     componentWillReceiveProps(newProps) {
-        // this.setState({
-        //     web3: newProps.web3,
-        //     web3Config: newProps.web3Config
-        // })
+        this.setState({
+            web3: newProps.web3,
+            web3Config: newProps.web3Config
+        });
 
         // detect Network account change
         window.ethereum.on('networkChanged', networkId => {
@@ -89,7 +89,7 @@ export default class LiquidityProvider extends PureComponent {
                 smartSwapContractAddress: null,
                 spAccount: null
             });
-            this.resetForm();
+            //this.resetForm();
         });
 
         // detect Network account change
@@ -110,7 +110,7 @@ export default class LiquidityProvider extends PureComponent {
             });
             // on account change currently disconnecting wallet so we can again check active contract on wallet connect 
 
-            this.resetForm();
+            //this.resetForm();
         });
         
 
@@ -165,7 +165,7 @@ export default class LiquidityProvider extends PureComponent {
         let collapse = "isOpen" + index;
         this.setState(prevState => ({
             [collapse]: !prevState[collapse] }));
-        this.toggleActiveContractSection();
+        //this.toggleActiveContractSection();
     };
 
     changeTokenA(token) {
@@ -190,7 +190,7 @@ export default class LiquidityProvider extends PureComponent {
             networkId: web3Config.getNetworkId(),
             spAccount: web3Config.getAddress()
         });
-        //this.toggleActiveContractSection();
+        this.toggleActiveContractSection();
         this.setGasFeeAndAmountMinMaxRanges(this.state.coinList[this.state.selectedTokenB]['networkId']);
     };
 
@@ -206,7 +206,7 @@ export default class LiquidityProvider extends PureComponent {
                     confirmed: true,
                     isActiveContractExist: true,
                     smartSwapContractAddress: activeContractAddress,
-                    deployed: true
+                    deployed: false
                 });
             } else {
                 this.setState({
@@ -236,15 +236,17 @@ export default class LiquidityProvider extends PureComponent {
             networkId &&
             (networkId === 97 || networkId === 56)
         ) {
-            notificationConfig.warning('Change metamask network to Ethereum Or Change token A BNB !');
-            return;
+            this.changeTokenA('ETH');
+            //notificationConfig.warning('Change metamask network to Ethereum Or Change token A BNB !');
+            //return;
         } else if (
             constantConfig.tokenDetails[this.state.selectedTokenA].networkId !==
             networkId &&
             (networkId === 42 || networkId === 1)
         ) {
-            notificationConfig.warning('Change metamask network to Binance! Or Change token A ETH !');
-            return;
+            this.changeTokenA('BNB');
+            //notificationConfig.warning('Change metamask network to Binance! Or Change token A ETH !');
+            //return;
         }
         this.setState({
             web3: web3Config.getWeb3(),
@@ -378,8 +380,8 @@ export default class LiquidityProvider extends PureComponent {
                 accumulateFundsLimit: this.state.accumulateFundsLimit,
                 stopRepeatsMode: this.state.stopRepeatsMode,
                 withdrawMode: this.state.withdrawMode,
-                cexApiKey: this.state.cexApiKey === null ? ('').toString() : this.state.cexApiKey,
-                cexApiSecret: this.state.cexApiSecret === null ? ('').toString() : this.state.cexApiSecret
+                // cexApiKey: this.state.cexApiKey === null ? ('').toString() : this.state.cexApiKey,
+                // cexApiSecret: this.state.cexApiSecret === null ? ('').toString() : this.state.cexApiSecret
             }),
             // data: {
             //     spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
@@ -449,7 +451,8 @@ export default class LiquidityProvider extends PureComponent {
                                     smartSwapContractAddress: response.data['smartContractAddress'],
                                     confirmed: true,
                                     deployButtonText: "Contract Deployed",
-                                    loadingIcon: false
+                                    loadingIcon: false,
+                                    isActiveContractExist: true
                                 });
                                 notificationConfig.success('Swap provider Added');
                             }
@@ -536,69 +539,70 @@ export default class LiquidityProvider extends PureComponent {
         try{
             let response = await AxiosRequest.request(args);
             if(response.status === 200){
+                
                 const isactiveContractExist = response.data.find(obj => {
                     if((obj.networkId == this.state.networkId) && (this.state.spAccount == obj.walletAddresses.spAccount)){
                         this.setState({
                             isActiveContractExist: true
                         });
 
-                        this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
-                        this.dispatchEventHandler(this.walletAddressToReceive, obj.walletAddresses.toReceive);
-                        this.dispatchEventHandler(this.walletAddressToSend, obj.walletAddresses.toSend);
-                        this.dispatchEventHandler(this.spProfitPercent, obj.spProfitPercent);
-                        this.dispatchEventHandler(this.accumulateFundsLimit, obj.accumulateFundsLimit);
-                        this.dispatchEventHandler(this.cexApiKey, obj.cexData.key);
-                        this.dispatchEventHandler(this.cexApiSecret, obj.cexData.secret);
+                        // this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
+                        // this.dispatchEventHandler(this.walletAddressToReceive, obj.walletAddresses.toReceive);
+                        // this.dispatchEventHandler(this.walletAddressToSend, obj.walletAddresses.toSend);
+                        // this.dispatchEventHandler(this.spProfitPercent, obj.spProfitPercent);
+                        // this.dispatchEventHandler(this.accumulateFundsLimit, obj.accumulateFundsLimit);
+                        // this.dispatchEventHandler(this.cexApiKey, obj.cexData.key);
+                        // this.dispatchEventHandler(this.cexApiSecret, obj.cexData.secret);
                         
-                        if(obj.stopRepeats.mode == 3){
-                            this.dispatchEventHandler(this.stopRepeatsMode3, obj.stopRepeats.mode, 'checked', 'click');
-                        }
+                        // if(obj.stopRepeats.mode == 3){
+                        //     this.dispatchEventHandler(this.stopRepeatsMode3, obj.stopRepeats.mode, 'checked', 'click');
+                        // }
 
-                        if(obj.stopRepeats.mode == 2){
-                            this.dispatchEventHandler(this.stopRepeatsMode2, obj.stopRepeats.mode, 'checked', 'click');
-                            this.dispatchEventHandler(this.stopRepeatsAfterCalls, obj.stopRepeats.afterCalls);
-                        }
+                        // if(obj.stopRepeats.mode == 2){
+                        //     this.dispatchEventHandler(this.stopRepeatsMode2, obj.stopRepeats.mode, 'checked', 'click');
+                        //     this.dispatchEventHandler(this.stopRepeatsAfterCalls, obj.stopRepeats.afterCalls);
+                        // }
                         
-                        if(obj.stopRepeats.mode == 1){
-                            this.dispatchEventHandler(this.stopRepeatsMode1, obj.stopRepeats.mode, 'checked', 'click');
-                            //this.dispatchEventHandler(this.stopRepeatsOnDate, obj.stopRepeats.onDate);
-                        }
+                        // if(obj.stopRepeats.mode == 1){
+                        //     this.dispatchEventHandler(this.stopRepeatsMode1, obj.stopRepeats.mode, 'checked', 'click');
+                        //     //this.dispatchEventHandler(this.stopRepeatsOnDate, obj.stopRepeats.onDate);
+                        // }
 
 
-                        if(obj.withdraw.mode == 3){
-                            this.dispatchEventHandler(this.withdrawMode3, obj.withdraw.mode, 'checked', 'click');
-                        }
+                        // if(obj.withdraw.mode == 3){
+                        //     this.dispatchEventHandler(this.withdrawMode3, obj.withdraw.mode, 'checked', 'click');
+                        // }
                         
-                        if(obj.withdraw.mode == 2){
-                            this.dispatchEventHandler(this.withdrawMode2, obj.withdraw.mode, 'checked', 'click');
-                            this.dispatchEventHandler(this.withdrawAfterCalls, obj.withdraw.afterCalls);
-                            this.setState({
-                                withdrawOnDate: null
-                            });
-                        }
+                        // if(obj.withdraw.mode == 2){
+                        //     this.dispatchEventHandler(this.withdrawMode2, obj.withdraw.mode, 'checked', 'click');
+                        //     this.dispatchEventHandler(this.withdrawAfterCalls, obj.withdraw.afterCalls);
+                        //     this.setState({
+                        //         withdrawOnDate: null
+                        //     });
+                        // }
                         
-                        if(obj.withdraw.mode == 1){
-                            this.dispatchEventHandler(this.withdrawMode1, obj.withdraw.mode, 'checked', 'click');
-                            //this.dispatchEventHandler(this.withdrawOnDate, obj.withdraw.onDate);
-                            this.setState({
-                                afterCalls: null
-                            });
-                        }
+                        // if(obj.withdraw.mode == 1){
+                        //     this.dispatchEventHandler(this.withdrawMode1, obj.withdraw.mode, 'checked', 'click');
+                        //     //this.dispatchEventHandler(this.withdrawOnDate, obj.withdraw.onDate);
+                        //     this.setState({
+                        //         afterCalls: null
+                        //     });
+                        // }
                         
-                        if(obj.swapSpeedMode == 'UPFRONT'){
-                            this.dispatchEventHandler(this.swapSpeedMode1, obj.swapSpeedMode, 'checked', 'click');                            
-                            //this.dispatchEventHandler(this.swapSpeedMode3, obj.swapSpeedMode, 'checked', 'click');                            
-                        }
+                        // if(obj.swapSpeedMode == 'UPFRONT'){
+                        //     this.dispatchEventHandler(this.swapSpeedMode1, obj.swapSpeedMode, 'checked', 'click');                            
+                        //     //this.dispatchEventHandler(this.swapSpeedMode3, obj.swapSpeedMode, 'checked', 'click');                            
+                        // }
 
-                        if(obj.swapSpeedMode == 'REALTIME'){
-                            this.dispatchEventHandler(this.swapSpeedMode2, obj.swapSpeedMode, 'checked', 'click');
-                            //this.dispatchEventHandler(this.swapSpeedMode4, obj.swapSpeedMode, 'checked', 'click');
-                        }
+                        // if(obj.swapSpeedMode == 'REALTIME'){
+                        //     this.dispatchEventHandler(this.swapSpeedMode2, obj.swapSpeedMode, 'checked', 'click');
+                        //     //this.dispatchEventHandler(this.swapSpeedMode4, obj.swapSpeedMode, 'checked', 'click');
+                        // }
 
 
-                        this.setState({
-                            contractCreatedAt: obj.createdAt
-                        });
+                        // this.setState({
+                        //     contractCreatedAt: obj.createdAt
+                        // });
 
                         //this.dispatchEventHandler(this.gasAndFeeAmount, obj.gasAndFeeAmount.$numberDecimal, 'value', 'mousemove');
 
@@ -617,7 +621,8 @@ export default class LiquidityProvider extends PureComponent {
                         confirmed: true,
                         isActiveContractExist: true,
                         smartSwapContractAddress: isactiveContractExist.smartContractAddress,
-                        deployed: true
+                        deployed: false,
+                        deployButtonText: 'DEPLOY SMART CONTRACT'
                     });
                 } else {
                     this.setState({
@@ -673,7 +678,7 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     reAuthrizeFeeAndGasLimit = async() => {
-        if(this.state.deployed){
+        if(this.state.isActiveContractExist){
             this.setState({
                 reAuthrizeing: true                
             });
@@ -828,7 +833,7 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     reAuthrizeSpreadLimit = async() => {
-        if(this.state.deployed){
+        if(this.state.isActiveContractExist){
             this.setState({
                 reAuthrizeing: true                
             });
@@ -850,7 +855,7 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     updateSwapSpeedMode = async(mode) => {
-        if(this.state.deployed){
+        if(this.state.isActiveContractExist){
             this.setState({
                 updating: true,
                 reAuthrizeing: true
@@ -873,6 +878,50 @@ export default class LiquidityProvider extends PureComponent {
         this.setState({
             swapSpeedMode: mode              
         });
+    }
+
+
+    updateAPIdata = async() => {
+
+        if(this.state.isActiveContractExist){
+
+            let error = false;
+
+            if(this.state.cexApiKey === null){
+                notificationConfig.error("API key can't be blank.");
+                error = true;
+            }
+
+            if(this.state.cexApiSecret === null){
+                notificationConfig.error("API secret can't be blank.");
+                error = true;
+            }
+
+            if(error === false){
+                this.setState({
+                    updating: true
+                });
+
+                await AxiosRequest.request({
+                    data: {
+                        smartContractAddress: this.state.smartSwapContractAddress,
+                        cexApiKey: this.state.cexApiKey,
+                        cexApiSecret: this.state.cexApiSecret,
+                    },
+                    path: "update",
+                    method: "POST"
+                });
+                notificationConfig.success('API data updated successfully.');    
+                this.setState({
+                    updating: false,
+                    reAuthrizeing: false              
+                });       
+            } else {
+                this.setState({
+                    updating: false
+                });       
+            }
+        }
     }
 
 
@@ -1333,58 +1382,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className='spacerLine'></div>
-                        {/* <div className="LiProfSbox03">
-                            <div className="LiProTitle02">WITHDRAW</div>
-                        </div> */}
-
-
-                        <div className='LiProFlexBX01 smFixer07'>
-                            <div className="LiProfSbox01">
-                                <div className="LiProLable">API Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
-                            </div>
-                            <div className="LiProfSbox02">
-                                <div className="LiproInput01">
-                                    <input 
-                                        type="text" 
-                                        defaultValue='' 
-                                        onChange={event => this.setState({cexApiKey: event.target.value})} 
-                                        ref={(input)=> this.cexApiKey = input}
-                                    />
-                                </div>
-                                <br></br>
-                                { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") && 
-                                <div className="error-Msg" style={smallError}>
-                                    <label>{this.state.errorMessage}</label>
-                                </div>
-                                }                                
-                            </div>
-                        </div>
-
-
-                        <div className='LiProFlexBX01 smFixer07'>
-                            <div className="LiProfSbox01">
-                                <div className="LiProLable">Security Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific Security Key to the CEX of your choice" aria-hidden="true"></i></i></div>
-                            </div>
-                            <div className="LiProfSbox02">
-                                <div className="LiproInput01">
-                                    <input 
-                                        type="text" 
-                                        defaultValue='' 
-                                        onChange={event => this.setState({cexApiSecret: event.target.value})} 
-                                        ref={(input)=> this.cexApiSecret = input}
-                                    />
-                                </div>
-                                <br></br>
-                                { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiSecret") && 
-                                <div className="error-Msg" style={smallError}>
-                                    <label>{this.state.errorMessage}</label>
-                                </div>
-                                }
-                            </div>
-                        </div>
+                        </div>        
 
                         {( () => {
                             if((this.state.web3 === null ||
@@ -1399,25 +1397,6 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                         </div>
                                     </div>) 
 
-                                } else if (
-                                    (this.state.web3 !== null || constantConfig.tokenDetails[this.state.selectedTokenA].networkId === web3Config.getNetworkId()) 
-                                    && this.state.isActiveContractExist === true) {
-                                        return (
-                                            <div className="LiProfSbox03">
-                                                <div className='LiProformBTNbar'>
-                                                    <button onClick={this.updateContract.bind(this)} disabled={this.state.updating}>
-                                                        {this.state.updateButtonText}                                                         
-                                                        {this.state.loadingIcon === true &&
-                                                            <LoopCircleLoading
-                                                                height={'20px'}
-                                                                width={'20px'}
-                                                                color={'#ffffff'}
-                                                            />
-                                                        }
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) 
                                 } else{
                                     return (<div className="LiProfSbox03">
                                         <div className='LiProformBTNbar'>
@@ -1554,39 +1533,81 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                         </div>	
                                     </div>	
                                 </div> 	
-                            </div>         	
+                            </div> 
+                            <div className='LiProFlexBX01 smFixer07'>
+                            <div className="LiProfSbox01">
+                                <div className="LiProLable">API Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
+                            </div>
+                            <div className="LiProfSbox02">
+                                <div className="LiproInput01">
+                                    <input 
+                                        type="text" 
+                                        defaultValue='' 
+                                        onChange={event => this.setState({cexApiKey: event.target.value})} 
+                                        ref={(input)=> this.cexApiKey = input}
+                                    />
+                                </div>
+                                <br></br>
+                                { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") && 
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                                }                                
+                            </div>
+                        </div>
+
+
+                        <div className='LiProFlexBX01 smFixer07'>
+                            <div className="LiProfSbox01">
+                                <div className="LiProLable">Security Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific Security Key to the CEX of your choice" aria-hidden="true"></i></i></div>
+                            </div>
+                            <div className="LiProfSbox02">
+                                <div className="LiproInput01">
+                                    <input 
+                                        type="text" 
+                                        defaultValue='' 
+                                        onChange={event => this.setState({cexApiSecret: event.target.value})} 
+                                        ref={(input)=> this.cexApiSecret = input}
+                                    />
+                                </div>
+                                <br></br>
+                                { this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiSecret") && 
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.errorMessage}</label>
+                                </div>
+                                }
+                            </div>
+                        </div>
+
+
+                        {( () => {
+                            if (
+                                (this.state.web3 !== null || constantConfig.tokenDetails[this.state.selectedTokenA].networkId === web3Config.getNetworkId()) 
+                                && this.state.isActiveContractExist === true) {
+                                    return (
+                                        <div className="LiProfSbox03">
+                                            <div className='LiProformBTNbar'>
+                                                <button onClick={this.updateAPIdata.bind(this)} disabled={this.state.updating}>
+                                                    {this.state.updateButtonText}                                                         
+                                                    {this.state.loadingIcon === true &&
+                                                        <LoopCircleLoading
+                                                            height={'20px'}
+                                                            width={'20px'}
+                                                            color={'#ffffff'}
+                                                        />
+                                                    }
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) 
+                                } 
+                            }
+                        )()}                        
+
+
                         </div>
                     </div>
                     }
-                    {/* <div className="spContrlMBX">
-                    <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
-                        <div className='spContrlInputBX'>
-                            <i>2</i>
-                            <input type="text" value='0xF3B3f6F15d474C92cb4051c22697C371e6e117B1' />
-                            <a href="#" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
-                        </div>
-                        <div className='spContrlInfotxt'>
-                        Created at April 6,2021 05:21:36pm UTC &nbsp;&nbsp;&nbsp;&nbsp; Balance:  425.563 BNB | $4,846 USDT
-                            <span>Withdraw all funds back to your CEX account</span>
-                        </div>
-                        <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
-                        <div className='spContrlSBX'>
-
-                            <div className='spContrlSSBX01'>
-                            <div className="dragorInput v2">  
-                                <InputRange
-                                    maxValue={100000}
-                                    minValue={100}
-                                    value={this.state.gasAndFeeAmount}
-                                    formatLabel={value => `$${value}`}
-                                    onChange={value => this.setState({ gasAndFeeAmount: value })} />
-                            </div>
-                            </div>
-                            <div className='spContrlSSBX02'>
-                                <button className='spContrlBTN01'>AUTHORIZE NEW LIMIT</button>
-                            </div> 
-                        </div> 
-                    </div> */}
                 </div>
                 <a href="javascript:void(0);" onClick={() => { this.props.closePopup("LiquidityProvider") }} className="close-Icon"></a>
             </div>
