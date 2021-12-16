@@ -375,7 +375,7 @@ export default class LiquidityProvider extends PureComponent {
                 amountA: this.state.amountA === null ? ('').toString() : this.state.amountA,
                 walletAddressToSend: this.state.walletAddressToSend === null ? ('').toString() : this.state.walletAddressToSend,
                 walletAddressToReceive: this.state.walletAddressToReceive === null ? ('').toString() : this.state.walletAddressToReceive,
-                gasAndFeeAmount: this.state.gasAndFeeAmount,
+                gasAndFeeAmount: Web3.utils.toWei((this.state.gasAndFeeAmount).toString()),
                 swapSpeedMode: this.state.swapSpeedMode,
                 spProfitPercent: this.state.spProfitPercent,
                 accumulateFundsLimit: this.state.accumulateFundsLimit,
@@ -421,7 +421,7 @@ export default class LiquidityProvider extends PureComponent {
                     response.data.tokenB.address,
                     response.data.walletAddresses.toSend,
                     response.data.walletAddresses.toReceive,
-                    response.data.gasAndFeeAmount.$numberDecimal,
+                    Web3.utils.fromWei((response.data.gasAndFeeAmount.$numberDecimal).toString(), 'ether'),
                     async (hash) => {
                         this.setState({
                             txid: response.data._id,
@@ -703,7 +703,7 @@ export default class LiquidityProvider extends PureComponent {
                         await AxiosRequest.request({
                             data: {
                                 smartContractAddress: this.state.smartSwapContractAddress,
-                                gasAndFeeAmount: newLimit
+                                gasAndFeeAmount: Web3.utils.toWei((newLimit).toString(), 'ether')
                             },
                             path: "update",
                             method: "POST"
@@ -1425,6 +1425,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                         <div>
                             <div className="LiProTitle03">Below is your Swap Provider smart contract address
                                 <span>Whitelist this smart contract address on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist the SmartSwap address below" aria-hidden="true"></i></i></span>
+                                <span>Whitelist this IP: 44.235.252.39 on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist IP" aria-hidden="true"></i></i></span>
                             </div>
 
                             <div className="spContrlMBX">
