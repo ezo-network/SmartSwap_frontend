@@ -28,4 +28,8 @@ CONSTANT.RPC_PROVIDER_ETHEREUM = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 
 
 CONSTANT.RPC_PROVIDER_BINANCE = Number(process.env.REACT_APP_BSC_CHAIN_ID) === 56 ? 'https://bsc-dataseed.binance.org' : 'https://data-seed-prebsc-1-s1.binance.org:8545';
 
+CONSTANT.WEB_RPC_PROVIDER_ETHEREUM = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? 'https://mainnet.infura.io/v3/0bc569339d39467c9c1840a2f5c6615f' : 'https://kovan.infura.io/v3/0bc569339d39467c9c1840a2f5c6615f';
+
+CONSTANT.WEB_RPC_PROVIDER_BINANCE = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? 'https://bsc-dataseed.binance.org' : 'https://data-seed-prebsc-1-s1.binance.org:8545';
+
 export default CONSTANT;

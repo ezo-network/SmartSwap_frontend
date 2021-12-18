@@ -15,6 +15,7 @@ import { LoopCircleLoading } from 'react-loadingg';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import DateFormat from "dateformat";
+import axios from "axios";
 
 var _ = require('lodash');
 
@@ -68,7 +69,11 @@ export default class LiquidityProvider extends PureComponent {
             isActiveContractExist: false,
             spData: null,
             contractCreatedAt: '',
-            baseState: null
+            baseState: null,
+            ethTokenUsdValue: null, 
+            bnbTokenUsdValue: null, 
+            spContractBal: null,
+            spContractBalInUsd: null,
         }
     }
 
@@ -113,7 +118,6 @@ export default class LiquidityProvider extends PureComponent {
             //this.resetForm();
         });
 
-
     }
 
     componentDidMount() {
@@ -142,6 +146,8 @@ export default class LiquidityProvider extends PureComponent {
         });
 
         this.setGasFeeAndAmountMinMaxRanges();
+
+        this.getTokenUsdValuesFromCoingecko();
 
     }
 
@@ -305,6 +311,16 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     async deployContract(event) {
+
+        if(!Web3.utils.isAddress(this.state.walletAddressToSend)){
+            notificationConfig.error('Please provide a valid wallet address that send token A');
+            return;
+        }
+
+        if(!Web3.utils.isAddress(this.state.walletAddressToReceive)){
+            notificationConfig.error('Please provide a valid wallet address that receive token B');
+            return;
+        }
 
         // set this to disable deploy button
         this.setState({
@@ -601,9 +617,9 @@ export default class LiquidityProvider extends PureComponent {
                         // }
 
 
-                        // this.setState({
-                        //     contractCreatedAt: obj.createdAt
-                        // });
+                        this.setState({
+                            contractCreatedAt: obj.createdAt
+                        });
 
                         //this.dispatchEventHandler(this.gasAndFeeAmount, obj.gasAndFeeAmount.$numberDecimal, 'value', 'mousemove');
 
@@ -625,6 +641,9 @@ export default class LiquidityProvider extends PureComponent {
                         deployed: false,
                         deployButtonText: 'DEPLOY SMART CONTRACT'
                     });
+
+                    this.getContractBal();
+
                 } else {
                     this.setState({
                         deployed: false,
@@ -900,10 +919,11 @@ export default class LiquidityProvider extends PureComponent {
 
             if (error === false) {
                 this.setState({
-                    updating: true
+                    updating: true,
+                    loadingIcon: true
                 });
 
-                await AxiosRequest.request({
+                let response = await AxiosRequest.request({
                     data: {
                         smartContractAddress: this.state.smartSwapContractAddress,
                         cexApiKey: this.state.cexApiKey,
@@ -912,19 +932,81 @@ export default class LiquidityProvider extends PureComponent {
                     path: "update",
                     method: "POST"
                 });
-                notificationConfig.success('API data updated successfully.');
+
+                if(response.status == 422){
+                    notificationConfig.error('Invalid API keys.');
+                }
+                
+                if(response.status == 200){
+                    notificationConfig.success('API data updated successfully.');
+                } 
+
+                if(response.status == 500){
+                    notificationConfig.error('Sever error');
+                }
+
                 this.setState({
                     updating: false,
-                    reAuthrizeing: false
-                });
-            } else {
-                this.setState({
-                    updating: false
+                    loadingIcon: false
                 });
             }
         }
     }
 
+    getTokenUsdValuesFromCoingecko = async () => {
+        let url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true";
+        
+        let response = await axios.get(url).then((res) => {
+            return res.data;
+        }).catch((err) => {
+            console.log("errorOrigin: getTokenUsdValuesFromCoingecko", err);
+        });
+  
+        this.setState({ 
+            ethTokenUsdValue: response["ethereum"]["usd"],
+            bnbTokenUsdValue: response["binancecoin"]["usd"]
+        });
+    }
+
+
+    getContractBal = async () => {
+
+        const bscProvider = CONSTANT.WEB_RPC_PROVIDER_BINANCE;
+        const ethreumProvider = CONSTANT.WEB_RPC_PROVIDER_ETHEREUM;
+        const web3ForBSC = new Web3(new Web3.providers.HttpProvider(bscProvider));
+        const web3ForETH = new Web3(new Web3.providers.HttpProvider(ethreumProvider));
+        let web3 = null;
+        let usdtFaceValue = 0;
+
+        if(this.state.networkId == 1 || this.state.networkId == 42){
+            web3 = web3ForETH;
+            usdtFaceValue = this.state.ethTokenUsdValue;
+        }
+
+        if(this.state.networkId == 56 || this.state.networkId == 97){
+            web3 = web3ForBSC;
+            usdtFaceValue = this.state.bnbTokenUsdValue;
+        }
+
+        let spBal =  await web3.eth.getBalance(this.state.smartSwapContractAddress, function (error, result) {
+            return result;
+        });
+
+        if(spBal){
+            let spNativeBal = Web3.utils.fromWei((spBal).toString(), 'ether');
+            let spUsdtBal = Number(usdtFaceValue) * Number(spNativeBal);
+            this.setState({
+                spNativeBal: spNativeBal,
+                spContractBalInUsd: Number(spUsdtBal).toFixed(2)
+            });
+        }
+
+
+    }
+
+    copyToClipboard = async() => {
+        await navigator.clipboard.writeText(this.state.smartSwapContractAddress);
+    }
 
 
     render() {
@@ -1090,7 +1172,7 @@ export default class LiquidityProvider extends PureComponent {
                                 </div>
                             </div>
                         </div>
-                        {/* <div className="LiProfSbox02">
+                        <div className="LiProfSbox02">
                             <div className='LipRadioFix01' >
                                 <div className="md-radio md-radio-inline ">
                                     <input
@@ -1101,6 +1183,7 @@ export default class LiquidityProvider extends PureComponent {
                                         onChange={() => { this.updateSwapSpeedMode('REALTIME'); }}
                                         checked={this.state.swapSpeedMode === 'REALTIME'}
                                         ref={(input) => this.swapSpeedMode2 = input}
+                                        disabled="true"
                                     />
                                     <label htmlFor="spS02"></label>
                                 </div>
@@ -1108,7 +1191,7 @@ export default class LiquidityProvider extends PureComponent {
                                     <div className="LipRTitle01">Deposit token A to the smart contract in real time<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
                                 </div>
                             </div>
-                        </div> */}
+                        </div>
                         {
                             this.state.errorMessage !== null && this.state.errorMessage.includes("swapSpeedMode") &&
                             <div className="error-Msg" style={smallError}>
@@ -1431,12 +1514,12 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                             <div className="spContrlMBX">
                                 <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
                                 <div className='spContrlInputBX'>
-                                    <i>></i>
+                                    <i></i>
                                     <input type="text" value={this.state.smartSwapContractAddress} />
-                                    <a href="#" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
+                                    <a href="javascript:void(0)" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                                 </div>
                                 <div className='spContrlInfotxt'>
-                                    Created at {DateFormat(this.state.contractCreatedAt, "dddd, mmmm dS, yyyy, h:MM:ss TT")} &nbsp;&nbsp;&nbsp;&nbsp; Balance:  425.563 {this.state.selectedTokenA} | $4,846 USDT
+                                    Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")} - Balance: {this.state.spNativeBal} {this.state.selectedTokenA} | ${this.state.spContractBalInUsd} USDT
                                     <span>Withdraw all funds back to your CEX account</span>
                                 </div>
                                 <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
@@ -1525,6 +1608,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                                 onChange={() => { this.updateSwapSpeedMode('REALTIME'); }}
                                                 checked={this.state.swapSpeedMode === 'REALTIME'}
                                                 ref={(input) => this.swapSpeedMode4 = input}
+                                                disabled="true"
                                             />
                                             <label htmlFor="spS04"></label>
                                         </div>
