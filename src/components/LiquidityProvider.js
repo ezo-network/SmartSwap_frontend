@@ -45,7 +45,7 @@ export default class LiquidityProvider extends PureComponent {
             minStepForGasAndFeeAmount: 0,
             swapSpeedMode: 'UPFRONT',
             spreadAmount: 100,
-            spProfitPercent: 0.3,
+            spProfitPercent: 0.5,
             accumulateFundsLimit: 100,
             stopRepeatsMode: 3,
             stopRepeatsOnDate: new Date(),
@@ -272,7 +272,7 @@ export default class LiquidityProvider extends PureComponent {
         if (networkID == CONSTANT.NETWORK_ID.BINANCE) {
             this.setState({
                 minGasAndFeeAmount: 0.5,
-                gasAndFeeAmount: 0.5,
+                gasAndFeeAmount: 500,
                 maxGasAndFeeAmount: 500,
                 minStepForGasAndFeeAmount: 0.5,
                 selectedTokenA: 'BNB',
@@ -282,7 +282,7 @@ export default class LiquidityProvider extends PureComponent {
         if (networkID == CONSTANT.NETWORK_ID.ETHEREUM) {
             this.setState({
                 minGasAndFeeAmount: 0.05,
-                gasAndFeeAmount: 0.05,
+                gasAndFeeAmount: 50,
                 maxGasAndFeeAmount: 50,
                 minStepForGasAndFeeAmount: 0.05,
                 selectedTokenA: 'ETH',
@@ -1033,10 +1033,10 @@ export default class LiquidityProvider extends PureComponent {
                         <div className="LiProfSbox02">
                             <div className="LiProTitle02">RECEIVED</div>
                         </div>
-                        <div className="LiProfSbox01 smFixer01">
-                            <div className="LiProLable">Choose the amount of token A to sell on Smartswap</div>
-                            <div className="bspMBX01 smFixer06">
-                                <div className="bspSBX01">
+                        <div className="LiProfSbox01">
+                            <div className="LiProLable">Choose the token A to sell on Smartswap</div>
+                            <div className="bspMBX01">
+                                {/* <div className="bspSBX01">
                                     <div className="LiproInput01 withLable01" style={{ marginTop: "12px" }}>
                                         <span>$</span>
                                         <input
@@ -1053,8 +1053,8 @@ export default class LiquidityProvider extends PureComponent {
                                             <label>{this.state.errorMessage}</label>
                                         </div>
                                     }
-                                </div>
-                                <div className="bspSBX01">
+                                </div> */}
+                                <div className="bspSBX01 fw">
                                     <div className="LiproDropdown">
                                         <button className='LiproDDbtn01' onClick={() => this.toggle(1)} >
                                             <div className="ddIconBX"> <span> <img src={this.state.coinList[this.state.selectedTokenA]['icon']} alt="" /></span> {this.state.coinList[this.state.selectedTokenA]['symbol']}</div>
@@ -1227,6 +1227,40 @@ export default class LiquidityProvider extends PureComponent {
                         <div className="LiProfSbox03">
                             {/* <div className="LiProTitle02">REPEAT</div> */}
                         </div>
+
+                        <div className='LiProFlexBX01 smFixer07'>
+                            <div className="LiProfSbox01">
+                                    <div className="LiProLable">Choose the amount of USDT allowed to use from Binance account 
+                                        <i className="help-circle">
+                                            <i 
+                                            className="fas fa-question-circle protip"
+                                            data-pt-position="top"
+                                            data-pt-title=""
+                                            aria-hidden="true">
+                                            </i>
+                                        </i>
+                                    </div>
+                            </div>
+                            <div className="LiProfSbox02">
+                                <div className="LiproInput01 withLable01" style={{ marginTop: "12px" }}>
+                                    <span>$</span>
+                                    <input
+                                        type="text"
+                                        defaultValue=''
+                                        placeholder="50000"
+                                        onChange={event => this.setState({ amountA: event.target.value })}
+                                        ref={(input) => this.amountA = input}
+                                    />
+                                </div>
+                                <br></br>
+                                {this.state.errorMessage !== null && this.state.errorMessage.includes("amountA") &&
+                                    <div className="error-Msg" style={smallError}>
+                                        <label>{this.state.errorMessage}</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
 
                         <div className='LiProFlexBX01 smFixer07'>
                             <div className="LiProfSbox01">
