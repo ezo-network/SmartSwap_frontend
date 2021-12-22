@@ -177,7 +177,6 @@ export default class LiquidityProvider extends PureComponent {
 
     copyText(entryText){
       let rsp = navigator.clipboard.writeText(entryText);
-      console.log(rsp);
       notificationConfig.success('Address copied. but make sure to cross check');
     }
 
