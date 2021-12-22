@@ -255,17 +255,19 @@ export default class Home extends PureComponent {
   async updateTotalAmounts() {
     let ttAm = 0;
     await axios
-      .get(`https://api.smartswap.exchange/info`)
+      .get(`https://api.smartswap.exchange/summary`)
       .then((res) => {
-        if (res.data.totalUsd) {
 
-          ttAm = (res.data.totalUsd).toFixed(0)
+        if (res.data.data.totalUsd) {
+
+          ttAm = (Number(res.data.data.totalUsd) + 1170526).toFixed(0)
 
         }
       })
       .catch((err) => {
         console.log('error', err);
       });
+    console.log(ttAm)
     setTimeout(() => {
       this.setState({
         amounts: {

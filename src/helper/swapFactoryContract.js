@@ -8,6 +8,7 @@ import swapFactoryAbi from "../abis/swapFactory.json";
 import tokenAbi from "../abis/tokenAbi.json";
 import constantConfig from "../config/constantConfig";
 import web3Config from "../config/web3Config";
+import notificationConfig from "../config/notificationConfig";
 var BigNumber = require('big-number');
 
 // const ADRESS_ONE = "0x0000000000000000000000000000000000000001";
@@ -163,6 +164,8 @@ class SwapFactoryContract extends EventEmitter {
             estGasCb(estGasEth);
         }).catch(error => {
             console.log(error);
+            if (error.data.code === -32000)
+                notificationConfig.error("Insufficient funds for transfer")
         });
     }
 
