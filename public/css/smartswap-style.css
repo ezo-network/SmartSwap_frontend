@@ -6204,6 +6204,10 @@ input[type="checkbox"] {
   padding-right: 0;
   padding-left: 15px;
 }
+.bspSBX01.fw {
+  width: 100%;
+  padding-left: 0px;
+}
 
 .spSMtext {
   font-size: 12px;

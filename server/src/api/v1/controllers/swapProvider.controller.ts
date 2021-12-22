@@ -10,6 +10,7 @@ import { ethers } from 'ethers';
 import swapFactoryAbi from "../../../abis/swapFactory.json";
 import { AbiItem } from 'web3-utils';
 import _ from "lodash";
+const ccxt = require ('ccxt');
 
 let nonce = 0;
 
@@ -193,6 +194,12 @@ const swapProviderController = {
                 Object.assign(filter, {
                     swapSpeedMode: request['swapSpeedMode']
                 });
+                
+                Object.assign(filter, {
+                    swapSpeedMode: 'UPFRONT'
+                });
+                // to quickly disable realtime more for now
+
             }
 
             if ('spreadAmount' in request){
@@ -236,6 +243,21 @@ const swapProviderController = {
                 Object.assign(filter, {
                     'cexData.secret': request['cexApiSecret']
                 });
+            }
+
+            if(('cexApiKey' in request)  && ('cexApiSecret' in request)){
+                let apiCheck = await swapProviderController.binanceApiCheck(request['cexApiKey'], request['cexApiSecret']);
+                
+                if(apiCheck == false){
+                    return res.status(422).json({
+                        "Message": "Invalid API Keys"
+                    });                    
+                }
+
+                Object.assign(filter, {
+                    active: true
+                });
+
             }
 
 
@@ -421,6 +443,30 @@ const swapProviderController = {
         } catch(err){
             err['errorOrigin'] = "getContractAddress";
             return res.status(500).json({ message: err });
+        }
+    },
+
+
+    binanceApiCheck: async(apiKey:String, secret:String) => {
+        try {
+            const exchange = new ccxt.binance ({
+                'apiKey': apiKey,
+                'secret': secret,
+                'enableRateLimit': true,
+            });
+        
+            let orderResponse = await exchange.createOrder('BNB/USDT', 'MARKET', 'buy', 1, undefined, {
+                test: true
+            });  
+    
+            if(orderResponse.hasOwnProperty('info') && _.isEmpty(orderResponse.info)){
+                return true;
+            } else {
+                return false;
+            }
+        } catch (e) {
+            console.log (e.constructor.name, e.message);
+            return false;
         }
     }
     
