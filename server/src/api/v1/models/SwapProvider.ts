@@ -179,7 +179,7 @@ const SwapProvider: Schema = new mongoose.Schema({
     active: {
         type: Boolean,
         required: true,
-        default: true
+        default: false
     },
     fromBlock: {
         type: Number,

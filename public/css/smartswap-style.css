@@ -6744,3 +6744,8 @@ a.LicSBTN01:hover {
   opacity: 0.7;
   pointer-events: none !important;
 }
+
+.withdrawButton {
+  border: 0;
+  background: transparent;
+}

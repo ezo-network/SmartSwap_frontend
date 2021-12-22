@@ -16,11 +16,12 @@ var BigNumber = require('big-number');
 
 class SwapFactoryContract extends EventEmitter {
 
-    constructor(web3, networkId) {
+    constructor(web3, networkId, component="") {
         super();
         this.web3 = web3;
         this.networkId = networkId;
         this.swapFactoryAddress = constantConfig[networkId].swapFactoryContract;
+        this.component = component;
 
         this.swapFactoryInstance = new ethers.Contract(
             this.swapFactoryAddress,
@@ -84,6 +85,14 @@ class SwapFactoryContract extends EventEmitter {
             })
         }).catch(error => {
             console.log(error);
+
+            if(this.component == "LiquidityProvider"){
+                if (error.code === 4001){
+                    //user rejected the transaction
+                    console.log('user rejected the transaction to become swap provider')
+                    receiptCb(error);
+                }
+            }
         });
     }
 
@@ -122,7 +131,18 @@ class SwapFactoryContract extends EventEmitter {
         console.log(payload);
         console.log(this.swapFactoryAddress);
 
-        this.sendTransaction(payload, 0, "400680", this.swapFactoryAddress, txCb, receiptCb)
+        return await this.sendTransaction(payload, 0, "400680", this.swapFactoryAddress, txCb, receiptCb)
+        // .then(tx => {
+        //     //do whatever you want with tx
+        //     console.log({
+        //         addSwapProviderTx: tx
+        //     });
+        // }).catch(e => {
+        //      if (e.code === 4001){
+        //          //user rejected the transaction
+        //          console.log('user rejected the transaction')
+        //      } 
+        // });
     }
 
     async estimateSwapGasFee(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, gasLimit, estGasCb) {

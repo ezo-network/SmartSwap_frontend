@@ -177,7 +177,7 @@ export default class LiquidityProvider extends PureComponent {
 
     copyText(entryText){
       let rsp = navigator.clipboard.writeText(entryText);
-      notificationConfig.success('Address copied. but make sure to cross check');
+      notificationConfig.success('Address copied.make sure to cross check');
     }
 
     changeTokenA(token) {
@@ -189,7 +189,7 @@ export default class LiquidityProvider extends PureComponent {
             networkId: web3Config.getNetworkId(),
             spAccount: web3Config.getAddress()
         });
-        //this.toggleActiveContractSection();
+        this.toggleActiveContractSection();
         this.setGasFeeAndAmountMinMaxRanges(this.state.coinList[this.state.selectedTokenB]['networkId']);
     };
 
@@ -248,7 +248,7 @@ export default class LiquidityProvider extends PureComponent {
             networkId &&
             (networkId === 97 || networkId === 56)
         ) {
-            this.changeTokenA('ETH');
+            this.changeTokenA(this.state.selectedTokenB);
             //notificationConfig.warning('Change metamask network to Ethereum Or Change token A BNB !');
             //return;
         } else if (
@@ -256,7 +256,7 @@ export default class LiquidityProvider extends PureComponent {
             networkId &&
             (networkId === 42 || networkId === 1)
         ) {
-            this.changeTokenA('BNB');
+            this.changeTokenA(this.state.selectedTokenB);
             //notificationConfig.warning('Change metamask network to Binance! Or Change token A ETH !');
             //return;
         }
@@ -436,7 +436,7 @@ export default class LiquidityProvider extends PureComponent {
             console.log(response);
             if (response.status === 201) {
                 console.log('record created!');
-                let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), this.state.networkId);
+                let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), this.state.networkId, 'LiquidityProvider');
                 swapFactory.addSwapProvider(
                     response.data.tokenA.address,
                     response.data.tokenB.address,
@@ -453,6 +453,17 @@ export default class LiquidityProvider extends PureComponent {
                         console.log({
                             "Contract response:": response
                         });
+
+                        if(response.code == 4001){
+                            this.setState({
+                                confirmed: false,
+                                deployButtonText: "DEPLOY SMART CONTRACT",
+                                deployed: false,
+                                loadingIcon: false,
+                                isActiveContractExist: false
+                            });
+                            notificationConfig.error('Deploying cancelled. Please try again');
+                        }
 
                         if (response.status === 1) {
                             // update tx hash to db
@@ -998,10 +1009,10 @@ export default class LiquidityProvider extends PureComponent {
         });
 
         if(spBal){
-            let spNativeBal = Web3.utils.fromWei((spBal).toString(), 'ether');
-            let spUsdtBal = Number(usdtFaceValue) * Number(spNativeBal);
+            let spContractBal = Web3.utils.fromWei((spBal).toString(), 'ether');
+            let spUsdtBal = Number(usdtFaceValue) * Number(spContractBal);
             this.setState({
-                spNativeBal: spNativeBal,
+                spContractBal: spContractBal,
                 spContractBalInUsd: Number(spUsdtBal).toFixed(2)
             });
         }
@@ -1009,8 +1020,43 @@ export default class LiquidityProvider extends PureComponent {
 
     }
 
-    copyToClipboard = async() => {
-        await navigator.clipboard.writeText(this.state.smartSwapContractAddress);
+    withdraw = async () => {
+        var BN = Web3.utils.BN;
+        var zeroDigit = new BN(0)
+        let spContract = new SPContract(web3Config.getWeb3(), this.state.networkId, this.state.smartSwapContractAddress);
+        let assetAddress = this.state.tokenA;
+        let amount = Web3.utils.toWei((this.state.spContractBal).toString(), 'ether');
+        amount = new BN((amount).toString());
+        
+        let validAddresses = ["0x0000000000000000000000000000000000000001", "0x0000000000000000000000000000000000000002"];
+        if(validAddresses.includes(assetAddress)){
+            if(amount.gt(zeroDigit)){
+                spContract.withdraw(
+                    assetAddress,
+                    amount, // should pass in wei
+                    async (hash) => { },
+                    async (response) => {
+                        console.log({
+                            "SP Contract response:": response
+                        });
+        
+                        if(response.code == 4001){
+                            notificationConfig.info('Withdraw transaction cancelled.');
+                        }
+        
+                        if (response.status === 1) {
+                            await this.getContractBal();
+                            notificationConfig.success('Withdraw applied successfully.');
+                        }
+                    }
+                );
+            } else {
+                notificationConfig.error("Contract does't have sufficient balance.");                            
+            }
+        } else {
+            notificationConfig.error('Invalid asset address.');            
+        }
+
     }
 
 
@@ -1558,8 +1604,10 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                     <a href="javascript:void(0)" onClick={() => this.copyText(this.state.smartSwapContractAddress)} class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                                 </div>
                                 <div className='spContrlInfotxt'>
-                                    Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")} - Balance: {this.state.spNativeBal} {this.state.selectedTokenA} | ${this.state.spContractBalInUsd} USDT
-                                    <span>Withdraw all funds back to your CEX account</span>
+                                    Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")} - Balance: {this.state.spContractBal} {this.state.selectedTokenA} | ${this.state.spContractBalInUsd} USDT
+                                    <button className='withdrawButton' onClick={this.withdraw.bind(this)}>
+                                        <span>Withdraw all funds back to your CEX account</span>
+                                    </button>
                                 </div>
                                 <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
                                 <div className='spContrlSBX'>

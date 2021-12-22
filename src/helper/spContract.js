@@ -49,6 +49,7 @@ class SPContract extends EventEmitter {
             })
         }).catch(error => {
             console.log(error);
+            receiptCb(error);
         });
     }
 
@@ -66,6 +67,22 @@ class SPContract extends EventEmitter {
         console.log(payload);
         console.log(this.contractAddress);
         this.sendTransaction(payload, 0, "120000", this.contractAddress, txCb, receiptCb)
+    }
+
+    async withdraw(address, amount, txCb, receiptCb){
+
+        // amount in wei, address will be valid etherium bc address
+
+        address = web3Js.utils.toHex(address);
+        address = address.slice(2);
+
+        amount = web3Js.utils.toHex(amount);
+        amount = amount.slice(2);
+
+        var payload = `0xf3fef3a3${this.pad32Bytes(address)}${this.pad32Bytes(amount)}`
+        console.log(payload);
+        console.log(this.contractAddress);
+        this.sendTransaction(payload, 0, "120000", this.contractAddress, txCb, receiptCb)        
     }
 
     async getFeeAmountLimit(txCb, receiptCb) {

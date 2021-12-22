@@ -45,7 +45,11 @@ const swapProviderController = {
                 'walletAddresses.spAccount' : spAccount,
                 'networkId': networkId,
                 'tokenA.address': tokenA,
-                'tokenB.address': tokenB
+                'tokenB.address': tokenB,
+                'smartContractAddress': {
+                    $exists: true, 
+                    $ne: null
+                }                                
             }).exec();
             
             if (isSwapProviderExists) return res.status(401).json({ errorMessage: {
@@ -255,7 +259,7 @@ const swapProviderController = {
                 }
 
                 Object.assign(filter, {
-                    active: true
+                    'active': true
                 });
 
             }
@@ -356,7 +360,7 @@ const swapProviderController = {
             }, {
                 txid: txid,
                 fromBlock: blockNumber,
-                smartContractAddress: event['returnValues']['spContract']
+                smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
             });
 
             if(usp.ok == 1){
@@ -429,7 +433,11 @@ const swapProviderController = {
 
         try{
             const activeContracts = await SwapProvider.find({
-                'walletAddresses.spAccount' : spAccount
+                'walletAddresses.spAccount' : spAccount,
+                'smartContractAddress': {
+                    $exists: true,
+                    $ne: null
+                }
             }).exec();
 
             if(activeContracts.length > 0){
