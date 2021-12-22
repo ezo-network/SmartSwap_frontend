@@ -11,6 +11,7 @@
         "@types/randomstring": "^1.1.6",
         "axios": "^0.21.1",
         "bcrypt": "^5.0.1",
+        "cctx": "^1.0.1",
         "ccxt": "^1.64.8",
         "config": "^3.3.6",
         "cors": "^2.8.5",

@@ -175,6 +175,12 @@ export default class LiquidityProvider extends PureComponent {
         //this.toggleActiveContractSection();
     };
 
+    copyText(entryText){
+      let rsp = navigator.clipboard.writeText(entryText);
+      console.log(rsp);
+      notificationConfig.success('Address copied. but make sure to cross check');
+    }
+
     changeTokenA(token) {
         this.setState({
             selectedTokenB: this.state.selectedTokenA,
@@ -1550,7 +1556,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                 <div className='spContrlInputBX'>
                                     <i></i>
                                     <input type="text" value={this.state.smartSwapContractAddress} />
-                                    <a href="javascript:void(0)" class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
+                                    <a href="javascript:void(0)" onClick={() => this.copyText(this.state.smartSwapContractAddress)} class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                                 </div>
                                 <div className='spContrlInfotxt'>
                                     Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")} - Balance: {this.state.spNativeBal} {this.state.selectedTokenA} | ${this.state.spContractBalInUsd} USDT
