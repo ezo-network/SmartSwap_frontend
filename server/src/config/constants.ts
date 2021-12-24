@@ -12,12 +12,14 @@ const constants = {
         'ETH': {
             NETWORK_ID: process.env.ETH_CHAIN_ID,
             SMARTSWAP_ADDRESS: process.env.ETH_SMARTSWAP_CONTRACT_ADDRESS,
-            PROVIDER: process.env.ETH_CHAIN_PROVIDER
+            PROVIDER: process.env.ETH_CHAIN_PROVIDER,
+            ADDRESS: '0x0000000000000000000000000000000000000002'
         },
         'BSC': {
             NETWORK_ID: process.env.BSC_CHAIN_ID,
             SMARTSWAP_ADDRESS: process.env.BSC_SMART_SWAP_CONTRACT_ADDRESS,
-            PROVIDER: process.env.BSC_CHAIN_PROVIDER
+            PROVIDER: process.env.BSC_CHAIN_PROVIDER,
+            ADDRESS: '0x0000000000000000000000000000000000000001'
         }
     }
 }
