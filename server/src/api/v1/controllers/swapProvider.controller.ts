@@ -39,7 +39,63 @@ const swapProviderController = {
                 withdrawMode, withdrawOnDate, withdrawAfterCalls, 
                 txid, smartContractAddress, swapSpeedMode      
             } = req.body;
+
+            // validations
+            if(tokenA == tokenB){
+                return res.status(422).json({ 
+                    errorMessage: {
+                        error: "Token A and Token B can't be the same" 
+                    }                 
+                });
+            }
             
+
+            if(Number(networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID)){
+                if(tokenA !== constants.NETWORKS.ETH.ADDRESS){
+                    return res.status(422).json({ 
+                        errorMessage: {
+                            error: "Invalid token A selected" 
+                        }                 
+                    });                    
+                }
+
+                if(tokenB !== constants.NETWORKS.BSC.ADDRESS){
+                    return res.status(422).json({ 
+                        errorMessage: {
+                            error: "Invalid token B selected" 
+                        }                 
+                    });                    
+                }                
+            }
+
+            if(Number(networkId) == Number(constants.NETWORKS.BSC.NETWORK_ID)){
+                if(tokenA !== constants.NETWORKS.BSC.ADDRESS){
+                    return res.status(422).json({ 
+                        errorMessage: {
+                            error: "Invalid token A selected" 
+                        }                 
+                    });                    
+                }
+
+                if(tokenB !== constants.NETWORKS.ETH.ADDRESS){
+                    return res.status(422).json({ 
+                        errorMessage: {
+                            error: "Invalid token B selected" 
+                        }                 
+                    });                    
+                }                
+            }
+
+
+            let allowedNetworks = [Number(constants.NETWORKS.ETH.NETWORK_ID), Number(constants.NETWORKS.BSC.NETWORK_ID)];
+            if(!allowedNetworks.includes(Number(networkId))){
+                return res.status(422).json({ 
+                    errorMessage: {
+                        error: "Provided network is not allowed to deploy contract." 
+                    }
+                });                
+            }
+
             // SP exist?
             const isSwapProviderExists: ISwapProvider = await SwapProvider.findOne({
                 'walletAddresses.spAccount' : spAccount,
