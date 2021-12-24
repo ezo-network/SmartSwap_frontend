@@ -317,6 +317,8 @@ export default class LiquidityProvider extends PureComponent {
 
     async deployContract(event) {
 
+        let allowedNetworks = [Number(process.env.REACT_APP_ETH_CHAIN_ID), Number(process.env.REACT_APP_BSC_CHAIN_ID)];
+
         if(!Web3.utils.isAddress(this.state.walletAddressToSend)){
             notificationConfig.error('Please provide a valid wallet address that send token A');
             return;
@@ -325,6 +327,21 @@ export default class LiquidityProvider extends PureComponent {
         if(!Web3.utils.isAddress(this.state.walletAddressToReceive)){
             notificationConfig.error('Please provide a valid wallet address that receive token B');
             return;
+        }
+
+        if(this.state.tokenA == this.state.tokenB){
+            notificationConfig.error("Token A and Token B can't be the same");
+            return;            
+        }
+
+        if(web3Config.getNetworkId() !== this.state.networkId){
+            notificationConfig.error("Invalid network selected");
+            return;                        
+        }
+
+        if(!allowedNetworks.includes(Number(this.state.networkId))){
+            notificationConfig.error("Selected network is not allowed.");
+            return;                        
         }
 
         // set this to disable deploy button
@@ -513,7 +530,7 @@ export default class LiquidityProvider extends PureComponent {
                 notificationConfig.error('Something went wrong!');
             }
 
-            if (response.status === 401) {
+            if (response.status === 401 || response.status === 422) {
                 this.setState({
                     loadingIcon: false,
                     deployButtonText: "DEPLOY SMART CONTRACT",
@@ -522,6 +539,7 @@ export default class LiquidityProvider extends PureComponent {
                 });
                 notificationConfig.error('Something went wrong!');
             }
+
         } catch (err) {
             console.log(err);
             notificationConfig.error('Server Error!');
