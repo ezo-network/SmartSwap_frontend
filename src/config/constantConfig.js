@@ -15,6 +15,7 @@ data.allowedNetwork = [Number(process.env.REACT_APP_ETH_CHAIN_ID), Number(proces
 
 data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].reimbursementContract = process.env.REACT_APP_BSC_REIMBURSEMENT_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].swapFactoryContract = process.env.REACT_APP_BSC_SMART_SWAP_CONTRACT_ADDRESS;
+data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].expediteContract = process.env.REACT_APP_BSC_EXPEDITE_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].explorer = Number(process.env.REACT_APP_BSC_CHAIN_ID) === 56 ? "https://bscscan.com" : "https://testnet.bscscan.com";
 
 // priceFeed 0x9326BFA02ADD2366b30bacB125260Af641031331
@@ -23,6 +24,7 @@ data[Number(process.env.REACT_APP_BSC_CHAIN_ID)].explorer = Number(process.env.R
 
 data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].reimbursementContract = process.env.REACT_APP_ETH_REIMBURSEMENT_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].swapFactoryContract = process.env.REACT_APP_ETH_SMARTSWAP_CONTRACT_ADDRESS;
+data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].expediteContract = process.env.REACT_APP_ETH_EXPEDITE_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].explorer = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? "https://etherscan.io" : "https://kovan.etherscan.io";
 
 data.pureToken = [

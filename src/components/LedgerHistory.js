@@ -60,6 +60,13 @@ export default function LedgerHistory(props) {
                             >
                                 Wait until few blocks confirmation
                             </a>
+                            <a
+                                href="javascript:void(0);"
+                                className="ani-1"
+                                onClick={() => props.expedite(props.sentTx, props.sentAmount)}
+                            >
+                                Expedite
+                            </a>
                         </p>
                     </div>
                 )}

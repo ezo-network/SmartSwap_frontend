@@ -86,6 +86,7 @@ export default class Home extends PureComponent {
     this.updateCloneData = this.updateCloneData.bind(this);
     this.clearPreview = this.clearPreview.bind(this);
     this.getData = this.getData.bind(this);
+    this.expedite = this.expedite.bind(this);
     const { match, location, history } = props;
     this.state = {
       web3: null,
@@ -1733,7 +1734,7 @@ export default class Home extends PureComponent {
           constantConfig.addressByToken[element.tokenB].symbol;
 
         element["sentTxLink"] =
-          constantConfig[element.chainId].explorer +
+          constantConfig[(element.chainId === 56 || element.chainId === 97) ? process.env.REACT_APP_BSC_CHAIN_ID : process.env.REACT_APP_ETH_CHAIN_ID].explorer +
           "/tx/" +
           element.txHash;
 
@@ -1769,9 +1770,10 @@ export default class Home extends PureComponent {
             sentTxTime={sentTxTime.toString()}
             recivedTxTime={recivedTxTime.toString()}
             filledAprice={element.filledAprice}
+            expedite={this.expedite}
           />
         );
-        if (element.relationship.claim.approveHash === undefined && element.relationship.claim.approveHash === null) {
+        if (element.relationship.claim.approveHash === undefined || element.relationship.claim.approveHash === null) {
           userPendingTxsUI.push(
             // <LedgerHistory />
             <LedgerHistory
@@ -1788,6 +1790,7 @@ export default class Home extends PureComponent {
               sentTxTime={sentTxTime.toString()}
               recivedTxTime={recivedTxTime.toString()}
               filledAprice={element.filledAprice}
+              expedite={this.expedite}
             />
           );
         }
@@ -1833,6 +1836,39 @@ export default class Home extends PureComponent {
       }
     );
   };
+
+  async expedite(txId, processAmount) {
+    let web3 = web3Config.getWeb3();
+    let networkId = web3Config.getNetworkId();
+    console.log(networkId)
+    let address = web3Config.getAddress();
+    if (web3 === null) return 0;
+    let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), networkId);
+
+    let allFees = await this.calculateSwapFees(processAmount);
+    await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toString(),
+      (hash) => {
+        this.setState({
+          // swapLoading: true,
+          // txIdSent: hash,
+          // txLinkSend: data[networkId].explorer + "/tx/" + hash,
+        });
+      },
+      (receipt) => {
+        // this.init()
+        // setTimeout(async () => {
+        //   await this.fetchTransactionStatus(receipt.transactionHash);
+        // }, 120000);
+
+        // this.setState({
+        //   swapLoading: false,
+        //   showLedger: true,
+        //   wrapBox: "success",
+        // });
+        notificationConfig.success("Expedite Success");
+      }
+    );
+  }
 
   render() {
     return (

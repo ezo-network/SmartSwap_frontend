@@ -16,11 +16,12 @@ var BigNumber = require('big-number');
 
 class SwapFactoryContract extends EventEmitter {
 
-    constructor(web3, networkId, component="") {
+    constructor(web3, networkId, component = "") {
         super();
         this.web3 = web3;
         this.networkId = networkId;
         this.swapFactoryAddress = constantConfig[networkId].swapFactoryContract;
+        this.expediteAddress = constantConfig[networkId].expediteContract;
         this.component = component;
 
         this.swapFactoryInstance = new ethers.Contract(
@@ -59,7 +60,7 @@ class SwapFactoryContract extends EventEmitter {
             const json = await response.json();
             gasPrice = (json.fast / 10).toString();
         }
-
+        console.log(value)
         const tx = {
             to: to,
             data: payload,
@@ -86,8 +87,8 @@ class SwapFactoryContract extends EventEmitter {
         }).catch(error => {
             console.log(error);
 
-            if(this.component == "LiquidityProvider"){
-                if (error.code === 4001){
+            if (this.component == "LiquidityProvider") {
+                if (error.code === 4001) {
                     //user rejected the transaction
                     console.log('user rejected the transaction to become swap provider')
                     receiptCb(error);
@@ -117,6 +118,13 @@ class SwapFactoryContract extends EventEmitter {
 
         var payload = `0xe0e45f0e${this.pad32Bytes(tokenA)}${this.pad32Bytes(tokenB)}${this.pad32Bytes(receiver)}${this.pad32Bytes(newamount)}${this.pad32Bytes(licensee)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(fees)}`
         this.sendTransaction(payload, amountNew, "270000", this.swapFactoryAddress, txCb, receiptCb)
+    }
+
+    async expedite(txID, processAmount, txCb, receiptCb) {
+        txID = txID.replace("0x", "");
+
+        var payload = `0xabc810a4${this.pad32Bytes(txID)}`
+        this.sendTransaction(payload, processAmount, "270000", this.expediteAddress, txCb, receiptCb)
     }
 
     async addSwapProvider(nativeToken, foreignToken, nativeTokenReceiver, foreignTokenReceiver, feeAmountLimit, txCb, receiptCb) {
