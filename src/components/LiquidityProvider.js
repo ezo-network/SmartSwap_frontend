@@ -83,41 +83,45 @@ export default class LiquidityProvider extends PureComponent {
             web3Config: newProps.web3Config
         });
 
-        // detect Network account change
-        window.ethereum.on('networkChanged', networkId => {
-            console.log('networkChanged', networkId);
-            this.setState({
-                web3: null,
-                confirmed: false,
-                isActiveContractExist: false,
-                spData: null,
-                smartSwapContractAddress: null,
-                spAccount: null
+        if (typeof window.ethereum !== 'undefined') {
+            console.log('MetaMask is installed!');
+            // detect Network account change
+            window.ethereum.on('networkChanged', networkId => {
+                console.log('networkChanged', networkId);
+                this.setState({
+                    web3: null,
+                    confirmed: false,
+                    isActiveContractExist: false,
+                    spData: null,
+                    smartSwapContractAddress: null,
+                    spAccount: null
+                });
+                //this.resetForm();
             });
-            //this.resetForm();
-        });
-
-        // detect Network account change
-        window.ethereum.on('chainChanged', networkId => {
-            //networkChanged will emit the network ID as a decimal string
-            //chainChanged will emit the chain ID as a hexadecimal string
-        });
-
-        window.ethereum.on('accountsChanged', accounts => {
-            console.log('account Changed');
-            this.setState({
-                web3: null,
-                confirmed: false,
-                isActiveContractExist: false,
-                spData: null,
-                smartSwapContractAddress: null,
-                spAccount: null
+    
+            // detect Network account change
+            window.ethereum.on('chainChanged', networkId => {
+                //networkChanged will emit the network ID as a decimal string
+                //chainChanged will emit the chain ID as a hexadecimal string
             });
-            // on account change currently disconnecting wallet so we can again check active contract on wallet connect 
-
-            //this.resetForm();
-        });
-
+    
+            window.ethereum.on('accountsChanged', accounts => {
+                console.log('account Changed');
+                this.setState({
+                    web3: null,
+                    confirmed: false,
+                    isActiveContractExist: false,
+                    spData: null,
+                    smartSwapContractAddress: null,
+                    spAccount: null
+                });
+                // on account change currently disconnecting wallet so we can again check active contract on wallet connect 
+    
+                //this.resetForm();
+            });
+        } else {
+            console.log('MetaMask is not installed!');
+        }
     }
 
     componentDidMount() {
@@ -232,6 +236,12 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     async connectWallet() {
+
+        if (typeof window.ethereum == 'undefined') {
+            notificationConfig.error('Metamask not found.');
+            return;
+        }
+
         this.setState({ btnClick: true });
         await web3Config.connectWallet(0);
         let networkId = web3Config.getNetworkId();
