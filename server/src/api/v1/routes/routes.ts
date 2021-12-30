@@ -14,6 +14,9 @@ export default function (app: Express) {
   app.get("/get-contract-address", validateRequest(requestValidations.getContractAddressRequest), swapProviderController.getContractAddress);
   app.get("/event", swapProviderController.addSwapProvider);
   app.post("/active-contracts", validateRequest(requestValidations.getActiveContractsRequest), swapProviderController.getActiveContracts);
+  app.post("/test-suite", swapProviderController.testSuite);
+
+
   //app.post("/become-swap-provider", becomeSwapProvider);
 
 
