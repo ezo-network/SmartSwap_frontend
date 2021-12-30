@@ -8,6 +8,7 @@ import web3Js from 'web3';
 import { ethers } from 'ethers';
 
 import swapFactoryAbi from "../../../abis/swapFactory.json";
+import spContractAbi from "../../../abis/spContract.json";
 import { AbiItem } from 'web3-utils';
 import _ from "lodash";
 const ccxt = require ('ccxt');
@@ -532,7 +533,506 @@ const swapProviderController = {
             console.log (e.constructor.name, e.message);
             return false;
         }
-    }
+    },
+
+
+    binanceTests: async(req: Request, res: Response, args: Object) => {
+        let response, result = {}, ;
+        try {
+
+
+            const exchange = new ccxt.binance ({
+                'apiKey': args['apiKey'],
+                'secret': args['secret'],
+                'enableRateLimit': true,
+            });
+            
+            if(args['type'] == 'binanceApiValidateCheck'){
+                response = await exchange.createOrder('BNB/USDT', 'MARKET', 'buy', 1, undefined, {
+                    test: true
+                });  
+        
+                if(response.hasOwnProperty('info') && _.isEmpty(response.info)){
+                    res.status(200).json({
+                        result: true
+                    });                
+                } else {
+                    res.status(200).json({
+                        result: false
+                    });                
+                }
+            }
+
+
+            if(args['type'] == 'binanceAccountCheck'){
+                if(args['accountType'] == "COINM"){
+                    response = await exchange.dapiPrivateGetAccount();
+                }
+
+                if(args['accountType'] == "USDTM"){
+                    response = await exchange.fapiPrivateV2GetAccount();                                
+                }
+
+                if(args['accountType'] == "SPOT"){
+                    response = await exchange.privateGetAccount();                                
+                }
+                
+                result['canDeposit'] = response.canDeposit;
+                result['canTrade'] = response.canTrade;
+                result['canWithdraw'] = response.canWithdraw;
+                result['result'] = (response.canTrade && response.canDeposit && response.canWithdraw);
+                res.status(200).json(result);
+            }
+
+            if(args['type'] == 'binanceBalanceCheck'){
+                if(args['accountType'] == "COINM"){
+                    response = await exchange.dapiPrivateGetAccount();
+                }
+
+                if(args['accountType'] == "USDTM"){
+                    response = await exchange.fapiPrivateV2GetAccount();
+                }
+
+                if(args['accountType'] == "SPOT"){
+                    response = await exchange.fetchBalance();
+                    response = _.find(response.info.balances, function(balanceOf) {
+                        if (balanceOf.asset == (args['asset']).toUpperCase()) {
+                            return balanceOf;
+                        }
+                    });
+                    result['availableBalance'] = Number(response.free);
+                    response = Number(response.free) >= Number(args['recievedAmount']);
+                } else {
+                    
+                    if(args['leverage']){
+                        let leverage = _.find(response.positions, function(token) {
+                            if (token.symbol == (args['asset']).toUpperCase() + "USDT") {
+                                return token;
+                            }
+                        });
+                        result['leverage'] = Number(leverage.leverage);
+                    }
+
+                    response = _.find(response.assets, function(balanceOf) {
+                        if (balanceOf.asset == (args['asset']).toUpperCase()) {
+                            return balanceOf;
+                        }
+                    });
+                    result['availableBalance'] = Number(response.availableBalance);
+
+
+                }
+                
+                result['result'] = response;
+                res.status(200).json(result);
+            }
+
+            if(args['type'] == 'binanceTransferCheck'){
+                response = await exchange.sapi_post_futures_transfer({
+                    'asset': args['asset'],
+                    'type': args['transferType'],
+                    'amount': args['amount']
+                });
+
+                if(response.hasOwnProperty('tranId')){
+                    res.status(200).json({
+                        result: true,
+                        response: response.tranId
+                    });
+                } else {
+                    res.status(200).json({
+                        result: false,
+                        response: response
+                    });                    
+                }
+            }
+
+            if(args['type'] == 'binanceWithdrawCheck'){
+                response = await exchange.sapiGetAssetAssetDetail({
+                    asset: args['asset']
+                });
+                let minWithdrawAmount = response[args['asset']]['minWithdrawAmount'];
+                let withdrawFee = response[args['asset']]['withdrawFee'];
+
+                args['amount'] = minWithdrawAmount;
+
+                response = await exchange.withdraw(
+                    args['asset'],
+                    args['amount'],
+                    args['address'],
+                    undefined, // address tag
+                    {
+                        'network': args['network']
+                    }
+                );
+
+                if(response.hasOwnProperty('id')){
+                    res.status(200).json({
+                        result: true,
+                        response: response.id,
+                        amount: minWithdrawAmount,
+                        withdrawFee: withdrawFee                        
+                    });
+                } else {
+                    res.status(200).json({
+                        result: false,
+                        response: response,
+                        amount: minWithdrawAmount,
+                        withdrawFee: withdrawFee
+                    });
+                }
+            }
+
+        } catch (e) {
+            res.status(200).json({
+                result: false,
+                message: e.message
+            });              
+        }
+    },
+
+    testSuite: async(req: Request, res: Response) => {
+
+        let contractAddress,
+            contractInstance,
+            response,
+            result,
+            type,
+            validTestsTypes,
+            testsOnContract,
+            errorMessage,
+            testOnBinance,
+            validAccountTypes,
+            defaultAsset,
+            defaultLeverage,
+            validTransferTypes,
+            transferTypesMap,
+            defaultAmount,
+            defaultwithdrawalNetwork,
+            withdrawalNetworks,
+            validAssetsToWithdraw;
+
+        validTestsTypes = [
+            "contractOwnerCheck",
+            "contractGasAndFeeCheck",
+            "spProfitPercentCheck",
+            "binanceApiKeysCheck",
+            "binanceApiValidateCheck",
+            "binanceAccountCheck",
+            "binanceBalanceCheck",
+            "binanceTransferCheck",
+            "binanceWithdrawCheck"
+        ];
+
+        testOnBinance = [
+            "binanceApiValidateCheck",
+            "binanceAccountCheck",
+            "binanceBalanceCheck",
+            "binanceTransferCheck",
+            "binanceWithdrawCheck"
+        ];
+
+        testsOnContract = [
+            "contractOwnerCheck",
+            "contractGasAndFeeCheck"            
+        ];
+
+        validAccountTypes = [
+            "SPOT",
+            "USDTM",
+            "COINM"
+        ];
+
+        transferTypesMap = {
+            "SPOT_TO_USDTM": 1,
+            "USDTM_TO_SPOT": 2,
+            "SPOT_TO_COINM": 3,
+            "COINM_TO_SPOT": 4            
+        };
+
+        validTransferTypes = [
+            "SPOT_TO_USDTM",
+            "USDTM_TO_SPOT",
+            "SPOT_TO_COINM",
+            "COINM_TO_SPOT"
+        ];
+
+        validAssetsToWithdraw = [
+            "BNB", "ETH"
+        ];
+
+        withdrawalNetworks = {
+            "BNB": "BSC",
+            "ETH": "ETH" 
+        };
+
+        try {
+            const {
+                owner,
+                networkId,
+                smartContractAddress,
+                type,
+                accountType, // COINM, USDTM, SPOT,
+                asset,
+                leverage,
+                transferType,
+                amount
+            } = req.body;
+
+            if(type == "" || type == null || type == undefined){
+                res.status(400).json({
+                    message: "a mandatory field type is required."
+                });
+            }
+
+            if(!validTestsTypes.includes(type)){
+                res.status(400).json({
+                    message: "Invalid test type"
+                });                
+            }
+
+            let filters = {
+                'walletAddresses.spAccount' : (owner).toLowerCase(),
+                'networkId': networkId,
+                'smartContractAddress': {
+                    $exists: true,
+                    $ne: null
+                }
+            }
+
+            // exact match with sp contact address
+            if(smartContractAddress !== null && smartContractAddress !== undefined){
+                filters['smartContractAddress'] = (smartContractAddress).toLowerCase();
+            }
+
+            if(testOnBinance.includes(type)){
+                filters['cexData.key'] = {
+                    $exists: true, 
+                    $ne: null                    
+                };
+
+                filters['cexData.secret'] = {
+                    $exists: true, 
+                    $ne: null                    
+                };
+
+                if(type == "binanceAccountCheck"){
+                    if(!validAccountTypes.includes((accountType).toUpperCase())){
+                        res.status(400).json({
+                            message: "Invalid account type"
+                        });                
+                    }
+                }
+
+                if(type == "binanceBalanceCheck"){
+                    if(accountType == "SPOT"){
+                        defaultAsset = "USDT";
+                    }
+                    if(accountType == "USDTM"){
+                        defaultAsset = "USDT";
+                    }
+                    if(accountType == "COINM"){
+                        defaultAsset = "BNB";
+                    }
+
+                    defaultAsset = (asset == null || asset == undefined) ? defaultAsset : asset;
+
+                    if(accountType == "USDTM" || accountType == "COINM"){
+                        defaultLeverage = (leverage == undefined || leverage == null) ? false : (leverage).toLowerCase();
+                        if(defaultLeverage == "true" || defaultLeverage == 1){
+                            defaultLeverage = true;
+                        }
+                        if(defaultLeverage == "false" || defaultLeverage == 0){
+                            defaultLeverage = false;
+                        }
+                        let isBool = (typeof defaultLeverage == "boolean");
+                        if(!isBool){
+                            res.status(400).json({
+                                message: `leverage should be a boolean value, ${typeof defaultLeverage} given`
+                            }); 
+                        }
+                    }
+
+                }
+
+                if(type == "binanceTransferCheck"){
+                    if(!validTransferTypes.includes((transferType).toUpperCase())){
+                        res.status(400).json({
+                            message: "Invalid transfer type"
+                        });                
+                    }
+                    if(transferType == "SPOT_TO_USDTM" || transferType == "USDTM_TO_SPOT"){
+                        defaultAsset = (asset == null || asset == undefined) ? "USDT" : asset;
+                    }
+                    if(transferType == "SPOT_TO_COINM" || transferType == "COINM_TO_SPOT"){
+                        defaultAsset = (asset == null || asset == undefined) ? "BNB" : asset;
+                    }
+                    defaultAmount = (amount == null || amount == undefined) ? 0.00000001 : Number(amount).toFixed(8);
+                }
+
+                if(type == "binanceWithdrawCheck"){
+                    if(asset == null || asset == undefined){
+                        res.status(400).json({
+                            message: "asset parameter is mandatory."
+                        });                        
+                    } 
+                    if(amount == null || amount == undefined){
+                        res.status(400).json({
+                            message: "amount parameter is mandatory."
+                        });                        
+                    }
+                    if(!validAssetsToWithdraw.includes((asset).toUpperCase())){
+                        res.status(400).json({
+                            message: "asset not allowed to withdraw, Or invalid asset"
+                        });
+                    }
+                    defaultAsset = (asset).toUpperCase();
+                    defaultwithdrawalNetwork = withdrawalNetworks[defaultAsset];
+                    defaultAmount = Number(amount);
+                }
+
+            }
+            
+            const sp = await SwapProvider.findOne(filters).sort({
+                createdAt: -1 // latest to oldest
+            });
+            
+            if(sp !== null){
+                if(testsOnContract.includes(type)){
+                    contractAddress = sp.smartContractAddress;
+                    contractInstance = swapProviderController.contractInstance(contractAddress, networkId);
+                }
+
+                if(type == "contractOwnerCheck"){
+                    response = await contractInstance.methods.owner().call();
+                    result = (owner).toLowerCase() == (response).toLowerCase() ? true : false;
+                    res.status(200).json({
+                        result: result,
+                        type: type
+                    });
+                }
+
+                if(type == "contractGasAndFeeCheck"){
+                    response = await contractInstance.methods.getFeeAmountLimit().call();
+                    result = response == sp.gasAndFeeAmount ? true : false;
+                    let message = result == true ? "Equal" : "Different";
+    
+                    res.status(200).json({
+                        result: result,
+                        type: type,
+                        message: message,
+                        value: response
+                    });
+                }
+                
+                if(type == "spProfitPercentCheck"){
+                    if('spProfitPercent' in sp && Number(sp.spProfitPercent) >= 0){
+                        res.status(200).json({
+                            result: true
+                        });
+                    } else {
+                        res.status(200).json({
+                            result: false
+                        });                    
+                    }                                        
+                }
+
+                if(type == "binanceApiKeysCheck"){
+                    let keyCheck = (sp?.cexData?.key) && (sp.cexData.key != null);
+                    let secretCheck = (sp?.cexData?.secret) && (sp.cexData.secret != null);
+
+                    result = keyCheck == true && secretCheck == true ? true : false;              
+
+                    res.status(200).json({
+                        result: result,
+                        type: type,
+                        key: keyCheck,
+                        secret: secretCheck
+                    });
+                }
+
+                if(type == "binanceApiValidateCheck"){
+                    await swapProviderController.binanceTests(req, res, {
+                        'apiKey': sp.cexData.key,
+                        'secret': sp.cexData.secret,
+                        'type': type
+                    });
+                }
+
+                if(type == "binanceAccountCheck"){
+                    await swapProviderController.binanceTests(req, res, {
+                        'apiKey': sp.cexData.key,
+                        'secret': sp.cexData.secret,
+                        'type': type,
+                        'accountType': (accountType).toUpperCase(),
+                        
+                    });
+                }
+
+                if(type == "binanceBalanceCheck"){
+                    await swapProviderController.binanceTests(req, res, {
+                        'apiKey': sp.cexData.key,
+                        'secret': sp.cexData.secret,
+                        'type': type,
+                        'accountType': (accountType).toUpperCase(),
+                        'asset': defaultAsset,
+                        'recievedAmount': Number(sp.tokenA.recievedAmount),
+                        'leverage': leverage
+                    });                    
+                }
+
+
+                if(type == "binanceTransferCheck"){
+                    await swapProviderController.binanceTests(req, res, {
+                        'apiKey': sp.cexData.key,
+                        'secret': sp.cexData.secret,
+                        'type': type,
+                        'transferType': transferTypesMap[transferType],
+                        'asset': defaultAsset,
+                        'amount': Number(defaultAmount)
+                    });
+                }
+
+                if(type == "binanceWithdrawCheck"){
+                    await swapProviderController.binanceTests(req, res, {
+                        'apiKey': sp.cexData.key,
+                        'secret': sp.cexData.secret,
+                        'type': type,
+                        'address': sp.smartContractAddress,
+                        'asset': defaultAsset,
+                        'amount': Number(defaultAmount),
+                        'network': defaultwithdrawalNetwork
+                    });
+                }          
+        
+
+            } else {
+                errorMessage = "Swap provider does not exist."
+                res.status(404).json({
+                    result: false,
+                    message: errorMessage,
+                    type: type,
+                    //filters: filters
+                });
+            }
+        } catch(err){
+            errorMessage = `Error From ${type}:` + err.constructor.name + ", " + err.message + ", " + ' at:' + new Date().toJSON()
+            res.status(500).json({
+                message: errorMessage
+            });
+        }
+    },
+
+    contractInstance: function(contractAddress, networkId) {
+        try {
+            const network = Number(networkId) === Number(constants.NETWORKS.ETH.NETWORK_ID) ? constants.NETWORKS.ETH : constants.NETWORKS.BSC;
+            const provider = network.PROVIDER;
+            const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
+            return new web3.eth.Contract(spContractAbi as AbiItem[], contractAddress);    
+        } catch(err){
+            console.log(`❌ Error From contractInstance:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+        }
+    }  
     
 }
 
