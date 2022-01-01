@@ -74,6 +74,8 @@ export default class LiquidityProvider extends PureComponent {
             bnbTokenUsdValue: null, 
             spContractBal: null,
             spContractBalInUsd: null,
+            clientSideError: false,
+            clientSideErrorMessage: null
         }
     }
 
@@ -190,6 +192,7 @@ export default class LiquidityProvider extends PureComponent {
             spAccount: web3Config.getAddress()
         });
         this.toggleActiveContractSection();
+        notificationConfig.error('Token reset. Please set Gas and Fee again.');
         this.setGasFeeAndAmountMinMaxRanges(this.state.coinList[this.state.selectedTokenB]['networkId']);
     };
 
@@ -203,6 +206,7 @@ export default class LiquidityProvider extends PureComponent {
             spAccount: web3Config.getAddress()
         });
         this.toggleActiveContractSection();
+        notificationConfig.error('Token reset. Please set Gas and Fee again.');
         this.setGasFeeAndAmountMinMaxRanges(this.state.coinList[this.state.selectedTokenB]['networkId']);
     };
 
@@ -228,6 +232,21 @@ export default class LiquidityProvider extends PureComponent {
                     deployed: false
                 });
             }
+        }
+    };
+
+    changeSpread(value) {
+        if(Number(value) > 1 || Number(value) < 0){
+            this.setState({
+                clientSideErrorMessage: "Please provide a valid input between 0-1 range",
+                clientSideError: true
+            });
+        } else {
+            this.setState({
+                spProfitPercent: Number(value),
+                clientSideError: false,
+                clientSideErrorMessage: null
+            });        
         }
     }
 
@@ -256,6 +275,7 @@ export default class LiquidityProvider extends PureComponent {
             (networkId === 97 || networkId === 56)
         ) {
             this.changeTokenA(this.state.selectedTokenB);
+            this.setGasFeeAndAmountMinMaxRanges(networkId);
             //notificationConfig.warning('Change metamask network to Ethereum Or Change token A BNB !');
             //return;
         } else if (
@@ -264,6 +284,7 @@ export default class LiquidityProvider extends PureComponent {
             (networkId === 42 || networkId === 1)
         ) {
             this.changeTokenA(this.state.selectedTokenB);
+            this.setGasFeeAndAmountMinMaxRanges(networkId);
             //notificationConfig.warning('Change metamask network to Binance! Or Change token A ETH !');
             //return;
         }
@@ -274,7 +295,6 @@ export default class LiquidityProvider extends PureComponent {
             spAccount: web3Config.getAddress()
         });
 
-        this.setGasFeeAndAmountMinMaxRanges(networkId);
 
         await this.getActiveContracts();
 
@@ -349,6 +369,18 @@ export default class LiquidityProvider extends PureComponent {
         if(!allowedNetworks.includes(Number(this.state.networkId))){
             notificationConfig.error("Selected network is not allowed.");
             return;                        
+        }
+
+        if(Number(this.state.spProfitPercent) > 1 || Number(this.state.spProfitPercent) < 0){
+            this.setState({
+                clientSideErrorMessage: "Please provide a valid input between 0-1 range",
+                clientSideError: true
+            });
+            return;           
+        } else {
+            this.setState({
+                clientSideError: false
+            });            
         }
 
         // set this to disable deploy button
@@ -1356,8 +1388,10 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                     <input
                                         type="text"
                                         placeholder={this.state.spProfitPercent}
-                                        onChange={event => this.setState({ spProfitPercent: event.target.value })}
+                                        onChange={event => this.changeSpread(event.target.value)}
                                         ref={(input) => this.spProfitPercent = input}
+                                        min="0"
+                                        max="1"
                                     />
                                     <span>%</span>
                                 </div>
@@ -1366,6 +1400,11 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                 {this.state.errorMessage !== null && this.state.errorMessage.includes("spProfitPercent") &&
                                     <div className="error-Msg" style={smallError}>
                                         <label>{this.state.errorMessage}</label>
+                                    </div>
+                                }
+                                {this.state.clientSideError == true &&
+                                    <div className="error-Msg" style={smallError}>
+                                        <label>{this.state.clientSideErrorMessage}</label>
                                     </div>
                                 }
                             </div>
