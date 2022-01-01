@@ -537,7 +537,7 @@ const swapProviderController = {
 
 
     binanceTests: async(req: Request, res: Response, args: Object) => {
-        let response, result = {}, ;
+        let response, result = {};
         try {
 
 

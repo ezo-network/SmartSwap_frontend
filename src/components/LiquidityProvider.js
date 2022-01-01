@@ -84,7 +84,6 @@ export default class LiquidityProvider extends PureComponent {
         });
 
         if (typeof window.ethereum !== 'undefined') {
-            console.log('MetaMask is installed!');
             // detect Network account change
             window.ethereum.on('networkChanged', networkId => {
                 console.log('networkChanged', networkId);
@@ -119,8 +118,6 @@ export default class LiquidityProvider extends PureComponent {
     
                 //this.resetForm();
             });
-        } else {
-            console.log('MetaMask is not installed!');
         }
     }
 
@@ -131,7 +128,6 @@ export default class LiquidityProvider extends PureComponent {
             baseState: this.state
         });
 
-        console.log(this.state.coinList)
         this.setState({
             web3Ethereum: new Web3(
                 new Web3.providers.WebsocketProvider(CONSTANT.RPC_PROVIDER_ETHEREUM)
@@ -238,6 +234,7 @@ export default class LiquidityProvider extends PureComponent {
     async connectWallet() {
 
         if (typeof window.ethereum == 'undefined') {
+            console.log('MetaMask is not installed!');
             notificationConfig.error('Metamask not found.');
             return;
         }
@@ -603,14 +600,21 @@ export default class LiquidityProvider extends PureComponent {
 
                 const isactiveContractExist = response.data.find(obj => {
                     if ((obj.networkId == this.state.networkId) && (this.state.spAccount == obj.walletAddresses.spAccount)) {
+                        
+                        // convert gasAndFeeAmount to ether so it can be set to input field
+                        let gasAndFeeAmount = Web3.utils.fromWei((obj.gasAndFeeAmount.$numberDecimal).toString(), 'ether');
                         this.setState({
-                            isActiveContractExist: true
+                            isActiveContractExist: true,
+                            gasAndFeeAmount: Number(gasAndFeeAmount),
+                            spProfitPercent: obj.spProfitPercent,
+                            contractCreatedAt: obj.createdAt
                         });
 
                         // this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
                         // this.dispatchEventHandler(this.walletAddressToReceive, obj.walletAddresses.toReceive);
                         // this.dispatchEventHandler(this.walletAddressToSend, obj.walletAddresses.toSend);
-                        // this.dispatchEventHandler(this.spProfitPercent, obj.spProfitPercent);
+                        //this.dispatchEventHandler(this.gasAndFeeAmount, Number(gasAndFeeAmount));
+                        //this.dispatchEventHandler(this.spProfitPercent, obj.spProfitPercent);
                         // this.dispatchEventHandler(this.accumulateFundsLimit, obj.accumulateFundsLimit);
                         // this.dispatchEventHandler(this.cexApiKey, obj.cexData.key);
                         // this.dispatchEventHandler(this.cexApiSecret, obj.cexData.secret);
@@ -661,9 +665,9 @@ export default class LiquidityProvider extends PureComponent {
                         // }
 
 
-                        this.setState({
-                            contractCreatedAt: obj.createdAt
-                        });
+                        // this.setState({
+                        //     contractCreatedAt: obj.createdAt
+                        // });
 
                         //this.dispatchEventHandler(this.gasAndFeeAmount, obj.gasAndFeeAmount.$numberDecimal, 'value', 'mousemove');
 
@@ -1628,7 +1632,11 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                 <div className='spCountrlTitle01'>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
                                 <div className='spContrlInputBX'>
                                     <i></i>
-                                    <input type="text" value={this.state.smartSwapContractAddress} />
+                                    <input type="text"
+                                        placeholder={"Your contract address for " + this.state.selectedTokenA}
+                                        value={this.state.smartSwapContractAddress} 
+                                        readOnly={true}
+                                    />
                                     <a href="javascript:void(0)" onClick={() => this.copyText(this.state.smartSwapContractAddress)} class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                                 </div>
                                 <div className='spContrlInfotxt'>
@@ -1677,7 +1685,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                             <InputRange
                                                 step={0.05}
                                                 maxValue={1}
-                                                minValue={0.2}
+                                                minValue={0}
                                                 value={this.state.spProfitPercent}
                                                 formatLabel={value => `${Number(value).toFixed(2)}%`}
                                                 onChange={value => this.setState({ spProfitPercent: value })} />
