@@ -123,7 +123,8 @@ const swapProviderController = {
                 totalAmount: amountA,
                 tokenA: {
                     address: tokenA,
-                    recievedAmount: (Number(amountA) * 55 / 100)
+                    recievedAmount: amountA
+                    //recievedAmount: (Number(amountA) * 55 / 100) upcomming feature
                 },
                 tokenB: {
                     address: tokenB
@@ -307,20 +308,20 @@ const swapProviderController = {
                 });
             }
 
-            if(('cexApiKey' in request)  && ('cexApiSecret' in request)){
-                let apiCheck = await swapProviderController.binanceApiCheck(request['cexApiKey'], request['cexApiSecret']);
+            // if(('cexApiKey' in request)  && ('cexApiSecret' in request)){
+            //     let apiCheck = await swapProviderController.binanceApiCheck(request['cexApiKey'], request['cexApiSecret']);
                 
-                if(apiCheck == false){
-                    return res.status(422).json({
-                        "Message": "Invalid API Keys"
-                    });                    
-                }
+            //     if(apiCheck == false){
+            //         return res.status(422).json({
+            //             "Message": "Invalid API Keys"
+            //         });                    
+            //     }
 
-                Object.assign(filter, {
-                    'active': true
-                });
+            //     Object.assign(filter, {
+            //         'active': true
+            //     });
 
-            }
+            // }
 
 
             if ('withdrawMode' in request){
