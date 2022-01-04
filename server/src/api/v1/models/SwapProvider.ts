@@ -56,6 +56,9 @@ export interface ISwapProvider extends Document {
     smartContractAddress?: string,
     txid?: string,
     active: boolean,
+    totalAmount: Schema.Types.Decimal128,
+    distributed: boolean,
+    canWithdraw: boolean,
     swapSpeedMode: {
         type: Number,
         enum : [1,2]
@@ -63,6 +66,21 @@ export interface ISwapProvider extends Document {
 };
 
 const SwapProvider: Schema = new mongoose.Schema({
+    totalAmount: {
+        type: Schema.Types.Decimal128,
+        required: true,
+        default: 0        
+    },
+    distributed: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    canWithdraw: {
+        type: Boolean,
+        required: true,
+        default: false        
+    },
     walletAddresses: {
         spAccount: {
             type: String,
@@ -84,7 +102,8 @@ const SwapProvider: Schema = new mongoose.Schema({
         },
         recievedAmount:  {
             type: Schema.Types.Decimal128,
-            required: true,        
+            required: true,
+            default: 0       
         },
         consumedAmount:  {
             type: Schema.Types.Decimal128,
