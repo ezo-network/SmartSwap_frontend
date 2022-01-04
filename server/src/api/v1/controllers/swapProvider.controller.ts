@@ -120,9 +120,10 @@ const swapProviderController = {
                     toReceive: walletAddressToReceive,
                     spAccount
                 },
+                totalAmount: amountA,
                 tokenA: {
                     address: tokenA,
-                    recievedAmount: amountA
+                    recievedAmount: (Number(amountA) * 55 / 100)
                 },
                 tokenB: {
                     address: tokenB
@@ -648,13 +649,13 @@ const swapProviderController = {
             }
 
             if(args['type'] == 'binanceWithdrawCheck'){
-                response = await exchange.sapiGetAssetAssetDetail({
-                    asset: args['asset']
-                });
-                let minWithdrawAmount = response[args['asset']]['minWithdrawAmount'];
-                let withdrawFee = response[args['asset']]['withdrawFee'];
+                // response = await exchange.sapiGetAssetAssetDetail({
+                //     asset: args['asset']
+                // });
+                // let minWithdrawAmount = response[args['asset']]['minWithdrawAmount'];
+                // let withdrawFee = response[args['asset']]['withdrawFee'];
 
-                args['amount'] = minWithdrawAmount;
+                //args['amount'] = Number(minWithdrawAmount) + Number(withdrawFee);
 
                 response = await exchange.withdraw(
                     args['asset'],
@@ -667,18 +668,24 @@ const swapProviderController = {
                 );
 
                 if(response.hasOwnProperty('id')){
-                    res.status(200).json({
-                        result: true,
-                        response: response.id,
-                        amount: minWithdrawAmount,
-                        withdrawFee: withdrawFee                        
+                    // mark canWithdraw true
+                    let usp = await SwapProvider.updateOne({
+                        _id: args['spId']
+                    }, {
+                        canWithdraw: true
                     });
+
+                    if(usp.ok == 1){
+                        res.status(200).json({
+                            result: true,
+                            response: response.id                                             
+                        });
+                    }
+
                 } else {
                     res.status(200).json({
                         result: false,
-                        response: response,
-                        amount: minWithdrawAmount,
-                        withdrawFee: withdrawFee
+                        response: response
                     });
                 }
             }
@@ -721,7 +728,10 @@ const swapProviderController = {
             "binanceAccountCheck",
             "binanceBalanceCheck",
             "binanceTransferCheck",
-            "binanceWithdrawCheck"
+            "binanceWithdrawCheck",
+            "binanceIpWhiteListCheck",
+            "binanceSpAddressWhiteListCheck",
+            "binanceWithdrawEnabledCheck"
         ];
 
         testOnBinance = [
@@ -729,7 +739,10 @@ const swapProviderController = {
             "binanceAccountCheck",
             "binanceBalanceCheck",
             "binanceTransferCheck",
-            "binanceWithdrawCheck"
+            "binanceWithdrawCheck",
+            "binanceIpWhiteListCheck",
+            "binanceSpAddressWhiteListCheck",
+            "binanceWithdrawEnabledCheck"
         ];
 
         testsOnContract = [
@@ -792,7 +805,7 @@ const swapProviderController = {
             }
 
             let filters = {
-                'walletAddresses.spAccount' : (owner).toLowerCase(),
+                'walletAddresses.spAccount' : owner,
                 'networkId': networkId,
                 'smartContractAddress': {
                     $exists: true,
@@ -870,34 +883,14 @@ const swapProviderController = {
                     defaultAmount = (amount == null || amount == undefined) ? 0.00000001 : Number(amount).toFixed(8);
                 }
 
-                if(type == "binanceWithdrawCheck"){
-                    if(asset == null || asset == undefined){
-                        res.status(400).json({
-                            message: "asset parameter is mandatory."
-                        });                        
-                    } 
-                    if(amount == null || amount == undefined){
-                        res.status(400).json({
-                            message: "amount parameter is mandatory."
-                        });                        
-                    }
-                    if(!validAssetsToWithdraw.includes((asset).toUpperCase())){
-                        res.status(400).json({
-                            message: "asset not allowed to withdraw, Or invalid asset"
-                        });
-                    }
-                    defaultAsset = (asset).toUpperCase();
-                    defaultwithdrawalNetwork = withdrawalNetworks[defaultAsset];
-                    defaultAmount = Number(amount);
-                }
-
             }
             
             const sp = await SwapProvider.findOne(filters).sort({
                 createdAt: -1 // latest to oldest
             });
             
-            if(sp !== null){
+            if(sp !== null){                
+                
                 if(testsOnContract.includes(type)){
                     contractAddress = sp.smartContractAddress;
                     contractInstance = swapProviderController.contractInstance(contractAddress, networkId);
@@ -926,7 +919,7 @@ const swapProviderController = {
                 }
                 
                 if(type == "spProfitPercentCheck"){
-                    if('spProfitPercent' in sp && Number(sp.spProfitPercent) >= 0){
+                    if('spProfitPercent' in sp && Number(sp.spProfitPercent) >= 0 && Number(sp.spProfitPercent) <= 1){
                         res.status(200).json({
                             result: true
                         });
@@ -993,16 +986,43 @@ const swapProviderController = {
                     });
                 }
 
-                if(type == "binanceWithdrawCheck"){
-                    await swapProviderController.binanceTests(req, res, {
-                        'apiKey': sp.cexData.key,
-                        'secret': sp.cexData.secret,
-                        'type': type,
-                        'address': sp.smartContractAddress,
-                        'asset': defaultAsset,
-                        'amount': Number(defaultAmount),
-                        'network': defaultwithdrawalNetwork
-                    });
+                if(type == "binanceWithdrawCheck" || type == "binanceIpWhiteListCheck" || type == "binanceSpAddressWhiteListCheck" || type == "binanceWithdrawEnabledCheck"){
+                    if(sp.canWithdraw == true){
+                        res.status(200).json({
+                            result: true,
+                            type: type
+                        });             
+                    } else {
+                        // if(asset == null || asset == undefined){
+                        //     res.status(400).json({
+                        //         message: "asset parameter is mandatory."
+                        //     });                        
+                        // } 
+                        // if(amount == null || amount == undefined){
+                        //     res.status(400).json({
+                        //         message: "amount parameter is mandatory."
+                        //     });                        
+                        // }
+                        // if(!validAssetsToWithdraw.includes((asset).toUpperCase())){
+                        //     res.status(400).json({
+                        //         message: "asset not allowed to withdraw, Or invalid asset"
+                        //     });
+                        // }
+                        defaultAsset = Number(sp.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH': 'BNB';
+                        defaultwithdrawalNetwork = withdrawalNetworks[defaultAsset];
+                        defaultAmount = 0.01;
+
+                        await swapProviderController.binanceTests(req, res, {
+                            'apiKey': sp.cexData.key,
+                            'secret': sp.cexData.secret,
+                            'type': 'binanceWithdrawCheck',
+                            'address': sp.smartContractAddress,
+                            'asset': defaultAsset,
+                            'amount': Number(defaultAmount),
+                            'network': defaultwithdrawalNetwork,
+                            'spId': sp._id
+                        });
+                    }
                 }          
         
 
@@ -1032,7 +1052,80 @@ const swapProviderController = {
         } catch(err){
             console.log(`❌ Error From contractInstance:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
         }
-    }  
+    },
+    
+    distributeAmount: async (req: Request, res: Response) => {
+        try{
+            const pendingDistributionRecord = await SwapProvider.findOne({
+                'smartContractAddress': {
+                    $exists: true,
+                    $ne: null
+                },
+                active: true,
+                distributed: false
+            }).exec();
+
+            if(pendingDistributionRecord !== null){
+                // if pending then get 45% amount and try to withdraw that to SP contract
+                let usdtAmountToBuyToken = (Number(pendingDistributionRecord.tokenA.recievedAmount) * 45 / 100);
+                let network = Number(pendingDistributionRecord.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH': 'BSC';
+                let asset = Number(pendingDistributionRecord.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
+                let address = pendingDistributionRecord.smartContractAddress;
+
+                // bal check if avail then buy then withdraw
+                const exchange = new ccxt.binance ({
+                    'apiKey': pendingDistributionRecord.cexData.key,
+                    'secret': pendingDistributionRecord.cexData.secret,
+                    'enableRateLimit': true,
+                });
+
+                let response = await exchange.createOrder(`${asset}/USDT`, 'MARKET', 'buy', undefined, usdtAmountToBuyToken);
+        
+                if(response.hasOwnProperty('info') && _.isEmpty(response.info)){
+                    res.status(200).json({
+                        result: true
+                    });                
+                    // withdraw 
+                    response = await exchange.withdraw(
+                        asset,
+                        //qtyInAsset,
+                        address,
+                        undefined, // address tag
+                        {
+                            'network': network
+                        }
+                    );
+    
+                    if(response.hasOwnProperty('id')){
+    
+                        pendingDistributionRecord['distributed'] = true;
+                        response = await pendingDistributionRecord.save();
+    
+                        res.status(200).json({
+                            result: true,
+                            response: response
+                        });
+                    } else {
+                        res.status(200).json({
+                            result: false,
+                            response: response
+                        });
+                    }
+                } else {
+                    res.status(200).json({
+                        result: false
+                    });                
+                }                
+
+            } else {
+                res.status(404).json({ errorMessage: {
+                    error: `No new swap provider found whose distribution is pending yet.` 
+                }});
+            }
+        } catch(err){
+            console.log(`❌ Error From distributeAmount:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+        }        
+    }
     
 }
 
