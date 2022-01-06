@@ -58,7 +58,6 @@ export interface ISwapProvider extends Document {
     active: boolean,
     totalAmount: Schema.Types.Decimal128,
     distributed: boolean,
-    canWithdraw: boolean,
     swapSpeedMode: {
         type: Number,
         enum : [1,2]
@@ -75,11 +74,6 @@ const SwapProvider: Schema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
-    },
-    canWithdraw: {
-        type: Boolean,
-        required: true,
-        default: false        
     },
     walletAddresses: {
         spAccount: {

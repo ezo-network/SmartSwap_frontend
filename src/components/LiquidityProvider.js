@@ -537,7 +537,7 @@ export default class LiquidityProvider extends PureComponent {
 
                             if (response.status === 200) {
                                 this.setState({
-                                    smartSwapContractAddress: response.data['smartContractAddress'],
+                                    smartSwapContractAddress: (response.data['smartContractAddress']).toLowerCase(),
                                     confirmed: true,
                                     deployButtonText: "Contract Deployed",
                                     loadingIcon: false,
@@ -639,7 +639,9 @@ export default class LiquidityProvider extends PureComponent {
                             isActiveContractExist: true,
                             gasAndFeeAmount: Number(gasAndFeeAmount),
                             spProfitPercent: obj.spProfitPercent,
-                            contractCreatedAt: obj.createdAt
+                            contractCreatedAt: obj.createdAt,
+                            cexApiKey: obj.cexData.key,
+                            cexApiSecret: obj.cexData.secret
                         });
 
                         // this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
@@ -1790,6 +1792,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                         <div className="LiproInput01">
                                             <input
                                                 type="text"
+                                                placeholder={this.state.cexApiKey !== null ? this.state.cexApiKey : 'Your Cex API Key'}
                                                 defaultValue=''
                                                 onChange={event => this.setState({ cexApiKey: event.target.value })}
                                                 ref={(input) => this.cexApiKey = input}
@@ -1813,6 +1816,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                         <div className="LiproInput01">
                                             <input
                                                 type="text"
+                                                placeholder={this.state.cexApiSecret !== null ? this.state.cexApiSecret : 'Your Cex API Secret'}
                                                 defaultValue=''
                                                 onChange={event => this.setState({ cexApiSecret: event.target.value })}
                                                 ref={(input) => this.cexApiSecret = input}

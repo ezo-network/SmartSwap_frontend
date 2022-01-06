@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
 import { log, constants } from "../../../config";
-import { v4 as uuidv4 } from 'uuid';
-import { Transaction as Tx } from '@ethereumjs/tx'
-import SwapProvider, {ISwapProvider} from '../models/SwapProvider';
-
 import web3Js from 'web3';
-import { ethers } from 'ethers';
+import mongoose, { Schema, Document } from 'mongoose';
+import SwapProvider, {ISwapProvider} from '../models/SwapProvider';
+import SwapProviderTest, {ISwapProviderTest} from '../models/SwapProviderTest';
 
 import swapFactoryAbi from "../../../abis/swapFactory.json";
 import spContractAbi from "../../../abis/spContract.json";
@@ -145,7 +143,12 @@ const swapProviderController = {
                     afterCalls: withdrawAfterCalls
                 }
             };
-            const swapProvider = await new SwapProvider(spArgs).save();
+            const swapProvider = await new SwapProvider(spArgs).save().then(async(sp) => {
+                await new SwapProviderTest({
+                    swapProvider: sp._id
+                }).save();
+                return sp;
+            }).catch(err => console.log(err));
             // const swapProvider = {
             //     tokenA: {
             //       consumedAmount: 0,
@@ -497,9 +500,22 @@ const swapProviderController = {
                     $exists: true,
                     $ne: null
                 }
-            }).exec();
+            }).lean().exec();
 
+            
             if(activeContracts.length > 0){
+
+                for(let i=0; i<activeContracts.length; i++){
+                    let maskedKey = activeContracts[i].cexData.key;
+                    let maskedSecret = activeContracts[i].cexData.secret;
+                    if(maskedKey !== null){
+                        activeContracts[i].cexData.key = maskedKey.replace(/.(?=.{4,}$)/g, '*');
+                    }
+                    if(maskedSecret !== null){
+                        activeContracts[i].cexData.secret = maskedSecret.replace(/.(?=.{4,}$)/g, '*');
+                    }                    
+                }
+
                 res.status(200).json(activeContracts);
             } else {
                 res.status(404).json({ errorMessage: {
@@ -552,17 +568,23 @@ const swapProviderController = {
             if(args['type'] == 'binanceApiValidateCheck'){
                 response = await exchange.createOrder('BNB/USDT', 'MARKET', 'buy', 1, undefined, {
                     test: true
-                });  
+                });
         
-                if(response.hasOwnProperty('info') && _.isEmpty(response.info)){
-                    res.status(200).json({
-                        result: true
-                    });                
+                if(response.hasOwnProperty('info') && _.isEmpty(response.info)){    
+                    result = true;   
                 } else {
-                    res.status(200).json({
-                        result: false
-                    });                
+                    result = false;
                 }
+
+                await swapProviderController.updateTest(args['spId'], args['type'], result).then(async() => {
+                    await swapProviderController.updateTest(args['spId'], 'binanceApiKeysCheck', result);
+                    await swapProviderController.testsCheck(args['spId']);
+                    res.status(200).json({
+                        result: result,
+                        type: args['type']
+                    });
+                });
+
             }
 
 
@@ -578,15 +600,44 @@ const swapProviderController = {
                 if(args['accountType'] == "SPOT"){
                     response = await exchange.privateGetAccount();                                
                 }
+
+                if(args['accountType'] == "SPOT_USDTM"){
+                    response = await exchange.fapiPrivateV2GetAccount();
+                    result['futureCanDeposit'] = response.canDeposit;
+                    result['futureCanTrade'] = response.canTrade;
+                    result['futureCanWithdraw'] = response.canWithdraw;
+
+                    response = await exchange.privateGetAccount();
+                    result['spotCanDeposit'] = response.canDeposit;
+                    result['spotCanTrade'] = response.canTrade;
+                    result['spotCanWithdraw'] = response.canWithdraw;                    
+
+                    result['result'] = 
+                        result['futureCanDeposit']
+                        && result['futureCanTrade']
+                        && result['futureCanWithdraw']
+                        && result['spotCanDeposit']
+                        && result['spotCanTrade']
+                        && result['spotCanWithdraw']
+                    ;
+
+                    await swapProviderController.updateTest(args['spId'], args['type'], result['result']).then(async() => {
+                        await swapProviderController.testsCheck(args['spId']);
+                        res.status(200).json(result);
+                    });
+
+                } else {
+                    result['canDeposit'] = response.canDeposit;
+                    result['canTrade'] = response.canTrade;
+                    result['canWithdraw'] = response.canWithdraw;
+                    result['result'] = (response.canTrade && response.canDeposit && response.canWithdraw);
+                    res.status(200).json(result);
+                }
                 
-                result['canDeposit'] = response.canDeposit;
-                result['canTrade'] = response.canTrade;
-                result['canWithdraw'] = response.canWithdraw;
-                result['result'] = (response.canTrade && response.canDeposit && response.canWithdraw);
-                res.status(200).json(result);
             }
 
             if(args['type'] == 'binanceBalanceCheck'){
+                
                 if(args['accountType'] == "COINM"){
                     response = await exchange.dapiPrivateGetAccount();
                 }
@@ -626,38 +677,74 @@ const swapProviderController = {
                 }
                 
                 result['result'] = response;
-                res.status(200).json(result);
+                await swapProviderController.updateTest(args['spId'], args['type'], result['result']).then(async() => {
+                    await swapProviderController.testsCheck(args['spId']);
+                    res.status(200).json(result);
+                });
+
             }
 
             if(args['type'] == 'binanceTransferCheck'){
-                response = await exchange.sapi_post_futures_transfer({
-                    'asset': args['asset'],
-                    'type': args['transferType'],
-                    'amount': args['amount']
-                });
-
-                if(response.hasOwnProperty('tranId')){
-                    res.status(200).json({
-                        result: true,
-                        response: response.tranId
+                let spot_to_future = false;
+                let spotToFutureTrasferId = null;
+                let future_to_spot = false;
+                let futureToSpotTrasferId = null;
+                if(args['transferType'] == 5){
+                    response = await exchange.sapi_post_futures_transfer({
+                        'asset': args['asset'],
+                        'type': 1,
+                        'amount': args['amount']
                     });
+    
+                    if(response.hasOwnProperty('tranId')){
+                        spot_to_future = true;
+                        spotToFutureTrasferId = response.tranId;
+                    }
+
+                    response = await exchange.sapi_post_futures_transfer({
+                        'asset': args['asset'],
+                        'type': 2,
+                        'amount': args['amount']
+                    });
+
+                    if(response.hasOwnProperty('tranId')){
+                        future_to_spot = true;
+                        futureToSpotTrasferId = response.tranId;
+                    }
+
+                    result = spot_to_future && future_to_spot;
+                    await swapProviderController.updateTest(args['spId'], args['type'], result).then(async() => {
+                        await swapProviderController.testsCheck(args['spId']);
+                        res.status(200).json({
+                            result: result,
+                            spotToFutureTrasferId: spotToFutureTrasferId,
+                            futureToSpotTrasferId: futureToSpotTrasferId
+                        }); 
+                    });
+
                 } else {
-                    res.status(200).json({
-                        result: false,
-                        response: response
-                    });                    
+                    response = await exchange.sapi_post_futures_transfer({
+                        'asset': args['asset'],
+                        'type': args['transferType'],
+                        'amount': args['amount']
+                    });
+    
+                    if(response.hasOwnProperty('tranId')){
+                        res.status(200).json({
+                            result: true,
+                            response: response.tranId
+                        });
+                    } else {
+                        res.status(200).json({
+                            result: false,
+                            response: response
+                        });                    
+                    }
                 }
             }
 
             if(args['type'] == 'binanceWithdrawCheck'){
-                // response = await exchange.sapiGetAssetAssetDetail({
-                //     asset: args['asset']
-                // });
-                // let minWithdrawAmount = response[args['asset']]['minWithdrawAmount'];
-                // let withdrawFee = response[args['asset']]['withdrawFee'];
-
-                //args['amount'] = Number(minWithdrawAmount) + Number(withdrawFee);
-
+                result['withdrawOrderId'] = null;
                 response = await exchange.withdraw(
                     args['asset'],
                     args['amount'],
@@ -667,31 +754,23 @@ const swapProviderController = {
                         'network': args['network']
                     }
                 );
-
-                if(response.hasOwnProperty('id')){
-                    // mark canWithdraw true
-                    let usp = await SwapProvider.updateOne({
-                        _id: args['spId']
-                    }, {
-                        canWithdraw: true
-                    });
-
-                    if(usp.ok == 1){
-                        res.status(200).json({
-                            result: true,
-                            response: response.id                                             
-                        });
-                    }
-
-                } else {
-                    res.status(200).json({
-                        result: false,
-                        response: response
-                    });
+                
+                result['result'] = response.hasOwnProperty('id') ? true : false;
+                if(result['result']){
+                    result['withdrawOrderId'] = response.id;
                 }
+
+                await swapProviderController.updateTest(args['spId'], args['type'], result['result']).then(async() => {
+                    await swapProviderController.updateTest(args['spId'], 'binanceWithdrawEnabledCheck', result['result']);
+                    await swapProviderController.updateTest(args['spId'], 'binanceSpAddressWhiteListCheck', result['result']);
+                    await swapProviderController.updateTest(args['spId'], 'binanceIpWhiteListCheck', result['result']); 
+                    await swapProviderController.testsCheck(args['spId']);                                      
+                    res.status(200).json(result);
+                });
             }
 
         } catch (e) {
+            await swapProviderController.testsCheck(args['spId']);
             res.status(200).json({
                 result: false,
                 message: e.message
@@ -732,7 +811,8 @@ const swapProviderController = {
             "binanceWithdrawCheck",
             "binanceIpWhiteListCheck",
             "binanceSpAddressWhiteListCheck",
-            "binanceWithdrawEnabledCheck"
+            "binanceWithdrawEnabledCheck",
+            "testsCheck"
         ];
 
         testOnBinance = [
@@ -754,21 +834,24 @@ const swapProviderController = {
         validAccountTypes = [
             "SPOT",
             "USDTM",
-            "COINM"
+            "COINM",
+            "SPOT_USDTM"
         ];
 
         transferTypesMap = {
             "SPOT_TO_USDTM": 1,
             "USDTM_TO_SPOT": 2,
             "SPOT_TO_COINM": 3,
-            "COINM_TO_SPOT": 4            
+            "COINM_TO_SPOT": 4,
+            "TWO_WAY": 5    
         };
 
         validTransferTypes = [
             "SPOT_TO_USDTM",
             "USDTM_TO_SPOT",
             "SPOT_TO_COINM",
-            "COINM_TO_SPOT"
+            "COINM_TO_SPOT",
+            "TWO_WAY"
         ];
 
         validAssetsToWithdraw = [
@@ -831,6 +914,12 @@ const swapProviderController = {
                 };
 
                 if(type == "binanceAccountCheck"){
+                    if(accountType == "" || accountType == null || accountType == undefined){
+                        res.status(400).json({
+                            message: "a mandatory field accountType is required."
+                        });
+                    }
+
                     if(!validAccountTypes.includes((accountType).toUpperCase())){
                         res.status(400).json({
                             message: "Invalid account type"
@@ -870,6 +959,12 @@ const swapProviderController = {
                 }
 
                 if(type == "binanceTransferCheck"){
+                    if(transferType == "" || transferType == null || transferType == undefined){
+                        res.status(400).json({
+                            message: "a mandatory field transferType is required."
+                        });
+                    }
+                    
                     if(!validTransferTypes.includes((transferType).toUpperCase())){
                         res.status(400).json({
                             message: "Invalid transfer type"
@@ -881,6 +976,10 @@ const swapProviderController = {
                     if(transferType == "SPOT_TO_COINM" || transferType == "COINM_TO_SPOT"){
                         defaultAsset = (asset == null || asset == undefined) ? "BNB" : asset;
                     }
+
+                    if(transferType == "TWO_WAY"){
+                        defaultAsset = (asset == null || asset == undefined) ? "USDT" : asset;
+                    }                
                     defaultAmount = (amount == null || amount == undefined) ? 0.00000001 : Number(amount).toFixed(8);
                 }
 
@@ -890,8 +989,36 @@ const swapProviderController = {
                 createdAt: -1 // latest to oldest
             });
             
-            if(sp !== null){                
-                
+            
+            if(sp !== null){
+                const spTests = await SwapProviderTest.findOne({
+                    "swapProvider": sp._id
+                }).select([
+                    "-createdAt", 
+                    "-updatedAt", 
+                    "-__v",
+                    "-swapProvider"
+                ]).lean()
+                .exec();
+
+                if(spTests == null){
+                    errorMessage = "Swap provider tests does not exist."
+                    res.status(404).json({
+                        result: false,
+                        message: errorMessage
+                    });
+                }
+
+                if(type == "testsCheck"){
+
+                    result = await swapProviderController.testsCheck(sp._id);
+                    res.status(200).json({
+                        result: result,
+                        response: spTests
+                    });               
+                }
+
+
                 if(testsOnContract.includes(type)){
                     contractAddress = sp.smartContractAddress;
                     contractInstance = swapProviderController.contractInstance(contractAddress, networkId);
@@ -900,9 +1027,12 @@ const swapProviderController = {
                 if(type == "contractOwnerCheck"){
                     response = await contractInstance.methods.owner().call();
                     result = (owner).toLowerCase() == (response).toLowerCase() ? true : false;
-                    res.status(200).json({
-                        result: result,
-                        type: type
+                    await swapProviderController.updateTest(sp._id, 'contractOwnerCheck', result).then(async() => {
+                        await swapProviderController.testsCheck(sp._id);
+                        res.status(200).json({
+                            result: result,
+                            type: type
+                        });
                     });
                 }
 
@@ -910,46 +1040,49 @@ const swapProviderController = {
                     response = await contractInstance.methods.getFeeAmountLimit().call();
                     result = response == sp.gasAndFeeAmount ? true : false;
                     let message = result == true ? "Equal" : "Different";
-    
-                    res.status(200).json({
-                        result: result,
-                        type: type,
-                        message: message,
-                        value: response
+                    await swapProviderController.updateTest(sp._id, 'contractGasAndFeeCheck', result).then(async() => {
+                        await swapProviderController.testsCheck(sp._id);
+                        res.status(200).json({
+                            result: result,
+                            type: type,
+                            message: message,
+                            value: response
+                        });
                     });
                 }
                 
                 if(type == "spProfitPercentCheck"){
-                    if('spProfitPercent' in sp && Number(sp.spProfitPercent) >= 0 && Number(sp.spProfitPercent) <= 1){
+                    result = ('spProfitPercent' in sp) && Number(sp.spProfitPercent) >= 0 && Number(sp.spProfitPercent) <= 1 ? true : false;
+                    await swapProviderController.updateTest(sp._id, 'spProfitPercentCheck', result).then(async() => {
+                        await swapProviderController.testsCheck(sp._id);
                         res.status(200).json({
-                            result: true
+                            result: result,
+                            type: type
                         });
-                    } else {
-                        res.status(200).json({
-                            result: false
-                        });                    
-                    }                                        
+                    });                    
                 }
 
                 if(type == "binanceApiKeysCheck"){
                     let keyCheck = (sp?.cexData?.key) && (sp.cexData.key != null);
                     let secretCheck = (sp?.cexData?.secret) && (sp.cexData.secret != null);
-
-                    result = keyCheck == true && secretCheck == true ? true : false;              
-
-                    res.status(200).json({
-                        result: result,
-                        type: type,
-                        key: keyCheck,
-                        secret: secretCheck
-                    });
+                    result = keyCheck == true && secretCheck == true ? true : false;
+                    await swapProviderController.updateTest(sp._id, 'binanceApiKeysCheck', result).then(async() => {
+                        await swapProviderController.testsCheck(sp._id);
+                        res.status(200).json({
+                            result: result,
+                            type: type,
+                            key: keyCheck,
+                            secret: secretCheck
+                        });
+                    });  
                 }
 
                 if(type == "binanceApiValidateCheck"){
                     await swapProviderController.binanceTests(req, res, {
                         'apiKey': sp.cexData.key,
                         'secret': sp.cexData.secret,
-                        'type': type
+                        'type': type,
+                        'spId': sp._id
                     });
                 }
 
@@ -959,7 +1092,7 @@ const swapProviderController = {
                         'secret': sp.cexData.secret,
                         'type': type,
                         'accountType': (accountType).toUpperCase(),
-                        
+                        'spId': sp._id
                     });
                 }
 
@@ -971,7 +1104,8 @@ const swapProviderController = {
                         'accountType': (accountType).toUpperCase(),
                         'asset': defaultAsset,
                         'recievedAmount': Number(sp.tokenA.recievedAmount),
-                        'leverage': leverage
+                        'leverage': leverage,
+                        'spId': sp._id
                     });                    
                 }
 
@@ -983,12 +1117,17 @@ const swapProviderController = {
                         'type': type,
                         'transferType': transferTypesMap[transferType],
                         'asset': defaultAsset,
-                        'amount': Number(defaultAmount)
+                        'amount': Number(defaultAmount),
+                        'spId': sp._id
                     });
                 }
 
                 if(type == "binanceWithdrawCheck" || type == "binanceIpWhiteListCheck" || type == "binanceSpAddressWhiteListCheck" || type == "binanceWithdrawEnabledCheck"){
-                    if(sp.canWithdraw == true){
+                    if(spTests.binanceWithdrawCheck == true){  
+                        await swapProviderController.updateTest(sp._id, 'binanceWithdrawEnabledCheck', true);
+                        await swapProviderController.updateTest(sp._id, 'binanceSpAddressWhiteListCheck', true);
+                        await swapProviderController.updateTest(sp._id, 'binanceIpWhiteListCheck', true);
+                        await swapProviderController.testsCheck(sp._id);
                         res.status(200).json({
                             result: true,
                             type: type
@@ -1013,6 +1152,9 @@ const swapProviderController = {
                         defaultwithdrawalNetwork = withdrawalNetworks[defaultAsset];
                         defaultAmount = 0.01;
 
+                        await swapProviderController.updateTest(sp._id, 'binanceWithdrawEnabledCheck', false);
+                        await swapProviderController.updateTest(sp._id, 'binanceSpAddressWhiteListCheck', false);
+                        await swapProviderController.updateTest(sp._id, 'binanceIpWhiteListCheck', false);
                         await swapProviderController.binanceTests(req, res, {
                             'apiKey': sp.cexData.key,
                             'secret': sp.cexData.secret,
@@ -1024,7 +1166,7 @@ const swapProviderController = {
                             'spId': sp._id
                         });
                     }
-                }          
+                }
         
 
             } else {
@@ -1126,6 +1268,121 @@ const swapProviderController = {
         } catch(err){
             console.log(`❌ Error From distributeAmount:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
         }        
+    },
+
+    updateTest : async(spId, field, value) => {
+
+        let fieldToUpdate = {};
+
+        if (field == 'contractOwnerCheck'){
+            Object.assign(fieldToUpdate, {
+                contractOwnerCheck: value
+            });
+        }
+
+        if (field == 'contractGasAndFeeCheck'){
+            Object.assign(fieldToUpdate, {
+                contractGasAndFeeCheck: value
+            });
+        }
+
+        if (field == 'spProfitPercentCheck'){
+            Object.assign(fieldToUpdate, {
+                spProfitPercentCheck: value
+            });
+        }
+
+        if (field == 'binanceApiKeysCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceApiKeysCheck: value
+            });
+        }
+
+        if (field == 'binanceApiValidateCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceApiValidateCheck: value
+            });
+        }
+
+        if (field == 'binanceAccountCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceAccountCheck: value
+            });
+        }
+
+        if (field == 'binanceBalanceCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceBalanceCheck: value
+            });
+        }
+
+        if (field == 'binanceTransferCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceTransferCheck: value
+            });
+        }
+
+        if (field == 'binanceWithdrawCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceWithdrawCheck: value
+            });
+        }
+
+        if (field == 'binanceIpWhiteListCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceIpWhiteListCheck: value
+            });
+        }
+
+        if (field == 'binanceSpAddressWhiteListCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceSpAddressWhiteListCheck: value
+            });
+        }
+
+        if (field == 'binanceWithdrawEnabledCheck'){
+            Object.assign(fieldToUpdate, {
+                binanceWithdrawEnabledCheck: value
+            });
+        }
+
+        await SwapProviderTest.updateOne({
+            "swapProvider": spId
+        }, fieldToUpdate);
+    },
+
+    testsCheck: async(spId) => {
+        const spTests = await SwapProviderTest.findOne({
+            "swapProvider": spId
+        }).select([
+            "-createdAt", 
+            "-updatedAt", 
+            "-__v",
+            "-swapProvider"
+        ]).lean()
+        .exec();        
+
+        if(spTests !== null){
+            let testsPassed = true;
+            for (let [key, value] of Object.entries(spTests)) {
+                if (key == '_id' || key == 'id') {
+                    continue;
+                } else {
+                    if(value == false){
+                        testsPassed = false;
+                        break;
+                    }
+                }
+            }
+    
+            await SwapProvider.updateOne({
+                _id: spId
+            }, {
+                active: testsPassed
+            });
+    
+            return testsPassed;
+        }
     }
     
 }
