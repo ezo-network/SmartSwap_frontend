@@ -2038,13 +2038,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                         <i className={this.state.tests !== null && this.state.tests.binanceBalanceCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                         &nbsp;Check account balance on CEX for allowed limit
                                     </div>
-                                </div>                               
-                                <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceBalanceCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Check account balance on CEX for allowed limit
-                                    </div>
-                                </div>                                                                 
+                                </div>
                                 <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.tests !== null && this.state.tests.binanceTransferCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
