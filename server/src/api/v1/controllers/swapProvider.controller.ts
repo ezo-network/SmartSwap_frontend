@@ -937,6 +937,10 @@ const swapProviderController = {
                     if(accountType == "COINM"){
                         defaultAsset = "BNB";
                     }
+                    if(accountType == "SPOT_USDTM"){
+                        defaultAsset = "USDT";
+                    }
+
 
                     defaultAsset = (asset == null || asset == undefined) ? defaultAsset : asset;
 

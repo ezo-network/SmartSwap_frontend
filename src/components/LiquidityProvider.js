@@ -55,6 +55,8 @@ export default class LiquidityProvider extends PureComponent {
             withdrawAfterCalls: 250,
             cexApiKey: null,
             cexApiSecret: null,
+            cexApiKeyMasked: null,
+            cexApiSecretMasked: null,
             txid: null,
             smartSwapContractAddress: 'Deploy contract to get this address.',
             confirmed: false,
@@ -75,7 +77,10 @@ export default class LiquidityProvider extends PureComponent {
             spContractBal: null,
             spContractBalInUsd: null,
             clientSideError: false,
-            clientSideErrorMessage: null
+            clientSideErrorMessage: null,
+            tests: null,
+            testPassed: false,
+            testing: false
         }
     }
 
@@ -640,8 +645,8 @@ export default class LiquidityProvider extends PureComponent {
                             gasAndFeeAmount: Number(gasAndFeeAmount),
                             spProfitPercent: obj.spProfitPercent,
                             contractCreatedAt: obj.createdAt,
-                            cexApiKey: obj.cexData.key,
-                            cexApiSecret: obj.cexData.secret
+                            cexApiKeyMasked: obj.cexData.key,
+                            cexApiSecretMasked: obj.cexData.secret
                         });
 
                         // this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
@@ -725,6 +730,7 @@ export default class LiquidityProvider extends PureComponent {
                     });
 
                     this.getContractBal();
+                    this.getAllTests();
 
                 } else {
                     this.setState({
@@ -1125,6 +1131,140 @@ export default class LiquidityProvider extends PureComponent {
 
     }
 
+    getAllTests = async() => {
+        // fetch all tests and set to tests var
+        try {
+            let response = await AxiosRequest.request({
+                data: {
+                    owner: this.state.spAccount,
+                    networkId: this.state.networkId,
+                    smartContractAddress: this.state.smartSwapContractAddress,
+                    type: 'testsCheck'
+                },
+                path: "test-suite",
+                method: "POST"
+            });
+
+            if(response.status == 200){
+                this.setState({
+                    tests: response.data.response,
+                    testPassed: response.data.result
+                });
+            }
+
+            if(response.status == 500){
+                notificationConfig.error('Sever error');
+            }
+        } catch (e){
+            console.log('Error from getAllTests: ', e.constructor.name, e.message)
+        }
+    }
+
+    testSuite = async(testType = '') => {
+        try {
+
+            let filter = {
+                owner: this.state.spAccount,
+                networkId: this.state.networkId,
+                smartContractAddress: this.state.smartSwapContractAddress,
+                type: testType                
+            };
+
+            if(testType == "binanceAccountCheck"){
+                filter['accountType'] = 'SPOT_USDTM';
+            }
+
+            if(testType == "binanceBalanceCheck"){
+                filter['accountType'] = 'SPOT';
+            }
+
+            if(testType == "binanceTransferCheck"){
+                filter['transferType'] = 'TWO_WAY';
+            }
+
+            let response = await AxiosRequest.request({
+                data: filter,
+                path: "test-suite",
+                method: "POST"
+            });
+
+            if(response.status == 200){
+                var property = {...this.state.tests.key}
+                property = true;
+                this.setState({property});
+                //notificationConfig.success(`Test ${testType} fetched`);
+                return response.data.result;
+            }
+
+            if(response.status == 500){
+                notificationConfig.error('Sever error');
+            }
+            
+            return false;
+
+        } catch (e){
+            console.log('Error from testSuite: ', e.constructor.name, e.message)
+        }        
+    }
+
+    repeatTests = async(testType = '') => {
+        try {
+
+            if(this.state.testing == false){
+                this.setState({
+                    testing: true
+                });
+                notificationConfig.info('Testing swap proider configuratons');
+                let failedTests = [], passedTests = [];
+                await this.getAllTests().then(async() => {
+                    // get all failed tests
+                    if(this.state.tests !== null){
+                        for (let [key, value] of Object.entries(this.state.tests)) {
+                            if (key == '_id' || key == 'id') {
+                                continue;
+                            } else {
+                                if(value == false){
+                                    var property = {...this.state.tests.key};
+                                    property = false;
+                                    this.setState({property});
+                                    failedTests.push(key);
+                                } else {
+                                    var property = {...this.state.tests.key};
+                                    property = true;
+                                    this.setState({property});                                
+                                    passedTests.push(key);                                
+                                }
+                            }
+                        }
+                        
+                    }
+                }).catch(e => {
+                    console.log('Error from repeatTests: ', e.constructor.name, e.message);
+                    notificationConfig.error(`Something went wrong while testing swap provider.`);
+                });
+    
+                if(failedTests.length > 0){
+                    for(let test=0; test<failedTests.length; test++){
+                        await this.testSuite(failedTests[test]);
+                    }                
+                }
+    
+                await this.getAllTests();
+
+                this.setState({
+                    testing: false
+                });
+
+            } else {
+                notificationConfig.info('Testing already in progress.');
+            }
+
+
+
+        } catch (e){
+            console.log('Error from repeatTests: ', e.constructor.name, e.message)
+        } 
+    }
 
     render() {
 
@@ -1792,7 +1932,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                         <div className="LiproInput01">
                                             <input
                                                 type="text"
-                                                placeholder={this.state.cexApiKey !== null ? this.state.cexApiKey : 'Your Cex API Key'}
+                                                placeholder={this.state.cexApiKeyMasked !== null ? this.state.cexApiKeyMasked : 'Your Cex API Key'}
                                                 defaultValue=''
                                                 onChange={event => this.setState({ cexApiKey: event.target.value })}
                                                 ref={(input) => this.cexApiKey = input}
@@ -1816,7 +1956,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                         <div className="LiproInput01">
                                             <input
                                                 type="text"
-                                                placeholder={this.state.cexApiSecret !== null ? this.state.cexApiSecret : 'Your Cex API Secret'}
+                                                placeholder={this.state.cexApiSecretMasked !== null ? this.state.cexApiSecretMasked : 'Your Cex API Secret'}
                                                 defaultValue=''
                                                 onChange={event => this.setState({ cexApiSecret: event.target.value })}
                                                 ref={(input) => this.cexApiSecret = input}
@@ -1839,7 +1979,7 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                         return (
                                             <div className="LiProfSbox03">
                                                 <div className='LiProformBTNbar'>
-                                                    <button onClick={this.updateAPIdata.bind(this)} disabled={this.state.updating}>
+                                                    <button onClick={this.updateAPIdata.bind(this)} disabled={this.state.updating || this.state.testPassed}>
                                                         {this.state.updateButtonText}
                                                         {this.state.loadingIcon === true &&
                                                             <LoopCircleLoading
@@ -1856,7 +1996,97 @@ For example, you can choose that you want your funds to swap only if it's gain 0
                                 }
                                 )()}
 
-
+                                <div className='spacerLine'></div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.contractOwnerCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check contract deployed for wallet address {this.state.spAccount !== null ? this.state.spAccount : '' }
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>                                
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.contractGasAndFeeCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check contract gas & fee set at limit {this.state.gasAndFeeAmount !== null ? this.state.gasAndFeeAmount : '' }
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>                                
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.spProfitPercentCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check contract spread at {this.state.spProfitPercent !== null ? this.state.spProfitPercent + '%' : '' }
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceApiKeysCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check Cex API key & API Secret set
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceApiValidateCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check Cex Valid API key and secret
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceAccountCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check enabled trading on CEX
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceBalanceCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check account balance on CEX for allowed limit
+                                    </div>
+                                </div>                               
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceBalanceCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check account balance on CEX for allowed limit
+                                    </div>
+                                </div>                                                                 
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceTransferCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Test moving USDT funds between spot and future account on CEX
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceSpAddressWhiteListCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check whitelisted smart contract address on CEX for withdraw
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceIpWhiteListCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check IP whitelisted on CEX for withdraw
+                                    </div>
+                                </div>                                
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceWithdrawEnabledCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check enabled withdraw on CEX
+                                    </div>
+                                </div>                                                                
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceWithdrawCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Test moving funds between spot and swap provider contract address
+                                    </div>
+                                </div>
+                                <div className='spacerLine'></div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.testPassed == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;{this.state.testPassed == true ? 'Swap provider has been successfully activated.' : 'You must pass all the tests to become an active swap provider.'}
+                                    </div>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <button className='repeatTestsButton' disabled={this.state.testPassed} onClick={this.repeatTests.bind(this)}>
+                                            <span>Repeat the SP checking</span>
+                                        </button>
+                                    </div>                                    
+                                </div>  
                             </div>
                         </div>
                     }

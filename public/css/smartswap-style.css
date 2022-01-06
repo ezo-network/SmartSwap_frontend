@@ -6749,3 +6749,23 @@ a.LicSBTN01:hover {
   border: 0;
   background: transparent;
 }
+
+.test-false {
+  color: red;
+}
+
+.test-true {
+  color: #91db28;
+}
+
+.test-suite {
+  font-size: 14px;
+}
+
+.repeatTestsButton {
+  color: #505fa8;
+  background: transparent;
+  border: 0;
+  font-weight: 900;
+  float: right;
+}
