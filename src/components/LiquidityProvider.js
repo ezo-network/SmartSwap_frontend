@@ -100,7 +100,10 @@ export default class LiquidityProvider extends PureComponent {
                     isActiveContractExist: false,
                     spData: null,
                     smartSwapContractAddress: null,
-                    spAccount: null
+                    spAccount: null,
+                    tests: null,
+                    testPassed: false,
+                    testing: false                    
                 });
                 //this.resetForm();
             });
@@ -119,7 +122,10 @@ export default class LiquidityProvider extends PureComponent {
                     isActiveContractExist: false,
                     spData: null,
                     smartSwapContractAddress: null,
-                    spAccount: null
+                    spAccount: null,
+                    tests: null,
+                    testPassed: false,
+                    testing: false                    
                 });
                 // on account change currently disconnecting wallet so we can again check active contract on wallet connect 
     
@@ -297,7 +303,11 @@ export default class LiquidityProvider extends PureComponent {
             web3: web3Config.getWeb3(),
             btnClick: false,
             networkId: networkId,
-            spAccount: web3Config.getAddress()
+            spAccount: web3Config.getAddress(),
+            spData: null,
+            tests: null,
+            testPassed: false,
+            testing: false
         });
 
 
@@ -646,7 +656,8 @@ export default class LiquidityProvider extends PureComponent {
                             spProfitPercent: obj.spProfitPercent,
                             contractCreatedAt: obj.createdAt,
                             cexApiKeyMasked: obj.cexData.key,
-                            cexApiSecretMasked: obj.cexData.secret
+                            cexApiSecretMasked: obj.cexData.secret,
+                            
                         });
 
                         // this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
