@@ -57,11 +57,13 @@ export interface ISwapProvider extends Document {
     txid?: string,
     active: boolean,
     totalAmount: Schema.Types.Decimal128,
-    distributed: boolean,
     swapSpeedMode: {
         type: Number,
         enum : [1,2]
-    }
+    },
+    distributionStatus: string,
+    message: string,
+
 };
 
 const SwapProvider: Schema = new mongoose.Schema({
@@ -70,10 +72,12 @@ const SwapProvider: Schema = new mongoose.Schema({
         required: true,
         default: 0        
     },
-    distributed: {
-        type: Boolean,
+    distributionStatus: {
+        type: String,
         required: true,
-        default: false
+        enum : ['PENDING','PROCESSED', 'COMPLETED', 'FAILED'],
+        default: 'PENDING',
+        uppercase: true
     },
     walletAddresses: {
         spAccount: {
@@ -198,6 +202,12 @@ const SwapProvider: Schema = new mongoose.Schema({
         type: Number,
         default: null,
         required: false
+    },
+    message: {
+        type: String,
+        required: false,
+        default: '',
+        uppercase: true
     }
 }, {
     timestamps: true, toJSON: {getters: true}
