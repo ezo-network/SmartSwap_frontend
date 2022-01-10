@@ -1240,7 +1240,11 @@ const swapProviderController = {
                         "type": 'distribution',
                         "swapProvider": pendingDistributionRecord._id
                     }).lean().exec();
-                    if(distributionOrder.spot.status == "CANCELLED"){
+                    if(
+                        distributionOrder.spot.status == "CANCELLED" 
+                        || distributionOrder.spot.status == "REJECTED"
+                        || distributionOrder.spot.status == "EXPIRED"
+                    ){
                         console.log(distributionOrder.spot.status);
                         console.log(distributionOrder);
                         await swapProviderController.newSpotOrderHandler(pendingDistributionRecord, exchangeinstance, distributionOrder);
@@ -1529,6 +1533,13 @@ const swapProviderController = {
                         await swapProviderController.withdrawHandler(swapProvider, order, exchangeinstance);
                     }).catch(err => console.log('❌ Error from Order.updateOne with status FILLED, ' + err.message));
                     
+                } else {
+                    await Order.updateOne({
+                        _id: order._id
+                    }, {
+                        'spot.status': response.info.status
+                    }).then(async(res) => {
+                    }).catch(err => console.log(`❌ Error from Order.updateOne with status ${response.info.status}, ` + err.message));
                 }
             }
         } catch(err){
