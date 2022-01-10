@@ -4,6 +4,7 @@ import web3Js from 'web3';
 import mongoose, { Schema, Document } from 'mongoose';
 import SwapProvider, {ISwapProvider} from '../models/SwapProvider';
 import SwapProviderTest, {ISwapProviderTest} from '../models/SwapProviderTest';
+import Order, {IOrder} from '../models/order';
 
 import swapFactoryAbi from "../../../abis/swapFactory.json";
 import spContractAbi from "../../../abis/spContract.json";
@@ -12,6 +13,7 @@ import _ from "lodash";
 const ccxt = require ('ccxt');
 
 let nonce = 0;
+let ccxtSandBox = true;
 
 const getRawTransactionApp = function(_address, _nonce, _gasPrice, _gasLimit, _to, _value, _data, chain_id, web3) {
     console.log("claming on: " + chain_id)
@@ -121,8 +123,7 @@ const swapProviderController = {
                 totalAmount: amountA,
                 tokenA: {
                     address: tokenA,
-                    recievedAmount: amountA
-                    //recievedAmount: (Number(amountA) * 55 / 100) upcomming feature
+                    recievedAmount: (Number(amountA) * 55 / 100) // upcomming feature
                 },
                 tokenB: {
                     address: tokenB
@@ -1201,7 +1202,7 @@ const swapProviderController = {
         }
     },
     
-    distributeAmount: async (req: Request, res: Response) => {
+    amountDistributionHandler: async () => {
         try{
             const pendingDistributionRecord = await SwapProvider.findOne({
                 'smartContractAddress': {
@@ -1209,65 +1210,54 @@ const swapProviderController = {
                     $ne: null
                 },
                 active: true,
-                distributed: false
+                swapSpeedMode: "UPFRONT",
+                distributionStatus: {
+                    $nin: ['COMPLETED']
+                },
             }).exec();
 
             if(pendingDistributionRecord !== null){
-                // if pending then get 45% amount and try to withdraw that to SP contract
-                let usdtAmountToBuyToken = (Number(pendingDistributionRecord.tokenA.recievedAmount) * 45 / 100);
-                let network = Number(pendingDistributionRecord.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH': 'BSC';
-                let asset = Number(pendingDistributionRecord.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
-                let address = pendingDistributionRecord.smartContractAddress;
-
-                // bal check if avail then buy then withdraw
-                const exchange = new ccxt.binance ({
+                const exchangeinstance = new ccxt.binance ({
                     'apiKey': pendingDistributionRecord.cexData.key,
                     'secret': pendingDistributionRecord.cexData.secret,
                     'enableRateLimit': true,
-                });
+                });                
+                exchangeinstance.set_sandbox_mode(ccxtSandBox);
+                
+                if(pendingDistributionRecord['distributionStatus'] == "PENDING"){
+                    await SwapProvider.updateOne({
+                        _id: pendingDistributionRecord._id
+                    }, {
+                        distributionStatus: 'PROCESSED'
+                    }).then(async(res) => {
+                        // make new spot order
+                        await swapProviderController.newSpotOrderHandler(pendingDistributionRecord, exchangeinstance);
+                    }).catch(err => console.log(`❌ Error From amountDistributionHandler: update SwapProvider status PROCESSED, `, err.constructor.name, err.message, ' at:' + new Date().toJSON()))
+                }
 
-                let response = await exchange.createOrder(`${asset}/USDT`, 'MARKET', 'buy', undefined, usdtAmountToBuyToken);
-        
-                if(response.hasOwnProperty('info') && _.isEmpty(response.info)){
-                    res.status(200).json({
-                        result: true
-                    });                
-                    // withdraw 
-                    response = await exchange.withdraw(
-                        asset,
-                        //qtyInAsset,
-                        address,
-                        undefined, // address tag
-                        {
-                            'network': network
-                        }
-                    );
-    
-                    if(response.hasOwnProperty('id')){
-    
-                        pendingDistributionRecord['distributed'] = true;
-                        response = await pendingDistributionRecord.save();
-    
-                        res.status(200).json({
-                            result: true,
-                            response: response
-                        });
+                if(pendingDistributionRecord['distributionStatus'] == "PROCESSED"){
+                    let distributionOrder = await Order.findOne({
+                        "type": 'distribution',
+                        "swapProvider": pendingDistributionRecord._id
+                    }).lean().exec();
+                    if(distributionOrder.spot.status == "CANCELLED"){
+                        console.log(distributionOrder.spot.status);
+                        console.log(distributionOrder);
+                        await swapProviderController.newSpotOrderHandler(pendingDistributionRecord, exchangeinstance, distributionOrder);
                     } else {
-                        res.status(200).json({
-                            result: false,
-                            response: response
-                        });
+                        // check status of distributionOrder
+                        if(distributionOrder.spot.status == "FILLED"){
+                            // create withdraw order
+                            await swapProviderController.withdrawHandler(pendingDistributionRecord, distributionOrder, exchangeinstance);
+                        } else {
+                            // query order status
+                            await swapProviderController.querySpotOrderHandler(pendingDistributionRecord, distributionOrder, exchangeinstance);
+                        }
                     }
-                } else {
-                    res.status(200).json({
-                        result: false
-                    });                
-                }                
+                }
 
             } else {
-                res.status(404).json({ errorMessage: {
-                    error: `No new swap provider found whose distribution is pending yet.` 
-                }});
+                console.log('❌ No new active swap provider found whose distribution is pending yet.');
             }
         } catch(err){
             console.log(`❌ Error From distributeAmount:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
@@ -1386,6 +1376,185 @@ const swapProviderController = {
             });
     
             return testsPassed;
+        }
+    },
+
+    withdrawHandler: async(swapProvider, order, exchangeinstance) => {
+        console.log('👉 Handle withdraw');
+        try {
+            let response = null;
+            let asset = Number(swapProvider.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
+            let network = asset == 'ETH' ? 'ETH': 'BSC';
+            let amount = Number(order.spot.executedQty);
+            let address = swapProvider.smartContractAddress;
+            if(order.withdraw.status == "PENDING"){
+                // create withdraw
+                if(!ccxtSandBox){
+                    try {
+                        response = await exchangeinstance.withdraw(
+                            asset,
+                            amount,
+                            address,
+                            undefined, // address tag
+                            {
+                                'network': network
+                            }
+                        ); 
+                    } catch (err) {
+                        console.log('❌ Error from withdrawHandler exchangeinstance.withdraw: ' + err.message);
+                        await swapProviderController.errorHandler('withdrawHandler', swapProvider._id, order._id, err.message); 
+                    }
+                } else {
+                    response = {
+                        id: 'abvasd'
+                    }
+                }
+                
+                if(response !== null && response.hasOwnProperty('id')){
+                    // save withdraw order
+                    let args = {
+                        refId: response.id,
+                        asset: asset,
+                        amount: (amount).toString(),
+                        status: 'COMPLETED',
+                        failedTry: 0,
+                        message: ''
+                    };
+    
+                    await Order.updateOne({
+                        _id: order._id
+                    }, {
+                        'withdraw': args
+                    }).then(async(res) => {
+    
+                    }).catch(err => console.log('❌ Error from withdrawHandler: Order.updateOne with withdraw order data., ' + err.message));
+                }
+    
+            } else if(order.withdraw.status == "PROCESSED"){
+                // query withdraw status
+    
+            } else if(order.withdraw.status == "COMPLETED"){
+                // mark distribution done on swap provider
+                await SwapProvider.updateOne({
+                    _id: swapProvider._id
+                }, {
+                    distributionStatus: 'COMPLETED'
+                }).then(async(res) => {
+                    console.log(`swapProvider ${swapProvider._id} amount distribution completed.`)
+                }).catch(err => console.log('❌ Error from withdrawHandler: swapProvider.updateOne with distributed flag true., ' + err.message));
+            } else {
+                // failed handler
+            }
+        } catch (err){
+            console.log(`❌ Error From withdrawHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            await swapProviderController.errorHandler('withdrawHandler', swapProvider._id, order._id, err.message);
+        }
+    },
+
+    newSpotOrderHandler: async(swapProvider, exchangeInstace, existingOrder = null) => {
+        try {
+            let usdtAmountToBuyToken = (Number(swapProvider.totalAmount) * 45 / 100);
+            let asset = Number(swapProvider.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
+            let ticker = await exchangeInstace.fetchTicker(`${asset}/USDT`);
+            let price = ticker.last;
+            let amount = Number(usdtAmountToBuyToken) / Number(price);
+
+            let response = await exchangeInstace.createOrder(`${asset}/USDT`, 'MARKET', 'buy', amount);
+            console.log(response);
+
+            if(response !== null && response.hasOwnProperty('id')){
+                // save order
+                let args = {
+                    'swapProvider': swapProvider._id,
+                    'type': 'distribution',
+                    'spot': {
+                        'asset': response.symbol,
+                        'type': response.type,
+                        'side': response.side,
+                        'orderId': response.id,
+                        'price': response.price,
+                        'origQty': response.info.origQty,
+                        'executedQty': response.info.executedQty,
+                        'cummulativeQuoteQty': response.info.executedQty,
+                        'status': response.info.status,
+                        'cancelledOrderIds': []
+                    }
+                };
+
+                try {
+                    if(existingOrder == null){
+                        await new Order(args).save();
+                    } else {
+                        let cancelledOrderIdsArray = [];
+                        for(let i=0; i<existingOrder.spot.cancelledOrderIds.length; i++){
+                            cancelledOrderIdsArray.push(existingOrder.spot.cancelledOrderIds[i]);
+                        }
+                        cancelledOrderIdsArray.push(existingOrder.spot.orderId);
+                        args.spot['cancelledOrderIds'] = cancelledOrderIdsArray;
+                        try {
+                            await Order.updateOne({
+                                _id: existingOrder._id,
+                            }, {
+                                'spot': args.spot
+                            });
+                        } catch(err){
+                            console.log(`❌ Error From newSpotOrderHandler updateOne:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+                            await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, existingOrder._id, err.message);
+                        }
+                    }
+                } catch(err){
+                    console.log(`❌ Error From saveOrder:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+                    await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, null, err.message);
+                }
+            }
+
+        } catch(err){
+            console.log(`❌ Error From newSpotOrderHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, null, err.message);            
+        }         
+    },
+
+    querySpotOrderHandler: async(swapProvider, order, exchangeinstance) => {
+        try {
+            let asset = Number(swapProvider.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
+            let response = await exchangeinstance.fetchOrder(order.spot.orderId, `${asset}/USDT`);
+            if(response !== null && response.hasOwnProperty('id')){
+                if(response.info.status == "FILLED"){
+                    await Order.updateOne({
+                        _id: order._id
+                    }, {
+                        'spot.status': response.info.status
+                    }).then(async(res) => {
+                        // handle withdraw
+                        await swapProviderController.withdrawHandler(swapProvider, order, exchangeinstance);
+                    }).catch(err => console.log('❌ Error from Order.updateOne with status FILLED, ' + err.message));
+                    
+                }
+            }
+        } catch(err){
+            console.log(`❌ Error From querySpotOrderHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            await swapProviderController.errorHandler('querySpotOrderHandler', swapProvider._id, order._id, err.message);
+        }
+    },
+
+    errorHandler: async(from, swapProviderId, orderId, message) => {
+        if(swapProviderId !== null){
+            await SwapProvider.updateOne({
+                _id: swapProviderId
+            }, {
+                distributionStatus: 'FAILED',
+                message: message
+            }).then(async(res) => {
+            }).catch(err => console.log(`❌ Error from ${from} swapProvider.updateOne with distributed flag FAILED`)); 
+        }
+
+        if(orderId !== null){
+            await Order.updateOne({
+                _id: orderId
+            }, {
+                'message': message
+            }).then(async(res) => {    
+            }).catch(err => console.log(`❌ Error from ${from} Order.updateOne with error message`));
         }
     }
     
