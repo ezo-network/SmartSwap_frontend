@@ -57,10 +57,7 @@ export interface ISwapProvider extends Document {
     txid?: string,
     active: boolean,
     totalAmount: Schema.Types.Decimal128,
-    swapSpeedMode: {
-        type: Number,
-        enum : [1,2]
-    },
+    swapSpeedMode: string,
     distributionStatus: string,
     message: string,
 

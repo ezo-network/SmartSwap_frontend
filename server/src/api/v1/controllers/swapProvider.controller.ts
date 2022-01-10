@@ -1210,9 +1210,10 @@ const swapProviderController = {
                     $ne: null
                 },
                 active: true,
+                swapSpeedMode: "UPFRONT",
                 distributionStatus: {
                     $nin: ['COMPLETED']
-                }
+                },
             }).exec();
 
             if(pendingDistributionRecord !== null){
