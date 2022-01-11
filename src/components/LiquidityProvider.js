@@ -77,7 +77,10 @@ export default class LiquidityProvider extends PureComponent {
             spContractBal: null,
             spContractBalInUsd: null,
             clientSideError: false,
-            clientSideErrorMessage: null,
+            clientSideErrorMessage: {
+                spProfitPercent: null,
+                amountA: null
+            },
             tests: null,
             testPassed: false,
             testing: false
@@ -248,17 +251,47 @@ export default class LiquidityProvider extends PureComponent {
 
     changeSpread(value) {
         if(Number(value) > 1 || Number(value) < 0){
+            
             this.setState({
-                clientSideErrorMessage: "Please provide a valid input between 0-1 range",
                 clientSideError: true
             });
+            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage.spProfitPercent = "Please provide a valid input between 0-1 range";
+            this.setState({clientSideErrorMessage});
+            //notificationConfig.success(`Test ${testType} fetched`);
+            return;
         } else {
             this.setState({
                 spProfitPercent: Number(value),
-                clientSideError: false,
-                clientSideErrorMessage: null
-            });        
+                clientSideError: false
+            });
+
+            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage.spProfitPercent = null;
+            this.setState({clientSideErrorMessage});
         }
+    };
+
+    checkAmountA(value){
+        if(Number(value) < 100){            
+            this.setState({
+                clientSideError: true
+            });
+            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage.amountA = "Minimum amount is $100";
+            this.setState({clientSideErrorMessage});
+            //notificationConfig.success(`Test ${testType} fetched`);
+            return;
+        } else {
+            this.setState({
+                amountA: Number(value),
+                clientSideError: false
+            });
+
+            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage.amountA = null;
+            this.setState({clientSideErrorMessage});
+        }        
     }
 
     async connectWallet() {
@@ -1582,7 +1615,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         type="text"
                                         defaultValue=''
                                         placeholder="50000"
-                                        onChange={event => this.setState({ amountA: event.target.value })}
+                                        onChange={event => this.checkAmountA(event.target.value)}
                                         ref={(input) => this.amountA = input}
                                     />
                                 </div>
@@ -1592,6 +1625,11 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         <label>{this.state.errorMessage}</label>
                                     </div>
                                 }
+                                {this.state.clientSideError == true && (this.state.clientSideErrorMessage.amountA !== null) &&
+                                    <div className="error-Msg" style={smallError}>
+                                        <label>{this.state.clientSideErrorMessage.amountA}</label>
+                                    </div>
+                                }                                
                             </div>
                         </div> */}
 
@@ -1621,9 +1659,9 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         <label>{this.state.errorMessage}</label>
                                     </div>
                                 }
-                                {this.state.clientSideError == true &&
+                                {this.state.clientSideError == true && (this.state.clientSideErrorMessage.spProfitPercent !== null) &&
                                     <div className="error-Msg" style={smallError}>
-                                        <label>{this.state.clientSideErrorMessage}</label>
+                                        <label>{this.state.clientSideErrorMessage.spProfitPercent}</label>
                                     </div>
                                 }
                             </div>
