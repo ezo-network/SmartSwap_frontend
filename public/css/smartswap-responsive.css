@@ -1,4 +1,14 @@
 @charset "utf-8";
+
+/* n css */
+  @media(min-width:768px){
+    .count-content-wrap-n{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      grid-gap: 1rem 2rem;
+    }
+  }
+/* n css end */
+
 @media (min-width: 320px) and (max-width: 500px){
 
 .smartSwap .Scroll-no { overflow: hidden; }    
@@ -121,6 +131,9 @@
 .gwFormSCheckbx01 .md-checkbox { width:50%; }
 .gwFroWidthFix01 {  width: 100%; }
 .spContrlMBX { padding: 20px; }
+.spContrlMBX-n {
+  padding-top: 40px;
+}
 .LiProTitle03 {  font-size: 26px; }
 .LiProTitle03 span { width: 100%; font-size: 16px; }
 
@@ -397,6 +410,23 @@
 
 .LiProFormMbox .LiProfSbox01:nth-child(01){ order: -1; }
 .LiProFormMbox .LiProfSbox01:nth-child(03){ order: -1; }
+
+/* n css */
+
+.step-num-n {
+  height: 40px;
+  width: 40px;
+  font-size: 15px;
+}
+.spCountrlTitle01-n {
+  font-size: 14px;
+  padding: 0 10px;
+}
+.step-title-trans-n{
+  margin-top: -59px;
+}
+
+
 
 }
 
