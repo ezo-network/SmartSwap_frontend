@@ -2594,7 +2594,7 @@ export default class Home extends PureComponent {
                                           href="javascript:void(0);"
                                           className="ani-1"
                                         >
-                                          Wait until few blocks confirmation
+                                          Waiting to be match with counter-party
                                         </a>
                                       </p>
                                     </div>
