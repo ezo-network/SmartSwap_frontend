@@ -196,7 +196,7 @@ CEO & CTO</span>Serial Entrepreneur with 5 Startups and 3 exits</div>
 												CMO</span>Venture Marketing Advisor totaling $16B market cap</div>
                                     </div>
 
-                                    <div class="s20Teambox01 clearfix" data-121500-start="opacity:0; transform: scale(1.3) translate(0px, 0px);" data-122500-start="opacity:1; transform: scale(1) translate(0px, 0px);">
+                                    {/* <div class="s20Teambox01 clearfix" data-121500-start="opacity:0; transform: scale(1.3) translate(0px, 0px);" data-122500-start="opacity:1; transform: scale(1) translate(0px, 0px);">
                                         <div class="s20tImgbox ani-5">
                                             <div class="s20RotaterBox"><a href="https://www.linkedin.com/in/debbierosenblum" target="_blank" class="teamLinkIcon"></a>
                                                 <div class="teamImgNPbox"><img  alt="" src="images/team/teamImg-015.png" /></div>
@@ -204,7 +204,7 @@ CEO & CTO</span>Serial Entrepreneur with 5 Startups and 3 exits</div>
                                         </div>
                                         <div class="s20ttextbox"> <span>Debbie Rosenblum<br />
 												CPO</span>People Architect, Strategic Leader + Decisive Doer</div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>
@@ -303,15 +303,17 @@ CEO & CTO</span>Serial Entrepreneur with 5 Startups and 3 exits</div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-02.png" alt="" />Hassan (Hatu) Sheikh </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-03.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-04.png" alt="" /> </div>
+                        <div className='VPSubBX01'>  <img src="images/venture-partners/bitangels.png" alt="" />Michael Terpin </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-05.png" alt="" /> </div>
-                        <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-06.png" alt="" />  Andrea Castiglione</div>
+                        <div className='VPSubBX01'>  <img src="images/venture-partners/silent.png" alt="" />Andrea Castiglione</div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-07.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-08.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-09.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-010.png" alt="" /> </div>
-                        <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-011.png" alt="" /> </div>
+                        <div className='VPSubBX01'>  <img src="images/venture-partners/mexc.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-012.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-013.png" alt="" /> </div>
+                        <div className='VPSubBX01'>  <img src="images/venture-partners/fairum.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-014.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-015.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-016.png" alt="" /> </div>
@@ -326,7 +328,6 @@ CEO & CTO</span>Serial Entrepreneur with 5 Startups and 3 exits</div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-025.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-026.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-027.png" alt="" /> </div>
-                        <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-028.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-029.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-030.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-031.png" alt="" /> </div>
@@ -339,6 +340,7 @@ CEO & CTO</span>Serial Entrepreneur with 5 Startups and 3 exits</div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-038.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-039.png" alt="" /> </div>
                         <div className='VPSubBX01'>  <img src="images/venture-partners/vpICON-040.png" alt="" /> </div>
+                        <div className='VPSubBX01'>  <img src="images/venture-partners/legion.png" alt="" /> </div>
 
 
 

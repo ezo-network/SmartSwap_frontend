@@ -4,8 +4,9 @@ import routes from "./api/v1/routes/routes";
 import cors from "cors";
 // Mongoose
 import mongoose from 'mongoose';
-import ETHListner = require('./api/v1/listners/ethListner');
-import BSCListner = require('./api/v1/listners/bscListner');
+import TaskScheduler from './api/v1/taskScheduler/index';
+// import ETHListner = require('./api/v1/listners/ethListner');
+// import BSCListner = require('./api/v1/listners/bscListner');
 
 mongoose.connect(db.url, db.configs);
 
@@ -22,7 +23,6 @@ app.listen(port, host, () => {
 
     routes(app);
 
-    // listners
-    //ETHListner;
-    //BSCListner;
+    // cron jobs
+    TaskScheduler.start();
 });

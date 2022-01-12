@@ -3992,18 +3992,17 @@ input[type="checkbox"] {
   position: relative;
   bottom: auto;
 }
+
 .error-Msg {
-  max-width: 900px;
-  text-align: center;
-  background: rgba(237, 38, 44, 0.1);
-  font-size: 18px;
   color: #f81e23;
-  border: 2px solid #f81e23;
   border-radius: 5px;
   min-height: 55px;
   line-height: 45px;
   margin: 0 auto;
+  font-size: 15px !important;
+  font-weight: 900;
 }
+
 .smartSwap
   .wallet-boxWrap.listView
   .wallet-Bx
@@ -6768,4 +6767,197 @@ a.LicSBTN01:hover {
   border: 0;
   font-weight: 900;
   float: right;
+}
+
+/* n css */
+
+.details-n .LiProTitle01 {
+  margin-bottom: 0;
+}
+.details-para-n p{
+  font-size: 18px;
+  line-height: 30px;
+}
+.count-n {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #fff;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+.count-content-wrap-n{
+  display: grid;
+  grid-gap: 2rem 2rem;
+  margin-top: 40px;
+}
+.details-para-n {
+  padding-bottom: 40px;
+  border-bottom: 1px solid #271d39;
+  margin-bottom: 40px;
+}
+.count-content-n{
+  display: flex;
+}
+.count-content-n p{
+  margin: 0;
+  flex: 1;
+}
+.count-content-n .count-n {
+  margin-right: 15px;
+}
+.d-flex{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* updated */
+
+.dragorInput .input-range__label--max .input-range__label-container {
+  left: auto;
+}
+.dragorInput.v2 .input-range__label--max {
+  right: 15px;
+}
+.dragorInput.v2 .input-range__label--min {
+  left: 15px;
+}
+.dragorInput .input-range__label-container {
+  left: 0;
+}
+.relative{
+  position: relative;
+}
+.spContrlMBX-n{
+  padding: 40px;
+}
+.step-title-trans-n {
+  margin-top: -71px;
+  margin-bottom: 40px;
+}
+.spCountrlTitle01-n{
+  background-color: #110525;
+  display: inline-block;
+  padding: 0 20px;
+  margin: 0;
+}
+.step-num-n {
+  height: 60px;
+  width: 60px;
+  background-color: #000000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  color: #fff;
+}
+.items-center-n {
+  align-items: center;
+}
+.justify-center-n{
+  justify-content: center;
+}
+.toggle-ic-n {
+  height: 30px;
+  width: 30px;
+  background-color: #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+.spContrlMBX .toggle-ic-n{
+  position: absolute;
+  right: 30px;
+  top: -15px;
+}
+.box-border-n {
+  padding: 20px;
+  border: 1px solid;
+  margin-bottom: 30px;
+}
+.text-center-n{
+  text-align: center;
+}
+.box-border-primary-n{
+  border-color: #91dc27;
+}
+.mb-10px-n{
+  margin-bottom: 10px;
+}
+.mb-20px-n{
+  margin-bottom: 20px;
+}
+.mb-30px-n{
+  margin-bottom: 30px;
+}
+.mb-40px-n{
+  margin-bottom: 40px;
+}
+.mt-10px-n{
+  margin-top: 10px;
+}
+.mt-20px-n{
+  margin-top: 20px;
+}
+.mt-30px-n{
+  margin-top: 30px;
+}
+.mt-40px-n{
+  margin-top: 40px;
+}
+.pt-20px{
+  padding-top: 20px;
+}
+.pl-20px{
+  padding-left: 20px;
+}
+.pr-20px{
+  padding-right: 20px;
+}
+.w-100-n{
+  width: 100%;
+}
+.d-block-n {
+  display: block;
+}
+.pl-0px-n{
+  padding-left: 0;
+}
+.mx-100{
+  max-width: 100% !important;
+}
+.text-primary{
+  color: #92db28;
+}
+.absolute-ic-n {
+  position: absolute;
+  right: 10px;
+  color: #a69cbe !important;
+  height: 40px;
+  width: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+}
+.LiProformBTNbar.btn-dark button {
+  width: 100%;
+  height: 80px;
+  line-height: 80px;
+  text-transform: uppercase;
+  color: #92db28!important;
+  display: inline-block;
+  font-weight: 700;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 -4px inset rgb(0 0 0 / 25%);
+  border: 2px solid #000;
+  background: #1C1C1C;
+}
+.ppAboutText01{
+  text-align: left;
 }
