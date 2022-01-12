@@ -3992,18 +3992,17 @@ input[type="checkbox"] {
   position: relative;
   bottom: auto;
 }
+
 .error-Msg {
-  max-width: 900px;
-  text-align: center;
-  background: rgba(237, 38, 44, 0.1);
-  font-size: 18px;
   color: #f81e23;
-  border: 2px solid #f81e23;
   border-radius: 5px;
   min-height: 55px;
   line-height: 45px;
   margin: 0 auto;
+  font-size: 15px !important;
+  font-weight: 900;
 }
+
 .smartSwap
   .wallet-boxWrap.listView
   .wallet-Bx

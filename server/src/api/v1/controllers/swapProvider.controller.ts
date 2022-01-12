@@ -13,7 +13,7 @@ import _ from "lodash";
 const ccxt = require ('ccxt');
 
 let nonce = 0;
-let ccxtSandBox = true;
+let ccxtSandBox = false;
 
 const getRawTransactionApp = function(_address, _nonce, _gasPrice, _gasLimit, _to, _value, _data, chain_id, web3) {
     console.log("claming on: " + chain_id)
@@ -277,7 +277,13 @@ const swapProviderController = {
             
             if ('amountA' in request){
                 Object.assign(filter, {
-                    'tokenA.recievedAmount': request['amountA']
+                    'totalAmount': request['amountA']
+                });
+            }
+
+            if ('amountA' in request){
+                Object.assign(filter, {
+                    'tokenA.recievedAmount': Number(request['amountA']) * 55 / 100
                 });
             }
 
@@ -356,13 +362,28 @@ const swapProviderController = {
                 if(request['stopRepeatsMode'] == 1){
                     Object.assign(filter, {
                         'stopRepeats.onDate': request['stopRepeatsOnDate']
-                    });                    
+                    });
+                    Object.assign(filter, {
+                        'stopRepeats.afterCalls': null
+                    });                                        
                 }
 
                 if(request['stopRepeatsMode'] == 2){
                     Object.assign(filter, {
                         'stopRepeats.afterCalls': request['stopRepeatsAfterCalls']
                     });                    
+                    Object.assign(filter, {
+                        'stopRepeats.onDate': null
+                    });                                                            
+                }
+
+                if(request['stopRepeatsMode'] == 3){
+                    Object.assign(filter, {
+                        'stopRepeats.afterCalls': null
+                    });
+                    Object.assign(filter, {
+                        'stopRepeats.onDate': null
+                    });                                                         
                 }
 
             }
@@ -506,16 +527,16 @@ const swapProviderController = {
             
             if(activeContracts.length > 0){
 
-                for(let i=0; i<activeContracts.length; i++){
-                    let maskedKey = activeContracts[i].cexData.key;
-                    let maskedSecret = activeContracts[i].cexData.secret;
-                    if(maskedKey !== null){
-                        activeContracts[i].cexData.key = maskedKey.replace(/.(?=.{4,}$)/g, '*');
-                    }
-                    if(maskedSecret !== null){
-                        activeContracts[i].cexData.secret = maskedSecret.replace(/.(?=.{4,}$)/g, '*');
-                    }                    
-                }
+                // for(let i=0; i<activeContracts.length; i++){
+                //     let maskedKey = activeContracts[i].cexData.key;
+                //     let maskedSecret = activeContracts[i].cexData.secret;
+                //     if(maskedKey !== null){
+                //         activeContracts[i].cexData.key = maskedKey.replace(/.(?=.{4,}$)/g, '*');
+                //     }
+                //     if(maskedSecret !== null){
+                //         activeContracts[i].cexData.secret = maskedSecret.replace(/.(?=.{4,}$)/g, '*');
+                //     }                    
+                // }
 
                 res.status(200).json(activeContracts);
             } else {

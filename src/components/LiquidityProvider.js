@@ -50,6 +50,7 @@ export default class LiquidityProvider extends PureComponent {
             stopRepeatsMode: 3,
             stopRepeatsOnDate: new Date(),
             stopRepeatsAfterCalls: 200,
+            toggleStopRepeatsSection: true,
             withdrawMode: 3,
             withdrawOnDate: new Date(),
             withdrawAfterCalls: 250,
@@ -57,11 +58,14 @@ export default class LiquidityProvider extends PureComponent {
             cexApiSecret: null,
             cexApiKeyMasked: null,
             cexApiSecretMasked: null,
+            cexApiKeyEditable: false,
+            cexApiSecretEditable: false,            
             txid: null,
             smartSwapContractAddress: 'Deploy contract to get this address.',
             confirmed: false,
             deployed: false,
             updating: false,
+            updated: false,
             reAuthrizeing: false,
             deployButtonText: "DEPLOY SMART CONTRACT",
             updateButtonText: "SAVE TO UPDATE CONTRACT",
@@ -292,6 +296,47 @@ export default class LiquidityProvider extends PureComponent {
             clientSideErrorMessage.amountA = null;
             this.setState({clientSideErrorMessage});
         }        
+    }
+
+    inputMask(input, value){
+        let maskedValue = value.replace(/.(?=.{4,}$)/g, '*');
+        if(input == "key"){
+            this.setState({
+                cexApiKey: value,
+                cexApiKeyMasked: maskedValue
+            });            
+        }
+        if(input == "secret"){
+            this.setState({
+                cexApiSecret: value,
+                cexApiSecretMasked: maskedValue
+            });            
+        }        
+    }
+
+    clearKeys(input){
+        if(input == "key"){
+            this.setState({
+                cexApiKey: null,
+                cexApiKeyMasked: null,
+                cexApiKeyEditable:false
+            });
+            this.dispatchEventHandler(this.cexApiKey, null);
+        }
+        if(input == "secret"){
+            this.setState({
+                cexApiSecret: null,
+                cexApiSecretMasked: null,
+                cexApiSecretEditable:false
+            });
+            this.dispatchEventHandler(this.cexApiSecret, null);            
+        }
+    }
+
+    toggleStopRepeatsSection(){
+        this.setState(prevState => ({
+            toggleStopRepeatsSection: !prevState.toggleStopRepeatsSection
+        }));
     }
 
     async connectWallet() {
@@ -593,12 +638,6 @@ export default class LiquidityProvider extends PureComponent {
                                 });
                                 notificationConfig.success('Swap provider Added');
                             }
-
-                            // this.setState({
-                            //     deployButtonText: "Getting smart contract address..."
-                            // });
-                            // await this.asyncInterval(10000);
-
                         }
 
                     }
@@ -688,10 +727,32 @@ export default class LiquidityProvider extends PureComponent {
                             gasAndFeeAmount: Number(gasAndFeeAmount),
                             spProfitPercent: obj.spProfitPercent,
                             contractCreatedAt: obj.createdAt,
-                            cexApiKeyMasked: obj.cexData.key,
-                            cexApiSecretMasked: obj.cexData.secret,
-                            
+                            amountA: obj.totalAmount.$numberDecimal,
+                            accumulateFundsLimit: obj.accumulateFundsLimit,
+                            stopRepeatsMode: obj.stopRepeats.mode,
+                            cexApiKey: obj.cexData.key,
+                            cexApiKeyEditable: true,
+                            cexApiSecret: obj.cexData.secret,
+                            cexApiSecretEditable: true
                         });
+
+                        if(obj.stopRepeats.mode == 1){
+                            let toDate = new Date(obj.stopRepeats.onDate)
+                            this.setState({
+                                stopRepeatsOnDate: toDate,
+                                stopRepeatsAfterCalls: null
+                            })
+                        }
+
+                        if(obj.stopRepeats.mode == 2){
+                            this.setState({
+                                stopRepeatsAfterCalls: obj.stopRepeats.afterCalls,
+                                stopRepeatsOnDate: null
+                            })
+                        }
+
+                        this.inputMask('key', obj.cexData.key);
+                        this.inputMask('secret', obj.cexData.secret);
 
                         // this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
                         // this.dispatchEventHandler(this.walletAddressToReceive, obj.walletAddresses.toReceive);
@@ -872,6 +933,24 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     updateContract = async () => {
+
+        if (this.state.cexApiKey === null || this.state.cexApiKey.length === 0) {
+            notificationConfig.error("API key can't be blank.");
+            return;
+        }
+
+        if (this.state.cexApiSecret === null || this.state.cexApiSecret.length === 0) {
+            notificationConfig.error("API secret can't be blank.");
+            return;
+        }
+
+        if (Number(this.state.stopRepeatsMode) == 2) {
+            if (this.state.stopRepeatsAfterCalls === null || this.state.stopRepeatsAfterCalls.length === 0) {
+                notificationConfig.error("You must choose how many time to repeat on CEX");
+                return;
+            }
+        }
+
         this.setState({
             updating: true,
             loadingIcon: true
@@ -902,43 +981,16 @@ export default class LiquidityProvider extends PureComponent {
             });
         }
 
-        if (Number(this.state.withdrawMode) == 1) {
-            console.log('Stop mode 1');
-            Object.assign(args, {
-                withdrawOnDate: this.state.withdrawOnDate,
-                withdrawAfterCalls: null
-            });
-        }
-
-        if (Number(this.state.withdrawMode) == 2) {
-            console.log('Stop mode 2');
-            Object.assign(args, {
-                withdrawOnDate: null,
-                withdrawAfterCalls: this.state.withdrawAfterCalls
-            });
-        }
-
-        if (Number(this.state.withdrawMode) == 3) {
-            console.log('Stop mode 3');
-            Object.assign(args, {
-                withdrawOnDate: null,
-                withdrawAfterCalls: null
-            });
-        }
-
 
         let finalArgs = {
             data: Object.assign(args, {
                 smartContractAddress: this.state.smartSwapContractAddress,
-                amountA: this.state.amountA === null ? ('').toString() : this.state.amountA,
-                walletAddressToSend: this.state.walletAddressToSend === null ? ('').toString() : this.state.walletAddressToSend,
-                walletAddressToReceive: this.state.walletAddressToReceive === null ? ('').toString() : this.state.walletAddressToReceive,
+                amountA: this.state.amountA,
                 spProfitPercent: this.state.spProfitPercent,
                 accumulateFundsLimit: this.state.accumulateFundsLimit,
                 stopRepeatsMode: this.state.stopRepeatsMode,
-                withdrawMode: this.state.withdrawMode,
-                cexApiKey: this.state.cexApiKey === null ? ('').toString() : this.state.cexApiKey,
-                cexApiSecret: this.state.cexApiSecret === null ? ('').toString() : this.state.cexApiSecret,
+                cexApiKey: this.state.cexApiKey,
+                cexApiSecret: this.state.cexApiSecret,
                 swapSpeedMode: this.state.swapSpeedMode === null ? 'UPFRONT' : this.state.swapSpeedMode
             }),
             // data: {
@@ -973,10 +1025,19 @@ export default class LiquidityProvider extends PureComponent {
                     console.log('Updated');
                     notificationConfig.success('Contract updated successfully');
                     this.setState({
+                        updated: true,
+                        updateButtonText: "CONTRACT UPDATED SUCCESSFULLY",
                         updating: false,
-                        loadingIcon: false
+                        loadingIcon: false,
                     });
                 }, 3000);
+
+                setTimeout(async () => {
+                    this.setState({
+                        updated: false,
+                        updateButtonText: 'SAVE TO UPDATE CONTRACT'
+                    });
+                }, 5000);
             }
         } catch (err) {
             notificationConfig.error('Something went wrong!');
@@ -1007,26 +1068,26 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     updateSwapSpeedMode = async (mode) => {
-        if (this.state.isActiveContractExist) {
-            this.setState({
-                updating: true,
-                reAuthrizeing: true
-            });
-            let swapSpeedMode = mode;
-            await AxiosRequest.request({
-                data: {
-                    smartContractAddress: this.state.smartSwapContractAddress,
-                    swapSpeedMode: swapSpeedMode
-                },
-                path: "update",
-                method: "POST"
-            });
-            notificationConfig.success('Swap speed mode updated.');
-            this.setState({
-                updating: false,
-                reAuthrizeing: false
-            });
-        }
+        // if (this.state.isActiveContractExist) {
+        //     this.setState({
+        //         updating: true,
+        //         reAuthrizeing: true
+        //     });
+        //     let swapSpeedMode = mode;
+        //     await AxiosRequest.request({
+        //         data: {
+        //             smartContractAddress: this.state.smartSwapContractAddress,
+        //             swapSpeedMode: swapSpeedMode
+        //         },
+        //         path: "update",
+        //         method: "POST"
+        //     });
+        //     notificationConfig.success('Swap speed mode updated.');
+        //     this.setState({
+        //         updating: false,
+        //         reAuthrizeing: false
+        //     });
+        // }
         this.setState({
             swapSpeedMode: mode
         });
@@ -1370,24 +1431,6 @@ export default class LiquidityProvider extends PureComponent {
 <br/><br/>
 For example, selecting $100,000 means up $100,000 circulates to support SmartSwap liquidity" aria-hidden="true"></i></i></div>
                             <div className="bspMBX01">
-                                {/* <div className="bspSBX01">
-                                    <div className="LiproInput01 withLable01" style={{ marginTop: "12px" }}>
-                                        <span>$</span>
-                                        <input
-                                            type="text"
-                                            defaultValue=''
-                                            placeholder="Amount"
-                                            onChange={event => this.setState({ amountA: event.target.value })}
-                                            ref={(input) => this.amountA = input}
-                                        />
-                                    </div>
-                                    <br></br>
-                                    {this.state.errorMessage !== null && this.state.errorMessage.includes("amountA") &&
-                                        <div className="error-Msg" style={smallError}>
-                                            <label>{this.state.errorMessage}</label>
-                                        </div>
-                                    }
-                                </div> */}
                                 <div className="bspSBX01 fw">
                                     <div className="LiproDropdown">
                                         <button className='LiproDDbtn01' onClick={() => this.toggle(1)} >
@@ -1480,7 +1523,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 </div>
                             }
                         </div>
-                        <div className="LiProfSbox01  ">
+                        <div className="LiProfSbox01 ">
                             <div className="LiProLable d-flex">Choose the total amount you are authorizing the API to use<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The total amount includes the amount that will be send to your smart contract, the stable coin amount that will be left on your CEX account and the funds that will be use to place short order when needed." aria-hidden="true"></i></i></div>
                         </div>
                         <div className="LiProfSbox02">
@@ -1490,7 +1533,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     type="text"
                                     defaultValue=''
                                     placeholder="50000"
-                                    onChange={event => this.setState({ amountA: event.target.value })}
+                                    onChange={event => this.checkAmountA(event.target.value)}
                                     ref={(input) => this.amountA = input}
                                 />
                             </div>
@@ -1500,6 +1543,11 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     <label>{this.state.errorMessage}</label>
                                 </div>
                             }
+                            {this.state.clientSideError == true && (this.state.clientSideErrorMessage.amountA !== null) &&
+                                <div className="error-Msg" style={smallError}>
+                                    <label>{this.state.clientSideErrorMessage.amountA}</label>
+                                </div>
+                            }                                                            
                         </div>
                         <div className='spacerLine'></div>
 
@@ -1520,7 +1568,6 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         type="radio"
                                         id="spS01"
                                         name="s001"
-                                        // defaultChecked
                                         onChange={() => { this.updateSwapSpeedMode('UPFRONT'); }}
                                         checked={this.state.swapSpeedMode === 'UPFRONT'}
                                         ref={(input) => this.swapSpeedMode1 = input}
@@ -1543,7 +1590,6 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         type="radio"
                                         id="spS02"
                                         name="s002"
-                                        //defaultChecked
                                         onChange={() => { this.updateSwapSpeedMode('REALTIME'); }}
                                         checked={this.state.swapSpeedMode === 'REALTIME'}
                                         ref={(input) => this.swapSpeedMode2 = input}
@@ -1591,49 +1637,8 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
 
                         <div className='spacerLine'></div>
                         <div className="LiProfSbox03">
-                            {/* <div className="LiProTitle02">REPEAT</div> */}
                             <div className="LiProTitle02">PROFIT</div>
                         </div>
-
-                        {/* <div className='LiProFlexBX01 smFixer07'>
-                            <div className="LiProfSbox01">
-                                    <div className="LiProLable">Choose the amount of USDT allowed to use from Binance account 
-                                        <i className="help-circle">
-                                            <i 
-                                            className="fas fa-question-circle protip"
-                                            data-pt-position="top"
-                                            data-pt-title=""
-                                            aria-hidden="true">
-                                            </i>
-                                        </i>
-                                    </div>
-                            </div>
-                            <div className="LiProfSbox02">
-                                <div className="LiproInput01 withLable01" style={{ marginTop: "12px" }}>
-                                    <span>$</span>
-                                    <input
-                                        type="text"
-                                        defaultValue=''
-                                        placeholder="50000"
-                                        onChange={event => this.checkAmountA(event.target.value)}
-                                        ref={(input) => this.amountA = input}
-                                    />
-                                </div>
-                                <br></br>
-                                {this.state.errorMessage !== null && this.state.errorMessage.includes("amountA") &&
-                                    <div className="error-Msg" style={smallError}>
-                                        <label>{this.state.errorMessage}</label>
-                                    </div>
-                                }
-                                {this.state.clientSideError == true && (this.state.clientSideErrorMessage.amountA !== null) &&
-                                    <div className="error-Msg" style={smallError}>
-                                        <label>{this.state.clientSideErrorMessage.amountA}</label>
-                                    </div>
-                                }                                
-                            </div>
-                        </div> */}
-
-
                         <div className='LiProFlexBX01 smFixer07'>
                             <div className="LiProfSbox01">
                                 <div className="LiProLable">Choose the minimum that you want to gain on each swap <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Set a profit limit that triggers your funds for swapping. Take under consideration all costs such as exchange fees. 
@@ -1652,7 +1657,6 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     />
                                     <span>%</span>
                                 </div>
-                                {/* <div className="smlInfotxt01">[0.161754 BNB/ETH]</div> */}
                                 <br></br>
                                 {this.state.errorMessage !== null && this.state.errorMessage.includes("spProfitPercent") &&
                                     <div className="error-Msg" style={smallError}>
@@ -1682,7 +1686,6 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         ref={(input) => this.accumulateFundsLimit = input}
                                     />
                                 </div>
-                                {/* <div className="smlInfotxt02">Based on minimum 10% accumulation, expect to pay 10x gas cost  </div> */}
                                 <br></br>
                                 {this.state.errorMessage !== null && this.state.errorMessage.includes("accumulateFundsLimit") &&
                                     <div className="error-Msg" style={smallError}>
@@ -1691,28 +1694,6 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 }
                             </div>
                         </div>
-
-                        {/* <div className='LiProFlexBX01 smFixer07'>
-                            <div className="LiProfSbox01">
-                                <div className="LiProLable">Sell token B for token A on CEX using</div>
-                            </div>
-                            <div className="LiProfSbox02">
-                                <div className="gwFormSFormbox02">
-                                    <div className="md-radio md-radio-inline">
-                                        <input type="radio" id="radio145" name="stepin50" value="option146" /><label for="radio145">
-                                            Market<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text Here" aria-hidden="true"></i></i>
-                                        </label>
-                                    </div>
-
-                                    <div className="md-radio md-radio-inline">
-                                        <input type="radio" id="radio146" name="stepin50" value="option145" /><label for="radio146">
-                                            Limit<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text Here" aria-hidden="true"></i></i>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> */}
-
                         <div className='spacerLine'></div>
                         <div className="LiProfSbox03">
                             <div className="LiProTitle02">REPEAT</div>
@@ -1890,7 +1871,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     <div className='LiProformBTNbar'>
                                         <button
                                             onClick={this.connectWallet.bind(this)}
-                                        >DEPLOY SMART CONTRACT</button>
+                                        >CONNECT YOUR WALLET</button>
                                     </div>
                                 </div>)
 
@@ -1917,22 +1898,22 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                     </div>
 
                     <div className='spacerLine'></div>
-                    {/* {(this.state.confirmed === true) && */}
+                    {(this.state.confirmed === true) &&
                         <div>
-                            <div className="LiProTitle03">Below is your Swap Provider smart contract address
-                                {/* <span>Whitelist this smart contract address on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist the SmartSwap address below" aria-hidden="true"></i></i></span>
-                                <span>Whitelist this IP: 44.235.252.39 on your account on your CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Follow the instructions on your CEX to whitelist IP" aria-hidden="true"></i></i></span> */}
-                            </div>
-
-                            {/* step 1 */}
+                            <div className="LiProTitle03">Below is your Swap Provider smart contract address</div>
                             <div className="spContrlMBX spContrlMBX-n relative mt-30px-n">
                                 <div className="d-flex step-title-trans-n items-center-n ">
-                                    <span className="step-num-n">1</span>
-                                    <div className='spCountrlTitle01 spCountrlTitle01-n '>SEND  <span>{this.state.selectedTokenB} </span> {'<>'} RECEIVE <span>{this.state.selectedTokenA}</span></div>
+                                    <span className="step-num-n">&#62;</span>
+                                    <div className='spCountrlTitle01 spCountrlTitle01-n '>
+                                        SEND  <span>{this.state.selectedTokenB} </span> {'<>'} RECEIVE <span>{this.state.selectedTokenA}</span>
+                                        <div className='spContrlInfotxt mb-20px-n'>
+                                            Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")}
+                                        </div>
+                                    </div>
                                 </div>
                                 <span className="toggle-ic-n"><i class="fas fa-caret-up"></i></span>
                                 <div className="box-border-primary-n box-border-n text-center-n">
-                                    <div className="LiProLable">Open new API and whitelist the smart contract address on your account on you CEX <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="left" data-pt-title="Before you set an API, make sure first that your account has active trade Futures (some CEX asking users to sign on risk disclosure before it become active)
+                                    <div className="spContrlInfotxt02">Open new API and whitelist the smart contract address on your account on you CEX <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="left" data-pt-title="Before you set an API, make sure first that your account has active trade Futures (some CEX asking users to sign on risk disclosure before it become active)
                                     <br/><br/>
                                     Then go to the right API section to open new API and approve the follow restrictions:
                                     <br/><br/>
@@ -1942,7 +1923,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     4. Enable Withdrawals<br/>
                                     <br/>
                                     * in order to enable withdrawals some CEX will ask you to restrict access to trusted IP, in that case use the IP address 44.235.252.39 " aria-hidden="true"></i></i></div>
-                                    <div className="LiProLable">Restrict access to trusted IP: <span className="text-primary"> 44.235.252.39</span></div>
+                                    <div className="spContrlInfotxt02">Restrict access to trusted IP: <span className="text-primary"> 44.235.252.39</span></div>
                                 </div>
                                 <div className='spContrlInfotxt02 mb-20px-n'>YOUR SMART CONTRACT ADDRESS<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="To secure the API completely you need to whitelist your smart contract address under the Address Management which is usually placed on the Withdraw section.
                                 <br/><br/>
@@ -1958,33 +1939,40 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     <a href="javascript:void(0)" onClick={() => this.copyText(this.state.smartSwapContractAddress)} class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                                 </div>
                                 <div className='spContrlInfotxt mb-20px-n'>
-                                    Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")} - Balance: {this.state.spContractBal} {this.state.selectedTokenA} | ${this.state.spContractBalInUsd} USDT
+                                    Balance: {this.state.spContractBal} {this.state.selectedTokenA} | ${this.state.spContractBalInUsd} USDT
                                     <button className='withdrawButton' onClick={this.withdraw.bind(this)}>
-                                        <span>Withdraw all funds back to your CEX account</span>
+                                        <span>Withdraw all funds back to your Wallet</span>
                                     </button>
                                 </div>
                                 <div className='LiProFlexBX01 smFixer07 d-block-n'>
                                     <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">YOUR TOTAL AMOUNT YOU AUTHORIZED THE API TO USE<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
+                                        <div className="spContrlInfotxt02">YOUR TOTAL AMOUNT YOU AUTHORIZED THE API TO USE
+                                        <i className="help-circle">
+                                            <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The total amount includes the amount that will be send to your smart contract, the stable coin amount that will be left on your CEX account and the funds that will be use to place short order when needed." aria-hidden="true">
+                                            </i>
+                                        </i>
+                                        </div>
                                     </div>
                                     <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
-                                    <div className="LiproInput01 withLable01" style={{ marginTop: "12px" }}>
-                                        <span>$</span>
-                                        <input
-                                            type="text"
-                                            defaultValue=''
-                                            placeholder="50.000"
-                                            onChange={event => this.setState({ amountA: event.target.value })}
-                                            ref={(input) => this.amountA = input}
-                                        />
-                                    </div>
-                                        
-                                        <br></br>
-                                        {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") &&
-                                            <div className="error-Msg" style={smallError}>
-                                                <label>{this.state.errorMessage}</label>
-                                            </div>
-                                        }
+                                        <div className="LiproInput01 withLable01" style={{ marginTop: "12px" }}>
+                                            <span>$</span>
+                                            <input
+                                                type="text"
+                                                placeholder="50000"
+                                                defaultValue={this.state.amountA}
+                                                onChange={event => this.checkAmountA(event.target.value)}
+                                                ref={(input) => this.amountA = input}
+                                            />
+                                            <a href="javascript:void(0)" className="absolute-ic-n">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                        <br></br> 
+                                        {this.state.clientSideError == true && (this.state.clientSideErrorMessage.amountA !== null) &&
+                                        <div className="error-Msg" style={smallError}>
+                                            <label>{this.state.clientSideErrorMessage.amountA}</label>
+                                        </div>
+                                        }                                                                        
                                     </div>
                                 </div>
                                 <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
@@ -2014,11 +2002,10 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 <div className='spContrlInfotxt02'>
                                     CHANGE THE MINIMUM SPREAD YOU WANT TO GAIN ON EACH SWAP
                                     <i className="help-circle">
-                                        <i
-                                            className="fas fa-question-circle protip"
-                                            data-pt-position="top"
-                                            data-pt-title="Authorize more funds to gas and fees to keep your SP contract active."
-                                            aria-hidden="true"></i>
+                                        <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Set a profit limit that triggers your funds for swapping. Take under consideration all costs such as exchange fees. 
+                                <br/><br/>
+                                For example, you can choose that you want your funds to swap only if it's gain 0.5% profits. When you set the profit limit, take under consideration all the costs that you may pay to your CEX for such transaction short position, blockchain cost, (which by themselves can be range from 0.1 to 0.3% - depend on the CEX and network)." aria-hidden="true">
+                                        </i>
                                     </i>
                                 </div>
                                 <div className='spContrlSBX mb-20px-n'>
@@ -2044,46 +2031,52 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 </div>
                                 <div className='LiProFlexBX01 smFixer07 d-block-n'>
                                     <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">YOUR MINIMUM AMOUNT TO SWAP WITH<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
+                                        <div className="spContrlInfotxt02">YOUR MINIMUM AMOUNT TO SWAP WITH
+                                        <i className="help-circle">
+                                            <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Take under consideration, performing a swap costs gas and fees which are reimbursed via SMART" aria-hidden="true">
+                                            </i>
+                                        </i>
+                                    </div>
                                     </div>
                                     <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
-                                    <div className="LiproInput01 withLable01 input-with-ic-n"  style={{ marginTop: "12px" }}>
-                                        <span>$</span>
-                                        <input
-                                            type="text"
-                                            defaultValue=''
-                                            placeholder="50.000"
-                                            onChange={event => this.setState({ amountA: event.target.value })}
-                                            ref={(input) => this.amountA = input}
-                                        />
-                                        <a href="" className="absolute-ic-n">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    </div>
-                                        
-                                        <br></br>
-                                        {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") &&
-                                            <div className="error-Msg" style={smallError}>
-                                                <label>{this.state.errorMessage}</label>
-                                            </div>
-                                        }
+                                        <div className="LiproInput01 withLable01 input-with-ic-n"  style={{ marginTop: "12px" }}>
+                                            <span>$</span>
+                                            <input
+                                                type="text"
+                                                placeholder="100"
+                                                defaultValue={this.state.accumulateFundsLimit}                                            
+                                                onChange={event => this.setState({ accumulateFundsLimit: event.target.value })}
+                                                ref={(input) => this.accumulateFundsLimit = input}
+                                            />
+                                            <a href="javascript:void(0)" className="absolute-ic-n">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className='LiProFlexBX01 smFixer07 d-block-n'>
                                     <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">STOP REPEAT ON CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
+                                        <div className="spContrlInfotxt02">STOP REPEAT ON CEX 
+                                            <i className="help-circle">
+                                                <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="This option denotes how many transactions you approve as a Swap Provider. Once the limit is reached, the API stops performing any repeats. Once the repeat stops, there is no way to change the process besides deploying a new Swap Provider contract with new rules." aria-hidden="true">                                    
+                                                </i>
+                                            </i>
+                                        </div>
                                     </div>
                                     <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
                                         <div className="LiproInput01 input-with-ic-n">
                                             <input
                                                 type="text"
-                                                placeholder={this.state.cexApiKeyMasked !== null ? this.state.cexApiKeyMasked : 'Never stop'}
-                                                defaultValue=''
-                                                onChange={event => this.setState({ cexApiKey: event.target.value })}
-                                                ref={(input) => this.cexApiKey = input}
+                                                placeholder=""
+                                                defaultValue={
+                                                    this.state.stopRepeatsMode == 3 ? 'Never stop' 
+                                                    : this.state.stopRepeatsMode == 1 ? "On date: " + DateFormat(this.state.stopRepeatsOnDate, "mmmm dS, yyyy, h:MM:ssTT")
+                                                    : 'After ' + this.state.stopRepeatsAfterCalls + ' repeats'}
+                                                //onChange={event => this.setState({ cexApiKey: event.target.value })}
+                                                //ref={(input) => this.cexApiKey = input}
                                             />
-                                            <a href="" className="absolute-ic-n">
-                                                <i class="fas fa-edit"></i>
+                                            <a href="javascript:void(0)" className="absolute-ic-n">
+                                                <i class="fas fa-edit" onClick={() => this.toggleStopRepeatsSection()}></i>
                                             </a>
                                         </div>
                                         <br></br>
@@ -2093,9 +2086,89 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                             </div>
                                         }
                                     </div>
+                                    {(this.state.toggleStopRepeatsSection) &&
+                                    <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
+                                        <div className='LipRadioFix01'>
+                                            <div className="md-radio md-radio-inline">
+                                                <input
+                                                    type="radio"
+                                                    id="s01"
+                                                    name="s11"
+                                                    value="s01"
+                                                    onChange={event => this.setState({ stopRepeatsMode: 1 })}
+                                                    checked={this.state.stopRepeatsMode === 1}
+                                                    ref={(input) => this.stopRepeatsMode1 = input}
+                                                />
+                                                <label htmlFor="s01"></label>
+                                            </div>
+                                            <div className='LiProFlexBX01 padFixer01'>
+                                                <div className="LiproInput01">
+                                                    <DatePicker
+                                                        selected={this.state.stopRepeatsOnDate}
+                                                        onChange={(date) => this.setState({ stopRepeatsOnDate: date })}
+                                                        peekNextMonth
+                                                        showMonthDropdown
+                                                        showYearDropdown
+                                                        dropdownMode="select"
+                                                        dateFormat="dd/MM/yyyy"
+                                                        ref={(input) => this.stopRepeatsOnDate = input}
+                                                    />
+                                                    <i class="fas fa-calendar-alt FlyICO"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='LipRadioFix01' >
+                                            <div className="md-radio md-radio-inline ">
+                                                <input
+                                                    type="radio"
+                                                    id="s02"
+                                                    name="s11"
+                                                    value="s02"
+                                                    onChange={event => this.setState({ stopRepeatsMode: 2 })}
+                                                    checked={this.state.stopRepeatsMode === 2}
+                                                    ref={(input) => this.stopRepeatsMode2 = input}
+                                                />
+                                                <label htmlFor="s02"></label>
+                                            </div>
+                                            <div className="LiProFlexBX01 padFixer01">
+                                                <div className="LiproInput01 withLable02">
+                                                    <input
+                                                        type="text"
+                                                        value={this.state.stopRepeatsAfterCalls}
+                                                        onChange={event => this.setState({ stopRepeatsAfterCalls: event.target.value })}
+                                                        ref={(input) => this.stopRepeatsAfterCalls = input}
+                                                    />
+                                                    {/* <div className="FlyICO02">Days</div> */}
+                                                    <span>Repeats</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='LipRadioFix01' >
+                                            <div className="md-radio md-radio-inline ">
+                                                <input
+                                                    type="radio"
+                                                    id="s03"
+                                                    name="s11"
+                                                    value="s03"
+                                                    onChange={event => this.setState({ stopRepeatsMode: 3 })}
+                                                    checked={this.state.stopRepeatsMode === 3}
+                                                    ref={(input) => this.stopRepeatsMode3 = input}
+                                                />
+                                                <label htmlFor="s03"></label>
+                                            </div>
+                                            <div className="LiProFlexBX01 padFixer01">
+                                                <div className="LipRTitle01">Never stop<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Run SP repeats non-stop as long as there is funds available in your CEX account." aria-hidden="true"></i></i></div>
+                                            </div>
+                                        </div>
+                                    </div>                                    
+                                    }
                                 </div>
-                                <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED<i className="help-circle">
-                                    <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text " aria-hidden="true"></i></i>
+                                <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED
+                                    <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="right" data-pt-title="The Smart swap using a matcher to match between users to users and if there are no users available, between users to swap providers (SP). the matcher taking under consideration, which SP can complete the swap fully, faster and cheaper. 
+                                <br/><br/>
+                                SP can hold stable coin (USDT) on their controlled CEX account, which will be trigger by API to buy in real time tokens and send over to the SP's smarts contact which will be  use as a counterparty to other users. same exchange processing withdraw after few long minutes and also each blockchain network as different proccing speed, those facts can put some SP with holding upfront tokens on their smart contract with advantage over other SP that requires to buy those tokens and then send them over.
+                                <br/><br/>
+                                As a SP you can choose if you want to send tokens to your smart contract in real time, or if you want to act faster by depositing tokens upfront to to your smart contract." aria-hidden="true"></i></i>                                
                                 </div>
                                 <div className='spscFix01 d-flex'>
                                     <div className="LiProfSbox01 pr-20px">
@@ -2113,7 +2186,11 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                                 <label htmlFor="spS03"></label>
                                             </div>
                                             <div className="LiProFlexBX01 padFixer01">
-                                                <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
+                                                <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="right" data-pt-title="This option required from you hold upfront 45% of the sell token in the smart contract, and another 55% as stable coin (USDT) on your centralized account (that 55% will be used to buy the sell tokens in real time and placing a short order against the receiving token to secure it's face value from volatility).
+                                    <br/><br/>
+                                    Once you will deploy your smart contract, you will need to deposit directly to your smart contract address the 45% the funds as tokens that you want to sell. 
+                                    <br/><br/>
+                                    For example if you want to and you are looking to gain profit of 0.05% as a spread. in exchange for ETH and you are looking to gain profit of 0.05% as a spread, you will need to deposit $45,000 of BNB to your smart contract, so users that buying those BNB will get those tokens instantly without waiting for your centralized account to send it over to the smart contract (which can takes few long minutes). Wen swaps take place your CEX account will be trigger to buy in real time new BNB at the best price in the exchange and then send them to feed back your smart contract, while on the same time the smartswap will send to your CEX account $45,225 of ETH (which is the same amount plus the spread that you agree to), then the API will open a short position to make sure those ETH will be sold back to stablecoins without any lost to volatility." aria-hidden="true"></i></i></div>
                                             </div>
                                         </div>
                                     </div>
@@ -2134,28 +2211,33 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                             </div>
                                             <div className="LiProFlexBX01 padFixer01">
                                                 <div className="LipRTitle01">
-                                                    Deposit token A to the smart contract in real time<i className="help-circle">
-                                                        <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i>
+                                                    Deposit token A to the smart contract in real time
+                                                    <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Selecting this option allows zero up front tokens and 100% of your funds may wait as stablecoins (USDT) on your centralized exchange account. Once your account is triggered to provide liquidity to SmartSwap, the controlled account uses the authorized stablecoin account to buy the tokens and send them to your smart contract address.
+                                    <br/><br/>
+                                    N.B. The process to send tokens from centralized  exchange accounts to your smart contract may take few minutes depending on the exchange and the speed of network. Therefore, the SmartSwap may choose other SPs over you which have tokens available on their smart contract already and can execute the swap faster for the end user." aria-hidden="true"></i></i>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="spacerLine"></div>
-                                <div className="LiProLable mb-30px-n pt-20px">After creating an API on your CEX update here the API and Secret key</div>
+                                <div className="spContrlInfotxt02 mb-30px-n pt-20px">After creating an API on your CEX update here the API and Secret key</div>
                                 <div className='LiProFlexBX01 smFixer07 d-block-n'>
                                     <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">API Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
+                                        <div className="spContrlInfotxt02">API Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
                                     </div>
                                     <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
                                         <div className="LiproInput01">
                                             <input
                                                 type="text"
-                                                placeholder={this.state.cexApiKeyMasked !== null ? this.state.cexApiKeyMasked : 'Your Cex API Key'}
-                                                defaultValue=''
-                                                onChange={event => this.setState({ cexApiKey: event.target.value })}
+                                                defaultValue={this.state.cexApiKeyMasked !== null ? this.state.cexApiKeyMasked : 'Your Cex API Key'}
+                                                onChange={event => this.setState({ cexApiKey: event.target.value})}
                                                 ref={(input) => this.cexApiKey = input}
+                                                readOnly={this.state.cexApiKeyEditable}
                                             />
+                                            <a href="javascript:void(0)" className="absolute-ic-n">
+                                                <i class="fas fa-times" onClick={() => this.clearKeys('key')}></i>
+                                            </a>
                                         </div>
                                         <br></br>
                                         {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") &&
@@ -2167,17 +2249,20 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 </div>
                                 <div className='LiProFlexBX01 smFixer07 d-block-n '>
                                     <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">Secret Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific Secret Key to the CEX of your choice" aria-hidden="true"></i></i></div>
+                                        <div className="spContrlInfotxt02">Secret Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific Secret Key to the CEX of your choice" aria-hidden="true"></i></i></div>
                                     </div>
                                     <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
                                         <div className="LiproInput01">
                                             <input
                                                 type="text"
-                                                placeholder={this.state.cexApiSecretMasked !== null ? this.state.cexApiSecretMasked : 'Your Cex API Secret'}
-                                                defaultValue=''
-                                                onChange={event => this.setState({ cexApiSecret: event.target.value })}
+                                                defaultValue={this.state.cexApiSecretMasked !== null ? this.state.cexApiSecretMasked : 'Your Cex API Secret'}
+                                                onChange={event => this.setState({ cexApiSecret: event.target.value})}
                                                 ref={(input) => this.cexApiSecret = input}
+                                                readOnly={this.state.cexApiSecretEditable}
                                             />
+                                            <a href="javascript:void(0)" onClick={() => this.clearKeys('secret')} className="absolute-ic-n">
+                                                <i class="fas fa-times"></i>
+                                            </a>                                             
                                         </div>
                                         <br></br>
                                         {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiSecret") &&
@@ -2194,9 +2279,14 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         (this.state.web3 !== null || constantConfig.tokenDetails[this.state.selectedTokenA].networkId === web3Config.getNetworkId())
                                         && this.state.isActiveContractExist === true) {
                                         return (
-                                            <div className="LiProfSbox03 ">
-                                                <div className='LiProformBTNbar mx-100 mb-30px-n'>
-                                                    <button onClick={this.updateAPIdata.bind(this)} disabled={this.state.updating || this.state.testPassed}>
+                                            <div className="LiProfSbox03">
+                                                <div className={this.state.updated ? 'LiProformBTNbar mx-100 mb-30px-n btn-dark' : 'LiProformBTNbar mx-100 mb-30px-n'}>
+
+                                                    <button onClick={() => this.updateContract()} disabled={this.state.updating || this.state.updated}>
+                                                        {(this.state.updated) &&
+                                                            <i className="fa fa-check" aria-hidden="true"></i>
+                                                        }
+                                                        &nbsp;
                                                         {this.state.updateButtonText}
                                                         {this.state.loadingIcon === true &&
                                                             <LoopCircleLoading
@@ -2235,45 +2325,15 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.tests !== null && this.state.tests.binanceApiKeysCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Check API key
+                                        &nbsp;Check CEX API key & API Secret set
                                     </div>
                                 </div>
                                 <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceApiKeysCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Check Secret key
-                                    </div>
-                                </div>
-                                <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceSpAddressWhiteListCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Check whitelisted smart contract address on CEX for withdraw
-                                    </div>
-                                </div>
-                                <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceIpWhiteListCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Check IP whitelisted on CEX for withdraw
-                                    </div>
-                                </div>
-                                <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceWithdrawEnabledCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Check enabled withdraw on CEX
-                                    </div>
-                                </div>  
-                                <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceWithdrawEnabledCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Check enabled future on CEX
-                                    </div>
-                                </div>  
-                                {/* <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.tests !== null && this.state.tests.binanceApiValidateCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Check Cex Valid API key and secret
+                                        &nbsp;Check CEX Valid API key and secret
                                     </div>
-                                </div> */}
+                                </div>
                                 <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.tests !== null && this.state.tests.binanceAccountCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
@@ -2288,356 +2348,49 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 </div>
                                 <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceAccountCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Test trading for peer ETH &lt;&gt; BNB
-                                    </div>
-                                </div>
-                                {/* <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.tests !== null && this.state.tests.binanceTransferCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                         &nbsp;Test moving USDT funds between spot and future account on CEX
                                     </div>
+                                </div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceSpAddressWhiteListCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check whitelisted smart contract address on CEX for withdraw
+                                    </div>
+                                </div>
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceIpWhiteListCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check IP whitelisted on CEX for withdraw
+                                    </div>
                                 </div>                                
-                                                                                              
+                                <div className='LiProFlexBX01'>
+                                    <div className='spContrlInfotxt02 test-suite'>
+                                        <i className={this.state.tests !== null && this.state.tests.binanceWithdrawEnabledCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                        &nbsp;Check enabled withdraw on CEX
+                                    </div>
+                                </div>                                                                
                                 <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.tests !== null && this.state.tests.binanceWithdrawCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Test moving funds between spot and swap provider contract address
-                                    </div>
-                                </div> */}
-                                <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceTransferCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Test moving funds on CEX between spot and future
-                                    </div>
-                                </div>                                
-                                                                                              
-                                <div className='LiProFlexBX01'>
-                                    <div className='spContrlInfotxt02 test-suite'>
-                                        <i className={this.state.tests !== null && this.state.tests.binanceWithdrawCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;Test moving fund between spot and smart contract address
+                                        &nbsp;Test moving fund between spot and swap provider contract address
                                     </div>
                                 </div>
                                 <div className='spacerLine'></div>
                                 <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.testPassed == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                        &nbsp;{this.state.testPassed == true ? 'Your Swap provider is completed successfully' : 'You must pass all the tests to become an active swap provider.'}
-                                    </div>
-                                    <div className='spContrlInfotxt02 test-suite text-primary'>
-                                        <i className='test-true fa fa-check' aria-hidden="true"></i>
-                                        &nbsp;Your Swap provider is completed successfully
+                                        &nbsp;{this.state.testPassed == true ? 'Swap provider has been successfully activated.' : 'You must pass all the tests to become an active swap provider.'}
                                     </div>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <button className='repeatTestsButton' disabled={this.state.testPassed} onClick={this.repeatTests.bind(this)}>
                                             <span>Repeat the SP checking</span>
                                         </button>
                                     </div>                                    
-                                </div>  
+                                </div>    
                             </div>
-
-                            {/* step 2 */}
-                            <div className="spContrlMBX spContrlMBX-n relative mt-30px-n">
-                                <div className="d-flex step-title-trans-n items-center-n ">
-                                    <span className="step-num-n">2</span>
-                                    <div className='spCountrlTitle01 spCountrlTitle01-n '>SEND <span>{this.state.selectedTokenA}</span> {'<>'} RECEIVE <span>{this.state.selectedTokenB}</span></div>
-                                </div>
-                                <span className="toggle-ic-n"><i class="fas fa-caret-up"></i></span>
-                                <div className="box-border-primary-n box-border-n text-center-n">
-                                    <div className="LiProLable">Open new API and whitelist the smart contract address on your account on you CEX <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="left" data-pt-title="Before you set an API, make sure first that your account has active trade Futures (some CEX asking users to sign on risk disclosure before it become active)
-                                    <br/><br/>
-                                    Then go to the right API section to open new API and approve the follow restrictions:
-                                    <br/><br/>
-                                    1. Enable Reading<br/>
-                                    2. Enable Spot & Margin Trading<br/>
-                                    3. Enable Futures<br/>
-                                    4. Enable Withdrawals<br/>
-                                    <br/>
-                                    * in order to enable withdrawals some CEX will ask you to restrict access to trusted IP, in that case use the IP address 44.235.252.39 " aria-hidden="true"></i></i></div>
-                                    <div className="LiProLable">Restrict access to trusted IP: <span className="text-primary"> 44.235.252.39</span></div>
-                                </div>
-                                <div className='spContrlInfotxt02 mb-20px-n'>YOUR SMART CONTRACT ADDRESS<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="To secure the API completely you need to whitelist your smart contract address under the Address Management which is usually placed on the Withdraw section.
-                                <br/><br/>
-                                Your smart contract address is your withdrawal Address.
-                                <br/><br/>
-                                Authorize your withdrawal Address to withdrawal only the token that you are selling. for example if you selling BNB, choose the BNB as a coin the and the BSC as the Network" aria-hidden="true"></i></i></div>
-                                <div className='spContrlInputBX'>
-                                    <input type="text"
-                                        placeholder={"Your contract address for " + this.state.selectedTokenA}
-                                        value={this.state.smartSwapContractAddress} 
-                                        readOnly={true}
-                                    />
-                                    <a href="javascript:void(0)" onClick={() => this.copyText(this.state.smartSwapContractAddress)} class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
-                                </div>
-                                <div className='spContrlInfotxt mb-20px-n'>
-                                    Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")} - Balance: {this.state.spContractBal} {this.state.selectedTokenA} | ${this.state.spContractBalInUsd} USDT
-                                    <button className='withdrawButton' onClick={this.withdraw.bind(this)}>
-                                        <span>Withdraw all funds back to your CEX account</span>
-                                    </button>
-                                </div>
-                                <div className='LiProFlexBX01 smFixer07 d-block-n'>
-                                    <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">YOUR TOTAL AMOUNT YOU AUTHORIZED THE API TO USE<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
-                                    </div>
-                                    <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
-                                    <div className="LiproInput01 withLable01" style={{ marginTop: "12px" }}>
-                                        <span>$</span>
-                                        <input
-                                            type="text"
-                                            defaultValue=''
-                                            placeholder="50.000"
-                                            onChange={event => this.setState({ amountA: event.target.value })}
-                                            ref={(input) => this.amountA = input}
-                                        />
-                                    </div>
-                                        
-                                        <br></br>
-                                        {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") &&
-                                            <div className="error-Msg" style={smallError}>
-                                                <label>{this.state.errorMessage}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                                <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
-                                <div className='spContrlSBX'>
-
-                                    <div className='spContrlSSBX01'>
-                                        <div className="dragorInput v2">
-                                            <InputRange
-                                                step={this.state.minStepForGasAndFeeAmount}
-                                                maxValue={this.state.maxGasAndFeeAmount}
-                                                minValue={this.state.minGasAndFeeAmount}
-                                                value={this.state.gasAndFeeAmount}
-                                                formatLabel={value => this.state.selectedTokenA + ` ${value}`}
-                                                onChange={value => this.setState({ gasAndFeeAmount: value })} />
-                                        </div>
-                                    </div>
-                                    <div className='spContrlSSBX02'>
-                                        <button
-                                            className='spContrlBTN01'
-                                            onClick={this.reAuthrizeFeeAndGasLimit.bind(this)}
-                                            disabled={this.state.reAuthrizeing}>
-                                            AUTHORIZE NEW LIMIT
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className='spContrlInfotxt02'>
-                                    CHANGE THE MINIMUM SPREAD YOU WANT TO GAIN ON EACH SWAP
-                                    <i className="help-circle">
-                                        <i
-                                            className="fas fa-question-circle protip"
-                                            data-pt-position="top"
-                                            data-pt-title="Authorize more funds to gas and fees to keep your SP contract active."
-                                            aria-hidden="true"></i>
-                                    </i>
-                                </div>
-                                <div className='spContrlSBX mb-20px-n'>
-                                    <div className='spContrlSSBX01'>
-                                        <div className="dragorInput v2">
-                                            <InputRange
-                                                step={0.05}
-                                                maxValue={1}
-                                                minValue={0}
-                                                value={this.state.spProfitPercent}
-                                                formatLabel={value => `${Number(value).toFixed(2)}%`}
-                                                onChange={value => this.setState({ spProfitPercent: value })} />
-                                        </div>
-                                    </div>
-                                    <div className='spContrlSSBX02'>
-                                        <button
-                                            className='spContrlBTN01'
-                                            onClick={this.reAuthrizeSpreadLimit.bind(this)}
-                                            disabled={this.state.reAuthrizeing}>
-                                            AUTHORIZE NEW SPREAD
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className='LiProFlexBX01 smFixer07 d-block-n'>
-                                    <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">YOUR MINIMUM AMOUNT TO SWAP WITH<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
-                                    </div>
-                                    <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
-                                    <div className="LiproInput01 withLable01 input-with-ic-n"  style={{ marginTop: "12px" }}>
-                                        <span>$</span>
-                                        <input
-                                            type="text"
-                                            defaultValue=''
-                                            placeholder="50.000"
-                                            onChange={event => this.setState({ amountA: event.target.value })}
-                                            ref={(input) => this.amountA = input}
-                                        />
-                                        <a href="" className="absolute-ic-n">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    </div>
-                                        
-                                        <br></br>
-                                        {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") &&
-                                            <div className="error-Msg" style={smallError}>
-                                                <label>{this.state.errorMessage}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                                <div className='LiProFlexBX01 smFixer07 d-block-n'>
-                                    <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">STOP REPEAT ON CEX<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
-                                    </div>
-                                    <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
-                                        <div className="LiproInput01 input-with-ic-n">
-                                            <input
-                                                type="text"
-                                                placeholder={this.state.cexApiKeyMasked !== null ? this.state.cexApiKeyMasked : 'Never stop'}
-                                                defaultValue=''
-                                                onChange={event => this.setState({ cexApiKey: event.target.value })}
-                                                ref={(input) => this.cexApiKey = input}
-                                            />
-                                            <a href="" className="absolute-ic-n">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                        </div>
-                                        <br></br>
-                                        {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") &&
-                                            <div className="error-Msg" style={smallError}>
-                                                <label>{this.state.errorMessage}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                                <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED<i className="help-circle">
-                                    <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text " aria-hidden="true"></i></i>
-                                </div>
-                                <div className='spscFix01 d-flex'>
-                                    <div className="LiProfSbox01 pr-20px">
-                                        <div className='LipRadioFix01'>
-                                            <div className="md-radio md-radio-inline ">
-                                                <input
-                                                    type="radio"
-                                                    id="spS03"
-                                                    name="s003"
-                                                    //defaultChecked
-                                                    onChange={() => { this.updateSwapSpeedMode('UPFRONT'); }}
-                                                    checked={this.state.swapSpeedMode === 'UPFRONT'}
-                                                    ref={(input) => this.swapSpeedMode3 = input}
-                                                />
-                                                <label htmlFor="spS03"></label>
-                                            </div>
-                                            <div className="LiProFlexBX01 padFixer01">
-                                                <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="LiProfSbox02 pl-20px">
-                                        <div className='LipRadioFix01' >
-                                            <div className="md-radio md-radio-inline ">
-                                                <input
-                                                    type="radio"
-                                                    id="spS04"
-                                                    name="s004"
-                                                    //defaultChecked
-                                                    onChange={() => { this.updateSwapSpeedMode('REALTIME'); }}
-                                                    checked={this.state.swapSpeedMode === 'REALTIME'}
-                                                    ref={(input) => this.swapSpeedMode4 = input}
-                                                    disabled="true"
-                                                />
-                                                <label htmlFor="spS04"></label>
-                                            </div>
-                                            <div className="LiProFlexBX01 padFixer01">
-                                                <div className="LipRTitle01">
-                                                    Deposit token A to the smart contract in real time<i className="help-circle">
-                                                        <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="spacerLine"></div>
-                                <div className="LiProLable mb-30px-n pt-20px">After creating an API on your CEX update here the API and Secret key</div>
-                                <div className='LiProFlexBX01 smFixer07 d-block-n'>
-                                    <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">API Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
-                                    </div>
-                                    <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
-                                        <div className="LiproInput01">
-                                            <input
-                                                type="text"
-                                                placeholder={this.state.cexApiKeyMasked !== null ? this.state.cexApiKeyMasked : 'Your Cex API Key'}
-                                                defaultValue=''
-                                                onChange={event => this.setState({ cexApiKey: event.target.value })}
-                                                ref={(input) => this.cexApiKey = input}
-                                            />
-                                        </div>
-                                        <br></br>
-                                        {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiKey") &&
-                                            <div className="error-Msg" style={smallError}>
-                                                <label>{this.state.errorMessage}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                                <div className='LiProFlexBX01 smFixer07 d-block-n '>
-                                    <div className="LiProfSbox01 w-100-n mb-20px-n">
-                                        <div className="LiProLable">Secret Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific Secret Key to the CEX of your choice" aria-hidden="true"></i></i></div>
-                                    </div>
-                                    <div className="LiProfSbox02 w-100-n pl-0px-n mb-10px-n">
-                                        <div className="LiproInput01">
-                                            <input
-                                                type="text"
-                                                placeholder={this.state.cexApiSecretMasked !== null ? this.state.cexApiSecretMasked : 'Your Cex API Secret'}
-                                                defaultValue=''
-                                                onChange={event => this.setState({ cexApiSecret: event.target.value })}
-                                                ref={(input) => this.cexApiSecret = input}
-                                            />
-                                        </div>
-                                        <br></br>
-                                        {this.state.errorMessage !== null && this.state.errorMessage.includes("cexApiSecret") &&
-                                            <div className="error-Msg" style={smallError}>
-                                                <label>{this.state.errorMessage}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-
-
-                                {(() => {
-                                    if (
-                                        (this.state.web3 !== null || constantConfig.tokenDetails[this.state.selectedTokenA].networkId === web3Config.getNetworkId())
-                                        && this.state.isActiveContractExist === true) {
-                                        return (
-                                            <div className="LiProfSbox03 ">
-                                                <div className='LiProformBTNbar mx-100 mb-30px-n'>
-                                                    <button onClick={this.updateAPIdata.bind(this)} disabled={this.state.updating || this.state.testPassed}>
-                                                        {this.state.updateButtonText}
-                                                        {this.state.loadingIcon === true &&
-                                                            <LoopCircleLoading
-                                                                height={'20px'}
-                                                                width={'20px'}
-                                                                color={'#ffffff'}
-                                                            />
-                                                        }
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                }
-                                )()}
-
-                               
-                        
-                                <div className='LiProformBTNbar btn-dark mx-100 mb-30px-n'>
-                                <button>
-                                    <i class="fa fa-check" aria-hidden="true"></i> CONTRACT UPDATED SUCCESSFULLY
-                                </button>
-                            </div> 
-                            </div>
-                            
-                            
-                            
                         </div>
-                    // }
+                    }
                 </div>
                 <a href="javascript:void(0);" onClick={() => { this.props.closePopup("LiquidityProvider") }} className="close-Icon"></a>
             </div>
