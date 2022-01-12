@@ -87,7 +87,9 @@ export default class LiquidityProvider extends PureComponent {
             },
             tests: null,
             testPassed: false,
-            testing: false
+            testing: false,
+            contractSideA: null,
+            contractSideB: null 
         }
     }
 
@@ -733,7 +735,9 @@ export default class LiquidityProvider extends PureComponent {
                             cexApiKey: obj.cexData.key,
                             cexApiKeyEditable: true,
                             cexApiSecret: obj.cexData.secret,
-                            cexApiSecretEditable: true
+                            cexApiSecretEditable: true,
+                            contractSideA: obj.networkId == this.state.coinList['ETH']['networkId'] ? 'ETH' : 'BNB',
+                            contractSideB: obj.networkId == this.state.coinList['ETH']['networkId'] ? 'BNB' : 'ETH'
                         });
 
                         if(obj.stopRepeats.mode == 1){
@@ -751,8 +755,13 @@ export default class LiquidityProvider extends PureComponent {
                             })
                         }
 
-                        this.inputMask('key', obj.cexData.key);
-                        this.inputMask('secret', obj.cexData.secret);
+                        if(obj.cexData.key !== null){
+                            this.inputMask('key', obj.cexData.key);
+                        }
+                        
+                        if(obj.cexData.secret !== null){
+                            this.inputMask('secret', obj.cexData.secret);
+                        }
 
                         // this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
                         // this.dispatchEventHandler(this.walletAddressToReceive, obj.walletAddresses.toReceive);
@@ -1905,7 +1914,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 <div className="d-flex step-title-trans-n items-center-n ">
                                     <span className="step-num-n">&#62;</span>
                                     <div className='spCountrlTitle01 spCountrlTitle01-n '>
-                                        SEND  <span>{this.state.selectedTokenB} </span> {'<>'} RECEIVE <span>{this.state.selectedTokenA}</span>
+                                        SEND  <span>{this.state.contractSideA} </span> {'<>'} RECEIVE <span>{this.state.contractSideB}</span>
                                         <div className='spContrlInfotxt mb-20px-n'>
                                             Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")}
                                         </div>
@@ -1939,7 +1948,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     <a href="javascript:void(0)" onClick={() => this.copyText(this.state.smartSwapContractAddress)} class="LicCopyBTN v2"><i class="fas fa-copy"></i></a>
                                 </div>
                                 <div className='spContrlInfotxt mb-20px-n'>
-                                    Balance: {this.state.spContractBal} {this.state.selectedTokenA} | ${this.state.spContractBalInUsd} USDT
+                                    Balance: {this.state.spContractBal} {this.state.contractSideA} | ${this.state.spContractBalInUsd} USDT
                                     <button className='withdrawButton' onClick={this.withdraw.bind(this)}>
                                         <span>Withdraw all funds back to your Wallet</span>
                                     </button>
@@ -1985,7 +1994,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                                 maxValue={this.state.maxGasAndFeeAmount}
                                                 minValue={this.state.minGasAndFeeAmount}
                                                 value={this.state.gasAndFeeAmount}
-                                                formatLabel={value => this.state.selectedTokenA + ` ${value}`}
+                                                formatLabel={value => this.state.contractSideA + ` ${value}`}
                                                 onChange={value => this.setState({ gasAndFeeAmount: value })} />
                                         </div>
                                     </div>
