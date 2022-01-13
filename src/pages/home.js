@@ -582,7 +582,7 @@ export default class Home extends PureComponent {
           // console.log(res.data)
           let result = res.data;
           console.log(result);
-          if (result.data.claimStatus === "CLAIMED" && result.data.status === "FULFILLED") {
+          if (result.data.status === "FULFILLED" && result.data.relationship.claim.approveHash !== null) {
             console.log(result.data);
             // if (result.data.length > 0) {
             //     result.data.map((ele) => {
@@ -1754,26 +1754,27 @@ export default class Home extends PureComponent {
           element["recivedAmount"] = Number(element["recivedAmount"]) + Number(rcAmount);
         })
 
-        userTxsUI.push(
-          // <LedgerHistory />
-          <LedgerHistory
-            sentAmount={web3Js.utils.fromWei(element.processAmount)}
-            sentCurrency={element.sentCurrency}
-            sentAPrice={element.sentAPrice}
-            sentTx={element.txHash}
-            sentTxLink={element.sentTxLink}
-            filledBprice={element.filledBprice}
-            recivedAmount={element.recivedAmount}
-            recivedCurrency={element.recivedCurrency}
-            oracleTx={element.oracleTx}
-            recivedTxLink={element.recivedTxLink}
-            sentTxTime={sentTxTime.toString()}
-            recivedTxTime={recivedTxTime.toString()}
-            filledAprice={element.filledAprice}
-            expedite={this.expedite}
-          />
-        );
-        if (element.relationship.claim.approveHash === undefined || element.relationship.claim.approveHash === null) {
+        if (element.status === "FULFILLED" && element.relationship.claim.approveHash !== null) {
+          userTxsUI.push(
+            // <LedgerHistory />
+            <LedgerHistory
+              sentAmount={web3Js.utils.fromWei(element.processAmount)}
+              sentCurrency={element.sentCurrency}
+              sentAPrice={element.sentAPrice}
+              sentTx={element.txHash}
+              sentTxLink={element.sentTxLink}
+              filledBprice={element.filledBprice}
+              recivedAmount={element.recivedAmount}
+              recivedCurrency={element.recivedCurrency}
+              oracleTx={element.oracleTx}
+              recivedTxLink={element.recivedTxLink}
+              sentTxTime={sentTxTime.toString()}
+              recivedTxTime={recivedTxTime.toString()}
+              filledAprice={element.filledAprice}
+              expedite={this.expedite}
+            />
+          );
+        } else {
           userPendingTxsUI.push(
             // <LedgerHistory />
             <LedgerHistory
