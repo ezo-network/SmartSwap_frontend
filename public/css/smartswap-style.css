@@ -6961,3 +6961,22 @@ a.LicSBTN01:hover {
 .ppAboutText01{
   text-align: left;
 }
+
+p.withdrawOnContractAlert {
+  color: #f43436;
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.withdrawSlider .dragorInput .input-range__track {
+  background: rgb(33 33 33);
+}
+.withdrawSlider .input-range__track.input-range__track--active {
+  width: 45% !important;
+  border-right: 3px solid black;
+  background: #43385d;
+}

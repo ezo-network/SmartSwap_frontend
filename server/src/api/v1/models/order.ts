@@ -29,7 +29,8 @@ export interface IOrder extends Document {
     type: string,
     withdraw: BinanceWithdrawOrder,
     spot: BinanceSpotOrder,
-    message: string
+    message: string,
+    status: string
 };
 
 
@@ -129,6 +130,13 @@ const Order: Schema = new mongoose.Schema({
         uppercase: true,
         default: ''
     },
+    status: {
+        type: String,
+        required: true,
+        default: 'PENDING',
+        enum : ['PENDING', 'COMPLETED', 'FAILED'],
+        uppercase: true        
+    }
 }, {
     timestamps: true, toJSON: {getters: true}
 });

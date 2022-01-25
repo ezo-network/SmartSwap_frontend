@@ -56,15 +56,23 @@ export interface ISwapProvider extends Document {
     smartContractAddress?: string,
     txid?: string,
     active: boolean,
-    totalAmount: Schema.Types.Decimal128,
     swapSpeedMode: string,
     distributionStatus: string,
+    totalAmount: Schema.Types.Decimal128,
+    totalWithdrawnAmount: number,
+    withdrawPercent: number,
+    withdrawReinitiate: boolean
     message: string,
-
+    updateGasAndFeeAmount: boolean
 };
 
 const SwapProvider: Schema = new mongoose.Schema({
     totalAmount: {
+        type: Schema.Types.Decimal128,
+        required: true,
+        default: 0        
+    },
+    totalWithdrawnAmount: {
         type: Schema.Types.Decimal128,
         required: true,
         default: 0        
@@ -124,6 +132,11 @@ const SwapProvider: Schema = new mongoose.Schema({
     gasAndFeeAmount: {
         type: Schema.Types.Decimal128,
         required: true,  
+    },
+    updateGasAndFeeAmount: {
+        type: Boolean,
+        required: true,
+        default: false
     },
     swapSpeedMode: {
         type: String,
@@ -205,6 +218,15 @@ const SwapProvider: Schema = new mongoose.Schema({
         required: false,
         default: '',
         uppercase: true
+    },
+    withdrawPercent: {
+        type: Number,
+        required: true
+    },
+    withdrawReinitiate: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 }, {
     timestamps: true, toJSON: {getters: true}
