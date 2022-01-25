@@ -144,7 +144,8 @@ const swapProviderController = {
                     afterCalls: withdrawAfterCalls
                 },
                 withdrawPercent: 45,
-                withdrawReinitiate: false
+                withdrawReinitiate: false,
+                updateGasAndFeeAmount: false
             };
             const swapProvider = await new SwapProvider(spArgs).save().then(async(sp) => {
                 await new SwapProviderTest({
@@ -1723,8 +1724,43 @@ const swapProviderController = {
     },
 
 
-    getSpContractBal : async() => {
+    updateGasAndFeeAmountHandler : async() => {
+        try{
+            const swapProviders = await SwapProvider.find({
+                updateGasAndFeeAmount: true,
+                active: true
+            }).sort({
+                updatedAt: 1 // /1 for oldest and -1 for latest
+            }).limit(1);
 
+            if(swapProviders.length > 0){
+                // get GasAndFeeAmount from contract
+                let swapProvider = swapProviders[0];
+                const address = swapProvider.smartContractAddress;
+                let contractInstance = swapProviderController.contractInstance(address, swapProvider.networkId);
+                await contractInstance.methods.getFeeAmountLimit().call().then(async(result) => {
+                    await SwapProvider.updateOne({
+                        _id: swapProvider._id
+                    }, {
+                        updateGasAndFeeAmount: false,
+                        gasAndFeeAmount: result,
+                        message: ""
+                    }).then(async(res) => {
+                    }).catch(err => console.log(`❌ Error swapProvider.updateOne with gasAndFeeAmount and gasAndFeeAmount flag false , ` + err.message));
+                }).catch(async(error) => {
+                    console.log(`❌ Error while calling getFeeAmountLimit contract func from updateGasAndFeeAmountHandler, ` + error);
+                    await SwapProvider.updateOne({
+                        _id: swapProvider._id
+                    }, {
+                        message: "updateGasAndFeeAmountHandler error: " + error,
+                        updateGasAndFeeAmount: true
+                    }).then(async(res) => {
+                    }).catch(err => console.log(`❌ Error swapProvider.updateOne with updateGasAndFeeAmount flag true again , ` + err.message));
+                });
+            }
+        } catch(err){
+            console.log(`❌ Error From updateGasAndFeeAmountHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+        }
     }
     
 }

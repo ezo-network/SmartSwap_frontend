@@ -63,6 +63,7 @@ export interface ISwapProvider extends Document {
     withdrawPercent: number,
     withdrawReinitiate: boolean
     message: string,
+    updateGasAndFeeAmount: boolean
 };
 
 const SwapProvider: Schema = new mongoose.Schema({
@@ -131,6 +132,11 @@ const SwapProvider: Schema = new mongoose.Schema({
     gasAndFeeAmount: {
         type: Schema.Types.Decimal128,
         required: true,  
+    },
+    updateGasAndFeeAmount: {
+        type: Boolean,
+        required: true,
+        default: false
     },
     swapSpeedMode: {
         type: String,
