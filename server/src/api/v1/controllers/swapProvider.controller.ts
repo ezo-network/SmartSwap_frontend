@@ -1508,8 +1508,13 @@ const swapProviderController = {
                     return result
                 });
                 let spContractBal = web3Js.utils.fromWei((spBal).toString(), 'ether');
-    
-                let newTotalWithdrawnAmount = Number(spContractBal) * Number(price);                
+                
+                let newTotalWithdrawnAmount;
+                if(ccxtSandBox == false){
+                    newTotalWithdrawnAmount = Number(spContractBal) * Number(price);                
+                } else {
+                    newTotalWithdrawnAmount = Number(swapProvider.totalWithdrawnAmount);
+                }
 
                 newTotalWithdrawnAmount = Number(Number(newTotalWithdrawnAmount) + Number(Number(order.spot.executedQty) * Number(order.spot.price)));
                 let recievedAmount = Number(swapProvider.totalAmount) - Number(newTotalWithdrawnAmount);
@@ -1551,7 +1556,7 @@ const swapProviderController = {
 
     newSpotOrderHandler: async(swapProvider, exchangeInstace, existingOrder = null) => {
         try {
-            
+            let spBal, spContractBal;
             const network = Number(swapProvider.networkId) === Number(constants.NETWORKS.ETH.NETWORK_ID) ? constants.NETWORKS.ETH : constants.NETWORKS.BSC;
             const provider = network.PROVIDER;
             const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
@@ -1565,13 +1570,15 @@ const swapProviderController = {
             let ticker = await exchangeInstace.fetchTicker(`${asset}/USDT`);
             let price = ticker.last;
 
-            let spBal =  await web3.eth.getBalance(address, function (error, result) {
+            spBal =  await web3.eth.getBalance(address, function (error, result) {
                 return result
             });
-            let spContractBal = web3Js.utils.fromWei((spBal).toString(), 'ether');
+            spContractBal = web3Js.utils.fromWei((spBal).toString(), 'ether');
 
-            totalWithdrawnAmount = Number(spContractBal) * Number(price);
-
+            if(ccxtSandBox == false){
+                totalWithdrawnAmount = Number(spContractBal) * Number(price);
+            }
+            
             console.log({
                 totalAmount: totalAmount,
                 withdrawPercent: withdrawPercent,
