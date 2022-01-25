@@ -1262,7 +1262,7 @@ const swapProviderController = {
     
     amountDistributionHandler: async () => {
         try{
-            const pendingDistributionRecord = await SwapProvider.findOne({
+            let pendingDistributionRecord = await SwapProvider.findOne({
                 'smartContractAddress': {
                     $exists: true,
                     $ne: null
@@ -1275,6 +1275,12 @@ const swapProviderController = {
                     "withdrawReinitiate": true
                 }]
             }).exec();
+
+            if(pendingDistributionRecord == null){
+                pendingDistributionRecord = await SwapProvider.findOne({
+                    distributionStatus: 'PROCESSED'
+                }).exec();
+            }
 
             if(pendingDistributionRecord !== null){
 
