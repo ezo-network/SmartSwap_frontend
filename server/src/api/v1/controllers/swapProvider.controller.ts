@@ -11,12 +11,13 @@ import spContractAbi from "../../../abis/spContract.json";
 import { AbiItem } from 'web3-utils';
 import _ from "lodash";
 const ccxt = require ('ccxt');
+let print = log.createLogger('Logs', 'trace');
 
 let nonce = 0;
 let ccxtSandBox = false;
 
 const getRawTransactionApp = function(_address, _nonce, _gasPrice, _gasLimit, _to, _value, _data, chain_id, web3) {
-    console.log("claming on: " + chain_id)
+    print.info("claming on: " + chain_id)
     return {
         nonce: web3.utils.toHex(_nonce),
         gasPrice: _gasPrice === null ? '0x098bca5a00' : web3.utils.toHex(_gasPrice),
@@ -152,7 +153,7 @@ const swapProviderController = {
                     swapProvider: sp._id
                 }).save();
                 return sp;
-            }).catch(err => console.log(err));
+            }).catch(err => print.info(err));
             // const swapProvider = {
             //     tokenA: {
             //       consumedAmount: 0,
@@ -181,7 +182,7 @@ const swapProviderController = {
             //     __v: 0
             // }
 
-            console.log({
+            print.info({
                 "Saved SP:": swapProvider
             });
             
@@ -196,7 +197,7 @@ const swapProviderController = {
             //     // let provider = 42 == 42 ? INFURA_WEB_ENDPOINT : BSC_WEB_ENDPOINT
             //     // const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
             //     // const contractInstance = new web3.eth.Contract(swapFactoryAbi as AbiItem[], contractAddress);
-            //     //console.log(contractInstance);
+            //     //print.info(contractInstance);
             //     // await swapProviderController.addSwapProvider(contractInstance, spArgs, web3).then(response => {
             //     //     swapProvider['addSwapProviderResponse'] = response;
             //     //     return res.status(201).json(swapProvider);
@@ -238,14 +239,14 @@ const swapProviderController = {
         //       ]
         //     }
         // };
-        //console.log(event);
+        //print.info(event);
         let usp = await SwapProvider.updateOne({
             txid: event.transactionHash,
             networkId: networkId
         }, {
             smartContractAddress: event.returnValues.spContract,
         });
-        //console.log(usp);
+        //print.info(usp);
     },
 
     update: async(req: Request, res: Response) => {
@@ -423,7 +424,7 @@ const swapProviderController = {
                 }
             }
 
-            console.log(filter);
+            print.info(filter);
             
             
             let usp = await SwapProvider.updateOne({
@@ -460,12 +461,12 @@ const swapProviderController = {
                 blockNumber: blockNumber,
                 txhash: txid
             }
-            console.log(args);
+            print.info(args);
 
             let event = await swapProviderController.fetchEvent(args);
 
 
-            console.log("updaing event:", event);
+            print.info("updaing event:", event);
 
             let usp = await SwapProvider.updateOne({
                 _id: docId
@@ -524,10 +525,10 @@ const swapProviderController = {
             toBlock: Number(args.blockNumber)
         }).then(async(events) => {
             let matchedEvent; 
-            console.log("matchedEvent", events) // same results as the optional callback above
+            print.info("matchedEvent", events) // same results as the optional callback above
             for (let i = 0; i < events.length; i++) {
                 if(events[i]['transactionHash'] == args.txhash){
-                    console.log("matched event:", events[i]);
+                    print.info("matched event:", events[i]);
                     matchedEvent = events[i];
                     break;
                 }
@@ -598,7 +599,7 @@ const swapProviderController = {
                 return false;
             }
         } catch (e) {
-            console.log (e.constructor.name, e.message);
+            print.info (e.constructor.name, e.message);
             return false;
         }
     },
@@ -1255,7 +1256,7 @@ const swapProviderController = {
             const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
             return new web3.eth.Contract(spContractAbi as AbiItem[], contractAddress);    
         } catch(err){
-            console.log(`❌ Error From contractInstance:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            print.info(`❌ Error From contractInstance:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
         }
     },
     
@@ -1268,9 +1269,19 @@ const swapProviderController = {
                 },
                 active: true,
                 swapSpeedMode: "UPFRONT",
+                "$or": [{
+                    "distributionStatus": 'PENDING'
+                }, {
+                    "withdrawReinitiate": true
+                }]
             }).exec();
 
             if(pendingDistributionRecord !== null){
+
+                print.info({
+                    pendingDistributionRecord: pendingDistributionRecord._id
+                });
+
                 const exchangeinstance = new ccxt.binance ({
                     'apiKey': pendingDistributionRecord.cexData.key,
                     'secret': pendingDistributionRecord.cexData.secret,
@@ -1279,6 +1290,9 @@ const swapProviderController = {
                 exchangeinstance.set_sandbox_mode(ccxtSandBox);
                 
                 if(pendingDistributionRecord['distributionStatus'] == "PENDING" || pendingDistributionRecord['withdrawReinitiate'] == true){
+
+                    print.info("inside distributionStatus and withdrawReinitiate check");
+
                     await SwapProvider.updateOne({
                         _id: pendingDistributionRecord._id
                     }, {
@@ -1287,7 +1301,7 @@ const swapProviderController = {
                     }).then(async(res) => {
                         // make new spot order
                         await swapProviderController.newSpotOrderHandler(pendingDistributionRecord, exchangeinstance);
-                    }).catch(err => console.log(`❌ Error From amountDistributionHandler: update SwapProvider status PROCESSED, `, err.constructor.name, err.message, ' at:' + new Date().toJSON()))
+                    }).catch(err => print.info(`❌ Error From amountDistributionHandler: update SwapProvider status PROCESSED, `, err.constructor.name, err.message, ' at:' + new Date().toJSON()))
                 }
 
                 if(pendingDistributionRecord['distributionStatus'] == "PROCESSED"){
@@ -1301,8 +1315,8 @@ const swapProviderController = {
                         || distributionOrder.spot.status == "REJECTED"
                         || distributionOrder.spot.status == "EXPIRED"
                     ){
-                        console.log(distributionOrder.spot.status);
-                        console.log(distributionOrder);
+                        print.info(distributionOrder.spot.status);
+                        print.info(distributionOrder);
                         await swapProviderController.newSpotOrderHandler(pendingDistributionRecord, exchangeinstance, distributionOrder);
                     } else {
                         // check status of distributionOrder
@@ -1317,10 +1331,10 @@ const swapProviderController = {
                 }
 
             } else {
-                console.log('❌ No new active swap provider found whose distribution is pending yet.');
+                print.info('❌ No new active swap provider found whose distribution is pending yet.');
             }
         } catch(err){
-            console.log(`❌ Error From distributeAmount:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            print.info(`❌ Error From distributeAmount:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
         }        
     },
 
@@ -1440,7 +1454,7 @@ const swapProviderController = {
     },
 
     withdrawHandler: async(swapProvider, order, exchangeinstance) => {
-        console.log('👉 Handle withdraw');
+        print.info('👉 Handle withdraw');
         try {
             let response = null;
             let asset = Number(swapProvider.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
@@ -1461,7 +1475,7 @@ const swapProviderController = {
                             }
                         ); 
                     } catch (err) {
-                        console.log('❌ Error from withdrawHandler exchangeinstance.withdraw: ' + err.message);
+                        print.info('❌ Error from withdrawHandler exchangeinstance.withdraw: ' + err.message);
                         await swapProviderController.errorHandler('withdrawHandler', swapProvider._id, order._id, err.message); 
                     }
                 } else {
@@ -1487,7 +1501,7 @@ const swapProviderController = {
                         'withdraw': args,
                     }).then(async(res) => {
     
-                    }).catch(err => console.log('❌ Error from withdrawHandler: Order.updateOne with withdraw order data., ' + err.message));
+                    }).catch(err => print.info('❌ Error from withdrawHandler: Order.updateOne with withdraw order data., ' + err.message));
                 }
     
             } else if(order.withdraw.status == "PROCESSED"){
@@ -1533,7 +1547,7 @@ const swapProviderController = {
                 await SwapProvider.updateOne({
                     _id: swapProvider._id
                 }, argsToUpdate).then(async(res) => {
-                    console.log(`swapProvider ${swapProvider._id} amount distribution completed.`)
+                    print.info(`swapProvider ${swapProvider._id} amount distribution completed.`)
 
                     await Order.updateOne({
                         _id: order._id
@@ -1541,15 +1555,15 @@ const swapProviderController = {
                         'status': 'COMPLETED'
                     }).then(async(res) => {
     
-                    }).catch(err => console.log('❌ Error from withdrawHandler: Order.updateOne with order status completed., ' + err.message));
+                    }).catch(err => print.info('❌ Error from withdrawHandler: Order.updateOne with order status completed., ' + err.message));
                     
 
-                }).catch(err => console.log('❌ Error from withdrawHandler: swapProvider.updateOne with distributed flag true., ' + err.message));
+                }).catch(err => print.info('❌ Error from withdrawHandler: swapProvider.updateOne with distributed flag true., ' + err.message));
             } else {
                 // failed handler
             }
         } catch (err){
-            console.log(`❌ Error From withdrawHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            print.info(`❌ Error From withdrawHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
             await swapProviderController.errorHandler('withdrawHandler', swapProvider._id, order._id, err.message);
         }
     },
@@ -1579,7 +1593,7 @@ const swapProviderController = {
                 totalWithdrawnAmount = Number(spContractBal) * Number(price);
             }
             
-            console.log({
+            print.info({
                 totalAmount: totalAmount,
                 withdrawPercent: withdrawPercent,
                 usdtAmountToBuyToken: usdtAmountToBuyToken,
@@ -1602,7 +1616,7 @@ const swapProviderController = {
                 let amount = Number(usdtAmountToBuyToken) / Number(price);
     
                 let response = await exchangeInstace.createOrder(`${asset}/USDT`, 'MARKET', 'buy', amount);
-                console.log(response);
+                print.info(response);
     
                 if(response !== null && response.hasOwnProperty('id')){
                     // save order
@@ -1640,12 +1654,12 @@ const swapProviderController = {
                                     'spot': args.spot
                                 });
                             } catch(err){
-                                console.log(`❌ Error From newSpotOrderHandler updateOne:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+                                print.info(`❌ Error From newSpotOrderHandler updateOne:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
                                 await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, existingOrder._id, err.message);
                             }
                         }
                     } catch(err){
-                        console.log(`❌ Error From saveOrder:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+                        print.info(`❌ Error From saveOrder:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
                         await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, null, err.message);
                     }
                 }
@@ -1664,8 +1678,8 @@ const swapProviderController = {
                     'tokenA.recievedAmount': recievedAmount,
                     message: ""
                 }).then(async(res) => {
-                    console.log(`swapProvider ${swapProvider._id} withdraw reinitiate completed.`)
-                }).catch(err => console.log('❌ Error from newSpotOrderHandler: swapProvider.updateOne with withdrawReinitiate flag false., ' + err.message));
+                    print.info(`swapProvider ${swapProvider._id} withdraw reinitiate completed.`)
+                }).catch(err => print.info('❌ Error from newSpotOrderHandler: swapProvider.updateOne with withdrawReinitiate flag false., ' + err.message));
 
                 
 
@@ -1674,7 +1688,7 @@ const swapProviderController = {
 
 
         } catch(err){
-            console.log(`❌ Error From newSpotOrderHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            print.info(`❌ Error From newSpotOrderHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
             await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, null, err.message);            
         }         
     },
@@ -1692,7 +1706,7 @@ const swapProviderController = {
                     }).then(async(res) => {
                         // handle withdraw
                         await swapProviderController.withdrawHandler(swapProvider, order, exchangeinstance);
-                    }).catch(err => console.log('❌ Error from Order.updateOne with status FILLED, ' + err.message));
+                    }).catch(err => print.info('❌ Error from Order.updateOne with status FILLED, ' + err.message));
                     
                 } else {
                     await Order.updateOne({
@@ -1700,11 +1714,11 @@ const swapProviderController = {
                     }, {
                         'spot.status': response.info.status
                     }).then(async(res) => {
-                    }).catch(err => console.log(`❌ Error from Order.updateOne with status ${response.info.status}, ` + err.message));
+                    }).catch(err => print.info(`❌ Error from Order.updateOne with status ${response.info.status}, ` + err.message));
                 }
             }
         } catch(err){
-            console.log(`❌ Error From querySpotOrderHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            print.info(`❌ Error From querySpotOrderHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
             await swapProviderController.errorHandler('querySpotOrderHandler', swapProvider._id, order._id, err.message);
         }
     },
@@ -1717,7 +1731,7 @@ const swapProviderController = {
                 distributionStatus: 'FAILED',
                 message: message
             }).then(async(res) => {
-            }).catch(err => console.log(`❌ Error from ${from} swapProvider.updateOne with distributed flag FAILED`)); 
+            }).catch(err => print.info(`❌ Error from ${from} swapProvider.updateOne with distributed flag FAILED`)); 
         }
 
         if(orderId !== null){
@@ -1726,7 +1740,7 @@ const swapProviderController = {
             }, {
                 'message': message
             }).then(async(res) => {    
-            }).catch(err => console.log(`❌ Error from ${from} Order.updateOne with error message`));
+            }).catch(err => print.info(`❌ Error from ${from} Order.updateOne with error message`));
         }
     },
 
@@ -1753,20 +1767,20 @@ const swapProviderController = {
                         gasAndFeeAmount: result,
                         message: ""
                     }).then(async(res) => {
-                    }).catch(err => console.log(`❌ Error swapProvider.updateOne with gasAndFeeAmount and gasAndFeeAmount flag false , ` + err.message));
+                    }).catch(err => print.info(`❌ Error swapProvider.updateOne with gasAndFeeAmount and gasAndFeeAmount flag false , ` + err.message));
                 }).catch(async(error) => {
-                    console.log(`❌ Error while calling getFeeAmountLimit contract func from updateGasAndFeeAmountHandler, ` + error);
+                    print.info(`❌ Error while calling getFeeAmountLimit contract func from updateGasAndFeeAmountHandler, ` + error);
                     await SwapProvider.updateOne({
                         _id: swapProvider._id
                     }, {
                         message: "updateGasAndFeeAmountHandler error: " + error,
                         updateGasAndFeeAmount: true
                     }).then(async(res) => {
-                    }).catch(err => console.log(`❌ Error swapProvider.updateOne with updateGasAndFeeAmount flag true again , ` + err.message));
+                    }).catch(err => print.info(`❌ Error swapProvider.updateOne with updateGasAndFeeAmount flag true again , ` + err.message));
                 });
             }
         } catch(err){
-            console.log(`❌ Error From updateGasAndFeeAmountHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+            print.info(`❌ Error From updateGasAndFeeAmountHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
         }
     }
     
