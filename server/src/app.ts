@@ -8,6 +8,8 @@ import TaskScheduler from './api/v1/taskScheduler/index';
 // import ETHListner = require('./api/v1/listners/ethListner');
 // import BSCListner = require('./api/v1/listners/bscListner');
 
+let print = log.createLogger('Logs', 'trace');
+
 mongoose.connect(db.url, db.configs);
 
 const port = constants.SERVER_PORT as number;
@@ -19,7 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors())
 
 app.listen(port, host, () => {
-    log.info(`Server listing at http://${host}:${port}`);
+    print.info(`Server listing at http://${host}:${port}`);
 
     routes(app);
 
