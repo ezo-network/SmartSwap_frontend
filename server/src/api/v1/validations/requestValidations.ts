@@ -98,7 +98,9 @@ const requestValidations = {
 
       active: boolean().nullable(true),
 
-      spreadAmount: number().nullable(true)
+      spreadAmount: number().nullable(true),
+
+      withdrawPercent: number().nullable(true)
 
     })
   })

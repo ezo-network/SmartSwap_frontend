@@ -16,6 +16,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import DateFormat from "dateformat";
 import axios from "axios";
+import ccxt from "ccxt";
+//const ccxt = require ('ccxt');
 
 var _ = require('lodash');
 
@@ -70,7 +72,7 @@ export default class LiquidityProvider extends PureComponent {
             spData: null,
             baseState: null,
             ethTokenUsdValue: null, 
-            bnbTokenUsdValue: null, 
+            bnbTokenUsdValue: null,
             spContractBal: null,
             spContractBalInUsd: null,
             tests: null,
@@ -94,7 +96,9 @@ export default class LiquidityProvider extends PureComponent {
             networkIdOnContract: null,
             stopRepeatsModeOnContract: null,
             stopRepeatsOnDateOnContract: null,
-            stopRepeatsAfterCallsOnContract: null,                
+            stopRepeatsAfterCallsOnContract: null,
+            withdrawPercentOnContract: null,
+            tempWithdrawPercentOnContract: null,
             errorMessage: null,
             clientSideError: false,
             clientSideErrorMessage: {
@@ -103,7 +107,9 @@ export default class LiquidityProvider extends PureComponent {
                 spProfitPercentOnContract: null,
                 amountAOnContract: null
             },
-            serverError: null
+            serverError: null,
+            priceSource: "binance", // coingecko OR binance
+            sandboxMode: false
         }
     }
 
@@ -829,7 +835,9 @@ export default class LiquidityProvider extends PureComponent {
                             cexApiKeyEditable: true,
                             cexApiSecret: obj.cexData.secret,
                             cexApiSecretEditable: true,
-                            swapSpeedModeOnContract: obj.swapSpeedMode
+                            swapSpeedModeOnContract: obj.swapSpeedMode,
+                            withdrawPercentOnContract: obj.withdrawPercent,
+                            tempWithdrawPercentOnContract: obj.withdrawPercent
                         });
 
 
@@ -1035,6 +1043,83 @@ export default class LiquidityProvider extends PureComponent {
         }
     }
 
+    validateWithdrawOnContractFromCexSlider = async() => {
+        if(this.state.withdrawPercentOnContract > 45){
+            notificationConfig.error('You must keep balance on your CEX account at least 55% of the total amount');
+            this.setState({
+                withdrawPercentOnContract: this.state.tempWithdrawPercentOnContract
+            });            
+            return false;
+        }
+
+        return true;
+    }
+
+    withdrawOnContractFromCex = async() => {
+
+        let validationPass = await this.validateWithdrawOnContractFromCexSlider();
+
+        let totalAmount = Number(this.state.amountAOnContract);
+        let withdrawPercent = Number(this.state.withdrawPercentOnContract);
+
+        let usdtAmountToBuyToken = (Number(totalAmount) * Number(withdrawPercent)) / 100;
+        let totalWithdrawnAmount = Number(this.state.spContractBalInUsd);
+
+        console.log({
+            usdtAmountToBuyToken: usdtAmountToBuyToken,
+            totalWithdrawnAmount: totalWithdrawnAmount
+        });
+
+        if(usdtAmountToBuyToken > totalWithdrawnAmount){
+            usdtAmountToBuyToken = usdtAmountToBuyToken - totalWithdrawnAmount;
+            if(usdtAmountToBuyToken >= 50){
+                if(validationPass){
+                    if (this.state.isActiveContractExist) {
+                        this.setState({
+                            updating: true
+                        });
+                        
+                        let response = await AxiosRequest.request({
+                            data: {
+                                smartContractAddress: this.state.smartSwapContractAddress,
+                                withdrawReinitiate: true
+                            },
+                            path: "update",
+                            method: "POST"
+                        });
+            
+                        if(response.status == 422){
+                            notificationConfig.error('Something went wrong.');
+                        }
+                        
+                        if(response.status == 200){
+                            if(response.data.message == "Record updated"){
+                                notificationConfig.success('Withdraw from CEX to SP contract initiated.');
+                            } else {
+                                notificationConfig.success(response.data.message);
+                            }
+                        }
+            
+                        if(response.status == 500){
+                            notificationConfig.error('Sever error');
+                        }
+            
+                        setTimeout(async() => {
+                            // code to be executed after 3 second
+                            this.setState({
+                                updating: false
+                            });
+                        }, 3000);
+                    }
+                }
+            } else {
+                notificationConfig.error("Please increase withdraw percent. Min withdraw amount is $50");
+            }
+        } else {
+            notificationConfig.error("Please increase withdraw percent. Min withdraw amount is $50");            
+        }
+    }
+
     updateContract = async () => {
 
         if (this.state.cexApiKey === null || this.state.cexApiKey.length === 0) {
@@ -1060,6 +1145,17 @@ export default class LiquidityProvider extends PureComponent {
                 return;
             }
         }
+
+        if (
+            this.state.withdrawPercentOnContract == null 
+            ||
+            this.state.withdrawPercentOnContract < 0
+            ||
+            this.state.withdrawPercentOnContract > 100
+        ) {
+            notificationConfig.error("Invalid Withdraw Percent.");
+            return;
+        }      
 
         if(this.clientSideError() == true){
             return;
@@ -1105,7 +1201,8 @@ export default class LiquidityProvider extends PureComponent {
                 stopRepeatsMode: this.state.stopRepeatsModeOnContract,
                 cexApiKey: this.state.cexApiKey,
                 cexApiSecret: this.state.cexApiSecret,
-                swapSpeedMode: this.state.swapSpeedModeOnContract === null ? 'UPFRONT' : this.state.swapSpeedModeOnContract
+                swapSpeedMode: this.state.swapSpeedModeOnContract === null ? 'UPFRONT' : this.state.swapSpeedModeOnContract,
+                withdrawPercent: this.state.withdrawPercentOnContract
             }),
             // data: {
             //     spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
@@ -1143,6 +1240,7 @@ export default class LiquidityProvider extends PureComponent {
                         updateButtonText: "CONTRACT UPDATED SUCCESSFULLY",
                         updating: false,
                         loadingIcon: false,
+                        tempWithdrawPercentOnContract: this.state.withdrawPercentOnContract
                     });
                 }, 3000);
 
@@ -1261,18 +1359,39 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     getTokenUsdValuesFromCoingecko = async () => {
-        let url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true";
-        
-        let response = await axios.get(url).then((res) => {
-            return res.data;
-        }).catch((err) => {
-            console.log("errorOrigin: getTokenUsdValuesFromCoingecko", err);
-        });
-  
-        this.setState({ 
-            ethTokenUsdValue: response["ethereum"]["usd"],
-            bnbTokenUsdValue: response["binancecoin"]["usd"]
-        });
+        if(this.state.priceSource == "coingecko"){
+            let url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true";
+            
+            let response = await axios.get(url).then((res) => {
+                return res.data;
+            }).catch((err) => {
+                console.log("errorOrigin: getTokenUsdValuesFromCoingecko", err);
+            });
+      
+            this.setState({ 
+                ethTokenUsdValue: response["ethereum"]["usd"],
+                bnbTokenUsdValue: response["binancecoin"]["usd"]
+            });
+        } 
+
+        if(this.state.priceSource == "binance"){
+            const exchange = new ccxt.binance();
+            exchange.set_sandbox_mode(this.state.sandboxMode);
+            let r = await exchange.fetchMarkets({
+                type: "spot"
+            });
+            
+            let ticker = await exchange.fetchTicker('BNBUSDT');
+            let bnbPrice = ticker.last;            
+
+            ticker = await exchange.fetchTicker('ETHUSDT');
+            let ethPrice = ticker.last;
+
+            this.setState({ 
+                ethTokenUsdValue: ethPrice,
+                bnbTokenUsdValue: bnbPrice
+            });
+        }
     }
 
 
@@ -1284,15 +1403,18 @@ export default class LiquidityProvider extends PureComponent {
         const web3ForETH = new Web3(new Web3.providers.HttpProvider(ethreumProvider));
         let web3 = null;
         let usdtFaceValue = 0;
+        let asset = null;
 
         if(this.state.networkId == 1 || this.state.networkId == 42){
             web3 = web3ForETH;
             usdtFaceValue = this.state.ethTokenUsdValue;
+            asset = "ETH";
         }
 
         if(this.state.networkId == 56 || this.state.networkId == 97){
             web3 = web3ForBSC;
             usdtFaceValue = this.state.bnbTokenUsdValue;
+            asset = "BNB";
         }
 
         let spBal =  await web3.eth.getBalance(this.state.smartSwapContractAddress, function (error, result) {
@@ -1307,8 +1429,6 @@ export default class LiquidityProvider extends PureComponent {
                 spContractBalInUsd: Number(spUsdtBal).toFixed(2)
             });
         }
-
-
     }
 
     withdraw = async () => {
@@ -2089,6 +2209,89 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         }                                                                        
                                     </div>
                                 </div>
+                                <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED
+                                    <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="right" data-pt-title="The Smart swap using a matcher to match between users to users and if there are no users available, between users to swap providers (SP). the matcher taking under consideration, which SP can complete the swap fully, faster and cheaper. 
+                                <br/><br/>
+                                SP can hold stable coin (USDT) on their controlled CEX account, which will be trigger by API to buy in real time tokens and send over to the SP's smarts contact which will be  use as a counterparty to other users. same exchange processing withdraw after few long minutes and also each blockchain network as different proccing speed, those facts can put some SP with holding upfront tokens on their smart contract with advantage over other SP that requires to buy those tokens and then send them over.
+                                <br/><br/>
+                                As a SP you can choose if you want to send tokens to your smart contract in real time, or if you want to act faster by depositing tokens upfront to to your smart contract." aria-hidden="true"></i></i>                                
+                                </div>
+                                <div className='spscFix01 d-flex'>
+                                    <div className="LiProfSbox01 pr-20px">
+                                        <div className='LipRadioFix01'>
+                                            <div className="md-radio md-radio-inline ">
+                                                <input
+                                                    type="radio"
+                                                    id="spS05"
+                                                    name="s005"
+                                                    //defaultChecked
+                                                    onChange={event => this.setState({ swapSpeedModeOnContract: 'UPFRONT' })}
+                                                    checked={this.state.swapSpeedModeOnContract === 'UPFRONT'}
+                                                />
+                                                <label htmlFor="spS05"></label>
+                                            </div>
+                                            <div className="LiProFlexBX01 padFixer01">
+                                                <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="right" data-pt-title="This option required from you hold upfront 45% of the sell token in the smart contract, and another 55% as stable coin (USDT) on your centralized account (that 55% will be used to buy the sell tokens in real time and placing a short order against the receiving token to secure it's face value from volatility).
+                                    <br/><br/>
+                                    Once you will deploy your smart contract, you will need to deposit directly to your smart contract address the 45% the funds as tokens that you want to sell. 
+                                    <br/><br/>
+                                    For example if you want to and you are looking to gain profit of 0.05% as a spread. in exchange for ETH and you are looking to gain profit of 0.05% as a spread, you will need to deposit $45,000 of BNB to your smart contract, so users that buying those BNB will get those tokens instantly without waiting for your centralized account to send it over to the smart contract (which can takes few long minutes). Wen swaps take place your CEX account will be trigger to buy in real time new BNB at the best price in the exchange and then send them to feed back your smart contract, while on the same time the smartswap will send to your CEX account $45,225 of ETH (which is the same amount plus the spread that you agree to), then the API will open a short position to make sure those ETH will be sold back to stablecoins without any lost to volatility." aria-hidden="true"></i></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="LiProfSbox02 pl-20px">
+                                        <div className='LipRadioFix01' >
+                                            <div className="md-radio md-radio-inline ">
+                                                <input
+                                                    type="radio"
+                                                    id="spS06"
+                                                    name="s006"
+                                                    //defaultChecked
+                                                    onChange={event => this.setState({ swapSpeedModeOnContract: 'REALTIME' })}
+                                                    checked={this.state.swapSpeedModeOnContract === 'REALTIME'}
+                                                    disabled="true"
+                                                />
+                                                <label htmlFor="spS06"></label>
+                                            </div>
+                                            <div className="LiProFlexBX01 padFixer01">
+                                                <div className="LipRTitle01">
+                                                    Deposit token A to the smart contract in real time
+                                                    <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Selecting this option allows zero up front tokens and 100% of your funds may wait as stablecoins (USDT) on your centralized exchange account. Once your account is triggered to provide liquidity to SmartSwap, the controlled account uses the authorized stablecoin account to buy the tokens and send them to your smart contract address.
+                                    <br/><br/>
+                                    N.B. The process to send tokens from centralized  exchange accounts to your smart contract may take few minutes depending on the exchange and the speed of network. Therefore, the SmartSwap may choose other SPs over you which have tokens available on their smart contract already and can execute the swap faster for the end user." aria-hidden="true"></i></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* withdraw % slider */}
+                                    <div className='spContrlSBX withdrawSlider'>
+                                        <div className='spContrlSSBX01'>
+                                            <div className="dragorInput v2">
+                                                <InputRange
+                                                    step={1}
+                                                    maxValue={100}
+                                                    minValue={0}
+                                                    value={this.state.withdrawPercentOnContract}
+                                                    formatLabel={value => `${value}%`}
+                                                    onChange={value => this.setState({ withdrawPercentOnContract: value })}
+                                                    onChangeComplete={() => this.validateWithdrawOnContractFromCexSlider()}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className='spContrlSSBX02'>
+                                            <button
+                                                className='spContrlBTN01'
+                                                onClick={() => this.withdrawOnContractFromCex()}
+                                                disabled={this.state.updating}
+                                            >
+                                                WITHDRAW
+                                            </button>
+                                        </div>
+                                    </div>                                    
+                                    <p className="withdrawOnContractAlert">
+                                    You must keep balance on your CEX account at least 55% of the total amount
+                                    </p>
+                                </div>                                
                                 <div className='spContrlInfotxt02'>AUTHORIZE NEW GAS AND FEES LIMIT<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Authorize more funds to gas and fees to keep your SP contract active." aria-hidden="true"></i></i></div>
                                 <div className='spContrlSBX'>
 
@@ -2214,6 +2417,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                             <input
                                                 type="text"
                                                 placeholder=""
+                                                readOnly="true"
                                                 defaultValue={
                                                     this.state.stopRepeatsModeOnContract == 3 ? 'Never stop' 
                                                     : this.state.stopRepeatsModeOnContract == 1 ? "On date: " + DateFormat(this.state.stopRepeatsOnDateOnContract, "mmmm dS, yyyy, h:MM:ssTT")
@@ -2299,61 +2503,6 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         </div>
                                     </div>                                    
                                     }
-                                </div>
-                                <div className='spContrlInfotxt02'>CHANGE THE SWAP SPEED
-                                    <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="right" data-pt-title="The Smart swap using a matcher to match between users to users and if there are no users available, between users to swap providers (SP). the matcher taking under consideration, which SP can complete the swap fully, faster and cheaper. 
-                                <br/><br/>
-                                SP can hold stable coin (USDT) on their controlled CEX account, which will be trigger by API to buy in real time tokens and send over to the SP's smarts contact which will be  use as a counterparty to other users. same exchange processing withdraw after few long minutes and also each blockchain network as different proccing speed, those facts can put some SP with holding upfront tokens on their smart contract with advantage over other SP that requires to buy those tokens and then send them over.
-                                <br/><br/>
-                                As a SP you can choose if you want to send tokens to your smart contract in real time, or if you want to act faster by depositing tokens upfront to to your smart contract." aria-hidden="true"></i></i>                                
-                                </div>
-                                <div className='spscFix01 d-flex'>
-                                    <div className="LiProfSbox01 pr-20px">
-                                        <div className='LipRadioFix01'>
-                                            <div className="md-radio md-radio-inline ">
-                                                <input
-                                                    type="radio"
-                                                    id="spS05"
-                                                    name="s005"
-                                                    //defaultChecked
-                                                    onChange={event => this.setState({ swapSpeedModeOnContract: 'UPFRONT' })}
-                                                    checked={this.state.swapSpeedModeOnContract === 'UPFRONT'}
-                                                />
-                                                <label htmlFor="spS05"></label>
-                                            </div>
-                                            <div className="LiProFlexBX01 padFixer01">
-                                                <div className="LipRTitle01">Deposit token A to the smart contract upfront<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="right" data-pt-title="This option required from you hold upfront 45% of the sell token in the smart contract, and another 55% as stable coin (USDT) on your centralized account (that 55% will be used to buy the sell tokens in real time and placing a short order against the receiving token to secure it's face value from volatility).
-                                    <br/><br/>
-                                    Once you will deploy your smart contract, you will need to deposit directly to your smart contract address the 45% the funds as tokens that you want to sell. 
-                                    <br/><br/>
-                                    For example if you want to and you are looking to gain profit of 0.05% as a spread. in exchange for ETH and you are looking to gain profit of 0.05% as a spread, you will need to deposit $45,000 of BNB to your smart contract, so users that buying those BNB will get those tokens instantly without waiting for your centralized account to send it over to the smart contract (which can takes few long minutes). Wen swaps take place your CEX account will be trigger to buy in real time new BNB at the best price in the exchange and then send them to feed back your smart contract, while on the same time the smartswap will send to your CEX account $45,225 of ETH (which is the same amount plus the spread that you agree to), then the API will open a short position to make sure those ETH will be sold back to stablecoins without any lost to volatility." aria-hidden="true"></i></i></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="LiProfSbox02 pl-20px">
-                                        <div className='LipRadioFix01' >
-                                            <div className="md-radio md-radio-inline ">
-                                                <input
-                                                    type="radio"
-                                                    id="spS06"
-                                                    name="s006"
-                                                    //defaultChecked
-                                                    onChange={event => this.setState({ swapSpeedModeOnContract: 'REALTIME' })}
-                                                    checked={this.state.swapSpeedModeOnContract === 'REALTIME'}
-                                                    disabled="true"
-                                                />
-                                                <label htmlFor="spS06"></label>
-                                            </div>
-                                            <div className="LiProFlexBX01 padFixer01">
-                                                <div className="LipRTitle01">
-                                                    Deposit token A to the smart contract in real time
-                                                    <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Selecting this option allows zero up front tokens and 100% of your funds may wait as stablecoins (USDT) on your centralized exchange account. Once your account is triggered to provide liquidity to SmartSwap, the controlled account uses the authorized stablecoin account to buy the tokens and send them to your smart contract address.
-                                    <br/><br/>
-                                    N.B. The process to send tokens from centralized  exchange accounts to your smart contract may take few minutes depending on the exchange and the speed of network. Therefore, the SmartSwap may choose other SPs over you which have tokens available on their smart contract already and can execute the swap faster for the end user." aria-hidden="true"></i></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div className="spacerLine"></div>
                                 <div className="spContrlInfotxt02 mb-30px-n pt-20px">After creating an API on your CEX update here the API and Secret key</div>
