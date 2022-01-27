@@ -814,7 +814,7 @@ export default class LiquidityProvider extends PureComponent {
             if (response.status === 200) {
 
                 const isactiveContractExist = response.data.find(obj => {
-                    if ((obj.networkId == this.state.networkId) && (this.state.spAccount == obj.walletAddresses.spAccount)) {
+                    if ((obj.networkId == this.state.networkId) && ((this.state.spAccount).toLowerCase() == obj.walletAddresses.spAccount)) {
                         
                         // convert gasAndFeeAmount to ether so it can be set to input field
                         let gasAndFeeAmount = Web3.utils.fromWei((obj.gasAndFeeAmount.$numberDecimal).toString(), 'ether');
