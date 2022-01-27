@@ -1748,11 +1748,11 @@ export default class Home extends PureComponent {
 
 
 
-        element["recivedAmount"] = "0";
-        element.counterParties.map(async (elementCounterParties, key) => {
-          let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
-          element["recivedAmount"] = Number(element["recivedAmount"]) + Number(rcAmount);
-        })
+        element["recivedAmount"] = web3Js.utils.fromWei(element.estimatedForeignAmount);
+        // element.counterParties.map(async (elementCounterParties, key) => {
+        //   let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
+        //   element["recivedAmount"] = Number(element["recivedAmount"]) + Number(rcAmount);
+        // })
 
         if (element.status === "FULFILLED" && element.relationship.claim.approveHash !== null) {
           userTxsUI.push(
