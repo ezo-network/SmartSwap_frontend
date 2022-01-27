@@ -6860,6 +6860,9 @@ a.LicSBTN01:hover {
 .justify-center-n{
   justify-content: center;
 }
+.justify-between-n{
+  justify-content: space-between;
+}
 .toggle-ic-n {
   height: 30px;
   width: 30px;
@@ -6885,6 +6888,9 @@ a.LicSBTN01:hover {
 .box-border-primary-n{
   border-color: #91dc27;
 }
+.mb-0-n{
+  margin-bottom: 0px;
+}
 .mb-10px-n{
   margin-bottom: 10px;
 }
@@ -6906,11 +6912,20 @@ a.LicSBTN01:hover {
 .mt-30px-n{
   margin-top: 30px;
 }
+.-mt-30px-n{
+  margin-top: -30px;
+}
 .mt-40px-n{
   margin-top: 40px;
 }
+.pt-0{
+  padding-top: 0px;
+}
 .pt-20px{
   padding-top: 20px;
+}
+.pb-0{
+  padding-bottom: 0px;
 }
 .pl-20px{
   padding-left: 20px;
@@ -6960,4 +6975,9 @@ a.LicSBTN01:hover {
 }
 .ppAboutText01{
   text-align: left;
+}
+.note-n{
+  color:#5d5d5d;
+  font-size:11px;
+  text-align:right;
 }
