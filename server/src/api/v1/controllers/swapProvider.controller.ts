@@ -100,7 +100,7 @@ const swapProviderController = {
 
             // SP exist?
             const isSwapProviderExists: ISwapProvider = await SwapProvider.findOne({
-                'walletAddresses.spAccount' : spAccount,
+                'walletAddresses.spAccount' : (spAccount).toLowerCase(),
                 'networkId': networkId,
                 'tokenA.address': tokenA,
                 'tokenB.address': tokenB,
@@ -119,7 +119,7 @@ const swapProviderController = {
                 walletAddresses: {
                     toSend: walletAddressToSend,
                     toReceive: walletAddressToReceive,
-                    spAccount
+                    spAccount: (spAccount).toLowerCase()
                 },
                 totalAmount: amountA,
                 tokenA: {
@@ -428,7 +428,7 @@ const swapProviderController = {
             
             
             let usp = await SwapProvider.updateOne({
-                smartContractAddress: request.smartContractAddress
+                smartContractAddress: (request.smartContractAddress).toLowerCase()
             }, filter);
             
             // let sp:ISwapProvider = await SwapProvider.findOne({
@@ -546,7 +546,7 @@ const swapProviderController = {
 
         try{
             const activeContracts = await SwapProvider.find({
-                'walletAddresses.spAccount' : spAccount,
+                'walletAddresses.spAccount' : (spAccount).toLowerCase(),
                 'smartContractAddress': {
                     $exists: true,
                     $ne: null
@@ -940,7 +940,7 @@ const swapProviderController = {
             }
 
             let filters = {
-                'walletAddresses.spAccount' : owner,
+                'walletAddresses.spAccount' : (owner).toLowerCase(),
                 'networkId': networkId,
                 'smartContractAddress': {
                     $exists: true,
@@ -1274,12 +1274,12 @@ const swapProviderController = {
                 }, {
                     "withdrawReinitiate": true
                 }]
-            }).exec();
+            }).sort({updatedAt: 1}).exec();
 
             if(pendingDistributionRecord == null){
                 pendingDistributionRecord = await SwapProvider.findOne({
                     distributionStatus: 'PROCESSED'
-                }).exec();
+                }).sort({updatedAt: 1}).exec(); 
             }
 
             if(pendingDistributionRecord !== null){
