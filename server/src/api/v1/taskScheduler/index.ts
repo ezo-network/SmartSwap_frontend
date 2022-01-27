@@ -3,6 +3,8 @@ import { boolean } from 'yup/lib/locale';
 // controllers
 import swapProviderController from '../controllers/swapProvider.controller';
 
+const {log} = require('../../../config');
+let print = log.createLogger('Logs', 'trace');
 
 class TaskScheduler {
     static scheduler: boolean;
@@ -15,33 +17,33 @@ class TaskScheduler {
     // sp processing
     static async amountDestributionTaskHandler(){
         if(this.scheduler == true) {
-            console.log(`\n⌛ - ${this.scheduledTask} is already running time:  ` + new Date());
+            print.info(`\n⌛ - ${this.scheduledTask} is already running time:  ` + new Date());
             return;
         }
 
-        console.log('\n⌛ - amountDestributionTaskHandler Job started.' + " : time:  " + new Date());
+        print.info('\n⌛ - amountDestributionTaskHandler Job started.' + " : time:  " + new Date());
         this.scheduledTask = 'amountDestributionTaskHandler';
         this.scheduler = true;
         await swapProviderController.amountDistributionHandler();
         this.scheduledTask = null;
         this.scheduler = false;
-        console.log('\n⌛ - amountDestributionTaskHandler Job finished.'+ " : time:  " + new Date());
+        print.info('\n⌛ - amountDestributionTaskHandler Job finished.'+ " : time:  " + new Date());
     }
 
     // sp processing
     static async updateGasAndFeeAmountHandler(){
         if(this.scheduler == true) {
-            console.log(`\n⌛ - ${this.scheduledTask} is already running time:  ` + new Date());
+            print.info(`\n⌛ - ${this.scheduledTask} is already running time:  ` + new Date());
             return;
         }
 
-        console.log('\n⌛ - updateGasAndFeeAmountHandler Job started.' + " : time:  " + new Date());
+        print.info('\n⌛ - updateGasAndFeeAmountHandler Job started.' + " : time:  " + new Date());
         this.scheduledTask = 'updateGasAndFeeAmountHandler';
         this.scheduler = true;
         await swapProviderController.updateGasAndFeeAmountHandler();
         this.scheduledTask = null;
         this.scheduler = false;
-        console.log('\n⌛ - updateGasAndFeeAmountHandler Job finished.'+ " : time:  " + new Date());
+        print.info('\n⌛ - updateGasAndFeeAmountHandler Job finished.'+ " : time:  " + new Date());
     }    
 
     static async start(){

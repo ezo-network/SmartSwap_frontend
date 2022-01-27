@@ -1,13 +1,12 @@
-import logger from "pino";
-import dayjs from "dayjs";
+const filename = "system.log";
+const SimpleLogger = require('simple-node-logger');
+const logManager = new SimpleLogger({ errorEventName: 'error' });
 
-
-const log = logger({
-    prettyPrint: true,
-    base: {
-        pid: false,
-    },
-    timestamp: () => `,"time":"${dayjs().format()}"`,
+process.on('error', (msg) => {
+    console.log('Error event caught: ', JSON.stringify(msg));
 });
 
-export default log;
+logManager.createConsoleAppender();
+logManager.createFileAppender({ logFilePath: filename });
+
+export default logManager;

@@ -81,6 +81,7 @@ export default class LiquidityProvider extends PureComponent {
             contractSideA: null,
             contractSideB: null,
             amountAOnContract: null,
+            tempAmountAOnContract:null,
             gasAndFeeAmountOnContract:null,
             minGasAndFeeAmountOnContractSide: 0,
             maxGasAndFeeAmountOnContractSide: 0,
@@ -829,6 +830,7 @@ export default class LiquidityProvider extends PureComponent {
                             spProfitPercentOnContract: obj.spProfitPercent,
                             contractCreatedAt: obj.createdAt,
                             amountAOnContract: obj.totalAmount.$numberDecimal,
+                            tempAmountAOnContract: obj.totalAmount.$numberDecimal,
                             accumulateFundsLimitOnContract: obj.accumulateFundsLimit,
                             stopRepeatsModeOnContract: obj.stopRepeats.mode,
                             cexApiKey: obj.cexData.key,
@@ -863,6 +865,12 @@ export default class LiquidityProvider extends PureComponent {
                         
                         if(obj.cexData.secret !== null){
                             this.inputMask('secret', obj.cexData.secret);
+                        }
+
+                        if(this.state.sandboxMode == true){
+                            this.setState({
+                                spContractBalInUsd: obj.totalWithdrawnAmount.$numberDecimal
+                            });
                         }
 
                         // this.dispatchEventHandler(this.amountA, obj.tokenA.recievedAmount.$numberDecimal);
@@ -944,8 +952,9 @@ export default class LiquidityProvider extends PureComponent {
                         deployed: false,
                         deployButtonText: 'DEPLOY SMART CONTRACT'
                     });
-
-                    this.getContractBal();
+                    if(this.state.sandboxMode == false){
+                        this.getContractBal();
+                    }
                     this.getAllTests();
 
                 } else {
@@ -1059,8 +1068,8 @@ export default class LiquidityProvider extends PureComponent {
 
         let validationPass = await this.validateWithdrawOnContractFromCexSlider();
 
-        let totalAmount = Number(this.state.amountAOnContract);
-        let withdrawPercent = Number(this.state.withdrawPercentOnContract);
+        let totalAmount = Number(this.state.tempAmountAOnContract);
+        let withdrawPercent = Number(this.state.tempWithdrawPercentOnContract);
 
         let usdtAmountToBuyToken = (Number(totalAmount) * Number(withdrawPercent)) / 100;
         let totalWithdrawnAmount = Number(this.state.spContractBalInUsd);
@@ -1240,7 +1249,8 @@ export default class LiquidityProvider extends PureComponent {
                         updateButtonText: "CONTRACT UPDATED SUCCESSFULLY",
                         updating: false,
                         loadingIcon: false,
-                        tempWithdrawPercentOnContract: this.state.withdrawPercentOnContract
+                        tempWithdrawPercentOnContract: this.state.withdrawPercentOnContract,
+                        tempAmountAOnContract: this.state.amountAOnContract
                     });
                 }, 3000);
 
@@ -2417,7 +2427,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                             <input
                                                 type="text"
                                                 placeholder=""
-                                                readOnly="true"
+                                                readOnly={true}
                                                 defaultValue={
                                                     this.state.stopRepeatsModeOnContract == 3 ? 'Never stop' 
                                                     : this.state.stopRepeatsModeOnContract == 1 ? "On date: " + DateFormat(this.state.stopRepeatsOnDateOnContract, "mmmm dS, yyyy, h:MM:ssTT")
