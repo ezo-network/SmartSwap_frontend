@@ -46,6 +46,7 @@ export default class LiquidityProvider extends PureComponent {
             maxGasAndFeeAmount: 0,
             minStepForGasAndFeeAmount: 0,
             swapSpeedMode: 'UPFRONT',
+            withdrawPercent: 45,
             spreadAmount: 100,
             spProfitPercent: 0.5,
             accumulateFundsLimit: 100,
@@ -571,6 +572,11 @@ export default class LiquidityProvider extends PureComponent {
             });            
         }
 
+        let validationPass = await this.validateWithdrawOnContractFromCexSlider();
+        if(validationPass == false){
+            return;
+        }
+
         // set this to disable deploy button
         this.setState({
             deployed: true,
@@ -646,6 +652,7 @@ export default class LiquidityProvider extends PureComponent {
                 accumulateFundsLimit: this.state.accumulateFundsLimit,
                 stopRepeatsMode: this.state.stopRepeatsMode,
                 withdrawMode: this.state.withdrawMode,
+                withdrawPercent: this.state.withdrawPercent
                 // cexApiKey: this.state.cexApiKey === null ? ('').toString() : this.state.cexApiKey,
                 // cexApiSecret: this.state.cexApiSecret === null ? ('').toString() : this.state.cexApiSecret
             }),
@@ -1052,13 +1059,23 @@ export default class LiquidityProvider extends PureComponent {
         }
     }
 
-    validateWithdrawOnContractFromCexSlider = async() => {
-        if(this.state.withdrawPercentOnContract > 45){
-            notificationConfig.error('You must keep balance on your CEX account at least 55% of the total amount');
-            this.setState({
-                withdrawPercentOnContract: this.state.tempWithdrawPercentOnContract
-            });            
-            return false;
+    validateWithdrawOnContractFromCexSlider = async(onContract = false) => {
+        if(onContract == true){
+            if(this.state.withdrawPercentOnContract > 45){
+                notificationConfig.error('You must keep balance on your CEX account at least 55% of the total amount');
+                this.setState({
+                    withdrawPercentOnContract: this.state.tempWithdrawPercentOnContract
+                });            
+                return false;
+            }
+        } else {
+            if(this.state.withdrawPercent > 45){
+                notificationConfig.error('You must keep balance on your CEX account at least 55% of the total amount');
+                this.setState({
+                    withdrawPercent: 45
+                });
+                return false;
+            }
         }
 
         return true;
@@ -1066,7 +1083,7 @@ export default class LiquidityProvider extends PureComponent {
 
     withdrawOnContractFromCex = async() => {
 
-        let validationPass = await this.validateWithdrawOnContractFromCexSlider();
+        let validationPass = await this.validateWithdrawOnContractFromCexSlider(true);
 
         let totalAmount = Number(this.state.tempAmountAOnContract);
         let withdrawPercent = Number(this.state.tempWithdrawPercentOnContract);
@@ -1861,7 +1878,24 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                 <label>{this.state.errorMessage}</label>
                             </div>
                         }
-
+                        <div className="LiProfSbox03 withdrawSlider">
+                            {/* withdraw % slider */}
+                            <div className="dragorInput v2">
+                                <InputRange
+                                    step={1}
+                                    maxValue={100}
+                                    minValue={0}
+                                    value={this.state.withdrawPercent}
+                                    formatLabel={value => `${value}%`}
+                                    onChange={value => this.setState({ withdrawPercent: value })}
+                                    onChangeComplete={() => this.validateWithdrawOnContractFromCexSlider()}
+                                />
+                            </div>
+                            <p className="withdrawOnContractAlert">
+                            You must keep balance on your CEX account at least 55% of the total amount
+                            </p>                        
+                        </div>
+  
                         <div className='spacerLine'></div>
 
                         <div className="LiProfSbox03">
@@ -2157,7 +2191,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     <span className="step-num-n">&#62;</span>
                                     <div className='spCountrlTitle01 spCountrlTitle01-n '>
                                         SEND  <span>{this.state.contractSideA} </span> {'<>'} RECEIVE <span>{this.state.contractSideB}</span>
-                                        <div className='spContrlInfotxt mb-20px-n'>
+                                        <div className='spContrlInfotxt pb-0'>
                                             Created at {DateFormat(this.state.contractCreatedAt, "mmmm dS, yyyy, h:MM:ssTT")}
                                         </div>
                                     </div>
@@ -2291,7 +2325,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                                     value={this.state.withdrawPercentOnContract}
                                                     formatLabel={value => `${value}%`}
                                                     onChange={value => this.setState({ withdrawPercentOnContract: value })}
-                                                    onChangeComplete={() => this.validateWithdrawOnContractFromCexSlider()}
+                                                    onChangeComplete={() => this.validateWithdrawOnContractFromCexSlider(true)}
                                                 />
                                             </div>
                                         </div>
