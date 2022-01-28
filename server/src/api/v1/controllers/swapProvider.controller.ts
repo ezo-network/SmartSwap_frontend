@@ -39,7 +39,7 @@ const swapProviderController = {
                 gasAndFeeAmount, spProfitPercent, accumulateFundsLimit, 
                 stopRepeatsMode, stopRepeatsOnDate, stopRepeatsAfterCalls,
                 withdrawMode, withdrawOnDate, withdrawAfterCalls, 
-                txid, smartContractAddress, swapSpeedMode      
+                txid, smartContractAddress, swapSpeedMode, withdrawPercent  
             } = req.body;
 
             // validations
@@ -144,7 +144,7 @@ const swapProviderController = {
                     onDate: withdrawOnDate,
                     afterCalls: withdrawAfterCalls
                 },
-                withdrawPercent: 45,
+                withdrawPercent: withdrawPercent <= 45 ? withdrawPercent : 45,
                 withdrawReinitiate: false,
                 updateGasAndFeeAmount: false
             };
