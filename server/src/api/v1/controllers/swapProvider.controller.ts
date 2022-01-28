@@ -9,7 +9,7 @@ import Order, {IOrder} from '../models/order';
 import swapFactoryAbi from "../../../abis/swapFactory.json";
 import spContractAbi from "../../../abis/spContract.json";
 import { AbiItem } from 'web3-utils';
-import _ from "lodash";
+import _, { repeat } from "lodash";
 const ccxt = require ('ccxt');
 let print = log.createLogger('Logs', 'trace');
 
@@ -848,7 +848,8 @@ const swapProviderController = {
             defaultAmount,
             defaultwithdrawalNetwork,
             withdrawalNetworks,
-            validAssetsToWithdraw;
+            validAssetsToWithdraw,
+            repeatTests;
 
         validTestsTypes = [
             "contractOwnerCheck",
@@ -924,7 +925,8 @@ const swapProviderController = {
                 asset,
                 leverage,
                 transferType,
-                amount
+                amount,
+                repeatTests
             } = req.body;
 
             if(type == "" || type == null || type == undefined){
@@ -1052,7 +1054,8 @@ const swapProviderController = {
                     "-createdAt", 
                     "-updatedAt", 
                     "-__v",
-                    "-swapProvider"
+                    "-swapProvider",
+                    "-binanceBalanceCheck"
                 ]).lean()
                 .exec();
 
@@ -1065,6 +1068,24 @@ const swapProviderController = {
                 }
 
                 if(type == "testsCheck"){
+                    if(repeatTests == true){
+                        await SwapProviderTest.updateOne({
+                            "swapProvider": sp._id
+                        }, {
+                            'contractOwnerCheck': false,
+                            'contractGasAndFeeCheck': false,
+                            'spProfitPercentCheck': false,
+                            'binanceApiKeysCheck': false,
+                            'binanceApiValidateCheck': false,
+                            'binanceAccountCheck': false,
+                            'binanceBalanceCheck': false,
+                            'binanceTransferCheck': false,
+                            'binanceWithdrawCheck': false,
+                            'binanceIpWhiteListCheck': false,
+                            'binanceSpAddressWhiteListCheck': false,
+                            'binanceWithdrawEnabledCheck': false
+                        });
+                    }
 
                     result = await swapProviderController.testsCheck(sp._id);
                     res.status(200).json({
@@ -1425,16 +1446,18 @@ const swapProviderController = {
         }, fieldToUpdate);
     },
 
-    testsCheck: async(spId) => {
+    testsCheck: async(spId, repeat = false) => {
+        
         const spTests = await SwapProviderTest.findOne({
             "swapProvider": spId
         }).select([
             "-createdAt", 
             "-updatedAt", 
             "-__v",
-            "-swapProvider"
+            "-swapProvider",
+            "-binanceBalanceCheck"
         ]).lean()
-        .exec();        
+        .exec();
 
         if(spTests !== null){
             let testsPassed = true;

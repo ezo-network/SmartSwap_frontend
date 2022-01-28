@@ -1509,7 +1509,7 @@ export default class LiquidityProvider extends PureComponent {
         }
     }
 
-    testSuite = async(testType = '') => {
+    testSuite = async(testType = '', repeat = false) => {
         try {
 
             let filter = {
@@ -1529,6 +1529,10 @@ export default class LiquidityProvider extends PureComponent {
 
             if(testType == "binanceTransferCheck"){
                 filter['transferType'] = 'TWO_WAY';
+            }
+
+            if(testType == "testsCheck"){
+                filter['repeatTests'] = repeat;
             }
 
             let response = await AxiosRequest.request({
@@ -1563,6 +1567,9 @@ export default class LiquidityProvider extends PureComponent {
                 this.setState({
                     testing: true
                 });
+
+                await this.testSuite("testsCheck", true);
+
                 notificationConfig.info('Testing swap proider configuratons');
                 let failedTests = [], passedTests = [];
                 await this.getAllTests().then(async() => {
@@ -2634,12 +2641,12 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         &nbsp;Check enabled trading on CEX
                                     </div>
                                 </div>
-                                <div className='LiProFlexBX01'>
+                                {/* <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.tests !== null && this.state.tests.binanceBalanceCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                         &nbsp;Check account balance on CEX for allowed limit
                                     </div>
-                                </div>
+                                </div> */}
                                 <div className='LiProFlexBX01'>
                                     <div className='spContrlInfotxt02 test-suite'>
                                         <i className={this.state.tests !== null && this.state.tests.binanceTransferCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
@@ -2677,7 +2684,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                         &nbsp;{this.state.testPassed == true ? 'Swap provider has been successfully activated.' : 'You must pass all the tests to become an active swap provider.'}
                                     </div>
                                     <div className='spContrlInfotxt02 test-suite'>
-                                        <button className='repeatTestsButton' disabled={this.state.testPassed} onClick={this.repeatTests.bind(this)}>
+                                        <button className='repeatTestsButton' onClick={this.repeatTests.bind(this)}>
                                             <span>Repeat the SP checking</span>
                                         </button>
                                     </div>                                    
