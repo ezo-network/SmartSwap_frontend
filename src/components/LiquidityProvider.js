@@ -20,6 +20,7 @@ import ccxt from "ccxt";
 //const ccxt = require ('ccxt');
 
 var _ = require('lodash');
+const MIN_AMOUNT_A = 500;
 
 export default class LiquidityProvider extends PureComponent {
     constructor(props) {
@@ -349,12 +350,12 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     checkAmountA(value){
-        if(Number(value) < 100){            
+        if(Number(value) < MIN_AMOUNT_A){        
             this.setState({
                 clientSideError: true
             });
             var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
-            clientSideErrorMessage.amountA = "Minimum amount is $100";
+            clientSideErrorMessage.amountA = `Minimum amount is $${MIN_AMOUNT_A}`;
             this.setState({clientSideErrorMessage});
             //notificationConfig.success(`Test ${testType} fetched`);
             return;
@@ -372,12 +373,12 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     checkAmountAOnUpdating(value){
-        if(Number(value) < 100){            
+        if(Number(value) < MIN_AMOUNT_A){
             this.setState({
                 clientSideError: true
             });
             var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
-            clientSideErrorMessage.amountAOnContract = "Minimum amount is $100";
+            clientSideErrorMessage.amountAOnContract = `Minimum amount is $${MIN_AMOUNT_A}`;
             this.setState({clientSideErrorMessage});
             //notificationConfig.success(`Test ${testType} fetched`);
             return;
@@ -1081,6 +1082,7 @@ export default class LiquidityProvider extends PureComponent {
         return true;
     }
 
+    /* withdraw via button - turned off */
     withdrawOnContractFromCex = async() => {
 
         let validationPass = await this.validateWithdrawOnContractFromCexSlider(true);
@@ -1146,7 +1148,54 @@ export default class LiquidityProvider extends PureComponent {
         }
     }
 
+    // validate before updateing contract
+    withdrawAmountOnContractFromCexCalc = async() => {
+        let validationPass = await this.validateWithdrawOnContractFromCexSlider(true);
+
+        let totalAmount = Number(this.state.amountAOnContract);
+        let withdrawPercent = Number(this.state.withdrawPercentOnContract);
+
+        let usdtAmountToBuyToken = (Number(totalAmount) * Number(withdrawPercent)) / 100;
+        let totalWithdrawnAmount = Number(this.state.spContractBalInUsd);
+
+        console.log({
+            usdtAmountToBuyToken: usdtAmountToBuyToken,
+            totalWithdrawnAmount: totalWithdrawnAmount
+        });
+
+        let error = "Please adjust withdraw percent or total amount. Min withdraw amount is $50";
+
+        if(usdtAmountToBuyToken > totalWithdrawnAmount){
+            usdtAmountToBuyToken = usdtAmountToBuyToken - totalWithdrawnAmount;
+            if(usdtAmountToBuyToken >= 50){
+                if(validationPass){
+                    return true;
+                } else {
+                    notificationConfig.error(error);
+                    return false;
+                }
+            } else {
+                notificationConfig.error(error);
+                return false;
+            }
+        } else {
+            notificationConfig.error(error);
+            return false;
+        }
+    }
+
     updateContract = async () => {
+
+        if(this.amountAOnContract < MIN_AMOUNT_A){
+            this.checkAmountAOnUpdating();
+            return;
+        }
+
+
+        let withdrawAmountValidation = await this.validateWithdrawOnContractFromCexSlider(true);
+        if(withdrawAmountValidation == false || withdrawAmountValidation == undefined){
+            return;
+        }
 
         if (this.state.cexApiKey === null || this.state.cexApiKey.length === 0) {
             notificationConfig.error("API key can't be blank.");
@@ -1228,7 +1277,8 @@ export default class LiquidityProvider extends PureComponent {
                 cexApiKey: this.state.cexApiKey,
                 cexApiSecret: this.state.cexApiSecret,
                 swapSpeedMode: this.state.swapSpeedModeOnContract === null ? 'UPFRONT' : this.state.swapSpeedModeOnContract,
-                withdrawPercent: this.state.withdrawPercentOnContract
+                withdrawPercent: this.state.withdrawPercentOnContract,
+                withdrawReinitiate: true
             }),
             // data: {
             //     spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
@@ -1260,7 +1310,13 @@ export default class LiquidityProvider extends PureComponent {
             if (response.status == 200) {
                 setTimeout(async () => {
                     console.log('Updated');
-                    notificationConfig.success('Contract updated successfully');
+                    if(response.data.messageType == 'success'){
+                        notificationConfig.success(response.data.message);
+                    }
+                    if(response.data.messageType == 'info'){
+                        notificationConfig.info(response.data.message);
+                    }
+
                     this.setState({
                         updated: true,
                         updateButtonText: "CONTRACT UPDATED SUCCESSFULLY",
@@ -2316,7 +2372,7 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                     </div>
                                     {/* withdraw % slider */}
                                     <div className='spContrlSBX withdrawSlider'>
-                                        <div className='spContrlSSBX01'>
+                                        {/* <div className='spContrlSSBX01'> */}
                                             <div className="dragorInput v2">
                                                 <InputRange
                                                     step={1}
@@ -2328,16 +2384,16 @@ N.B. that on some CEX it may be two different wallet addresses, one to send and 
                                                     onChangeComplete={() => this.validateWithdrawOnContractFromCexSlider(true)}
                                                 />
                                             </div>
-                                        </div>
-                                        <div className='spContrlSSBX02'>
-                                            <button
+                                        {/* </div>
+                                        <div className='spContrlSSBX02'> */}
+                                            {/* <button
                                                 className='spContrlBTN01'
                                                 onClick={() => this.withdrawOnContractFromCex()}
                                                 disabled={this.state.updating}
                                             >
                                                 WITHDRAW
-                                            </button>
-                                        </div>
+                                            </button> */}
+                                        {/* </div> */}
                                     </div>                                    
                                     <p className="withdrawOnContractAlert">
                                     You must keep balance on your CEX account at least 55% of the total amount

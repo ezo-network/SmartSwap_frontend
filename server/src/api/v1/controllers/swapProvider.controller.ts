@@ -252,7 +252,10 @@ const swapProviderController = {
     update: async(req: Request, res: Response) => {
         try{
             const request = req.body;
-
+            let message = 'Contract updated successfully.';
+            let messageType = "success";
+            let withdrawPercentChanged = true;
+            let amountAChanged = true;
             let filter = {};
             
             if ('gasAndFeeAmount' in request){
@@ -285,11 +288,11 @@ const swapProviderController = {
                 });
             }
 
-            if ('amountA' in request){
-                // Object.assign(filter, {
-                //     'withdrawReinitiate': true
-                // });
-            }
+            // if ('amountA' in request){
+            //     Object.assign(filter, {
+            //         'withdrawReinitiate': true
+            //     });
+            // }
 
             if ('walletAddressToSend' in request){
                 Object.assign(filter, {
@@ -411,16 +414,52 @@ const swapProviderController = {
 
 
             if('withdrawReinitiate' in request){
-                let sp = await SwapProvider.findOne({
-                    smartContractAddress: request.smartContractAddress
-                });
-
-                if(sp['distributionStatus'] == "COMPLETED"){
-                    Object.assign(filter, {
-                        withdrawReinitiate: true
+                if(request['withdrawReinitiate'] == true){
+                    let sp = await SwapProvider.findOne({
+                        smartContractAddress: request.smartContractAddress
                     });
-                } else {
-                    return res.status(200).json({ message: 'Withdraw from CEX to SP contract already initiated.' });
+
+                    if(Number(sp['totalAmount']) == Number(request['amountA'])) {
+                        delete filter['totalAmount'];
+                        amountAChanged = false;
+                    }
+
+                    if(Number(sp['withdrawPercent']) == Number(request['withdrawPercent'])) {
+                        delete filter['withdrawPercent'];
+                        withdrawPercentChanged = false;
+                    }
+
+                    console.log({
+                        sp: sp,
+                        cond1: (sp['distributionStatus'] == "COMPLETED" && sp['withdrawReinitiate'] == false),
+                        cond2: (sp['distributionStatus'] == "FAILED" && sp['withdrawReinitiate'] == false),
+                        combined: (sp['distributionStatus'] == "COMPLETED" && sp['withdrawReinitiate'] == false) 
+                        ||
+                        (sp['distributionStatus'] == "FAILED" && sp['withdrawReinitiate'] == false),
+                        amountAChanged: amountAChanged,
+                        withdrawPercentChanged: withdrawPercentChanged
+                    });
+
+                    if(
+                        (amountAChanged == true && sp['active'] == true) 
+                        || 
+                        (withdrawPercentChanged == true && sp['active'] == true)
+                    ){
+                        if(
+                            (sp['distributionStatus'] == "COMPLETED" && sp['withdrawReinitiate'] == false) 
+                            ||
+                            (sp['distributionStatus'] == "FAILED" && sp['withdrawReinitiate'] == false)
+                        ){
+                            Object.assign(filter, {
+                                withdrawReinitiate: true
+                            });
+                        } else {
+                            delete filter['totalAmount'];
+                            delete filter['withdrawPercent'];
+                            message = "Withdraw to contract already in process.";
+                            messageType = "info";
+                        }
+                    }
                 }
             }
 
@@ -437,7 +476,8 @@ const swapProviderController = {
             
             if(usp.ok == 1){
                 return res.status(200).json({
-                    "message": "Record updated"
+                    "message": message,
+                    "messageType": messageType
                 });
             }
         
@@ -1642,56 +1682,70 @@ const swapProviderController = {
 
             if(usdtAmountToBuyToken > totalWithdrawnAmount){
                 usdtAmountToBuyToken = usdtAmountToBuyToken - totalWithdrawnAmount;
-                let amount = Number(usdtAmountToBuyToken) / Number(price);
-    
-                let response = await exchangeInstace.createOrder(`${asset}/USDT`, 'MARKET', 'buy', amount);
-                print.info(response);
-    
-                if(response !== null && response.hasOwnProperty('id')){
-                    // save order
-                    let args = {
-                        'swapProvider': swapProvider._id,
-                        'type': 'distribution',
-                        'spot': {
-                            'asset': response.symbol,
-                            'type': response.type,
-                            'side': response.side,
-                            'orderId': response.id,
-                            'price': response.price,
-                            'origQty': response.info.origQty,
-                            'executedQty': response.info.executedQty,
-                            'cummulativeQuoteQty': response.info.executedQty,
-                            'status': response.info.status,
-                            'cancelledOrderIds': []
-                        }
-                    };
-    
-                    try {
-                        if(existingOrder == null){
-                            await new Order(args).save();
-                        } else {
-                            let cancelledOrderIdsArray = [];
-                            for(let i=0; i<existingOrder.spot.cancelledOrderIds.length; i++){
-                                cancelledOrderIdsArray.push(existingOrder.spot.cancelledOrderIds[i]);
+
+                if(usdtAmountToBuyToken < 50){
+                    await SwapProvider.updateOne({
+                        _id: swapProvider._id
+                    }, {
+                        distributionStatus: "FAILED",
+                        withdrawReinitiate: false,
+                        message: "Withdraw amount less then $50"
+                    }).then(async(res) => {
+                        print.info(`swapProvider ${swapProvider._id}, Withdraw amount less then $50.`);
+                    }).catch(err => print.info('❌ Error from newSpotOrderHandler: swapProvider.updateOne with withdrawReinitiate flag false., ' + err.message));                    
+                } else {
+                    let amount = Number(usdtAmountToBuyToken) / Number(price);
+        
+                    let response = await exchangeInstace.createOrder(`${asset}/USDT`, 'MARKET', 'buy', amount);
+                    print.info(response);
+        
+                    if(response !== null && response.hasOwnProperty('id')){
+                        // save order
+                        let args = {
+                            'swapProvider': swapProvider._id,
+                            'type': 'distribution',
+                            'spot': {
+                                'asset': response.symbol,
+                                'type': response.type,
+                                'side': response.side,
+                                'orderId': response.id,
+                                'price': response.price,
+                                'origQty': response.info.origQty,
+                                'executedQty': response.info.executedQty,
+                                'cummulativeQuoteQty': response.info.executedQty,
+                                'status': response.info.status,
+                                'cancelledOrderIds': []
                             }
-                            cancelledOrderIdsArray.push(existingOrder.spot.orderId);
-                            args.spot['cancelledOrderIds'] = cancelledOrderIdsArray;
-                            try {
-                                await Order.updateOne({
-                                    _id: existingOrder._id,
-                                }, {
-                                    'spot': args.spot
-                                });
-                            } catch(err){
-                                print.info(`❌ Error From newSpotOrderHandler updateOne:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
-                                await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, existingOrder._id, err.message);
+                        };
+        
+                        try {
+                            if(existingOrder == null){
+                                await new Order(args).save();
+                            } else {
+                                let cancelledOrderIdsArray = [];
+                                for(let i=0; i<existingOrder.spot.cancelledOrderIds.length; i++){
+                                    cancelledOrderIdsArray.push(existingOrder.spot.cancelledOrderIds[i]);
+                                }
+                                cancelledOrderIdsArray.push(existingOrder.spot.orderId);
+                                args.spot['cancelledOrderIds'] = cancelledOrderIdsArray;
+                                try {
+                                    await Order.updateOne({
+                                        _id: existingOrder._id,
+                                    }, {
+                                        'spot': args.spot
+                                    });
+                                } catch(err){
+                                    print.info(`❌ Error From newSpotOrderHandler updateOne:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+                                    await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, existingOrder._id, err.message);
+                                }
                             }
+                        } catch(err){
+                            print.info(`❌ Error From saveOrder:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+                            await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, null, err.message);
                         }
-                    } catch(err){
-                        print.info(`❌ Error From saveOrder:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
-                        await swapProviderController.errorHandler('newSpotOrderHandler', swapProvider._id, null, err.message);
                     }
                 }
+
             } else {
                 // turn off withdrawReinitiate because amount is less
                 let recievedAmount = Number(swapProvider.totalAmount) - Number(usdtAmountToBuyToken);
