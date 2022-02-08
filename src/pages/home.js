@@ -32,7 +32,7 @@ import Carousel from "react-multi-carousel";
 import AnimatedNumber from "react-animated-numbers";
 import "react-multi-carousel/lib/styles.css";
 import { isValidAddress } from 'ethereumjs-util';
-import reimbursementAbi from "../abis/reimbursementAbi.json";
+import reimbursementAbi from "../abis/reimbursementAbi.json"; 
 
 import SBLogo01 from "../assets/images/sb-ICO-01.png";
 import SBLogo02 from "../assets/images/sb-ICO-02.png";
@@ -1882,9 +1882,9 @@ export default class Home extends PureComponent {
               <div className="fsbg_sad01"></div>
               <div className="fsbg_container">
                 <video loop autoPlay muted className="fullscreen-bg__video">
-                  <source src="video/smartswap.webm" type="video/webm" />
-                  <source src="video/smartswap.mp4" type="video/mp4" />
-                  <source src="video/smartswap.ogv" type="video/ogg" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.webm"} type="video/webm" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4"} type="video/mp4" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv"} type="video/ogg" /> 
                 </video>
               </div>
             </div>
@@ -1950,61 +1950,57 @@ export default class Home extends PureComponent {
                         Unlimited Liquidity CeFi to Defi Decentralized Bridge
                       </div>
                       {this.state.wrapBox === "swap" ? (
-                        <div className="wrap-Box">
-                          <div
-                            className="swap-Wrap wow fadeInRight"
-                            data-wow-delay="0.3s"
-                          >
-                            <div class="tab-container">
-                              <div class="tab-main-wrapper">
-                                <ul class="tabs-n">
-                                  <li class="tab-link current-n" data-tab="tab-1">CRYPTO
-                                    <span class="text-sm-n">LIVE BETA</span>
-                                  </li>
-                                  <li class="tab-link" data-tab="tab-2" style={{ pointerEvents: 'none', filter: 'brightness(0.5)' }}>W3B
-                                    <span class="text-sm-n">COMING SOON</span>
-                                  </li>
-                                  <li class="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none', filter: 'brightness(0.5)' }}>FOREX
-                                    <span class="text-sm-n">COMING SOON</span>
-                                  </li>
-                                  <li class="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none', filter: 'brightness(0.5)' }}>STOCKS
-                                    <span class="text-sm-n">COMING SOON</span>
-                                  </li>
-                                </ul>
+                        <>
+                          <div class="tab-container">
+                            <div class="tab-main-wrapper">
+                              <ul class="tabs-n">
+                                <li class="tab-link current-n" data-tab="tab-1">CRYPTO
+                                  <span class="text-sm-n">LIVE BETA</span>
+                                </li>
+                                <li class="tab-link" data-tab="tab-2" style={{ pointerEvents: 'none' }}>W3B
+                                  <span class="text-sm-n">COMING SOON</span>
+                                </li>
+                                <li class="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>FOREX
+                                  <span class="text-sm-n">COMING SOON</span>
+                                </li>
+                                <li class="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none' }}>STOCKS
+                                  <span class="text-sm-n">COMING SOON</span>
+                                </li>
+                              </ul>
 
-                                <div class="tab-content-n-main">
-                                  <div id="tab-1" class="tab-content-n current-n">
-                                    <div class="">
-                                      <div class="form-group-n d-flex items-center-n">
-                                        <div class="flex-1 w-100-sm flex-auto-sm">
-                                          <label for="" class="form-label">from</label>
-                                          <div class="inputs-wrap light-controls-n">
-                                            <span class="currency-ic-n">
-                                              $
-                                            </span>
-                                            <div class="inputs-wrap-control">
-                                              <input
-                                                type="text"
-                                                class="form-control-n"
-                                                placeholder="Enter amount"
-                                                id="input04"
-                                                value={this.state.sendFundAmount}
-                                                onKeyDown={(e) => Validation.floatOnly(e)}
-                                                onChange={this.recivedToken.bind(this)}
-                                                autoComplete="off"
-                                              />
-                                              <div class="relative select-item-wrap curICPL">
-                                                <img src={
-                                                  "images/currencies/" +
-                                                  data.tokenDetails[
-                                                    this.state.selectedSendCurrency
-                                                  ].iconName +
-                                                  ".png"
-                                                } />{this.state.selectedSendCurrency}
-                                                {/* <select class="select-item" id="bnb" name="currency"> */}
-                                                {/* <option value="btc" data-icon="images/bnb.png"> BNB</option>
+                              <div class="tab-content-n-main">
+                                <div id="tab-1" class="tab-content-n current-n">
+                                  <div class="">
+                                    <div class="form-group-n d-flex items-center-n">
+                                      <div class="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" class="form-label">from</label>
+                                        <div class="inputs-wrap light-controls-n">
+                                          <span class="currency-ic-n">
+                                            $
+                                          </span>
+                                          <div class="inputs-wrap-control">
+                                            <input
+                                              type="text"
+                                              class="form-control-n"
+                                              placeholder="Enter amount"
+                                              id="input04"
+                                              value={this.state.sendFundAmount}
+                                              onKeyDown={(e) => Validation.floatOnly(e)}
+                                              onChange={this.recivedToken.bind(this)}
+                                              autoComplete="off"
+                                            />
+                                            <div class="relative select-item-wrap curICPL">
+                                              <img src={
+                                                "images/currencies/" +
+                                                data.tokenDetails[
+                                                  this.state.selectedSendCurrency
+                                                ].iconName +
+                                                ".png"
+                                              } />{this.state.selectedSendCurrency}
+                                              {/* <select class="select-item" id="bnb" name="currency"> */}
+                                              {/* <option value="btc" data-icon="images/bnb.png"> BNB</option>
                                                   <option value="eth" data-icon="images/eth.png"> ETH</option> */}
-                                                {/* <option
+                                              {/* <option
                                                     value={this.state.selectedSendCurrency}
                                                     data-icon={
                                                       "images/currencies/" +
@@ -2015,44 +2011,43 @@ export default class Home extends PureComponent {
                                                     }
                                                   > {this.state.selectedSendCurrency}</option>
                                                 </select> */}
-                                              </div>
                                             </div>
                                           </div>
-                                          <p class="form-label font-normal pl-50">≈ {this.state.actualSendFundAmount.toFixed(5)} | 1 {this.state.selectedSendCurrency} : ${this.state.currencyPrices[this.state.selectedSendCurrency]}</p>
                                         </div>
-                                        <div class="form-ic">
-                                          <a
-                                            href="javascript:void(0);"
-                                            onClick={() => {
-                                              this.changeCurrency(true);
-                                            }}
-                                          ><img src="images/form-middle-ic.png" alt="" /></a>
-                                        </div>
-                                        <div class="flex-1 w-100-sm flex-auto-sm">
-                                          <label for="" class="form-label">to</label>
-                                          <div class="inputs-wrap dark-controls-n">
-                                            <span class="currency-ic-n">
-                                              $
-                                            </span>
-                                            <div class="inputs-wrap-control">
-                                              <input
-                                                type="text"
-                                                class="form-control-n"
-                                                placeholder="Enter amount"
-                                                readOnly=""
-                                                disabled
-                                                style={{ background: "#3d3d3d" }}
-                                                value={this.state.sendFundAmount}
-                                              />
-                                              <div class="relative select-item-wrap curICPL">
-                                                <img src={
-                                                  "images/currencies/" +
-                                                  data.tokenDetails[
-                                                    this.state.selectedReceiveCurrency
-                                                  ].iconName +
-                                                  ".png"
-                                                } />{this.state.selectedReceiveCurrency}
-                                                {/* <select class="select-item" id="eth" name="currency">
+                                        <p class="form-label font-normal pl-50">≈ {this.state.actualSendFundAmount.toFixed(5)} | 1 {this.state.selectedSendCurrency} : ${this.state.currencyPrices[this.state.selectedSendCurrency]}</p>
+                                      </div>
+                                      <div class="form-ic">
+                                        <a
+                                          href="javascript:void(0);"
+                                          onClick={() => {
+                                            this.changeCurrency(true);
+                                          }}
+                                        ><img src="images/form-middle-ic.png" alt="" /></a>
+                                      </div>
+                                      <div class="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" class="form-label">to</label>
+                                        <div class="inputs-wrap dark-controls-n">
+                                          <span class="currency-ic-n">
+                                            $
+                                          </span>
+                                          <div class="inputs-wrap-control">
+                                            <input
+                                              type="text"
+                                              class="form-control-n"
+                                              placeholder="Enter amount"
+                                              readOnly=""
+                                              disabled 
+                                              value={this.state.sendFundAmount}
+                                            />
+                                            <div class="relative select-item-wrap curICPL02">
+                                              <img src={
+                                                "images/currencies/" +
+                                                data.tokenDetails[
+                                                  this.state.selectedReceiveCurrency
+                                                ].iconName +
+                                                ".png"
+                                              } />{this.state.selectedReceiveCurrency}
+                                              {/* <select class="select-item" id="eth" name="currency">
                                                   <option
                                                     selected
                                                     value={this.state.selectedReceiveCurrency}
@@ -2064,258 +2059,258 @@ export default class Home extends PureComponent {
                                                       ".png"
                                                     }
                                                   > {this.state.selectedReceiveCurrency}</option> */}
-                                                {/* <option value="btc" data-icon="images/bnb.png"> BNB</option> */}
-                                                {/* </select> */}
-                                              </div>
+                                              {/* <option value="btc" data-icon="images/bnb.png"> BNB</option> */}
+                                              {/* </select> */}
                                             </div>
                                           </div>
-                                          <p class="form-label font-normal pl-50">≈ {this.state.approxReceiveFundAmount.toFixed(5)} | 1 {this.state.selectedReceiveCurrency} : ${this.state.currencyPrices[this.state.selectedReceiveCurrency]}</p>
                                         </div>
+                                        <p class="form-label font-normal pl-50">≈ {this.state.approxReceiveFundAmount.toFixed(5)} | 1 {this.state.selectedReceiveCurrency} : ${this.state.currencyPrices[this.state.selectedReceiveCurrency]}</p>
                                       </div>
-                                      <div class="text-center">
-                                        {this.state.web3 === null ||
-                                          constantConfig.tokenDetails[
-                                            this.state.selectedSendCurrency
-                                          ].networkId !== web3Config.getNetworkId() ? (
-                                          <button class="btn-primary-n ani-1 connect" style={{ background: "#5c6bc0" }} onClick={this.connectWallet.bind(this)}><span>
-                                            <i
-                                              className={
-                                                data.tokenDetails[
-                                                  this.state.selectedSendCurrency
-                                                ].networkId ===
-                                                  CONSTANT.NETWORK_ID.ETHEREUM
-                                                  ? "ETH"
-                                                  : "BNB"
-                                              }
-                                            ></i>
-                                          </span>
-                                            CONNECT YOUR WALLET</button>
-
-                                        ) : constantConfig.tokenDetails[
+                                    </div>
+                                    <div class="text-center">
+                                      {this.state.web3 === null ||
+                                        constantConfig.tokenDetails[
                                           this.state.selectedSendCurrency
-                                        ].approveRequire &&
-                                          this.state.tokenBalances[
-                                          this.state.selectedSendCurrency + "_APPROVED"
-                                          ] <= this.state.actualSendFundAmount ? (
-                                          this.state.approveLoading ? (
-                                            <button class="btn-primary-n ani-1 connect swap"><LoopCircleLoading
-                                              height={"20px"}
-                                              width={"20px"}
-                                              color={"#ffffff"}
-                                            /></button>
-                                          ) : (
-                                            <button class="btn-primary-n ani-1 connect swap" onClick={() => {
-                                              this.approve();
-                                            }}>Approve</button>
-                                          )
-                                        ) : this.state.swapLoading ? (
+                                        ].networkId !== web3Config.getNetworkId() ? (
+                                        <button class="btn-primary-n ani-1 connect" style={{ background: "#5c6bc0" }} onClick={this.connectWallet.bind(this)}><span>
+                                          <i
+                                            className={
+                                              data.tokenDetails[
+                                                this.state.selectedSendCurrency
+                                              ].networkId ===
+                                                CONSTANT.NETWORK_ID.ETHEREUM
+                                                ? "ETH"
+                                                : "BNB"
+                                            }
+                                          ></i>
+                                        </span>
+                                          CONNECT YOUR WALLET</button>
+
+                                      ) : constantConfig.tokenDetails[
+                                        this.state.selectedSendCurrency
+                                      ].approveRequire &&
+                                        this.state.tokenBalances[
+                                        this.state.selectedSendCurrency + "_APPROVED"
+                                        ] <= this.state.actualSendFundAmount ? (
+                                        this.state.approveLoading ? (
                                           <button class="btn-primary-n ani-1 connect swap"><LoopCircleLoading
                                             height={"20px"}
                                             width={"20px"}
                                             color={"#ffffff"}
                                           /></button>
                                         ) : (
-                                          <button class="btn-primary-n ani-1 connect swap swapBtn" onClick={() => {
-                                            this.swap();
-                                          }}>SWAP</button>
-                                        )}
+                                          <button class="btn-primary-n ani-1 connect swap" onClick={() => {
+                                            this.approve();
+                                          }}>Approve</button>
+                                        )
+                                      ) : this.state.swapLoading ? (
+                                        <button class="btn-primary-n ani-1 connect swap"><LoopCircleLoading
+                                          height={"20px"}
+                                          width={"20px"}
+                                          color={"#ffffff"}
+                                        /></button>
+                                      ) : (
+                                        <button class="btn-primary-n ani-1 connect swap swapBtn" onClick={() => {
+                                          this.swap();
+                                        }}>SWAP</button>
+                                      )}
 
-                                        <p class="font-11 color-light-n mb-0-n">{this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ? "You are swapping $" + this.state.sendFundAmount + " of " + this.state.selectedSendCurrency + " to $" + this.state.sendFundAmount + " of " + this.state.selectedReceiveCurrency : null}</p>
-                                      </div>
+                                      <p class="font-11 color-light-n mb-0-n">{this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ? "You are swapping $" + this.state.sendFundAmount + " of " + this.state.selectedSendCurrency + " to $" + this.state.sendFundAmount + " of " + this.state.selectedReceiveCurrency : null}</p>
                                     </div>
                                   </div>
-                                  <div id="tab-2" class="tab-content-n">
-                                    <div class="">
-                                      <div class="form-group-n d-flex items-center-n">
-                                        <div class="flex-1 w-100-sm flex-auto-sm">
-                                          <label for="" class="form-label">from</label>
-                                          <div class="inputs-wrap light-controls-n">
-                                            <span class="currency-ic-n">
-                                              $
-                                            </span>
-                                            <div class="inputs-wrap-control">
-                                              <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                              <div class="relative select-item-wrap">
-                                                <select class="select-item" id="bnb2" name="currency">
-                                                  <option value="btc" data-icon="images/bnb.png"> BNB</option>
-                                                  <option value="eth" data-icon="images/eth.png"> ETH</option>
-                                                </select>
-                                              </div>
+                                </div>
+                                <div id="tab-2" class="tab-content-n">
+                                  <div class="">
+                                    <div class="form-group-n d-flex items-center-n">
+                                      <div class="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" class="form-label">from</label>
+                                        <div class="inputs-wrap light-controls-n">
+                                          <span class="currency-ic-n">
+                                            $
+                                          </span>
+                                          <div class="inputs-wrap-control">
+                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
+                                            <div class="relative select-item-wrap">
+                                              <select class="select-item" id="bnb2" name="currency">
+                                                <option value="btc" data-icon="images/bnb.png"> BNB</option>
+                                                <option value="eth" data-icon="images/eth.png"> ETH</option>
+                                              </select>
                                             </div>
                                           </div>
-                                          <p class="form-label font-normal pl-50">≈ 0.0123 | 1 BNB : $257.63</p>
                                         </div>
-                                        <div class="form-ic">
-                                          <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
-                                        </div>
-                                        <div class="flex-1 w-100-sm flex-auto-sm">
-                                          <label for="" class="form-label">to</label>
-                                          <div class="inputs-wrap dark-controls-n">
-                                            <span class="currency-ic-n">
-                                              $
-                                            </span>
-                                            <div class="inputs-wrap-control">
-                                              <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                              <div class="relative select-item-wrap">
-                                                <select class="select-item" id="eth2" name="demo">
-                                                  <option value="btc" data-icon="images/bnb.png"> BNB</option>
-                                                  <option value="eth" data-icon="images/eth.png"> ETH</option>
-                                                </select>
-                                              </div>
+                                        <p class="form-label font-normal pl-50">≈ 0.0123 | 1 BNB : $257.63</p>
+                                      </div>
+                                      <div class="form-ic">
+                                        <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
+                                      </div>
+                                      <div class="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" class="form-label">to</label>
+                                        <div class="inputs-wrap dark-controls-n">
+                                          <span class="currency-ic-n">
+                                            $
+                                          </span>
+                                          <div class="inputs-wrap-control">
+                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
+                                            <div class="relative select-item-wrap">
+                                              <select class="select-item" id="eth2" name="demo">
+                                                <option value="btc" data-icon="images/bnb.png"> BNB</option>
+                                                <option value="eth" data-icon="images/eth.png"> ETH</option>
+                                              </select>
                                             </div>
                                           </div>
-                                          <p class="form-label font-normal pl-50">≈ 3.2025 | 1 ETH : $2,070.12</p>
                                         </div>
+                                        <p class="form-label font-normal pl-50">≈ 3.2025 | 1 ETH : $2,070.12</p>
                                       </div>
-                                      <div class="text-center">
-                                        <button class="btn-primary-n">SWAP</button>
-                                        <p class="font-11 color-light-n mb-0-n">You are swapping $100 of BNB to $100 of ETH</p>
-                                      </div>
+                                    </div>
+                                    <div class="text-center">
+                                      <button class="btn-primary-n">SWAP</button>
+                                      <p class="font-11 color-light-n mb-0-n">You are swapping $100 of BNB to $100 of ETH</p>
                                     </div>
                                   </div>
-                                  <div id="tab-3" class="tab-content-n">
-                                    <div class="">
-                                      <div class="form-group-n d-flex items-center-n">
-                                        <div class="flex-1 w-100-sm flex-auto-sm">
-                                          <label for="" class="form-label">from</label>
-                                          <div class="inputs-wrap light-controls-n">
-                                            <span class="currency-ic-n">
-                                              $
-                                            </span>
-                                            <div class="inputs-wrap-control">
-                                              <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                              <div class="relative select-item-wrap">
-                                                <select class="select-item" id="usd" name="currency">
-                                                  <option value="USD" data-icon="images/usd.png" > USD</option>
-                                                  <option value="EUR" data-icon="images/eur.png"> EUR</option>
-                                                </select>
-                                              </div>
+                                </div>
+                                <div id="tab-3" class="tab-content-n">
+                                  <div class="">
+                                    <div class="form-group-n d-flex items-center-n">
+                                      <div class="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" class="form-label">from</label>
+                                        <div class="inputs-wrap light-controls-n">
+                                          <span class="currency-ic-n">
+                                            $
+                                          </span>
+                                          <div class="inputs-wrap-control">
+                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
+                                            <div class="relative select-item-wrap">
+                                              <select class="select-item" id="usd" name="currency">
+                                                <option value="USD" data-icon="images/usd.png" > USD</option>
+                                                <option value="EUR" data-icon="images/eur.png"> EUR</option>
+                                              </select>
                                             </div>
                                           </div>
-                                          <p class="form-label font-normal pl-50">1 EUR = 1.1414 USD</p>
                                         </div>
-                                        <div class="form-ic">
-                                          <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
-                                        </div>
-                                        <div class="flex-1 w-100-sm flex-auto-sm">
-                                          <label for="" class="form-label">to</label>
-                                          <div class="inputs-wrap dark-controls-n">
-                                            <span class="currency-ic-n">
-                                              $
-                                            </span>
-                                            <div class="inputs-wrap-control">
-                                              <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                              <div class="relative select-item-wrap">
-                                                <select class="select-item" id="eur" name="demo">
-                                                  <option value="EUR" data-icon="images/eur.png"> EUR</option>
-                                                  <option value="USD" data-icon="images/usd.png"> USD</option>
-                                                </select>
-                                              </div>
+                                        <p class="form-label font-normal pl-50">1 EUR = 1.1414 USD</p>
+                                      </div>
+                                      <div class="form-ic">
+                                        <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
+                                      </div>
+                                      <div class="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" class="form-label">to</label>
+                                        <div class="inputs-wrap dark-controls-n">
+                                          <span class="currency-ic-n">
+                                            $
+                                          </span>
+                                          <div class="inputs-wrap-control">
+                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
+                                            <div class="relative select-item-wrap">
+                                              <select class="select-item" id="eur" name="demo">
+                                                <option value="EUR" data-icon="images/eur.png"> EUR</option>
+                                                <option value="USD" data-icon="images/usd.png"> USD</option>
+                                              </select>
                                             </div>
                                           </div>
-                                          <p class="form-label font-normal pl-50">1 EUR = 1.1414 USD</p>
                                         </div>
+                                        <p class="form-label font-normal pl-50">1 EUR = 1.1414 USD</p>
                                       </div>
-                                      <div class="text-center">
-                                        <button class="btn-primary-n">SWAP</button>
-                                      </div>
-                                      <p class="font-11 color-light-n mb-0-n text-with-svg-sm">
-                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" class="svg-inline--fa fa-cog fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg>
-                                        <span class="text-between-ic"> Estimated gas and fees: 0.0015 USD</span>
-                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" class="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
-                                      </p>
                                     </div>
+                                    <div class="text-center">
+                                      <button class="btn-primary-n">SWAP</button>
+                                    </div>
+                                    <p class="font-11 color-light-n mb-0-n text-with-svg-sm">
+                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" class="svg-inline--fa fa-cog fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg>
+                                      <span class="text-between-ic"> Estimated gas and fees: 0.0015 USD</span>
+                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" class="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
+                                    </p>
                                   </div>
-                                  <div id="tab-4" class="tab-content-n">
-                                    <div class="">
-                                      <div class="form-group-n d-flex items-center-n">
-                                        <div class="flex-1 w-100-sm flex-auto-sm">
-                                          <label for="" class="form-label">from</label>
-                                          <div class="inputs-wrap light-controls-n">
-                                            <span class="currency-ic-n">
-                                              $
-                                            </span>
-                                            <div class="inputs-wrap-control">
-                                              <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                              <div class="relative select-item-wrap">
-                                                <select class="select-item no-img" id="jd1" name="currency">
-                                                  <option value="JD.com" > JD.com</option>
-                                                  <option value="Yandex" > Yandex</option>
-                                                </select>
-                                              </div>
+                                </div>
+                                <div id="tab-4" class="tab-content-n">
+                                  <div class="">
+                                    <div class="form-group-n d-flex items-center-n">
+                                      <div class="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" class="form-label">from</label>
+                                        <div class="inputs-wrap light-controls-n">
+                                          <span class="currency-ic-n">
+                                            $
+                                          </span>
+                                          <div class="inputs-wrap-control">
+                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
+                                            <div class="relative select-item-wrap">
+                                              <select class="select-item no-img" id="jd1" name="currency">
+                                                <option value="JD.com" > JD.com</option>
+                                                <option value="Yandex" > Yandex</option>
+                                              </select>
                                             </div>
                                           </div>
-                                          <p class="form-label font-normal pl-50">1 JD.COM = 0.8759 YANDEX
-                                          </p>
                                         </div>
-                                        <div class="form-ic">
-                                          <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
-                                        </div>
-                                        <div class="flex-1 w-100-sm flex-auto-sm">
-                                          <label for="" class="form-label">to</label>
-                                          <div class="inputs-wrap dark-controls-n">
-                                            <span class="currency-ic-n">
-                                              $
-                                            </span>
-                                            <div class="inputs-wrap-control">
-                                              <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                              <div class="relative select-item-wrap">
-                                                <select class="select-item no-img" id="jd2" name="demo">
-                                                  <option value="Yandex" > Yandex</option>
-                                                  <option value="JD.com" > JD.com</option>
-                                                </select>
-                                              </div>
+                                        <p class="form-label font-normal pl-50">1 JD.COM = 0.8759 YANDEX
+                                        </p>
+                                      </div>
+                                      <div class="form-ic">
+                                        <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
+                                      </div>
+                                      <div class="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" class="form-label">to</label>
+                                        <div class="inputs-wrap dark-controls-n">
+                                          <span class="currency-ic-n">
+                                            $
+                                          </span>
+                                          <div class="inputs-wrap-control">
+                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
+                                            <div class="relative select-item-wrap">
+                                              <select class="select-item no-img" id="jd2" name="demo">
+                                                <option value="Yandex" > Yandex</option>
+                                                <option value="JD.com" > JD.com</option>
+                                              </select>
                                             </div>
                                           </div>
-                                          <p class="form-label font-normal pl-50">1 YANDEX = 1.1414 JD.COM
-                                          </p>
                                         </div>
+                                        <p class="form-label font-normal pl-50">1 YANDEX = 1.1414 JD.COM
+                                        </p>
                                       </div>
-                                      <div class="text-center">
-                                        <button class="btn-primary-n">SWAP</button>
-                                      </div>
-                                      <p class="font-11 color-light-n mb-0-n text-with-svg-sm">
-                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" class="svg-inline--fa fa-cog fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg>
-                                        <span class="text-between-ic"> Estimated gas and fees: 0.0015 USD</span>
-                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" class="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
-                                      </p>
                                     </div>
+                                    <div class="text-center">
+                                      <button class="btn-primary-n">SWAP</button>
+                                    </div>
+                                    <p class="font-11 color-light-n mb-0-n text-with-svg-sm">
+                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" class="svg-inline--fa fa-cog fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg>
+                                      <span class="text-between-ic"> Estimated gas and fees: 0.0015 USD</span>
+                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" class="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
+                                    </p>
                                   </div>
                                 </div>
                               </div>
-
                             </div>
-                            <div className="swap-Textlink">
-                              {this.state.web3 !== null ? (
-                                <div className="swap-Link01">
-                                  <a
-                                    className="icon-Box Setting"
-                                    // onClick={() => { this.setState({ sideBar: !this.state.sideBar }) }}
-                                    href="javascript:void(0);"
-                                  >
-                                    <i className="fas fa-cog"></i>
-                                  </a>
-                                  Estimated gas and fees:
-                                  {Number(this.state.estimatedGasFee).toFixed(
-                                    5
-                                  )}{" "}
-                                  {this.state.selectedSendCurrency}{" "}
-                                  <a
-                                    href="javascript:void(0);"
-                                    className="gas-Est"
-                                  >
-                                    <i
-                                      className="fas fa-question-circle"
-                                      aria-hidden="true"
-                                    ></i>
-                                  </a>
-                                </div>
-                              ) : (
-                                <div className="powertextBX">
-                                  Powered by <img src="images/smLOGO.png" />{" "}
-                                </div>
-                              )}
-                              {/* <div className="swap-Link03">
+
+                          </div>
+                          <div className="swap-Textlink">
+                            {this.state.web3 !== null ? (
+                              <div className="swap-Link01">
+                                <a
+                                  className="icon-Box Setting"
+                                  // onClick={() => { this.setState({ sideBar: !this.state.sideBar }) }}
+                                  href="javascript:void(0);"
+                                >
+                                  <i className="fas fa-cog"></i>
+                                </a>
+                                Estimated gas and fees:
+                                {Number(this.state.estimatedGasFee).toFixed(
+                                  5
+                                )}{" "}
+                                {this.state.selectedSendCurrency}{" "}
+                                <a
+                                  href="javascript:void(0);"
+                                  className="gas-Est"
+                                >
+                                  <i
+                                    className="fas fa-question-circle"
+                                    aria-hidden="true"
+                                  ></i>
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="powertextBX">
+                                Powered by <img src="images/smLOGO.png" />{" "}
+                              </div>
+                            )}
+                            {/* <div className="swap-Link03">
                                                 <a href="javascript:void();">P2C</a> | <a href="javascript:void();">P2G</a> | <a
                                                     href="javascript:void();">P2P</a>
                                             </div>
@@ -2337,9 +2332,8 @@ export default class Home extends PureComponent {
                                                         SmartSwap reimburses users with ZERO/1 at 100%.</p>
                                                 </div>
                                             </div> */}
-                            </div>
                           </div>
-                        </div>
+                        </>
                       ) : this.state.wrapBox === "success" ? (
                         <div className="wrap-Box">
                           <div

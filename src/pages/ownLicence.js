@@ -2,6 +2,7 @@ import React, { PureComponent, lazy, Suspense } from "react";
 import InputRange from "react-input-range";
 
 import { Redirect } from "react-router-dom";
+import { Link, NavLink } from 'react-router-dom' 
 import web3Js from "web3";
 import Web3 from "web3";
 import web3Config from "../config/web3Config";
@@ -1352,9 +1353,9 @@ export default class ownLicence extends PureComponent {
           <div className="fsbg_sad01"></div>
           <div className="fsbg_container">
             <video loop autoPlay muted className="fullscreen-bg__video">
-              <source src="video/smartswap.webm" type="video/webm" />
-              <source src="video/smartswap.mp4" type="video/mp4" />
-              <source src="video/smartswap.ogv" type="video/ogg" />
+            <source src={CONSTANT.PrePath + "/video/14559736-hd.webm"} type="video/webm" />
+            <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4"} type="video/mp4" />
+            <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv"} type="video/ogg" /> 
             </video>
           </div>
         </div>
@@ -1375,6 +1376,8 @@ export default class ownLicence extends PureComponent {
           {/* <!--======================= HEADER END =====================--> */}
           <div className="mainBlock">
             {/* <!--======================= SWAP BLOCK START =====================--> */}
+
+            <Link to="/" class="close-Icon" style={{zIndex : '1000', top : '70px', right : '35px'}}></Link>
             <div className="swap-Block">
               <div className="container-Grid">
                 <div className="smeTitle01-v2"> {/*   onClick={() => { this.openPopup("WithdrawToken"); }} */}

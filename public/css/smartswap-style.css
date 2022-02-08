@@ -3,7 +3,7 @@ body {
   background: #0e0424;
   margin: 0 auto;
   color: #fff;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Montserrat", monospace;
 }
 #main {
   overflow: hidden;
@@ -456,7 +456,7 @@ body {
   width: 100%;
   align-items: center;
   margin-bottom: 11px;
-  font: 400 9px/14px "Press Start 2P", arial;
+  font: 400 9px/14px "Montserrat", arial;
 }
 .smartSwap .msb-Waddress a.rmDotLink {
   margin-left: auto;
@@ -3633,9 +3633,9 @@ ul {
 }
 /* End of Licence Form Style */
 .smeTitle01 {
-  font-size: 30px;
-  font-family: "Press Start 2P", sans-serif;
-  font-weight: 400;
+  font-size: 42px;
+  font-family: "Montserrat", sans-serif;
+  font-weight:700; text-transform: uppercase;
   text-align: center;
   color: #fff;
   margin: 0 0 30px 0;
@@ -3645,7 +3645,7 @@ ul {
 }
 .smeTitle01-v2 {
   font-size: 30px;
-  font-family: "Press Start 2P", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 400;
   text-align: center;
   color: #92db28;
@@ -3654,7 +3654,7 @@ ul {
 
 .smeTitle01-v3 {
   font-size: 24px;
-  font-family: "Press Start 2P", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 400;
   text-align: center;
   color: #92db28;
@@ -4476,7 +4476,7 @@ input[type="checkbox"] {
   position: relative;
   width: 100%;
   height: 100%;
-  filter: brightness(1.2) hue-rotate(261deg);
+  /* filter: brightness(1.2) hue-rotate(261deg); */
   opacity: 0.2;
   overflow: hidden;
 }
@@ -4484,7 +4484,7 @@ input[type="checkbox"] {
   width: 100% !important;
   height: auto !important;
   position: relative;
-  left: 46px;
+  /* left: 46px; */
 }
 .fsbg_sad01 {
   position: absolute;
@@ -4497,7 +4497,7 @@ input[type="checkbox"] {
   background: url(../images/videoSad01.png) left bottom repeat-x;
 }
 .rmUserWallet {
-  font-family: "Press Start 2P", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 10px;
 }
 .auditLogo {
@@ -6139,7 +6139,7 @@ input[type="checkbox"] {
   left: -50%;
   position: relative;
   color: #a69cbe;
-  font: 300 16px/20px "IBM Plex Mono", arial;
+  font: 300 16px/20px "Montserrat", arial;
   pointer-events: none;
 }
 .dragorInput .input-range__label--max .input-range__label-container {
@@ -7017,7 +7017,7 @@ ul.tabs-n {
 }
 ul.tabs-n li {
   background: #130929;
-  color: #fff;
+  color: #805cc2;
   padding: 10px 15px;
   cursor: pointer;
   text-align: center;
@@ -7033,7 +7033,7 @@ ul.tabs-n li {
 
 ul.tabs-n li.current-n {
   background-color: rgba(18, 8, 41, 0.5);
-  color: #5b6ebb;
+  color: #a9a3c9;
 }
 
 .tab-content-n {
@@ -7078,7 +7078,7 @@ ul.tabs-n li.current-n {
   border: 0;
   background-color: #fff;
   height: 50px;
-  padding: 0 15px;
+  padding: 0 10px;
   width: 100%;
   color: #130929;
 }
@@ -7232,7 +7232,7 @@ ul.tabs-n li.current-n {
 }
 .inputs-wrap-control .form-control-n,
 .select-item-wrap {
-  width: 50%;
+  width: 50%; border-radius: 0; font-family: 'Montserrat'
 }
 .currency-ic-n {
   display: inline-flex;
@@ -7302,7 +7302,32 @@ ul.tabs-n li.current-n {
 
 .curICPL {
   padding: 0px 8px;
-  display: flex;
-  justify-content: space-between;
+  display: flex; 
   align-items: center;
+  height: 50px; 
+    background-color: #ededed;
+    padding-left: 15px;
+    border: 2px solid #fff;
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: bold;
+    color: #0F1821;font-size:16px;
 }
+.curICPL img{ margin-right:7px; max-width: 18px;}
+.curICPL02 img{ margin-right:7px; max-width: 12px;}
+
+.curICPL02 {
+  padding: 0px 8px;
+  display: flex; 
+  align-items: center;
+  height: 50px; 
+    background-color:#271f3b;
+    padding-left: 15px;
+    border: 2px solid #35294B;
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: bold;
+    color: #ffffff;font-size:16px;
+}
+
+.swap-Textlink{width: 100%; max-width: 850px;  margin: 0 auto 20px auto; }
