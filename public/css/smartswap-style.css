@@ -1674,13 +1674,16 @@ input {
   position: relative;
 }
 /*.smartSwap .swap-Wrap .swap-Textlink .swap-Link01 a { margin-left: 15px; } */
-.smartSwap .swap-Wrap .swap-Textlink .swap-Link01,
-.smartSwap .swap-Wrap .swap-Textlink .swap-Link01 a {
+ .swap-Textlink .swap-Link01,
+ .swap-Textlink .swap-Link01 a {
   font-size: 12px;
   color: #aaa;
   font-weight: 700;
   vertical-align: middle;
 }
+.swap-Textlink .swap-Link01 .icon-Box.Setting { margin-right:5px;}
+.swap-Textlink .swap-Link01 .gas-Est{ margin-left:5px;}
+
 .smartSwap .swap-Wrap .swap-Textlink .swap-Link01 {
   color: #aaa;
   font-weight: 400;
@@ -7028,8 +7031,14 @@ ul.tabs-n li {
   justify-content: center;
   font-size: 18px;
   font-weight: bold;
-  flex: 1;
+  flex: 1; margin-left:2px;
 }
+
+ul.tabs-n li:nth-child(01){ margin-left:0;}
+
+
+
+
 
 ul.tabs-n li.current-n {
   background-color: rgba(18, 8, 41, 0.5);
@@ -7305,29 +7314,37 @@ ul.tabs-n li.current-n {
   display: flex; 
   align-items: center;
   height: 50px; 
-    background-color: #ededed;
+    background-color: #fff;
     padding-left: 15px;
     border: 2px solid #fff;
     font-size: 16px;
     line-height: 20px;
     font-weight: bold;
-    color: #0F1821;font-size:16px;
+    color: #0F1821;font-size:16px; position: relative;
 }
+.curICPL:hover{ cursor: pointer; background-color: #ededed;}
+
+
 .curICPL img{ margin-right:7px; max-width: 18px;}
 .curICPL02 img{ margin-right:7px; max-width: 12px;}
+
+.curICPL:after, .curICPL02:after{ content: ""; border-width:5px; border-color:#000 transparent transparent transparent; border-style: solid; position:absolute; right:8px; top:20px;}
+.curICPL02:after{ border-color:#fff transparent transparent transparent; }
+
 
 .curICPL02 {
   padding: 0px 8px;
   display: flex; 
   align-items: center;
+  background-color:#28203B;
   height: 50px; 
-    background-color:#271f3b;
     padding-left: 15px;
-    border: 2px solid #35294B;
+    border: 2px solid #271f3b;
     font-size: 16px;
     line-height: 20px;
     font-weight: bold;
-    color: #ffffff;font-size:16px;
+    color: #ffffff;font-size:16px; position: relative;
 }
+.curICPL02:hover{ cursor: pointer;  background-color:#352A4C;}
 
 .swap-Textlink{width: 100%; max-width: 850px;  margin: 0 auto 20px auto; }

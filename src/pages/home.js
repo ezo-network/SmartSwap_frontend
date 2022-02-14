@@ -1944,10 +1944,10 @@ export default class Home extends PureComponent {
                       //     this.openPopup('About');
                       // }}
                       >
-                        <span>One click</span> slippage-free cross-chain swap
+                        <span>One click</span> SLIPPAGE-FREE MULTICHAIN SWAP
                       </div>
                       <div className="smvTitle02 wow fadeInUp" data-wow-delay="0.2s">
-                        Unlimited Liquidity CeFi to Defi Decentralized Bridge
+                      Unlimited Liquidity CeFi to Defi Decentralized Bridge <span style={{color: '#525252' }}>|</span> AMM Alternative 
                       </div>
                       {this.state.wrapBox === "swap" ? (
                         <>

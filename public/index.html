@@ -239,8 +239,8 @@
     });
     var menuOpen = false;
     var menuOpen2 = false;
-    $("#DotMenu").click(function () {
-      $(".menuSideBar").animate({ right: "0", opacity: "1" }, 500);
+    $("#DotMenu").hover(function () {
+      $(".menuSideBar").animate({ right: "0", opacity: "1" }, 800);
       menuOpen = true;
       event.stopPropagation();
     });
