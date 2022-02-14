@@ -32,7 +32,7 @@ import Carousel from "react-multi-carousel";
 import AnimatedNumber from "react-animated-numbers";
 import "react-multi-carousel/lib/styles.css";
 import { isValidAddress } from 'ethereumjs-util';
-import reimbursementAbi from "../abis/reimbursementAbi.json"; 
+import reimbursementAbi from "../abis/reimbursementAbi.json";
 
 import SBLogo01 from "../assets/images/sb-ICO-01.png";
 import SBLogo02 from "../assets/images/sb-ICO-02.png";
@@ -1847,7 +1847,7 @@ export default class Home extends PureComponent {
     let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), networkId);
 
     let allFees = await this.calculateSwapFees(processAmount);
-    await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toString(),
+    await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
       (hash) => {
         this.setState({
           // swapLoading: true,
@@ -1884,7 +1884,7 @@ export default class Home extends PureComponent {
                 <video loop autoPlay muted className="fullscreen-bg__video">
                   <source src={CONSTANT.PrePath + "/video/14559736-hd.webm"} type="video/webm" />
                   <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4"} type="video/mp4" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv"} type="video/ogg" /> 
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv"} type="video/ogg" />
                 </video>
               </div>
             </div>
@@ -2036,7 +2036,7 @@ export default class Home extends PureComponent {
                                               class="form-control-n"
                                               placeholder="Enter amount"
                                               readOnly=""
-                                              disabled 
+                                              disabled
                                               value={this.state.sendFundAmount}
                                             />
                                             <div class="relative select-item-wrap curICPL02">
