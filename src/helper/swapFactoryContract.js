@@ -192,8 +192,14 @@ class SwapFactoryContract extends EventEmitter {
             estGasCb(estGasEth);
         }).catch(error => {
             console.log(error);
-            if (error.data.code === -32000)
-                notificationConfig.error("Insufficient funds for transfer")
+            if (error.error) {
+                if (error.error.code === -32000)
+                    notificationConfig.error("Insufficient funds for transfer")
+            }
+            if (error.data) {
+                if (error.data.code === -32000)
+                    notificationConfig.error("Insufficient funds for transfer")
+            }
         });
     }
 

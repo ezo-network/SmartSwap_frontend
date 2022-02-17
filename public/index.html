@@ -31,7 +31,7 @@
       rel="stylesheet"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <link
@@ -74,12 +74,12 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="%PUBLIC_URL%/css/smartswap-style.css?v=1.14"
+      href="%PUBLIC_URL%/css/smartswap-style.css?v=1.16"
     />
     <link
       rel="stylesheet"
       type="text/css"
-      href="%PUBLIC_URL%/css/smartswap-responsive.css?v=1.12"
+      href="%PUBLIC_URL%/css/smartswap-responsive.css?v=1.16"
     />
     <script
       src="https://code.jquery.com/jquery-3.5.1.js"
@@ -110,6 +110,7 @@
   ></script>
   <script src="%PUBLIC_URL%/js/protip.min.js"></script>
   <script src="%PUBLIC_URL%/js/jquery.mCustomScrollbar.concat.min.js"></script>
+  <script src="%PUBLIC_URL%/js/custom-selectbox.js"></script>
   <script src="%PUBLIC_URL%/js/custom.js"></script>
   <script
     type="text/javascript"
@@ -238,8 +239,8 @@
     });
     var menuOpen = false;
     var menuOpen2 = false;
-    $("#DotMenu").click(function () {
-      $(".menuSideBar").animate({ right: "0", opacity: "1" }, 500);
+    $("#DotMenu").hover(function () {
+      $(".menuSideBar").animate({ right: "0", opacity: "1" }, 800);
       menuOpen = true;
       event.stopPropagation();
     });

@@ -58,11 +58,12 @@ export default function LedgerHistory(props) {
                                 href="javascript:void(0);"
                                 className="ani-1"
                             >
-                                Wait until few blocks confirmation
+                                Pending due to network gas limit
                             </a>
                             <a
                                 href="javascript:void(0);"
                                 className="ani-1"
+                                style={{ color: "white" }}
                                 onClick={() => props.expedite(props.sentTx, props.sentAmount)}
                             >
                                 Expedite
