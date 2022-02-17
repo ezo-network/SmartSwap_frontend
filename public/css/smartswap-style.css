@@ -6999,3 +6999,15 @@ p.withdrawOnContractAlert {
   border-right: 3px solid black;
   background: #43385d;
 }
+.ddIconBX img {
+  width: 25px;
+  height: 25px;
+}
+
+.step-open {
+  display: block;
+}
+
+.step-close {
+  display: none;
+}

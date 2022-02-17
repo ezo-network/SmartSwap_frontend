@@ -47,6 +47,7 @@ export interface ISwapProvider extends Document {
     tokenB: TokenB, // address of token B (reciever)
     walletAddresses: WalletAddresses,
     networkId: number, // active network id
+    crossNetworkId: number, // corss network id
     gasAndFeeAmount: Schema.Types.Decimal128 // gas And Fee
     spProfitPercent: number, // Choose the minimum that you want to gain on each repeat 
     accumulateFundsLimit: number, // Choose the minimum funds to accumulate before calming it back to your CEX account

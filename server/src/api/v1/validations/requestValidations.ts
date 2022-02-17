@@ -60,7 +60,8 @@ const requestValidations = {
 
   getActiveContractsRequest: object({
     body: object({
-      spAccount: string().required('sp wallet address is required.')
+      spAccount: string().required('sp wallet address is required.'),
+      networkId: number().required('Network id is required.')
     })
   }),
   

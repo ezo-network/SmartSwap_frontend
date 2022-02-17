@@ -10,16 +10,34 @@ const constants = {
     DB_NAME: process.env.DB_NAME,
     NETWORKS: {
         'ETH': {
-            NETWORK_ID: process.env.ETH_CHAIN_ID,
+            NETWORK_ID: Number(process.env.ETH_CHAIN_ID),
             SMARTSWAP_ADDRESS: process.env.ETH_SMARTSWAP_CONTRACT_ADDRESS,
             PROVIDER: process.env.ETH_CHAIN_PROVIDER,
-            ADDRESS: '0x0000000000000000000000000000000000000002'
+            ADDRESS: '0x0000000000000000000000000000000000000002',
+            ASSET: 'ETH',
+            MIN_WITHDRAW_AMOUNT: 0.01,
+            MIN_AMOUNT_TO_TEST_TRANSFER: 0.00000001,
+            NETWORK: 'ETH'
         },
         'BSC': {
-            NETWORK_ID: process.env.BSC_CHAIN_ID,
+            NETWORK_ID: Number(process.env.BSC_CHAIN_ID),
             SMARTSWAP_ADDRESS: process.env.BSC_SMART_SWAP_CONTRACT_ADDRESS,
             PROVIDER: process.env.BSC_CHAIN_PROVIDER,
-            ADDRESS: '0x0000000000000000000000000000000000000001'
+            ADDRESS: '0x0000000000000000000000000000000000000001',
+            ASSET: 'BNB',
+            MIN_WITHDRAW_AMOUNT: 0.01,
+            MIN_AMOUNT_TO_TEST_TRANSFER: 0.00000001,
+            NETWORK: 'BSC'
+        },
+        'POLYGON': {
+            NETWORK_ID: Number(process.env.POLYGON_CHAIN_ID),
+            SMARTSWAP_ADDRESS: process.env.POLYGON_SMART_SWAP_CONTRACT_ADDRESS,
+            PROVIDER: process.env.POLYGON_CHAIN_PROVIDER,
+            ADDRESS: '0x0000000000000000000000000000000000000004',
+            ASSET: 'MATIC',
+            MIN_WITHDRAW_AMOUNT: 0.3,
+            MIN_AMOUNT_TO_TEST_TRANSFER: 0.00000001,
+            NETWORK: 'MATIC'
         }
     }
 }

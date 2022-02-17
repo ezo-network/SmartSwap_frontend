@@ -12,22 +12,7 @@ import { AbiItem } from 'web3-utils';
 import _, { repeat } from "lodash";
 const ccxt = require ('ccxt');
 let print = log.createLogger('Logs', 'trace');
-
-let nonce = 0;
 let ccxtSandBox = false;
-
-const getRawTransactionApp = function(_address, _nonce, _gasPrice, _gasLimit, _to, _value, _data, chain_id, web3) {
-    print.info("claming on: " + chain_id)
-    return {
-        nonce: web3.utils.toHex(_nonce),
-        gasPrice: _gasPrice === null ? '0x098bca5a00' : web3.utils.toHex(_gasPrice),
-        gasLimit: _gasLimit === null ? '0x96ed' : web3.utils.toHex(_gasLimit),
-        to: _to,
-        value: _value === null ? '0x00' : web3.utils.toHex(_value),
-        data: _data === null ? '' : _data,
-        chainId: chain_id
-    }
-}
 
 const swapProviderController = {
     becomeSwapProvider: async (req: Request, res: Response) => {
@@ -50,7 +35,6 @@ const swapProviderController = {
                     }                 
                 });
             }
-            
 
             if(Number(networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID)){
                 if(tokenA !== constants.NETWORKS.ETH.ADDRESS){
@@ -61,7 +45,7 @@ const swapProviderController = {
                     });                    
                 }
 
-                if(tokenB !== constants.NETWORKS.BSC.ADDRESS){
+                if(!((tokenB == constants.NETWORKS.BSC.ADDRESS) || (tokenB == constants.NETWORKS.POLYGON.ADDRESS))){
                     return res.status(422).json({ 
                         errorMessage: {
                             error: "Invalid token B selected" 
@@ -79,7 +63,7 @@ const swapProviderController = {
                     });                    
                 }
 
-                if(tokenB !== constants.NETWORKS.ETH.ADDRESS){
+                if(!((tokenB == constants.NETWORKS.ETH.ADDRESS) || (tokenB == constants.NETWORKS.POLYGON.ADDRESS))){
                     return res.status(422).json({ 
                         errorMessage: {
                             error: "Invalid token B selected" 
@@ -88,8 +72,31 @@ const swapProviderController = {
                 }                
             }
 
+            if(Number(networkId) == Number(constants.NETWORKS.POLYGON.NETWORK_ID)){
+                console.log('herererer');
+                if(tokenA !== constants.NETWORKS.POLYGON.ADDRESS){
+                    return res.status(422).json({ 
+                        errorMessage: {
+                            error: "Invalid token A selected" 
+                        }                 
+                    });                    
+                }
 
-            let allowedNetworks = [Number(constants.NETWORKS.ETH.NETWORK_ID), Number(constants.NETWORKS.BSC.NETWORK_ID)];
+                if(!((tokenB == constants.NETWORKS.ETH.ADDRESS) || (tokenB == constants.NETWORKS.BSC.ADDRESS))){
+                    return res.status(422).json({ 
+                        errorMessage: {
+                            error: "Invalid token B selected" 
+                        }                 
+                    });                    
+                }    
+            }
+
+            let allowedNetworks = [
+                Number(constants.NETWORKS.ETH.NETWORK_ID), 
+                Number(constants.NETWORKS.BSC.NETWORK_ID),
+                Number(constants.NETWORKS.POLYGON.NETWORK_ID)
+            ];
+            
             if(!allowedNetworks.includes(Number(networkId))){
                 return res.status(422).json({ 
                     errorMessage: {
@@ -154,55 +161,12 @@ const swapProviderController = {
                 }).save();
                 return sp;
             }).catch(err => print.info(err));
-            // const swapProvider = {
-            //     tokenA: {
-            //       consumedAmount: 0,
-            //       address: '0x0000000000000000000000000000000000000002',
-            //       recievedAmount: 10
-            //     },
-            //     tokenB: { recievedAmount: 0, address: '0x0000000000000000000000000000000000000001' },
-            //     smartContractAddress: '9b909d25-079c-49ce-b937-534b77f8a9c9',
-            //     txid: '5bf54f13-7e38-4127-a65c-62754aec5815',
-            //     active: true,
-            //     _id: '6109081b8a73615144abf49f',
-            //     walletAddresses: {
-            //       toSend: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
-            //       toReceive: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8',
-            //       spAccount: '0x22a6a4Dd1eB834f62c43F8A4f58B7F6c1ED5A2F8'
-            //     },
-            //     networkId: 42,
-            //     gasAndFeeAmount: 3.3,
-            //     spProfitPercent: 0.3,
-            //     accumulateFundsLimit: 0.3,
-            //     stopRepeats: { mode: 3 },
-            //     withdraw: { mode: 3 },
-            //     cexData: { key: '00000000ab', secret: '00000000yz' },
-            //     createdAt: '2021-08-03T09:10:51.181Z',
-            //     updatedAt:'2021-08-03T09:10:51.181Z',
-            //     __v: 0
-            // }
 
             print.info({
                 "Saved SP:": swapProvider
             });
             
             return res.status(201).json(swapProvider);
-            // if(swapProvider[0].hasOwnProperty('_id')){
-            //     // call add swap provider 
-            //     // add as provider onto blockchain 
-            //     // let contractAddress = constantConfig[networkId].swapFactoryContract;                
-                
-            //     // contractAddress = "0xcb8fAb404a5b55942690457ccD0b31F1D09B5419";
-
-            //     // let provider = 42 == 42 ? INFURA_WEB_ENDPOINT : BSC_WEB_ENDPOINT
-            //     // const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
-            //     // const contractInstance = new web3.eth.Contract(swapFactoryAbi as AbiItem[], contractAddress);
-            //     //print.info(contractInstance);
-            //     // await swapProviderController.addSwapProvider(contractInstance, spArgs, web3).then(response => {
-            //     //     swapProvider['addSwapProviderResponse'] = response;
-            //     //     return res.status(201).json(swapProvider);
-            //     // });
-            // }
 
         } catch (err) {
             err['errorOrigin'] = "becomeSwapProvider";
@@ -210,43 +174,6 @@ const swapProviderController = {
                 error: err
             } });
         }
-    },
-
-    addSwapProvider: async(event, networkId) => {
-        // event = {
-        //     address: '0xcb8fAb404a5b55942690457ccD0b31F1D09B5419',
-        //     blockHash: '0x0928b0fce1f8bc0ed4e72f58975a630e4a496e015dc74aea35e0f86c13bd7991',
-        //     blockNumber: 26637578,
-        //     logIndex: 0,
-        //     removed: false,
-        //     transactionHash: '0xc399f0b6ac26abff81670904cf3a45acb59f09cd4da2c0d59c295f5b95eb94f3',
-        //     transactionIndex: 0,
-        //     transactionLogIndex: '0x0',
-        //     type: 'mined',
-        //     id: 'log_cd0a9e6a',
-        //     returnValues: {
-        //       '0': '0x216D55ef7d326c94cea812E6057b5620760828C2',
-        //       '1': '0x640961D8273Bc9d8A2784c96deCc70CF60A3a5d1',
-        //       swapProvider: '0x216D55ef7d326c94cea812E6057b5620760828C2',
-        //       spContract: '0x640961D8273Bc9d8A2784c96deCc70CF60A3a5d1'
-        //     },
-        //     event: 'AddSwapProvider',
-        //     signature: '0xa1eff58c8543affdfb5afa33295ae122f9b6fd5a1f6b5ba48a39014cfcb70b5d',
-        //     raw: {
-        //       data: '0x000000000000000000000000216d55ef7d326c94cea812e6057b5620760828c2000000000000000000000000640961d8273bc9d8a2784c96decc70cf60a3a5d1',
-        //       topics: [
-        //         '0xa1eff58c8543affdfb5afa33295ae122f9b6fd5a1f6b5ba48a39014cfcb70b5d'
-        //       ]
-        //     }
-        // };
-        //print.info(event);
-        let usp = await SwapProvider.updateOne({
-            txid: event.transactionHash,
-            networkId: networkId
-        }, {
-            smartContractAddress: event.returnValues.spContract,
-        });
-        //print.info(usp);
     },
 
     update: async(req: Request, res: Response) => {
@@ -552,11 +479,10 @@ const swapProviderController = {
     },
 
     fetchEvent: async(args) => {
-
-        const network = Number(args.networkId) === Number(constants.NETWORKS.ETH.NETWORK_ID) ? constants.NETWORKS.ETH : constants.NETWORKS.BSC;
-        const provider = network.PROVIDER;
+        const networkConfig = _.find(constants.NETWORKS, { "NETWORK_ID": Number(args.networkId) });
+        const provider = networkConfig['PROVIDER'];
         const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
-        const address = network.SMARTSWAP_ADDRESS;
+        const address = networkConfig['SMARTSWAP_ADDRESS'];
         const SWAP_INSTANCE = new web3.eth.Contract(swapFactoryAbi as AbiItem[], address);
 
         return await SWAP_INSTANCE.getPastEvents('AddSwapProvider', {
@@ -581,7 +507,7 @@ const swapProviderController = {
 
     getActiveContracts: async(req: Request, res: Response) => {
         const {
-            spAccount
+            spAccount, networkId
         } = req.body;
 
         try{
@@ -590,7 +516,8 @@ const swapProviderController = {
                 'smartContractAddress': {
                     $exists: true,
                     $ne: null
-                }
+                },
+                'networkId': Number(networkId)
             }).lean().exec();
 
             
@@ -947,12 +874,13 @@ const swapProviderController = {
         ];
 
         validAssetsToWithdraw = [
-            "BNB", "ETH"
+            "BNB", "ETH", "MATIC"
         ];
 
         withdrawalNetworks = {
             "BNB": "BSC",
-            "ETH": "ETH" 
+            "ETH": "ETH",
+            "MATIC": "MATIC"
         };
 
         try {
@@ -989,6 +917,8 @@ const swapProviderController = {
                     $ne: null
                 }
             }
+
+            const networkConfig = _.find(constants.NETWORKS, { "NETWORK_ID": Number(networkId) });
 
             // exact match with sp contact address
             if(smartContractAddress !== null && smartContractAddress !== undefined){
@@ -1028,7 +958,7 @@ const swapProviderController = {
                         defaultAsset = "USDT";
                     }
                     if(accountType == "COINM"){
-                        defaultAsset = "BNB";
+                        defaultAsset = networkConfig['ASSET'];
                     }
                     if(accountType == "SPOT_USDTM"){
                         defaultAsset = "USDT";
@@ -1071,13 +1001,13 @@ const swapProviderController = {
                         defaultAsset = (asset == null || asset == undefined) ? "USDT" : asset;
                     }
                     if(transferType == "SPOT_TO_COINM" || transferType == "COINM_TO_SPOT"){
-                        defaultAsset = (asset == null || asset == undefined) ? "BNB" : asset;
+                        defaultAsset = (asset == null || asset == undefined) ? networkConfig['ASSET'] : asset;
                     }
 
                     if(transferType == "TWO_WAY"){
                         defaultAsset = (asset == null || asset == undefined) ? "USDT" : asset;
-                    }                
-                    defaultAmount = (amount == null || amount == undefined) ? 0.00000001 : Number(amount).toFixed(8);
+                    }
+                    defaultAmount = (amount == null || amount == undefined) ? networkConfig['MIN_AMOUNT_TO_TEST_TRANSFER'] : Number(amount).toFixed(8);
                 }
 
             }
@@ -1088,6 +1018,7 @@ const swapProviderController = {
             
             
             if(sp !== null){
+
                 const spTests = await SwapProviderTest.findOne({
                     "swapProvider": sp._id
                 }).select([
@@ -1227,7 +1158,7 @@ const swapProviderController = {
                         'type': type,
                         'accountType': (accountType).toUpperCase(),
                         'asset': defaultAsset,
-                        'recievedAmount': Number(sp.tokenA.recievedAmount),
+                        'recievedAmount': Number(sp.totalAmount),
                         'leverage': leverage,
                         'spId': sp._id
                     });                    
@@ -1272,9 +1203,9 @@ const swapProviderController = {
                         //         message: "asset not allowed to withdraw, Or invalid asset"
                         //     });
                         // }
-                        defaultAsset = Number(sp.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH': 'BNB';
+                        defaultAsset = networkConfig['ASSET'];
                         defaultwithdrawalNetwork = withdrawalNetworks[defaultAsset];
-                        defaultAmount = 0.01;
+                        defaultAmount = networkConfig['MIN_WITHDRAW_AMOUNT'];
 
                         await swapProviderController.updateTest(sp._id, 'binanceWithdrawEnabledCheck', false);
                         await swapProviderController.updateTest(sp._id, 'binanceSpAddressWhiteListCheck', false);
@@ -1312,8 +1243,8 @@ const swapProviderController = {
 
     contractInstance: function(contractAddress, networkId) {
         try {
-            const network = Number(networkId) === Number(constants.NETWORKS.ETH.NETWORK_ID) ? constants.NETWORKS.ETH : constants.NETWORKS.BSC;
-            const provider = network.PROVIDER;
+            const networkConfig = _.find(constants.NETWORKS, { "NETWORK_ID": Number(networkId) });
+            const provider = networkConfig['PROVIDER'];
             const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
             return new web3.eth.Contract(spContractAbi as AbiItem[], contractAddress);    
         } catch(err){
@@ -1526,8 +1457,9 @@ const swapProviderController = {
         print.info('👉 Handle withdraw');
         try {
             let response = null;
-            let asset = Number(swapProvider.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
-            let network = asset == 'ETH' ? 'ETH': 'BSC';
+            const networkConfig = _.find(constants.NETWORKS, { "NETWORK_ID": Number(swapProvider.networkId) });
+            let asset = networkConfig['ASSET'];
+            let network = networkConfig['NETWORK'];
             let amount = Number(order.spot.executedQty);
             let address = swapProvider.smartContractAddress;
             if(order.withdraw.status == "PENDING"){
@@ -1578,12 +1510,8 @@ const swapProviderController = {
     
             } else if(order.withdraw.status == "COMPLETED"){
                 // mark distribution done on swap provider
-
-                const network = Number(swapProvider.networkId) === Number(constants.NETWORKS.ETH.NETWORK_ID) ? constants.NETWORKS.ETH : constants.NETWORKS.BSC;
-                const provider = network.PROVIDER;
-                const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
+                const web3 = new web3Js(new web3Js.providers.HttpProvider(networkConfig['PROVIDER']));
                 const address = swapProvider.smartContractAddress;
-                let asset = Number(swapProvider.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
                 let ticker = await exchangeinstance.fetchTicker(`${asset}/USDT`);
                 let price = ticker.last;
     
@@ -1640,11 +1568,10 @@ const swapProviderController = {
     newSpotOrderHandler: async(swapProvider, exchangeInstace, existingOrder = null) => {
         try {
             let spBal, spContractBal;
-            const network = Number(swapProvider.networkId) === Number(constants.NETWORKS.ETH.NETWORK_ID) ? constants.NETWORKS.ETH : constants.NETWORKS.BSC;
-            const provider = network.PROVIDER;
-            const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
+            const networkConfig = _.find(constants.NETWORKS, { "NETWORK_ID": Number(swapProvider.networkId) });
+            const web3 = new web3Js(new web3Js.providers.HttpProvider(networkConfig['PROVIDER']));
             const address = swapProvider.smartContractAddress;
-            let asset = Number(swapProvider.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
+            const asset = networkConfig['ASSET'];
 
             let totalAmount = Number(swapProvider.totalAmount);
             let withdrawPercent =  Number(swapProvider.withdrawPercent);
@@ -1778,7 +1705,8 @@ const swapProviderController = {
 
     querySpotOrderHandler: async(swapProvider, order, exchangeinstance) => {
         try {
-            let asset = Number(swapProvider.networkId) == Number(constants.NETWORKS.ETH.NETWORK_ID) ? 'ETH' : 'BNB';
+            const networkConfig = _.find(constants.NETWORKS, { "NETWORK_ID": Number(swapProvider.networkId) });
+            const asset = networkConfig['ASSET'];
             let response = await exchangeinstance.fetchOrder(order.spot.orderId, `${asset}/USDT`);
             if(response !== null && response.hasOwnProperty('id')){
                 if(response.info.status == "FILLED"){

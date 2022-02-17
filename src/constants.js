@@ -21,8 +21,10 @@ CONSTANT.currencyAddresses = {
 CONSTANT.NETWORK_ID = {
     'ETHEREUM': Number(process.env.REACT_APP_ETH_CHAIN_ID),
     'BINANCE': Number(process.env.REACT_APP_BSC_CHAIN_ID),
+    'POLYGON': Number(process.env.REACT_APP_POLYGON_CHAIN_ID),
     [Number(process.env.REACT_APP_ETH_CHAIN_ID)]: 'ETHEREUM',
-    [Number(process.env.REACT_APP_BSC_CHAIN_ID)]: 'BINANCE'
+    [Number(process.env.REACT_APP_BSC_CHAIN_ID)]: 'BINANCE',
+    [Number(process.env.REACT_APP_POLYGON_CHAIN_ID)]: 'POLYGON',    
 }
 
 CONSTANT.RPC_PROVIDER_ETHEREUM = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? 'wss://mainnet.infura.io/ws/v3/0bc569339d39467c9c1840a2f5c6615f' : 'wss://kovan.infura.io/ws/v3/d86e5c556a9f4e5d84c5319ab1d174be';
@@ -32,5 +34,8 @@ CONSTANT.RPC_PROVIDER_BINANCE = Number(process.env.REACT_APP_BSC_CHAIN_ID) === 5
 CONSTANT.WEB_RPC_PROVIDER_ETHEREUM = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? 'https://mainnet.infura.io/v3/0bc569339d39467c9c1840a2f5c6615f' : 'https://kovan.infura.io/v3/0bc569339d39467c9c1840a2f5c6615f';
 
 CONSTANT.WEB_RPC_PROVIDER_BINANCE = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? 'https://bsc-dataseed.binance.org' : 'https://data-seed-prebsc-1-s1.binance.org:8545';
+
+CONSTANT.RPC_PROVIDER_POLYGON = Number(process.env.REACT_APP_POLYGON_CHAIN_ID) === 137 ? 'https://rpc-mainnet.matic.network' : 'https://matic-mumbai.chainstacklabs.com';
+
 
 export default CONSTANT;
