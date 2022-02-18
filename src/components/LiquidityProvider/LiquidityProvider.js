@@ -47,7 +47,7 @@ export default class LiquidityProvider extends PureComponent {
     }
 
     getTokenUsdValuesFromCoingecko = async () => {
-        if(PRICE_SOURCE == "coingecko"){
+        if(PRICE_SOURCE === "coingecko"){
             let url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin,cardano,polkadot,uniswap,ripple,matic-network&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true";
             
             let response = await axios.get(url).then((res) => {
@@ -64,19 +64,16 @@ export default class LiquidityProvider extends PureComponent {
             });
         } 
 
-        if(PRICE_SOURCE == "binance"){
+        if(PRICE_SOURCE === "binance"){
             const exchange = new ccxt.binance();
             exchange.set_sandbox_mode(SANDBOX_MODE);
-            let r = await exchange.fetchMarkets({
-                type: "spot"
-            });
             
             let ticker = await exchange.fetchTicker('BNBUSDT');
             let bnbPrice = ticker.last;            
 
             ticker = await exchange.fetchTicker('ETHUSDT');
             let ethPrice = ticker.last;
-            if(SANDBOX_MODE == false){
+            if(SANDBOX_MODE === false){
                 ticker = await exchange.fetchTicker('MATICUSDT');
             } else {
                 ticker = {

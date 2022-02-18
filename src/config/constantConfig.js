@@ -34,13 +34,11 @@ data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].expediteContract = process.env.
 data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].explorer = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? "https://etherscan.io" : "https://kovan.etherscan.io";
 data[Number(process.env.REACT_APP_ETH_CHAIN_ID)].rpcUrl = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? "https://mainnet.infura.io/v3/0bc569339d39467c9c1840a2f5c6615f" : "https://kovan.infura.io/v3/0bc569339d39467c9c1840a2f5c6615f";
 
-
 data[Number(process.env.REACT_APP_POLYGON_CHAIN_ID)].reimbursementContract = process.env.REACT_APP_POLYGON_REIMBURSEMENT_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_POLYGON_CHAIN_ID)].swapFactoryContract = process.env.REACT_APP_POLYGON_SMART_SWAP_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_POLYGON_CHAIN_ID)].expediteContract = process.env.REACT_APP_POLYGON_EXPEDITE_CONTRACT_ADDRESS;
 data[Number(process.env.REACT_APP_POLYGON_CHAIN_ID)].explorer = Number(process.env.REACT_APP_POLYGON_CHAIN_ID) === 137 ? "https://polygonscan.com/" : "https://mumbai.polygonscan.com/";
 data[Number(process.env.REACT_APP_POLYGON_CHAIN_ID)].rpcUrl = Number(process.env.REACT_APP_POLYGON_CHAIN_ID) === 137 ? "https://rpc-mainnet.matic.network" : "https://matic-mumbai.chainstacklabs.com";
-
 
 data.pureToken = [
     {
@@ -58,6 +56,39 @@ data.pureToken = [
         // frozenToken: data[97].frozenTokenContract
     }
 ];
+
+data.contractAddressesByPairs = {
+    smartswap:{
+        "ETH/BNB": process.env.REACT_APP_ETH_BNB_SMARTSWAP_CONTRACT_ADDRESS,
+        "ETH/MATIC": process.env.REACT_APP_ETH_MATIC_SMART_SWAP_CONTRACT_ADDRESS,        
+        "BNB/ETH": process.env.REACT_APP_BNB_ETH_SMARTSWAP_CONTRACT_ADDRESS,        
+        "BNB/MATIC": process.env.REACT_APP_BNB_MATIC_SMART_SWAP_CONTRACT_ADDRESS,        
+        "MATIC/BNB": process.env.REACT_APP_MATIC_BNB_SMART_SWAP_CONTRACT_ADDRESS,        
+        "MATIC/ETH": process.env.REACT_APP_MATIC_ETH_SMART_SWAP_CONTRACT_ADDRESS,        
+    },
+    expedite: {
+
+    },
+    reimbursement: {
+
+    }
+}
+
+
+data.getSmartswapContractAddressByPairs = function(tokenSymbolA, tokenSymbolB){
+    const key = tokenSymbolA + '/' + tokenSymbolB;
+    return this.contractAddressesByPairs.smartswap[key];
+}
+
+data.getExpediteContractAddressByPairs = function(tokenSymbolA, tokenSymbolB){
+    const key = tokenSymbolA + '/' + tokenSymbolB;
+    return this.contractAddressesByPairs.expedite[key];
+}
+
+data.getReimbursementContractAddressByPairs = function(tokenSymbolA, tokenSymbolB){
+    const key = tokenSymbolA + '/' + tokenSymbolB;
+    return this.contractAddressesByPairs.reimbursement[key];
+}
 
 data.tokenDetails = {
     // "WBNB": {

@@ -423,32 +423,42 @@ const swapProviderController = {
                 networkId
             } = req.body;
 
-            let args = {
-                networkId: networkId,
-                blockNumber: blockNumber,
-                txhash: txid
-            }
-            print.info(args);
 
-            let event = await swapProviderController.fetchEvent(args);
-
-
-            print.info("updaing event:", event);
-
-            let usp = await SwapProvider.updateOne({
+            let fsp = await SwapProvider.findOne({
                 _id: docId
-            }, {
-                txid: txid,
-                fromBlock: blockNumber,
-                smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
-            });
+            });            
 
-            if(usp.ok == 1){
-                return res.status(200).json({
-                    "Message": "Record updated",
-                    smartContractAddress: event['returnValues']['spContract']
+            if(fsp !== null){
+                let args = {
+                    networkId: networkId,
+                    blockNumber: blockNumber,
+                    txhash: txid,
+                    tokenA: fsp.tokenA.address,
+                    tokenB: fsp.tokenB.address
+                }
+                print.info(args);
+    
+                let event = await swapProviderController.fetchEvent(args);
+    
+    
+                print.info("updaing event:", event);
+    
+                let usp = await SwapProvider.updateOne({
+                    _id: docId
+                }, {
+                    txid: txid,
+                    fromBlock: blockNumber,
+                    smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
                 });
+    
+                if(usp.ok == 1){
+                    return res.status(200).json({
+                        "Message": "Record updated",
+                        smartContractAddress: event['returnValues']['spContract']
+                    });
+                }
             }
+
 
         }  catch (err) {
             err['errorOrigin'] = "updateTransactionHash";
@@ -482,7 +492,7 @@ const swapProviderController = {
         const networkConfig = _.find(constants.NETWORKS, { "NETWORK_ID": Number(args.networkId) });
         const provider = networkConfig['PROVIDER'];
         const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
-        const address = networkConfig['SMARTSWAP_ADDRESS'];
+        const address = constants.getSmartswapContractAddressByPairs(args.tokenA, args.tokenB);
         const SWAP_INSTANCE = new web3.eth.Contract(swapFactoryAbi as AbiItem[], address);
 
         return await SWAP_INSTANCE.getPastEvents('AddSwapProvider', {

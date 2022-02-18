@@ -18,7 +18,7 @@ import RightSideMenu from "../components/RightSideMenu";
 import WalletPopup from "../components/WalletPopup";
 import CoinPopup from "../components/CoinPopup";
 import SidePopup from "../components/SidePopup";
-import LiquidityProvider from "../components/LiquidityProvider";
+import LiquidityProvider from "../components/LiquidityProvider/LiquidityProvider";
 import LiquidityFountainSP from "../components/liquidity_fountain_for_SPs";
 import About from "../components/About";
 import PeerPopup from "../components/PeerPopup";

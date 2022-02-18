@@ -20,12 +20,12 @@ export default class ActiveContract extends Component {
 
         let stopRepeatsOnDateOnContract = null, stopRepeatsAfterCallsOnContract = null, cexApiKeyMasked = null, cexApiSecretMasked = null, spContractBalInUsd = 0;
 
-        if(props.contractData.stopRepeats.mode == 1){
+        if(props.contractData.stopRepeats.mode === 1){
             let toDate = new Date(props.contractData.stopRepeats.onDate);
             stopRepeatsOnDateOnContract = toDate;
         }
 
-        if(props.contractData.stopRepeats.mode == 2){
+        if(props.contractData.stopRepeats.mode === 2){
             stopRepeatsAfterCallsOnContract = props.contractData.stopRepeats.afterCalls;
         }
 
@@ -37,7 +37,7 @@ export default class ActiveContract extends Component {
             cexApiSecretMasked = this.inputMask('secret', props.contractData.cexData.secret, false);
         }
 
-        if(props.sandboxMode == true){
+        if(props.sandboxMode === true){
             spContractBalInUsd = props.contractData.totalWithdrawnAmount.$numberDecimal;
         }
 
@@ -127,7 +127,7 @@ export default class ActiveContract extends Component {
     }
     
     componentDidMount() {
-        if(this.props.sandboxMode == false){
+        if(this.props.sandboxMode === false){
             this.getContractBal();
         }
         this.getAllTests();
@@ -151,7 +151,7 @@ export default class ActiveContract extends Component {
     }
 
     copyText(entryText){
-        let rsp = navigator.clipboard.writeText(entryText);
+        navigator.clipboard.writeText(entryText);
         notificationConfig.success('Address copied.make sure to cross check');
     }
 
@@ -178,7 +178,7 @@ export default class ActiveContract extends Component {
     withdraw = async () => {
         var BN = Web3.utils.BN;
         var zeroDigit = new BN(0);
-        let spContract = new SPContract(this.state.web3, this.state.networkIdOnContract, this.state.spContractAddress);
+        let spContract = new SPContract(this.state.web3, this.state.spContractAddress);
         let assetAddress = this.state.tokenA;
         let amount = Web3.utils.toWei((this.state.spContractBal).toString(), 'ether');
         amount = new BN((amount).toString());
@@ -200,7 +200,7 @@ export default class ActiveContract extends Component {
                             "SP Contract response:": response
                         });
         
-                        if(response.code == 4001){
+                        if(response.code === 4001){
                             notificationConfig.info('Withdraw transaction cancelled.');
                         }
         
@@ -220,11 +220,12 @@ export default class ActiveContract extends Component {
     }
 
     checkAmountAOnUpdating(value, minValue){
+        var clientSideErrorMessage;
         if(Number(value) < minValue){
             this.setState({
                 clientSideError: true
             });
-            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
             clientSideErrorMessage.amountAOnContract = `Minimum amount is $${minValue}`;
             this.setState({clientSideErrorMessage});
             //notificationConfig.success(`Test ${testType} fetched`);
@@ -234,7 +235,7 @@ export default class ActiveContract extends Component {
                 amountAOnContract: Number(value)
             });
 
-            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
             clientSideErrorMessage.amountAOnContract = null;
             this.setState({clientSideErrorMessage});
         }      
@@ -262,7 +263,7 @@ export default class ActiveContract extends Component {
     }  
 
     validateWithdrawOnContractFromCexSlider = async(onContract = false, maxWithdrawPercent) => {
-        if(onContract == true){
+        if(onContract === true){
             if(this.state.withdrawPercentOnContract > Number(maxWithdrawPercent)){
                 notificationConfig.error(`You must keep balance on your CEX account at least ${100 - maxWithdrawPercent}% of the total amount`);
                 this.setState({
@@ -290,7 +291,7 @@ export default class ActiveContract extends Component {
             });
             let newLimit = this.state.gasAndFeeAmountOnContract;
 
-            let spContract = new SPContract(web3Config.getWeb3(), web3Config.getNetworkId(), this.state.spContractAddress);
+            let spContract = new SPContract(this.state.web3, this.state.spContractAddress);
             spContract.setFeeAmountLimit(
                 newLimit,
                 async (hash) => { },
@@ -326,12 +327,13 @@ export default class ActiveContract extends Component {
     }
 
     changeSpreadOnUpdating(value, minSpreadRange, maxSpreadRange) {
+        var clientSideErrorMessage;
         if(Number(value) > Number(maxSpreadRange) || Number(value) < Number(minSpreadRange)){
             
             this.setState({
                 clientSideError: true
             });
-            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
             clientSideErrorMessage.spProfitPercentOnContract = `Please provide a valid input between ${minSpreadRange}-${maxSpreadRange} range`;
             this.setState({clientSideErrorMessage});
             return;
@@ -339,7 +341,7 @@ export default class ActiveContract extends Component {
             this.setState({
                 spProfitPercentOnContract: Number(value)
             });
-            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
             clientSideErrorMessage.spProfitPercentOnContract = null;
             this.setState({clientSideErrorMessage});
         }
@@ -355,7 +357,7 @@ export default class ActiveContract extends Component {
 
     inputMask(input, value, setState = true){
         let maskedValue = value.replace(/.(?=.{4,}$)/g, '*');
-        if(input == "key"){
+        if(input === "key"){
             if(setState){
                 this.setState({
                     cexApiKey: value,
@@ -365,7 +367,7 @@ export default class ActiveContract extends Component {
                 return maskedValue
             }
         }
-        if(input == "secret"){
+        if(input === "secret"){
             if(setState){
                 this.setState({
                     cexApiSecret: value,
@@ -378,7 +380,7 @@ export default class ActiveContract extends Component {
     }
     
     clearKeys(input){
-        if(input == "key"){
+        if(input === "key"){
             this.setState({
                 cexApiKey: null,
                 cexApiKeyMasked: null,
@@ -386,7 +388,7 @@ export default class ActiveContract extends Component {
             });
             this.dispatchEventHandler(this.cexApiKey, null);
         }
-        if(input == "secret"){
+        if(input === "secret"){
             this.setState({
                 cexApiSecret: null,
                 cexApiSecretMasked: null,
@@ -406,7 +408,7 @@ export default class ActiveContract extends Component {
             valueSetter.call(inputRef, value);
         }
 
-        if (eventType == 'mousemove') {
+        if (eventType === 'mousemove') {
             inputRef.dispatchEvent(new MouseEvent(eventType, { bubbles: true }));
         } else {
             inputRef.dispatchEvent(new Event(eventType, { bubbles: true }));
@@ -422,7 +424,7 @@ export default class ActiveContract extends Component {
 
 
         let withdrawAmountValidation = await this.validateWithdrawOnContractFromCexSlider(true, this.props.maxWithdrawPercent);
-        if(withdrawAmountValidation == false || withdrawAmountValidation == undefined){
+        if(withdrawAmountValidation === false || withdrawAmountValidation === undefined){
             return;
         }
 
@@ -436,14 +438,14 @@ export default class ActiveContract extends Component {
             return;
         }
 
-        if (Number(this.state.stopRepeatsModeOnContract) == 2) {
+        if (Number(this.state.stopRepeatsModeOnContract) === 2) {
             if (this.state.stopRepeatsAfterCallsOnContract === null || this.state.stopRepeatsAfterCallsOnContract.length === 0) {
                 notificationConfig.error("You must choose how many time to repeat on CEX");
                 return;
             }
         }
 
-        if (Number(this.state.stopRepeatsModeOnContract) == 1) {
+        if (Number(this.state.stopRepeatsModeOnContract) === 1) {
             if (this.state.stopRepeatsOnDateOnContract === null || this.state.stopRepeatsOnDateOnContract.length === 0) {
                 notificationConfig.error("You must choose a date when to stop repeat on CEX");
                 return;
@@ -451,7 +453,7 @@ export default class ActiveContract extends Component {
         }
 
         if (
-            this.state.withdrawPercentOnContract == null 
+            this.state.withdrawPercentOnContract === null 
             ||
             this.state.withdrawPercentOnContract < 0
             ||
@@ -461,7 +463,7 @@ export default class ActiveContract extends Component {
             return;
         }      
 
-        if(this.clientSideError() == true){
+        if(this.clientSideError() === true){
             return;
         }
 
@@ -471,7 +473,7 @@ export default class ActiveContract extends Component {
         });
 
         let args = {};
-        if (Number(this.state.stopRepeatsModeOnContract) == 1) {
+        if (Number(this.state.stopRepeatsModeOnContract) === 1) {
             console.log('Stop mode 1');
             Object.assign(args, {
                 stopRepeatsOnDate: this.state.stopRepeatsOnDateOnContract,
@@ -479,7 +481,7 @@ export default class ActiveContract extends Component {
             });
         }
 
-        if (Number(this.state.stopRepeatsModeOnContract) == 2) {
+        if (Number(this.state.stopRepeatsModeOnContract) === 2) {
             console.log('Stop mode 2');
             Object.assign(args, {
                 stopRepeatsOnDate: null,
@@ -487,7 +489,7 @@ export default class ActiveContract extends Component {
             });
         }
 
-        if (Number(this.state.stopRepeatsModeOnContract) == 3) {
+        if (Number(this.state.stopRepeatsModeOnContract) === 3) {
             console.log('Stop mode 3');
             Object.assign(args, {
                 stopRepeatsOnDate: null,
@@ -516,13 +518,13 @@ export default class ActiveContract extends Component {
         console.log(finalArgs);
         try {
             let response = await AxiosRequest.request(finalArgs);
-            if (response.status == 200) {
+            if (response.status === 200) {
                 setTimeout(async () => {
                     console.log('Updated');
-                    if(response.data.messageType == 'success'){
+                    if(response.data.messageType === 'success'){
                         notificationConfig.success(response.data.message);
                     }
-                    if(response.data.messageType == 'info'){
+                    if(response.data.messageType === 'info'){
                         notificationConfig.info(response.data.message);
                     }
 
@@ -563,14 +565,14 @@ export default class ActiveContract extends Component {
                 method: "POST"
             });
 
-            if(response.status == 200){
+            if(response.status === 200){
                 this.setState({
                     tests: response.data.response,
                     testPassed: response.data.result
                 });
             }
 
-            if(response.status == 500){
+            if(response.status === 500){
                 notificationConfig.error('Sever error');
             }
         } catch (e){
@@ -588,19 +590,19 @@ export default class ActiveContract extends Component {
                 type: testType                
             };
 
-            if(testType == "binanceAccountCheck"){
+            if(testType === "binanceAccountCheck"){
                 filter['accountType'] = 'SPOT_USDTM';
             }
 
-            if(testType == "binanceBalanceCheck"){
+            if(testType === "binanceBalanceCheck"){
                 filter['accountType'] = 'SPOT';
             }
 
-            if(testType == "binanceTransferCheck"){
+            if(testType === "binanceTransferCheck"){
                 filter['transferType'] = 'TWO_WAY';
             }
 
-            if(testType == "testsCheck"){
+            if(testType === "testsCheck"){
                 filter['repeatTests'] = repeat;
             }
 
@@ -610,7 +612,7 @@ export default class ActiveContract extends Component {
                 method: "POST"
             });
 
-            if(response.status == 200){
+            if(response.status === 200){
                 var property = {...this.state.tests.key}
                 property = true;
                 this.setState({property});
@@ -618,7 +620,7 @@ export default class ActiveContract extends Component {
                 return response.data.result;
             }
 
-            if(response.status == 500){
+            if(response.status === 500){
                 notificationConfig.error('Sever error');
             }
             
@@ -632,7 +634,7 @@ export default class ActiveContract extends Component {
     repeatTests = async(testType = '') => {
         try {
 
-            if(this.state.testing == false){
+            if(this.state.testing === false){
                 this.setState({
                     testing: true
                 });
@@ -645,16 +647,17 @@ export default class ActiveContract extends Component {
                     // get all failed tests
                     if(this.state.tests !== null){
                         for (let [key, value] of Object.entries(this.state.tests)) {
-                            if (key == '_id' || key == 'id') {
+                            var property;
+                            if (key === '_id' || key === 'id') {
                                 continue;
                             } else {
-                                if(value == false){
-                                    var property = {...this.state.tests.key};
+                                if(value === false){
+                                    property = {...this.state.tests.key};
                                     property = false;
                                     this.setState({property});
                                     failedTests.push(key);
                                 } else {
-                                    var property = {...this.state.tests.key};
+                                    property = {...this.state.tests.key};
                                     property = true;
                                     this.setState({property});                                
                                     passedTests.push(key);                                
@@ -753,7 +756,7 @@ export default class ActiveContract extends Component {
                                     readOnly={true}
                                 />
                                 <a 
-                                    href="javascript:void(0)" 
+                                    href="javascript:void(0)"
                                     onClick={() => this.copyText(this.state.spContractAddress)} 
                                     class="LicCopyBTN v2"
                                 >
@@ -791,7 +794,7 @@ export default class ActiveContract extends Component {
                                         </a>
                                     </div>
                                     <br></br> 
-                                    {this.state.clientSideError == true && (this.state.clientSideErrorMessage.amountAOnContract !== null) &&
+                                    {this.state.clientSideError === true && (this.state.clientSideErrorMessage.amountAOnContract !== null) &&
                                     <div className="error-Msg" style={smallError}>
                                         <label>{this.state.clientSideErrorMessage.amountAOnContract}</label>
                                     </div>
@@ -930,7 +933,7 @@ export default class ActiveContract extends Component {
                                     </div>
                                 </div>
                                 <br></br> 
-                                {this.state.clientSideError == true && (this.state.clientSideErrorMessage.spProfitPercentOnContract !== null) &&
+                                {this.state.clientSideError === true && (this.state.clientSideErrorMessage.spProfitPercentOnContract !== null) &&
                                 <div className="error-Msg" style={smallError}>
                                     <label>{this.state.clientSideErrorMessage.spProfitPercentOnContract}</label>
                                 </div>
@@ -988,8 +991,8 @@ export default class ActiveContract extends Component {
                                             placeholder=""
                                             readOnly={true}
                                             defaultValue={
-                                                this.state.stopRepeatsModeOnContract == 3 ? 'Never stop' 
-                                                : this.state.stopRepeatsModeOnContract == 1 ? "On date: " + DateFormat(this.state.stopRepeatsOnDateOnContract, "mmmm dS, yyyy, h:MM:ssTT")
+                                                this.state.stopRepeatsModeOnContract === 3 ? 'Never stop' 
+                                                : this.state.stopRepeatsModeOnContract === 1 ? "On date: " + DateFormat(this.state.stopRepeatsOnDateOnContract, "mmmm dS, yyyy, h:MM:ssTT")
                                                 : 'After ' + this.state.stopRepeatsAfterCallsOnContract + ' repeats'}
                                             //onChange={event => this.setState({ cexApiKey: event.target.value })}
                                             //ref={(input) => this.cexApiKey = input}
@@ -1160,37 +1163,37 @@ export default class ActiveContract extends Component {
                             { /** test cases */ }
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.contractOwnerCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.contractOwnerCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check contract deployed for wallet address {this.state.spAccount !== null ? this.state.spAccount : '' }
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>                                
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.contractGasAndFeeCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.contractGasAndFeeCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check contract gas & fee set at limit {this.state.gasAndFeeAmount !== null ? this.state.gasAndFeeAmount : '' }
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>                                
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.spProfitPercentCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                    &nbsp;Check contract spread at {this.state.spProfitPercent !== null ? this.state.spProfitPercent + '%' : '' }
+                                    <i className={this.state.tests !== null && this.state.tests.spProfitPercentCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    &nbsp;Check contract spread at {this.state.spProfitPercentOnContract !== null ? this.state.spProfitPercentOnContract + '%' : '' }
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceApiKeysCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.binanceApiKeysCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check CEX API key & API Secret set
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceApiValidateCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.binanceApiValidateCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check CEX Valid API key and secret
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceAccountCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.binanceAccountCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check enabled trading on CEX
                                 </div>
                             </div>
@@ -1202,39 +1205,39 @@ export default class ActiveContract extends Component {
                             </div> */}
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceTransferCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.binanceTransferCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Test moving USDT funds between spot and future account on CEX
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceSpAddressWhiteListCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.binanceSpAddressWhiteListCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check whitelisted smart contract address on CEX for withdraw
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceIpWhiteListCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.binanceIpWhiteListCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check IP whitelisted on CEX for withdraw
                                 </div>
                             </div>                                
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceWithdrawEnabledCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.binanceWithdrawEnabledCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check enabled withdraw on CEX
                                 </div>
                             </div>                                                                
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceWithdrawCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.binanceWithdrawCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Test moving fund between spot and swap provider contract address
                                 </div>
                             </div>
                             <div className='spacerLine'></div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.testPassed == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
-                                    &nbsp;{this.state.testPassed == true ? 'Swap provider has been successfully activated.' : 'You must pass all the tests to become an active swap provider.'}
+                                    <i className={this.state.testPassed === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    &nbsp;{this.state.testPassed === true ? 'Swap provider has been successfully activated.' : 'You must pass all the tests to become an active swap provider.'}
                                 </div>
                                 <div className='spContrlInfotxt02 test-suite'>
                                     <button className='repeatTestsButton' onClick={this.repeatTests.bind(this)}>

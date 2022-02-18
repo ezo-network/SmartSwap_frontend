@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
+import _ from "lodash";
 
 const constants = {
     SERVER_HOST: process.env.SERVER_HOST,
@@ -38,7 +39,31 @@ const constants = {
             MIN_WITHDRAW_AMOUNT: 0.3,
             MIN_AMOUNT_TO_TEST_TRANSFER: 0.00000001,
             NETWORK: 'MATIC'
+        },
+    },
+
+    contractAddressesByPairs: {
+        smartswap:{
+            "ETH/BNB": process.env.ETH_BNB_SMARTSWAP_CONTRACT_ADDRESS,
+            "ETH/MATIC": process.env.ETH_MATIC_SMART_SWAP_CONTRACT_ADDRESS,        
+            "BNB/ETH": process.env.BNB_ETH_SMARTSWAP_CONTRACT_ADDRESS,        
+            "BNB/MATIC": process.env.BNB_MATIC_SMART_SWAP_CONTRACT_ADDRESS,        
+            "MATIC/BNB": process.env.MATIC_BNB_SMART_SWAP_CONTRACT_ADDRESS,        
+            "MATIC/ETH": process.env.MATIC_ETH_SMART_SWAP_CONTRACT_ADDRESS,        
+        },
+        expedite: {
+    
+        },
+        reimbursement: {
+    
         }
+    },
+
+    getSmartswapContractAddressByPairs: function(tokenA, tokenB){
+        const tokenAData = _.find(this.NETWORKS, { "ADDRESS": tokenA });
+        const tokenBData = _.find(this.NETWORKS, { "ADDRESS": tokenB });
+        const key = tokenAData.ASSET + '/' + tokenBData.ASSET;
+        return this.contractAddressesByPairs.smartswap[key];
     }
 }
 

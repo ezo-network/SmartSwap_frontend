@@ -10,7 +10,7 @@ import { tokenDetails } from "../../config/constantConfig";
 import constantConfig from '../../config/constantConfig';
 import web3Config from "../../config/web3Config";
 import notificationConfig from '../../config/notificationConfig';
-import SwapFactoryContract from '../../helper/swapFactoryContract';
+import SwapFactoryContractPairWise from '../../helper/swapFactoryContractPairWise';
 var _ = require('lodash');
 
 
@@ -138,11 +138,12 @@ export default class SpContractDeployForm extends Component {
     }
 
     checkAmountA(value, minValue){
+        var clientSideErrorMessage;
         if(Number(value) < minValue){        
             this.setState({
                 clientSideError: true
             });
-            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
             clientSideErrorMessage.amountA = `Minimum amount is $${minValue}`;
             this.setState({clientSideErrorMessage});
             //notificationConfig.success(`Test ${testType} fetched`);
@@ -152,7 +153,7 @@ export default class SpContractDeployForm extends Component {
                 amountA: Number(value)
             });
 
-            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
             clientSideErrorMessage.amountA = null;
             this.setState({clientSideErrorMessage});
         }
@@ -161,11 +162,12 @@ export default class SpContractDeployForm extends Component {
     }
 
     changeSpread(value, minSpreadRange, maxSpreadRange) {
+        var clientSideErrorMessage;
         if(Number(value) > maxSpreadRange || Number(value) < minSpreadRange){            
             this.setState({
                 clientSideError: true
             });
-            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
             clientSideErrorMessage.spProfitPercent = `Please provide a valid input between ${minSpreadRange}-${maxSpreadRange} range`;
             this.setState({clientSideErrorMessage});
             return;
@@ -173,7 +175,7 @@ export default class SpContractDeployForm extends Component {
             this.setState({
                 spProfitPercent: Number(value)
             });
-            var clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
             clientSideErrorMessage.spProfitPercent = null;
             this.setState({clientSideErrorMessage});
         }
@@ -273,7 +275,7 @@ export default class SpContractDeployForm extends Component {
             return;
         }
 
-        if(this.state.tokenA == this.state.tokenB){
+        if(this.state.tokenA === this.state.tokenB){
             notificationConfig.error("Token A and Token B can't be the same");
             return;            
         }
@@ -296,7 +298,7 @@ export default class SpContractDeployForm extends Component {
         }
 
         let validationPass = await this.validateWithdrawOnContractFromCexSlider(this.props.maxWithdrawPercent);
-        if(validationPass == false){
+        if(validationPass === false){
             return;
         }
 
@@ -311,7 +313,7 @@ export default class SpContractDeployForm extends Component {
         console.log(`deploying contact on network - ${web3Config.getNetworkId()}`)
 
         let args = {};
-        if (Number(this.state.stopRepeatsMode) == 1) {
+        if (Number(this.state.stopRepeatsMode) === 1) {
             console.log('Stop mode 1');
             Object.assign(args, {
                 stopRepeatsOnDate: this.state.stopRepeatsOnDate,
@@ -319,7 +321,7 @@ export default class SpContractDeployForm extends Component {
             });
         }
 
-        if (Number(this.state.stopRepeatsMode) == 2) {
+        if (Number(this.state.stopRepeatsMode) === 2) {
             console.log('Stop mode 2');
             Object.assign(args, {
                 stopRepeatsOnDate: null,
@@ -327,7 +329,7 @@ export default class SpContractDeployForm extends Component {
             });
         }
 
-        if (Number(this.state.stopRepeatsMode) == 3) {
+        if (Number(this.state.stopRepeatsMode) === 3) {
             console.log('Stop mode 3');
             Object.assign(args, {
                 stopRepeatsOnDate: null,
@@ -335,7 +337,7 @@ export default class SpContractDeployForm extends Component {
             });
         }
 
-        if (Number(this.state.withdrawMode) == 1) {
+        if (Number(this.state.withdrawMode) === 1) {
             console.log('Stop mode 1');
             Object.assign(args, {
                 withdrawOnDate: this.state.withdrawOnDate,
@@ -343,7 +345,7 @@ export default class SpContractDeployForm extends Component {
             });
         }
 
-        if (Number(this.state.withdrawMode) == 2) {
+        if (Number(this.state.withdrawMode) === 2) {
             console.log('Stop mode 2');
             Object.assign(args, {
                 withdrawOnDate: null,
@@ -351,7 +353,7 @@ export default class SpContractDeployForm extends Component {
             });
         }
 
-        if (Number(this.state.withdrawMode) == 3) {
+        if (Number(this.state.withdrawMode) === 3) {
             console.log('Stop mode 3');
             Object.assign(args, {
                 withdrawOnDate: null,
@@ -359,6 +361,8 @@ export default class SpContractDeployForm extends Component {
             });
         }
 
+        const tokenA = _.find(this.state.coinList, { "address": this.state.tokenA });
+        const tokenB = _.find(this.state.coinList, { "address": this.state.tokenB });
 
         let finalArgs = {
             data: Object.assign(args, {
@@ -388,7 +392,7 @@ export default class SpContractDeployForm extends Component {
             console.log(response);
             if (response.status === 201) {
                 console.log('record created!');
-                let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), web3Config.getNetworkId(), 'LiquidityProvider');
+                let swapFactory = new SwapFactoryContractPairWise(this.state.web3, tokenA.symbol, tokenB.symbol, 'LiquidityProvider');
                 swapFactory.addSwapProvider(
                     response.data.tokenA.address,
                     response.data.tokenB.address,
@@ -406,7 +410,7 @@ export default class SpContractDeployForm extends Component {
                             "Contract response:": response
                         });
 
-                        if(response.code == 4001){
+                        if(response.code === 4001){
                             this.setState({
                                 confirmed: false,
                                 deployButtonText: "DEPLOY SMART CONTRACT",
@@ -504,7 +508,7 @@ export default class SpContractDeployForm extends Component {
             if (response.status === 200) {
 
                 const isactiveContractExist = response.data.find(obj => {
-                    if ((obj.networkId == web3Config.getNetworkId()) && ((web3Config.getAddress()).toLowerCase() == obj.walletAddresses.spAccount)) {
+                    if ((obj.networkId === web3Config.getNetworkId()) && ((web3Config.getAddress()).toLowerCase() === obj.walletAddresses.spAccount)) {
                         return true;
                     } else {
                         return false;
@@ -699,7 +703,7 @@ export default class SpContractDeployForm extends Component {
                                 <label>{this.state.errorMessage}</label>
                             </div>
                         }
-                        {this.state.clientSideError == true && (this.state.clientSideErrorMessage.amountA !== null) &&
+                        {this.state.clientSideError === true && (this.state.clientSideErrorMessage.amountA !== null) &&
                             <div className="error-Msg" style={smallError}>
                                 <label>{this.state.clientSideErrorMessage.amountA}</label>
                             </div>
@@ -836,7 +840,7 @@ export default class SpContractDeployForm extends Component {
                                     <label>{this.state.errorMessage}</label>
                                 </div>
                             }
-                            {this.state.clientSideError == true && (this.state.clientSideErrorMessage.spProfitPercent !== null) &&
+                            {this.state.clientSideError === true && (this.state.clientSideErrorMessage.spProfitPercent !== null) &&
                                 <div className="error-Msg" style={smallError}>
                                     <label>{this.state.clientSideErrorMessage.spProfitPercent}</label>
                                 </div>
