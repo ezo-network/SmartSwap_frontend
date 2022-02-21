@@ -471,7 +471,7 @@ export default class SpContractDeployForm extends Component {
                     deployed: false,
                     serverError: response.data.errorMessage.error
                 });
-                notificationConfig.error('Something went wrong!');
+                notificationConfig.error(response.data.errorMessage.error);
             }
 
         } catch (err) {
@@ -564,11 +564,6 @@ export default class SpContractDeployForm extends Component {
 
         return (
             <>
-                {this.state.serverError !== null &&
-                    <div className="error-Msg">
-                        <label>{this.state.serverError}</label>
-                    </div>
-                }
                 <div className="LiProFormMbox">
 
                     <div className="LiProfSbox01">
@@ -991,6 +986,13 @@ export default class SpContractDeployForm extends Component {
                         }
                     }
                     )()}
+
+                    {/* <div className='spacerLine'></div>
+                    {this.state.serverError !== null &&
+                        <div className="error-Msg" style={{display: 'none;'}}>
+                            <label>{this.state.serverError}</label>
+                        </div>
+                    } */}
                 </div>
                 <div className='spacerLine'></div>
                 {

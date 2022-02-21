@@ -13,6 +13,7 @@ import web3Config from "../../config/web3Config";
 var _ = require('lodash');
 
 export default class ActiveContract extends Component {
+    _isMounted = false;
     constructor(props) {
         super();
 
@@ -127,10 +128,13 @@ export default class ActiveContract extends Component {
     }
     
     componentDidMount() {
-        if(this.props.sandboxMode === false){
-            this.getContractBal();
+        this._isMounted = true;
+        if(this._isMounted){
+            if(this.props.sandboxMode === false){
+                this.getContractBal();
+            }
+            this.getAllTests();
         }
-        this.getAllTests();
     }
 
     getTokenData(tokenAddress, key) {
