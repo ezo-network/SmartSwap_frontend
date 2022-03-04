@@ -90,6 +90,18 @@ data.getReimbursementContractAddressByPairs = function(tokenSymbolA, tokenSymbol
     return this.contractAddressesByPairs.reimbursement[key];
 }
 
+
+data.cexTypes = {
+    "BINANCE": {
+        symbol: "BINANCE",
+        icon: "images/cex/binance.png"
+    }, 
+    "MEXC": {
+        symbol: "MEXC",
+        icon: "images/cex/mexc.png"
+    }
+}
+
 data.tokenDetails = {
     // "WBNB": {
     //     symbol: "WBNB",

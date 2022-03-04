@@ -38,6 +38,7 @@ export interface Withdraw extends Document {
 }
 
 export interface CexData extends Document {
+    type: string
     key: string,
     secret: string,
 }
@@ -64,7 +65,7 @@ export interface ISwapProvider extends Document {
     withdrawPercent: number,
     withdrawReinitiate: boolean
     message: string,
-    updateGasAndFeeAmount: boolean
+    updateGasAndFeeAmount: boolean,
 };
 
 const SwapProvider: Schema = new mongoose.Schema({
@@ -183,6 +184,11 @@ const SwapProvider: Schema = new mongoose.Schema({
         },
     },
     cexData: {
+        type: {
+            type: String,
+            required: false,
+            default: null
+        },
         key: {
             type: String,
             required: false,

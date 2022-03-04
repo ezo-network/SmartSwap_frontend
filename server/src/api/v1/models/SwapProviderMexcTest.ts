@@ -1,7 +1,7 @@
 import uniqueValidator from 'mongoose-unique-validator';
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface ISwapProviderTest extends Document {
+export interface ISwapProviderMexcTest extends Document {
     swapProvider: Schema.Types.ObjectId,
     contractOwnerCheck: boolean,
     contractGasAndFeeCheck: boolean,
@@ -17,7 +17,7 @@ export interface ISwapProviderTest extends Document {
     withdrawEnabledCheck: boolean
 };
 
-const SwapProviderTest: Schema = new mongoose.Schema({
+const SwapProviderMexcTest: Schema = new mongoose.Schema({
     swapProvider: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -87,6 +87,6 @@ const SwapProviderTest: Schema = new mongoose.Schema({
     timestamps: true, toJSON: {getters: true}
 });
 
-SwapProviderTest.plugin(uniqueValidator);
+SwapProviderMexcTest.plugin(uniqueValidator);
 
-export default mongoose.model<ISwapProviderTest>('SwapProviderTest', SwapProviderTest, 'swap_provider_tests');
+export default mongoose.model<ISwapProviderMexcTest>('SwapProviderMexcTest', SwapProviderMexcTest, 'swap_provider_mexc_tests');
