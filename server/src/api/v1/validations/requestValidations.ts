@@ -95,6 +95,7 @@ const requestValidations = {
         then: number().required("[withdrawAfterCalls] Required -  Withdraw after X repeats")
       }),
 
+      cexType: string().nullable(true),
       cexApiKey: string().nullable(true),
       cexApiSecret: string().nullable(true),
 
@@ -102,7 +103,7 @@ const requestValidations = {
 
       spreadAmount: number().nullable(true),
 
-      withdrawPercent: number().nullable(true)
+      withdrawPercent: number().nullable(true),
 
     })
   })

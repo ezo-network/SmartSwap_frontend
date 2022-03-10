@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import Collapse from "@kunukn/react-collapse";
 import notificationConfig from '../../config/notificationConfig';
 import SPContract from '../../helper/spContract';
 import AxiosRequest from "../../helper/axiosRequest";
@@ -14,6 +15,7 @@ var _ = require('lodash');
 
 export default class ActiveContract extends Component {
     _isMounted = false;
+    _isCexUpdated = false;
     constructor(props) {
         super();
 
@@ -41,6 +43,8 @@ export default class ActiveContract extends Component {
         if(props.sandboxMode === true){
             spContractBalInUsd = props.contractData.totalWithdrawnAmount.$numberDecimal;
         }
+
+        const cexType = props.contractData.cexData.type !== null ? (props.contractData.cexData.type).toUpperCase() : 'BINANCE';
 
         this.state = {
             web3: props.web3,
@@ -97,7 +101,12 @@ export default class ActiveContract extends Component {
             // tests vars
             tests: null,
             testPassed: false,
-            testing: false,            
+            testing: false,   
+            
+            //
+            cexList: constantConfig.cexTypes,
+            selectedCex: cexType,
+            cexListOpen: false
         }
     }
 
@@ -152,6 +161,20 @@ export default class ActiveContract extends Component {
         this.setState({
             stepOpen: !currentState
         });
+    }
+
+    toggleCexList(changedCex = null){
+        const currentState = this.state.cexListOpen;
+        this.setState({
+            cexListOpen: !currentState
+        });     
+
+        if(changedCex){
+            this.setState({
+                selectedCex: changedCex
+            });                 
+        }
+
     }
 
     copyText(entryText){
@@ -501,6 +524,16 @@ export default class ActiveContract extends Component {
             });
         }
 
+        if(this.props.contractData.cexData.type === null && this._isCexUpdated === false){
+            console.log({_isCexUpdated: this._isCexUpdated});
+            Object.assign(args, {
+                cexType: this.state.selectedCex
+            });     
+            
+            // this ensures that - cex type can't be changed once set  
+            this._isCexUpdated = true;
+        }
+
 
         let finalArgs = {
             data: Object.assign(args, {
@@ -547,6 +580,9 @@ export default class ActiveContract extends Component {
                         updated: false,
                         updateButtonText: 'SAVE TO UPDATE CONTRACT'
                     });
+
+                    this.getAllTests();
+
                 }, 5000);
             }
         } catch (err) {
@@ -563,7 +599,8 @@ export default class ActiveContract extends Component {
                     owner: (web3Config.getAddress()).toLowerCase(),
                     networkId: Number(web3Config.getNetworkId()),
                     smartContractAddress: this.state.spContractAddress,
-                    type: 'testsCheck'
+                    type: 'testsCheck',
+                    cexType: this.props.contractData.cexData.type !== null ? (this.props.contractData.cexData.type).toUpperCase() : "BINANCE" // to insure cex saved in db for SP
                 },
                 path: "test-suite",
                 method: "POST"
@@ -587,22 +624,30 @@ export default class ActiveContract extends Component {
     testSuite = async(testType = '', repeat = false) => {
         try {
 
+            const cexType = this.props.contractData.cexData.type !== null ? (this.props.contractData.cexData.type).toUpperCase() : "BINANCE";
             let filter = {
                 owner: (web3Config.getAddress()).toLowerCase(),
                 networkId: Number(web3Config.getNetworkId()),
                 smartContractAddress: this.state.spContractAddress,
-                type: testType                
+                type: testType,
+                cexType: cexType
             };
+            
+            if(testType === "accountCheck"){
+                if(cexType === 'BINANCE'){
+                    filter['accountType'] = 'SPOT_USDTM';
+                }
 
-            if(testType === "binanceAccountCheck"){
-                filter['accountType'] = 'SPOT_USDTM';
+                if(cexType === 'MEXC'){
+                    filter['accountType'] = 'BOTH';
+                }                
             }
 
-            if(testType === "binanceBalanceCheck"){
+            if(testType === "balanceCheck"){
                 filter['accountType'] = 'SPOT';
             }
 
-            if(testType === "binanceTransferCheck"){
+            if(testType === "transferCheck"){
                 filter['transferType'] = 'TWO_WAY';
             }
 
@@ -1084,6 +1129,50 @@ export default class ActiveContract extends Component {
                                 After creating an API on your CEX update here the API and Secret key
                             </div>
                             <div className='LiProFlexBX01 smFixer07 d-block-n'>
+                                <div className="w-100-n mb-20px-n">
+                                    <div className="spContrlInfotxt02">CEX
+                                        <i className="help-circle">
+                                            <i 
+                                                className="fas fa-question-circle protip" 
+                                                data-pt-position="top" 
+                                                data-pt-title="Choose CEX Of your choice from the below listed CEX. Note that once cex set it can't be changed in the future. Choose carefully" 
+                                                aria-hidden="true"
+                                            ></i>
+                                        </i>
+                                    </div>
+                                    <div className="LiproDropdown">
+                                        <button className='LiproDDbtn01' onClick={() => this.toggleCexList()}>
+                                            <div className="ddIconBX">
+                                                <span>
+                                                    <img src={this.state.cexList[this.state.selectedCex]['icon']} alt=""/>
+                                                </span> 
+                                                {this.state.cexList[this.state.selectedCex]['symbol']}
+                                            </div>
+                                            <i className="fas fa-caret-down"></i>
+                                        </button>
+                                        <div className="ddContainer">
+                                            <Collapse isOpen={(this.state.cexListOpen) && (this.props.contractData.cexData.type === null)} className={"collapse-css-transition"} >
+                                                {
+                                                    Object.keys(this.state.cexList).map((cex) => (
+                                                        <button
+                                                            //disabled={this.props.contractData.cexData.type !== null}
+                                                            key={this.state.cexList[cex]['symbol']} className='LiproDDbtn01'
+                                                            onClick={() => {
+                                                                this.toggleCexList(this.state.cexList[cex]['symbol']);
+                                                            }}
+                                                        >
+                                                            <div className="ddIconBX"> 
+                                                                <span> 
+                                                                    <img src={this.state.cexList[cex]['icon']} alt="" />
+                                                                </span> {this.state.cexList[cex]['symbol']}
+                                                            </div>
+                                                        </button>
+                                                    ))
+                                                }
+                                            </Collapse>
+                                        </div>
+                                    </div>                                    
+                                </div>                                
                                 <div className="LiProfSbox01 w-100-n mb-20px-n">
                                     <div className="spContrlInfotxt02">API Key<i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Add your specific API key to the CEX of your choice" aria-hidden="true"></i></i></div>
                                 </div>
@@ -1185,55 +1274,55 @@ export default class ActiveContract extends Component {
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceApiKeysCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.apiKeysCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check CEX API key & API Secret set
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceApiValidateCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.apiValidateCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check CEX Valid API key and secret
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceAccountCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.accountCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check enabled trading on CEX
                                 </div>
                             </div>
                             {/* <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceBalanceCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.balanceCheck == true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check account balance on CEX for allowed limit
                                 </div>
                             </div> */}
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceTransferCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.transferCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Test moving USDT funds between spot and future account on CEX
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceSpAddressWhiteListCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.spAddressWhiteListCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check whitelisted smart contract address on CEX for withdraw
                                 </div>
                             </div>
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceIpWhiteListCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.ipWhiteListCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check IP whitelisted on CEX for withdraw
                                 </div>
                             </div>                                
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceWithdrawEnabledCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.withdrawEnabledCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Check enabled withdraw on CEX
                                 </div>
                             </div>                                                                
                             <div className='LiProFlexBX01'>
                                 <div className='spContrlInfotxt02 test-suite'>
-                                    <i className={this.state.tests !== null && this.state.tests.binanceWithdrawCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
+                                    <i className={this.state.tests !== null && this.state.tests.withdrawCheck === true ? 'test-true fa fa-check' : 'test-false fa fa-times'} aria-hidden="true"></i>
                                     &nbsp;Test moving fund between spot and swap provider contract address
                                 </div>
                             </div>
