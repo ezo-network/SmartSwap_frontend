@@ -1,6 +1,7 @@
 import {
     EventEmitter
 } from "events";
+import { contractAddressesByPairs } from "../config/constantConfig";
 
 
 
@@ -35,6 +36,10 @@ class Validation extends EventEmitter {
             (code === 190 || code === 110)
         )
             event.preventDefault();
+    }
+
+    getPairAddress(sendCurrency, receiveCurrency) {
+        return contractAddressesByPairs.smartswap[sendCurrency + "/" + receiveCurrency];
     }
 
     handleActions(action) {

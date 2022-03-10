@@ -7,7 +7,7 @@ import web3Config from "../config/web3Config";
 import Validation from "../helper/validation";
 import swapFactoryAbi from "../abis/swapFactory.json";
 import tokenAbi from "../abis/tokenAbi.json";
-import constantConfig from "../config/constantConfig";
+import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
 import SwapFactoryContract from "../helper/swapFactoryContract";
 import { LoopCircleLoading } from "react-loadingg";
@@ -46,6 +46,7 @@ import SBLogo09 from "../assets/images/sb-ICO-09.png";
 import SBLogo010 from "../assets/images/sb-ICO-010.png";
 import SBLogo011 from "../assets/images/sb-ICO-011.png";
 import BigNumber from "big-number/big-number";
+import Select from 'react-select';
 
 const responsive = {
   desktop: {
@@ -98,6 +99,7 @@ export default class Home extends PureComponent {
       selectedReceiveCurrency: "ETH",
       instanceSwapFactoryBinance: null,
       instanceSwapFactoryEthereum: null,
+      instanceSwapFactoryPolygon: null,
       instanceReimbursementBinance: null,
       instanceReimbursementEthereum: null,
       tokenInstance: {},
@@ -159,7 +161,21 @@ export default class Home extends PureComponent {
         97: "0x0000000000000000000000000000000000000000",
         42: "0x0000000000000000000000000000000000000000"
       },
-      loadingHistory: false
+      loadingHistory: false,
+      selectedOptionSend: { value: tokenDetails.BNB.symbol, label: tokenDetails.BNB.symbol, networkId: tokenDetails.BNB.networkId },
+      selectedOptionReceive: { value: tokenDetails.ETH.symbol, label: tokenDetails.ETH.symbol, networkId: tokenDetails.ETH.networkId },
+      selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs("BNB", "ETH"),
+      sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+        return value.label !== "ETH" && value.label !== "BNB";
+      }),
+      recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+        return value.label !== "BNB" && value.label !== "ETH";
+      }),
+      web3Provider: {
+        [process.env.REACT_APP_ETH_CHAIN_ID]: null,
+        [process.env.REACT_APP_BSC_CHAIN_ID]: null,
+        [process.env.REACT_APP_POLYGON_CHAIN_ID]: null,
+      }
     };
   }
 
@@ -199,6 +215,16 @@ export default class Home extends PureComponent {
 
   };
   componentDidMount = async () => {
+    let web3Provider = {};
+    web3Provider[process.env.REACT_APP_ETH_CHAIN_ID] = new Web3(
+      new Web3.providers.WebsocketProvider(CONSTANT.RPC_PROVIDER_ETHEREUM)
+    );
+    web3Provider[process.env.REACT_APP_BSC_CHAIN_ID] = new Web3(
+      new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_BINANCE)
+    );
+    web3Provider[process.env.REACT_APP_POLYGON_CHAIN_ID] = new Web3(
+      new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_POLYGON)
+    );
     this.setState({
       web3Ethereum: new Web3(
         new Web3.providers.WebsocketProvider(CONSTANT.RPC_PROVIDER_ETHEREUM)
@@ -206,6 +232,10 @@ export default class Home extends PureComponent {
       web3Binance: new Web3(
         new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_BINANCE)
       ),
+      web3Polygon: new Web3(
+        new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_POLYGON)
+      ),
+      web3Provider
     });
 
     {
@@ -356,9 +386,10 @@ export default class Home extends PureComponent {
   };
 
   async initInstance() {
-    let { web3Binance, web3Ethereum } = this.state;
+    let { web3Binance, web3Ethereum, web3Polygon } = this.state;
     let instanceSwapFactoryBinance = null;
     let instanceSwapFactoryEthereum = null;
+    let instanceSwapFactoryPolygon = null;
     let instanceReimbursementBinance = null;
     let instanceReimbursementEthereum = null;
     instanceReimbursementBinance = new web3Binance.eth.Contract(
@@ -377,6 +408,11 @@ export default class Home extends PureComponent {
       swapFactoryAbi,
       constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].swapFactoryContract
     );
+    instanceSwapFactoryPolygon = new web3Polygon.eth.Contract(
+      swapFactoryAbi,
+      constantConfig[CONSTANT.NETWORK_ID.POLYGON].swapFactoryContract
+    );
+
     let tokenInstance = {};
     tokenInstance["JNTR"] = new web3Binance.eth.Contract(
       tokenAbi,
@@ -394,6 +430,7 @@ export default class Home extends PureComponent {
       {
         instanceSwapFactoryBinance,
         instanceSwapFactoryEthereum,
+        instanceSwapFactoryPolygon,
         instanceReimbursementBinance,
         instanceReimbursementEthereum,
         tokenInstance,
@@ -469,7 +506,7 @@ export default class Home extends PureComponent {
     await web3Config.connectWallet(0);
     let networkId = web3Config.getNetworkId();
     if (!constantConfig.allowedNetwork.includes(networkId)) {
-      notificationConfig.error("Please Select Ethereum or BSC Main Network");
+      notificationConfig.error("Please Select Ethereum or BSC or Polygon Main Network");
       this.setState({ btnClick: false });
       return;
     }
@@ -486,6 +523,13 @@ export default class Home extends PureComponent {
       (networkId === 42 || networkId === 1)
     ) {
       notificationConfig.warning("Change metamask network to Binance!");
+      return;
+    } else if (
+      constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId !==
+      networkId &&
+      (networkId === 80001 || networkId === 137)
+    ) {
+      notificationConfig.warning("Change metamask network to Polygon!");
       return;
     }
     this.setState(
@@ -748,24 +792,38 @@ export default class Home extends PureComponent {
     // console.log(actualSendFundAmount)
     // console.log("----------------------------------------------amount-end----------------------------------")
     let networkId = web3Config.getNetworkId();
+    let { selectedOptionReceive } = this.state;
+    console.log("------------------------matic-gas-price------------------------------")
+
     if (networkId === 56 || networkId === 97) {
-      const response = await fetch(
-        "https://ethgasstation.info/json/ethgasAPI.json"
-      );
-      const json = await response.json();
-      let gasPrice = (json.fast / 10).toString();
-      let prcsFees = Number(
-        web3Js.utils.fromWei(
-          ((330000 *
-            web3Js.utils.toWei(gasPrice, "gwei") *
-            (this.state.currencyPrices["ETH"] / this.state.currencyPrices["BNB"])).toFixed(0)).toString()
+      let prcsFees = 0;
+      if (selectedOptionReceive.networkId === 42 || selectedOptionReceive.networkId === 1) {
+        const response = await fetch(
+          "https://ethgasstation.info/json/ethgasAPI.json"
+        );
+        const json = await response.json();
+        let gasPrice = (json.fast / 10).toString();
+        prcsFees = Number(
+          web3Js.utils.fromWei(
+            ((330000 *
+              web3Js.utils.toWei(gasPrice, "gwei") *
+              (this.state.currencyPrices["ETH"] / this.state.currencyPrices["BNB"])).toFixed(0)).toString()
+          )
         )
-      )
+      } else if (selectedOptionReceive.networkId === 137 || selectedOptionReceive.networkId === 80001) {
+        prcsFees = Number(
+          web3Js.utils.fromWei(
+            ((330000 *
+              (await this.state.web3Polygon.eth.getGasPrice()) *
+              (this.state.currencyPrices["MATIC"] / this.state.currencyPrices["BNB"])).toFixed(0)).toString()
+          )
+        )
+      }
       let companyFees = (
-        (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryBinance)) / 10000
+        (Number(actualSendFundAmount) * await this.getCompanyFees()) / 10000
       )
       let reimbursementFees = (
-        (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementBinance, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.BINANCE].swapFactoryContract)) / 10000
+        (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.licenseeAddress[networkId])) / 10000
       )
       // console.log("----------------------------------Fee calculation Logs Start -----------------------------------------")
       // console.log("Company Fees : ", await this.getCompanyFees(this.state.instanceSwapFactoryBinance))
@@ -776,7 +834,7 @@ export default class Home extends PureComponent {
       // console.log("Licensee Fees Calculated Amount * Licensee Fees / 10000: ", (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementBinance, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.BINANCE].swapFactoryContract)) / 10000)
       // console.log("----------------------------------Fee calculation Logs End -----------------------------------------")
       console.log((
-        (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryBinance)) / 10000
+        (Number(actualSendFundAmount) * await this.getCompanyFees()) / 10000
       ))
       return {
         totalFees: (
@@ -794,18 +852,83 @@ export default class Home extends PureComponent {
         reimbursementFees: reimbursementFees
       }
     } else if (networkId === 1 || networkId === 42) {
-      let prcsFees = Number(
-        web3Js.utils.fromWei(
-          ((330000 *
-            web3Js.utils.toWei("5", "gwei") *
-            (this.state.currencyPrices["BNB"] / this.state.currencyPrices["ETH"])).toFixed(0)).toString()
+      let prcsFees;
+      if (selectedOptionReceive.networkId === 56 || selectedOptionReceive.networkId === 97) {
+        prcsFees = Number(
+          web3Js.utils.fromWei(
+            ((330000 *
+              web3Js.utils.toWei("5", "gwei") *
+              (this.state.currencyPrices["BNB"] / this.state.currencyPrices["ETH"])).toFixed(0)).toString()
+          )
         )
-      )
+      } else if (selectedOptionReceive.networkId === 137 || selectedOptionReceive.networkId === 80001) {
+        prcsFees = Number(
+          web3Js.utils.fromWei(
+            ((330000 *
+              (await this.state.web3Polygon.eth.getGasPrice()) *
+              (this.state.currencyPrices["MATIC"] / this.state.currencyPrices["ETH"])).toFixed(0)).toString()
+          )
+        )
+      }
       let companyFees = (
-        (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryEthereum)) / 10000
+        (Number(actualSendFundAmount) * await this.getCompanyFees()) / 10000
       )
       let reimbursementFees = (
-        (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementEthereum, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].swapFactoryContract)) / 10000
+        (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.licenseeAddress[networkId])) / 10000
+      )
+      // console.log("----------------------------------Fee calculation Logs Start -----------------------------------------")
+      // console.log("Company Fees : ", await this.getCompanyFees(this.state.instanceSwapFactoryEthereum))
+      // console.log("License Address : ", this.state.licenseeAddress[networkId])
+      // console.log("Licensee Fees : ", await this.getReimbursementFees(this.state.instanceReimbursementEthereum, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].swapFactoryContract))
+      // console.log(Number(actualSendFundAmount))
+      // console.log("Company Fees Calculated Amount * Company Fees / 10000: ", (Number(actualSendFundAmount) * await this.getCompanyFees(this.state.instanceSwapFactoryEthereum)) / 10000)
+      // console.log("Licensee Fees Calculated Amount * Licensee Fees / 10000: ", (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.instanceReimbursementEthereum, this.state.licenseeAddress[networkId], constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].swapFactoryContract)) / 10000)
+
+      // console.log("----------------------------------Fee calculation Logs End -----------------------------------------")
+      return {
+        totalFees: (
+          // web3Js.utils.toWei(
+          ((prcsFees
+            +
+            companyFees
+            +
+            reimbursementFees
+          ) * 10 ** 18).toFixed()
+          // )
+        ),
+        processingFees: prcsFees,
+        companyFees: companyFees,
+        reimbursementFees: reimbursementFees
+      }
+    } else if (networkId === 137 || networkId === 80001) {
+      let prcsFees;
+      if (selectedOptionReceive.networkId === 42 || selectedOptionReceive.networkId === 1) {
+        const response = await fetch(
+          "https://ethgasstation.info/json/ethgasAPI.json"
+        );
+        const json = await response.json();
+        let gasPrice = (json.fast / 10).toString();
+        prcsFees = Number(
+          web3Js.utils.fromWei(
+            ((330000 *
+              web3Js.utils.toWei(gasPrice, "gwei") *
+              (this.state.currencyPrices["ETH"] / this.state.currencyPrices["MATIC"])).toFixed(0)).toString()
+          )
+        )
+      } else if (selectedOptionReceive.networkId === 1 || selectedOptionReceive.networkId === 42) {
+        prcsFees = Number(
+          web3Js.utils.fromWei(
+            ((330000 *
+              web3Js.utils.toWei("5", "gwei") *
+              (this.state.currencyPrices["BNB"] / this.state.currencyPrices["MATIC"])).toFixed(0)).toString()
+          )
+        )
+      }
+      let companyFees = (
+        (Number(actualSendFundAmount) * await this.getCompanyFees()) / 10000
+      )
+      let reimbursementFees = (
+        (Number(actualSendFundAmount) * await this.getReimbursementFees(this.state.licenseeAddress[networkId])) / 10000
       )
       // console.log("----------------------------------Fee calculation Logs Start -----------------------------------------")
       // console.log("Company Fees : ", await this.getCompanyFees(this.state.instanceSwapFactoryEthereum))
@@ -834,13 +957,26 @@ export default class Home extends PureComponent {
     }
   }
 
-  async getCompanyFees(instance) {
+  async getCompanyFees() {
+    let { web3Provider, selectedOptionSend, selectedPairAddress } = this.state;
+    let instance = await new web3Provider[selectedOptionSend.networkId].eth.Contract(
+      swapFactoryAbi,
+      selectedPairAddress
+    );
     let fees = await instance.methods.companyFee().call();
+    console.log("company-fees:-----------------------", fees)
     return fees;
   }
 
-  async getReimbursementFees(instance, vaultAddress, projectContractAddress) {
-    let fees = await instance.methods.getLicenseeFee(vaultAddress, projectContractAddress).call();
+  async getReimbursementFees(vaultAddress) {
+    let { web3Provider, selectedOptionSend, selectedSendCurrency, selectedReceiveCurrency, selectedPairAddress } = this.state;
+
+    let instance = await new web3Provider[selectedOptionSend.networkId].eth.Contract(
+      reimbursementAbi,
+      constantConfig.getReimbursementContractAddressByPairs(selectedSendCurrency, selectedReceiveCurrency)
+    );
+    let fees = await instance.methods.getLicenseeFee(vaultAddress, selectedPairAddress).call();
+    console.log("reimbur-fees:-----------------------", fees)
     return fees;
   }
 
@@ -1472,7 +1608,7 @@ export default class Home extends PureComponent {
 
     await axios
       .get(
-        `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`
+        `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple%2Cmatic-network&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`
       )
       .then((res) => {
         tableDataLocalcoingecko = res.data;
@@ -1484,6 +1620,8 @@ export default class Home extends PureComponent {
     currencyPrices["ETH"] = tableDataLocalcoingecko["ethereum"]["usd"];
 
     currencyPrices["BNB"] = tableDataLocalcoingecko["binancecoin"]["usd"];
+
+    currencyPrices["MATIC"] = tableDataLocalcoingecko["matic-network"]["usd"];
 
     currencyPrices["JNTR/e"] = 0.062166;
     currencyPrices["JNTR/b"] = 0.054237;
@@ -1500,12 +1638,21 @@ export default class Home extends PureComponent {
   }
   changeCurrency(check) {
     // if(check && this.state.web3 === null){
-    let selectedSendCurrency = this.state.selectedSendCurrency;
-    let selectedReceiveCurrency = this.state.selectedReceiveCurrency;
+    let { selectedSendCurrency, selectedReceiveCurrency, selectedOptionSend, selectedOptionReceive } = this.state;
+
     this.setState(
       {
         selectedSendCurrency: selectedReceiveCurrency,
         selectedReceiveCurrency: selectedSendCurrency,
+        selectedOptionSend: selectedOptionReceive,
+        selectedOptionReceive: selectedOptionSend,
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedReceiveCurrency, selectedSendCurrency),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.label !== selectedOptionSend.label && selectedOptionReceive.label !== value.label;
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.label !== selectedOptionReceive.label && selectedOptionSend.label !== value.label;
+        }),
         sendFundAmount: "",
         estimatedGasFee: "0"
       },
@@ -1517,6 +1664,36 @@ export default class Home extends PureComponent {
     //     notificationConfig.warning("Please change metamask network!")
     // }
   }
+
+  handleChange = (name, selectedOption) => {
+    const { selectedOptionSend, selectedOptionReceive } = this.state;
+    if (name === "send") {
+      this.setState({
+        selectedSendCurrency: selectedOption.label,
+        selectedOptionSend: selectedOption,
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.label, selectedOptionReceive.label),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.label !== selectedOption.label && selectedOptionSend.label !== value.label;
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.label !== selectedOption.label && selectedOptionReceive.label !== value.label;
+        }),
+      })
+    } else if (name === "receive") {
+      this.setState({
+        selectedReceiveCurrency: selectedOption.label,
+        selectedOptionReceive: selectedOption,
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.label, selectedOption.label,),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.label !== selectedOption.label && selectedOptionSend.label !== value.label;
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return (value.label !== selectedOption.label && selectedOptionReceive.label !== value.label);
+        }),
+      })
+    }
+  };
+
   setSendCurrency(currency) {
     this.setState({ selectedSendCurrency: currency }, () => {
       this.closePopup("sendCurPop");
@@ -1667,6 +1844,7 @@ export default class Home extends PureComponent {
     // var userTxs = StableCoinStore.getFetchedUserTxs();
     this.setState({ loadingHistory: true })
     let url = process.env.REACT_APP_LEDGER_HOST + 'ledger/' + (address).toLocaleLowerCase();
+    console.log(process.env.REACT_APP_LEDGER_HOST)
 
     let json;
     await axios
@@ -1796,6 +1974,20 @@ export default class Home extends PureComponent {
           );
         }
       });
+      if (userTxsUI.length <= 0) {
+        userTxsUI.push(
+          <div style={{ textAlign: "center" }}>
+            <h2>No transaction</h2>
+          </div>
+        );
+      }
+      if (userPendingTxsUI <= 0) {
+        userPendingTxsUI.push(
+          <div style={{ textAlign: "center" }}>
+            <h2>No transaction</h2>
+          </div>
+        );
+      }
     } else {
       userTxsUI.push(
         <div style={{ textAlign: "center" }}>
@@ -1947,41 +2139,41 @@ export default class Home extends PureComponent {
                         <span>One click</span> SLIPPAGE-FREE MULTICHAIN SWAP
                       </div>
                       <div className="smvTitle02 wow fadeInUp" data-wow-delay="0.2s">
-                      Unlimited Liquidity CeFi to Defi Decentralized Bridge <span style={{color: '#525252' }}>|</span> AMM Alternative 
+                        Unlimited Liquidity CeFi to Defi Decentralized Bridge <span style={{ color: '#525252' }}>|</span> AMM Alternative
                       </div>
                       {this.state.wrapBox === "swap" ? (
                         <>
-                          <div class="tab-container">
-                            <div class="tab-main-wrapper">
-                              <ul class="tabs-n">
-                                <li class="tab-link current-n" data-tab="tab-1">CRYPTO
-                                  <span class="text-sm-n">LIVE BETA</span>
+                          <div className="tab-container">
+                            <div className="tab-main-wrapper">
+                              <ul className="tabs-n">
+                                <li className="tab-link current-n" data-tab="tab-1">CRYPTO
+                                  <span className="text-sm-n">LIVE BETA</span>
                                 </li>
-                                <li class="tab-link" data-tab="tab-2" style={{ pointerEvents: 'none' }}>W3B
-                                  <span class="text-sm-n">COMING SOON</span>
+                                <li className="tab-link" data-tab="tab-2" style={{ pointerEvents: 'none' }}>W3B
+                                  <span className="text-sm-n">COMING SOON</span>
                                 </li>
-                                <li class="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>FOREX
-                                  <span class="text-sm-n">COMING SOON</span>
+                                <li className="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>FOREX
+                                  <span className="text-sm-n">COMING SOON</span>
                                 </li>
-                                <li class="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none' }}>STOCKS
-                                  <span class="text-sm-n">COMING SOON</span>
+                                <li className="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none' }}>STOCKS
+                                  <span className="text-sm-n">COMING SOON</span>
                                 </li>
                               </ul>
 
-                              <div class="tab-content-n-main">
-                                <div id="tab-1" class="tab-content-n current-n">
-                                  <div class="">
-                                    <div class="form-group-n d-flex items-center-n">
-                                      <div class="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" class="form-label">from</label>
-                                        <div class="inputs-wrap light-controls-n">
-                                          <span class="currency-ic-n">
+                              <div className="tab-content-n-main">
+                                <div id="tab-1" className="tab-content-n current-n">
+                                  <div className="">
+                                    <div className="form-group-n d-flex items-center-n">
+                                      <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" className="form-label">from</label>
+                                        <div className="inputs-wrap light-controls-n">
+                                          <span className="currency-ic-n">
                                             $
                                           </span>
-                                          <div class="inputs-wrap-control">
+                                          <div className="inputs-wrap-control">
                                             <input
                                               type="text"
-                                              class="form-control-n"
+                                              className="form-control-n"
                                               placeholder="Enter amount"
                                               id="input04"
                                               value={this.state.sendFundAmount}
@@ -1989,34 +2181,62 @@ export default class Home extends PureComponent {
                                               onChange={this.recivedToken.bind(this)}
                                               autoComplete="off"
                                             />
-                                            <div class="relative select-item-wrap curICPL">
-                                              <img src={
+                                            <div className="relative select-item-wrap curICPL">
+                                              {/* <img src={
                                                 "images/currencies/" +
                                                 data.tokenDetails[
                                                   this.state.selectedSendCurrency
                                                 ].iconName +
                                                 ".png"
-                                              } />{this.state.selectedSendCurrency}
-                                              {/* <select class="select-item" id="bnb" name="currency"> */}
-                                              {/* <option value="btc" data-icon="images/bnb.png"> BNB</option>
-                                                  <option value="eth" data-icon="images/eth.png"> ETH</option> */}
+                                              } />{this.state.selectedSendCurrency} */}
+                                              <Select
+                                                value={this.state.selectedOptionSend}
+                                                onChange={this.handleChange.bind(this, "send")}
+                                                options={this.state.sendCurrencyList}
+                                              />
+                                              {/* <select> */}
                                               {/* <option
-                                                    value={this.state.selectedSendCurrency}
-                                                    data-icon={
-                                                      "images/currencies/" +
-                                                      data.tokenDetails[
-                                                        this.state.selectedSendCurrency
-                                                      ].iconName +
-                                                      ".png"
+                                                  value={this.state.selectedSendCurrency}
+                                                  data-icon={
+                                                    "images/currencies/" +
+                                                    this.state.selectedSendCurrency +
+                                                    ".png"
+                                                  }
+                                                > {this.state.selectedSendCurrency}</option>
+                                                {
+
+                                                  getTokenList().map((ele) => {
+                                                    if (ele.symbol !== this.state.selectedSendCurrency && ele.symbol !== this.state.selectedReceiveCurrency) {
+                                                      return <option
+                                                        value={ele.symbol}
+                                                        data-icon={
+                                                          "images/currencies/" +
+                                                          ele.iconName +
+                                                          ".png"
+                                                        }
+                                                      > {ele.symbol}</option>
                                                     }
-                                                  > {this.state.selectedSendCurrency}</option>
-                                                </select> */}
+                                                  })
+                                                } */}
+                                              {/* <option value="btc" data-icon="images/bnb.png"> BNB</option>
+                                                <option value="eth" data-icon="images/eth.png"> ETH</option>
+                                                <option
+                                                  value={this.state.selectedSendCurrency}
+                                                  data-icon={
+                                                    "images/currencies/" +
+                                                    data.tokenDetails[
+                                                      this.state.selectedSendCurrency
+                                                    ].iconName +
+                                                    ".png"
+                                                  }
+                                                > {this.state.selectedSendCurrency}</option> */}
+                                              {/* </select> */}
                                             </div>
                                           </div>
                                         </div>
-                                        <p class="form-label font-normal pl-50">≈ {this.state.actualSendFundAmount.toFixed(5)} | 1 {this.state.selectedSendCurrency} : ${this.state.currencyPrices[this.state.selectedSendCurrency]}</p>
+                                        <p className="form-label font-normal pl-50">≈ {this.state.actualSendFundAmount.toFixed(5)} | 1 {this.state.selectedSendCurrency} : ${this.state.currencyPrices[this.state.selectedSendCurrency]}</p>
                                       </div>
-                                      <div class="form-ic">
+                                      <div className="form-ic">
                                         <a
                                           href="javascript:void(0);"
                                           onClick={() => {
@@ -2024,55 +2244,63 @@ export default class Home extends PureComponent {
                                           }}
                                         ><img src="images/form-middle-ic.png" alt="" /></a>
                                       </div>
-                                      <div class="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" class="form-label">to</label>
-                                        <div class="inputs-wrap dark-controls-n">
-                                          <span class="currency-ic-n">
+                                      <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" className="form-label">to</label>
+                                        <div className="inputs-wrap dark-controls-n">
+                                          <span className="currency-ic-n">
                                             $
                                           </span>
-                                          <div class="inputs-wrap-control">
+                                          <div className="inputs-wrap-control">
                                             <input
                                               type="text"
-                                              class="form-control-n"
+                                              className="form-control-n"
                                               placeholder="Enter amount"
                                               readOnly=""
                                               disabled
                                               value={this.state.sendFundAmount}
                                             />
-                                            <div class="relative select-item-wrap curICPL02">
-                                              <img src={
-                                                "images/currencies/" +
-                                                data.tokenDetails[
-                                                  this.state.selectedReceiveCurrency
-                                                ].iconName +
-                                                ".png"
-                                              } />{this.state.selectedReceiveCurrency}
-                                              {/* <select class="select-item" id="eth" name="currency">
-                                                  <option
-                                                    selected
-                                                    value={this.state.selectedReceiveCurrency}
-                                                    data-icon={
-                                                      "images/currencies/" +
-                                                      data.tokenDetails[
-                                                        this.state.selectedReceiveCurrency
-                                                      ].iconName +
-                                                      ".png"
+                                            <div className="relative select-item-wrap curICPL02">
+                                              <Select
+                                                value={this.state.selectedOptionReceive}
+                                                onChange={this.handleChange.bind(this, "receive")}
+                                                options={this.state.recieveCurrencyList}
+                                              />
+                                              {/* <select>
+                                                <option
+                                                  value={this.state.selectedReceiveCurrency}
+                                                  data-icon={
+                                                    "images/currencies/" +
+                                                    this.state.selectedReceiveCurrency +
+                                                    ".png"
+                                                  }
+                                                > {this.state.selectedReceiveCurrency}</option>
+                                                {
+                                                  getTokenList().map((ele) => {
+                                                    if (ele.symbol !== this.state.selectedSendCurrency && ele.symbol !== this.state.selectedReceiveCurrency) {
+                                                      return <option
+                                                        value={ele.symbol}
+                                                        data-icon={
+                                                          "images/currencies/" +
+                                                          ele.iconName +
+                                                          ".png"
+                                                        }
+                                                      > {ele.symbol}</option>
                                                     }
-                                                  > {this.state.selectedReceiveCurrency}</option> */}
-                                              {/* <option value="btc" data-icon="images/bnb.png"> BNB</option> */}
-                                              {/* </select> */}
+                                                  })
+                                                }
+                                              </select> */}
                                             </div>
                                           </div>
                                         </div>
-                                        <p class="form-label font-normal pl-50">≈ {this.state.approxReceiveFundAmount.toFixed(5)} | 1 {this.state.selectedReceiveCurrency} : ${this.state.currencyPrices[this.state.selectedReceiveCurrency]}</p>
+                                        <p className="form-label font-normal pl-50">≈ {this.state.approxReceiveFundAmount.toFixed(5)} | 1 {this.state.selectedReceiveCurrency} : ${this.state.currencyPrices[this.state.selectedReceiveCurrency]}</p>
                                       </div>
                                     </div>
-                                    <div class="text-center">
+                                    <div className="text-center">
                                       {this.state.web3 === null ||
                                         constantConfig.tokenDetails[
                                           this.state.selectedSendCurrency
                                         ].networkId !== web3Config.getNetworkId() ? (
-                                        <button class="btn-primary-n ani-1 connect" style={{ background: "#5c6bc0" }} onClick={this.connectWallet.bind(this)}><span>
+                                        <button className="btn-primary-n ani-1 connect" style={{ background: "#5c6bc0" }} onClick={this.connectWallet.bind(this)}><span>
                                           <i
                                             className={
                                               data.tokenDetails[
@@ -2093,186 +2321,186 @@ export default class Home extends PureComponent {
                                         this.state.selectedSendCurrency + "_APPROVED"
                                         ] <= this.state.actualSendFundAmount ? (
                                         this.state.approveLoading ? (
-                                          <button class="btn-primary-n ani-1 connect swap"><LoopCircleLoading
+                                          <button className="btn-primary-n ani-1 connect swap"><LoopCircleLoading
                                             height={"20px"}
                                             width={"20px"}
                                             color={"#ffffff"}
                                           /></button>
                                         ) : (
-                                          <button class="btn-primary-n ani-1 connect swap" onClick={() => {
+                                          <button className="btn-primary-n ani-1 connect swap" onClick={() => {
                                             this.approve();
                                           }}>Approve</button>
                                         )
                                       ) : this.state.swapLoading ? (
-                                        <button class="btn-primary-n ani-1 connect swap"><LoopCircleLoading
+                                        <button className="btn-primary-n ani-1 connect swap"><LoopCircleLoading
                                           height={"20px"}
                                           width={"20px"}
                                           color={"#ffffff"}
                                         /></button>
                                       ) : (
-                                        <button class="btn-primary-n ani-1 connect swap swapBtn" onClick={() => {
+                                        <button className="btn-primary-n ani-1 connect swap swapBtn" onClick={() => {
                                           this.swap();
                                         }}>SWAP</button>
                                       )}
 
-                                      <p class="font-11 color-light-n mb-0-n">{this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ? "You are swapping $" + this.state.sendFundAmount + " of " + this.state.selectedSendCurrency + " to $" + this.state.sendFundAmount + " of " + this.state.selectedReceiveCurrency : null}</p>
+                                      <p className="font-11 color-light-n mb-0-n">{this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ? "You are swapping $" + this.state.sendFundAmount + " of " + this.state.selectedSendCurrency + " to $" + this.state.sendFundAmount + " of " + this.state.selectedReceiveCurrency : null}</p>
                                     </div>
                                   </div>
                                 </div>
-                                <div id="tab-2" class="tab-content-n">
-                                  <div class="">
-                                    <div class="form-group-n d-flex items-center-n">
-                                      <div class="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" class="form-label">from</label>
-                                        <div class="inputs-wrap light-controls-n">
-                                          <span class="currency-ic-n">
+                                <div id="tab-2" className="tab-content-n">
+                                  <div className="">
+                                    <div className="form-group-n d-flex items-center-n">
+                                      <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" className="form-label">from</label>
+                                        <div className="inputs-wrap light-controls-n">
+                                          <span className="currency-ic-n">
                                             $
                                           </span>
-                                          <div class="inputs-wrap-control">
-                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                            <div class="relative select-item-wrap">
-                                              <select class="select-item" id="bnb2" name="currency">
+                                          <div className="inputs-wrap-control">
+                                            <input type="text" className="form-control-n" placeholder="Enter amount" />
+                                            <div className="relative select-item-wrap">
+                                              <select className="select-item" id="bnb2" name="currency">
                                                 <option value="btc" data-icon="images/bnb.png"> BNB</option>
                                                 <option value="eth" data-icon="images/eth.png"> ETH</option>
                                               </select>
                                             </div>
                                           </div>
                                         </div>
-                                        <p class="form-label font-normal pl-50">≈ 0.0123 | 1 BNB : $257.63</p>
+                                        <p className="form-label font-normal pl-50">≈ 0.0123 | 1 BNB : $257.63</p>
                                       </div>
-                                      <div class="form-ic">
+                                      <div className="form-ic">
                                         <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
                                       </div>
-                                      <div class="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" class="form-label">to</label>
-                                        <div class="inputs-wrap dark-controls-n">
-                                          <span class="currency-ic-n">
+                                      <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" className="form-label">to</label>
+                                        <div className="inputs-wrap dark-controls-n">
+                                          <span className="currency-ic-n">
                                             $
                                           </span>
-                                          <div class="inputs-wrap-control">
-                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                            <div class="relative select-item-wrap">
-                                              <select class="select-item" id="eth2" name="demo">
+                                          <div className="inputs-wrap-control">
+                                            <input type="text" className="form-control-n" placeholder="Enter amount" />
+                                            <div className="relative select-item-wrap">
+                                              <select className="select-item" id="eth2" name="demo">
                                                 <option value="btc" data-icon="images/bnb.png"> BNB</option>
                                                 <option value="eth" data-icon="images/eth.png"> ETH</option>
                                               </select>
                                             </div>
                                           </div>
                                         </div>
-                                        <p class="form-label font-normal pl-50">≈ 3.2025 | 1 ETH : $2,070.12</p>
+                                        <p className="form-label font-normal pl-50">≈ 3.2025 | 1 ETH : $2,070.12</p>
                                       </div>
                                     </div>
-                                    <div class="text-center">
-                                      <button class="btn-primary-n">SWAP</button>
-                                      <p class="font-11 color-light-n mb-0-n">You are swapping $100 of BNB to $100 of ETH</p>
+                                    <div className="text-center">
+                                      <button className="btn-primary-n">SWAP</button>
+                                      <p className="font-11 color-light-n mb-0-n">You are swapping $100 of BNB to $100 of ETH</p>
                                     </div>
                                   </div>
                                 </div>
-                                <div id="tab-3" class="tab-content-n">
-                                  <div class="">
-                                    <div class="form-group-n d-flex items-center-n">
-                                      <div class="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" class="form-label">from</label>
-                                        <div class="inputs-wrap light-controls-n">
-                                          <span class="currency-ic-n">
+                                <div id="tab-3" className="tab-content-n">
+                                  <div className="">
+                                    <div className="form-group-n d-flex items-center-n">
+                                      <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" className="form-label">from</label>
+                                        <div className="inputs-wrap light-controls-n">
+                                          <span className="currency-ic-n">
                                             $
                                           </span>
-                                          <div class="inputs-wrap-control">
-                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                            <div class="relative select-item-wrap">
-                                              <select class="select-item" id="usd" name="currency">
+                                          <div className="inputs-wrap-control">
+                                            <input type="text" className="form-control-n" placeholder="Enter amount" />
+                                            <div className="relative select-item-wrap">
+                                              <select className="select-item" id="usd" name="currency">
                                                 <option value="USD" data-icon="images/usd.png" > USD</option>
                                                 <option value="EUR" data-icon="images/eur.png"> EUR</option>
                                               </select>
                                             </div>
                                           </div>
                                         </div>
-                                        <p class="form-label font-normal pl-50">1 EUR = 1.1414 USD</p>
+                                        <p className="form-label font-normal pl-50">1 EUR = 1.1414 USD</p>
                                       </div>
-                                      <div class="form-ic">
+                                      <div className="form-ic">
                                         <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
                                       </div>
-                                      <div class="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" class="form-label">to</label>
-                                        <div class="inputs-wrap dark-controls-n">
-                                          <span class="currency-ic-n">
+                                      <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" className="form-label">to</label>
+                                        <div className="inputs-wrap dark-controls-n">
+                                          <span className="currency-ic-n">
                                             $
                                           </span>
-                                          <div class="inputs-wrap-control">
-                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                            <div class="relative select-item-wrap">
-                                              <select class="select-item" id="eur" name="demo">
+                                          <div className="inputs-wrap-control">
+                                            <input type="text" className="form-control-n" placeholder="Enter amount" />
+                                            <div className="relative select-item-wrap">
+                                              <select className="select-item" id="eur" name="demo">
                                                 <option value="EUR" data-icon="images/eur.png"> EUR</option>
                                                 <option value="USD" data-icon="images/usd.png"> USD</option>
                                               </select>
                                             </div>
                                           </div>
                                         </div>
-                                        <p class="form-label font-normal pl-50">1 EUR = 1.1414 USD</p>
+                                        <p className="form-label font-normal pl-50">1 EUR = 1.1414 USD</p>
                                       </div>
                                     </div>
-                                    <div class="text-center">
-                                      <button class="btn-primary-n">SWAP</button>
+                                    <div className="text-center">
+                                      <button className="btn-primary-n">SWAP</button>
                                     </div>
-                                    <p class="font-11 color-light-n mb-0-n text-with-svg-sm">
-                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" class="svg-inline--fa fa-cog fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg>
-                                      <span class="text-between-ic"> Estimated gas and fees: 0.0015 USD</span>
-                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" class="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
+                                    <p className="font-11 color-light-n mb-0-n text-with-svg-sm">
+                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" className="svg-inline--fa fa-cog fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg>
+                                      <span className="text-between-ic"> Estimated gas and fees: 0.0015 USD</span>
+                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" className="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
                                     </p>
                                   </div>
                                 </div>
-                                <div id="tab-4" class="tab-content-n">
-                                  <div class="">
-                                    <div class="form-group-n d-flex items-center-n">
-                                      <div class="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" class="form-label">from</label>
-                                        <div class="inputs-wrap light-controls-n">
-                                          <span class="currency-ic-n">
+                                <div id="tab-4" className="tab-content-n">
+                                  <div className="">
+                                    <div className="form-group-n d-flex items-center-n">
+                                      <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" className="form-label">from</label>
+                                        <div className="inputs-wrap light-controls-n">
+                                          <span className="currency-ic-n">
                                             $
                                           </span>
-                                          <div class="inputs-wrap-control">
-                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                            <div class="relative select-item-wrap">
-                                              <select class="select-item no-img" id="jd1" name="currency">
+                                          <div className="inputs-wrap-control">
+                                            <input type="text" className="form-control-n" placeholder="Enter amount" />
+                                            <div className="relative select-item-wrap">
+                                              <select className="select-item no-img" id="jd1" name="currency">
                                                 <option value="JD.com" > JD.com</option>
                                                 <option value="Yandex" > Yandex</option>
                                               </select>
                                             </div>
                                           </div>
                                         </div>
-                                        <p class="form-label font-normal pl-50">1 JD.COM = 0.8759 YANDEX
+                                        <p className="form-label font-normal pl-50">1 JD.COM = 0.8759 YANDEX
                                         </p>
                                       </div>
-                                      <div class="form-ic">
+                                      <div className="form-ic">
                                         <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
                                       </div>
-                                      <div class="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" class="form-label">to</label>
-                                        <div class="inputs-wrap dark-controls-n">
-                                          <span class="currency-ic-n">
+                                      <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <label for="" className="form-label">to</label>
+                                        <div className="inputs-wrap dark-controls-n">
+                                          <span className="currency-ic-n">
                                             $
                                           </span>
-                                          <div class="inputs-wrap-control">
-                                            <input type="text" class="form-control-n" placeholder="Enter amount" />
-                                            <div class="relative select-item-wrap">
-                                              <select class="select-item no-img" id="jd2" name="demo">
+                                          <div className="inputs-wrap-control">
+                                            <input type="text" className="form-control-n" placeholder="Enter amount" />
+                                            <div className="relative select-item-wrap">
+                                              <select className="select-item no-img" id="jd2" name="demo">
                                                 <option value="Yandex" > Yandex</option>
                                                 <option value="JD.com" > JD.com</option>
                                               </select>
                                             </div>
                                           </div>
                                         </div>
-                                        <p class="form-label font-normal pl-50">1 YANDEX = 1.1414 JD.COM
+                                        <p className="form-label font-normal pl-50">1 YANDEX = 1.1414 JD.COM
                                         </p>
                                       </div>
                                     </div>
-                                    <div class="text-center">
-                                      <button class="btn-primary-n">SWAP</button>
+                                    <div className="text-center">
+                                      <button className="btn-primary-n">SWAP</button>
                                     </div>
-                                    <p class="font-11 color-light-n mb-0-n text-with-svg-sm">
-                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" class="svg-inline--fa fa-cog fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg>
-                                      <span class="text-between-ic"> Estimated gas and fees: 0.0015 USD</span>
-                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" class="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
+                                    <p className="font-11 color-light-n mb-0-n text-with-svg-sm">
+                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" className="svg-inline--fa fa-cog fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg>
+                                      <span className="text-between-ic"> Estimated gas and fees: 0.0015 USD</span>
+                                      <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" className="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>
                                     </p>
                                   </div>
                                 </div>
@@ -2560,14 +2788,14 @@ export default class Home extends PureComponent {
                     ) : null}
                     <div className="bb-traHSection">
                       <div className="container-Grid">
-                        {/* <div class="bb-traHistoryBTNbar ">
-                                        <a href="javascript:void(0);" class="">All</a>
-                                        <a href="javascript:void(0);" class="">Completed</a>
-                                        <a href="javascript:void(0);" class="active">Pending</a>
+                        {/* <div className="bb-traHistoryBTNbar ">
+                                        <a href="javascript:void(0);" className="">All</a>
+                                        <a href="javascript:void(0);" className="">Completed</a>
+                                        <a href="javascript:void(0);" className="active">Pending</a>
                                     </div> */}
                         {web3Config.getAddress() !== null ? (
                           !this.state.showTxHistory ? (
-                            <div class="bb-traHistoryBTNbar">
+                            <div className="bb-traHistoryBTNbar">
                               <a
                                 href="javascript:void(0)"
                                 className="ssbtn05"
@@ -2577,7 +2805,7 @@ export default class Home extends PureComponent {
                               </a>
                             </div>
                           ) : (
-                            <div class="bb-traHistoryBTNbar">
+                            <div className="bb-traHistoryBTNbar">
                               <a
                                 href="javascript:void(0)"
                                 onClick={() => this.showHistory("all", false)}
@@ -2627,10 +2855,10 @@ export default class Home extends PureComponent {
 
                     {/* <div className="bb-traHSection">
                                 <div className="container-Grid">
-                                <div class="bb-traHistoryBTNbar ">
-                                    <a href="javascript:void(0);" class="">All</a> 
-                                    <a href="javascript:void(0);" class="">Completed</a>
-                                    <a href="javascript:void(0);" class="active">Pending</a>
+                                <div className="bb-traHistoryBTNbar ">
+                                    <a href="javascript:void(0);" className="">All</a> 
+                                    <a href="javascript:void(0);" className="">Completed</a>
+                                    <a href="javascript:void(0);" className="active">Pending</a>
                                 </div>
                                     <div className="transaction-histroryWrap">
                                         <div className="transaction-histroryBox">
@@ -2777,7 +3005,7 @@ export default class Home extends PureComponent {
                             <div className="icon-Box icon04">
                               <svg viewBox="0 0 200 200">
                                 <polygon
-                                  class="st0"
+                                  className="st0"
                                   fill="var(--button-bg-color)"
                                   points="170.6,45.7 170.6,42.8 167.5,42.8 167.5,39.8 167.5,39.7 167.5,36.6 161.8,36.6 161.8,33.8 158.5,33.8 
 	158.5,31.2 158.5,30.9 158.5,28 125.5,28 125.5,30.9 122.8,30.9 122.8,33.8 119.8,33.8 119.8,36.6 113.9,36.6 113.9,39.8 
@@ -2802,7 +3030,7 @@ export default class Home extends PureComponent {
 	"
                                 />
                                 <polygon
-                                  class="st1"
+                                  className="st1"
                                   fill="var(--button-bg-color)"
                                   points="129.7,91.2 129.7,88.2 127,88.2 127,85.2 123.7,85.2 123.7,82.4 123.7,82.1 123.7,79.5 123.7,79.2 
 	123.7,76.3 114.8,76.3 114.8,73.2 106.1,73.2 106.1,76.3 105.9,76.3 105.9,79.2 103,79.2 103,82.4 106.1,82.4 106.1,85.3 
@@ -2845,13 +3073,13 @@ export default class Home extends PureComponent {
                                   <rect
                                     x="35.2"
                                     y="160.4"
-                                    class="st0"
+                                    className="st0"
                                     fill="var(--button-bg-color)"
                                     width="128.3"
                                     height="8.5"
                                   />
                                   <path
-                                    class="st0"
+                                    className="st0"
                                     fill="var(--button-bg-color)"
                                     d="M38.9,115.5v2.9h6.4v3.1h2.9h0.1h2.9v-3.1h6.4v-2.9h9.7v-3.1h3.3v-2.9h3.2v-3.1h3.1v-2.9H79v-3.2h-0.1v-3.2
 		h-2.8v-2.6v-0.1v-3.1h-3v-2.7v-0.2v-3.1h-3v-3h-3v-2.7v-0.3v-2.7v-0.2v-3h-3.2v-2.9h-2.8v-3.2h-3v-3.1h-6v-2.7v-0.2v-2.6h3.2h108.1
@@ -2864,7 +3092,7 @@ export default class Home extends PureComponent {
                                   <rect
                                     x="94.8"
                                     y="19.7"
-                                    class="st1"
+                                    className="st1"
                                     width="9.2"
                                     height="26.8"
                                     fill="var(--button-bg-color)"
@@ -2872,13 +3100,13 @@ export default class Home extends PureComponent {
                                   <rect
                                     x="94.8"
                                     y="58.8"
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     width="9.2"
                                     height="101.6"
                                   />
                                   <path
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     d="M183.5,100.3v-3.2h-2.8v-2.6v-0.1v-3.1h-3v-2.7v-0.2v-3.1h-3v-3h-3.1v-2.7v-0.3v-2.7v-0.2v-3h-3.1v-2.9h-2.8
 		v-3.2h-3v-3.1h-6.1v-2.7v-0.2v-2.6h3.2v-3.2h-3.2v-2.9v-0.2v-2.8v-0.2v-3h-8.7v3v0.2v2.8v0.2v2.9h-3.1v3.2h3.1v2.6v0.2v2.7H142v3.1
@@ -2905,7 +3133,7 @@ export default class Home extends PureComponent {
                             <div className="icon-Box icon02">
                               <svg viewBox="0 0 200 200">
                                 <path
-                                  class="st0"
+                                  className="st0"
                                   fill="var(--button-bg-color)"
                                   d="M152.4,81.9v-2.7h-2.9V76h-6.4v-2.8h-6.4V64h-3V46.4l-3.2,0v-3.2h-3.1v-3h-3.1v-3.1h-3.1v-3h-3.1v-3h-3.4v-3
 	h-12.7h-4.1H85.3v3h-3.4v3h-3.1v3h-3.1v3.1h-3.1v3h-3.1v3.2l-3.2,0V64h-3v9.2h-6.4V76h-6.4v3.2h-2.9v2.7h-9v2.8v0.5v2.3v0.6v74.5
@@ -2914,7 +3142,7 @@ export default class Home extends PureComponent {
 	h39.9h1.5h39.9h2.5h3.4v2.9h6.2V162.7z"
                                 />
                                 <path
-                                  class="st1"
+                                  className="st1"
                                   fill="var(--button-bg-color)"
                                   d="M113.1,114.7v-2.9v-3.2h-2.9v-2.8H107v-2.7v-0.3v-2.9h-7.4h-7.4v2.9v0.3v2.7h-3.3v2.8H86v3.2v2.9H86v3.2H86v3
 	v0.2v3H89v2.9h5.9v17.9h4.7h0h4.7v-17.9h5.9v-2.9h2.9v-3v-0.2v-3h0.1L113.1,114.7L113.1,114.7z M107.2,117.9h-2.9v3v0.2v2.7h-4.7
@@ -2946,7 +3174,7 @@ export default class Home extends PureComponent {
                             <div className="icon-Box icon03">
                               <svg viewBox="0 0 200 200">
                                 <polygon
-                                  class="st0"
+                                  className="st0"
                                   fill="var(--button-bg-color)"
                                   points="168.8,93.6 168.8,91.3 171.8,91.3 171.8,88.1 165.9,88.1 165.9,85.7 166.3,85.7 166.3,82.5 165.9,82.5 
 	165.9,79.8 162.9,79.8 162.9,77.1 162.9,76.9 162.9,74.4 162.9,73.9 162.9,71.7 163.4,71.7 163.4,68.5 160.6,68.5 160.6,65.9 
@@ -2980,7 +3208,7 @@ export default class Home extends PureComponent {
 	168.8,107.7 168.8,105.1 168.8,104.5 168.8,102.3 171.5,102.3 171.5,99.5 171.8,99.5 171.8,96.3 168.8,96.3 168.8,94 "
                                 />
                                 <path
-                                  class="st1"
+                                  className="st1"
                                   fill="var(--button-bg-color)"
                                   d="M118.2,108.9v-1.1h0v-2.8v-0.5v-2.2v-0.6v-2.7h-11.1v-2.4v-0.6V94v-0.4v-2.4v-0.4v-2.4V88v-2.4h5.8v2.7h2.2v2.7
 	h3v-2.7v-0.6v-2.1h3v-2.8v-0.3v-2.8h-3v-2.8h-11.1v-2.4v-0.5v-2.3v-0.4v-2.8H96.4v2.8v0.4v2.3v0.5v2.4H91v2.8h-0.3v2.8h-3v2.8h-5.4
@@ -3020,7 +3248,7 @@ export default class Home extends PureComponent {
                             <div className="icon-Box icon05">
                               <svg viewBox="0 0 200 200">
                                 <path
-                                  class="st0"
+                                  className="st0"
                                   fill="var(--button-bg-color)"
                                   d="M169.2,96.7v-2.3h-2.7v-0.3v-1.9v-0.5v-0.3V89v-0.1v-3.1h-2.7v-2.5v-0.3v-2.9h-0.3v-2.8h-2.5V75v-0.3v-2.3v-0.5
 	v-2.7h-0.3v-2.5v-0.3V64v-0.5v-2.7h-5.5V58h-2.6v-2.7h-0.3v-2.8h-2.6v-2.9h-5.5v-2.9H144v-2.6h-5.6v-2.9h-2.6v-2.4v-0.4v-2.8h-14
@@ -3037,7 +3265,7 @@ export default class Home extends PureComponent {
 	v2.5v0.5v2.7h-0.1v3.2h0.1v1.9v0.3v0.1v0.3v1.9v0.5v0.1v0.3v1.9v0.3v0.1v0.5v1.9v0.3v0.1V103.1z"
                                 />
                                 <path
-                                  class="st1"
+                                  className="st1"
                                   fill="var(--button-bg-color)"
                                   d="M115.9,106.2v-1.1h0v-2.8v-0.4v-2.2v-0.5v-2.7h-11.1V94v-0.6v-2.1v-0.5v-2.3v-0.4v-2.4v-0.4v-2.4h5.8v2.7h2.2
 	v2.6h3v-2.6V85v-2.1h3V80v-0.4v-2.8h-3v-2.8h-11.1v-2.3v-0.5v-2.3v-0.4v-2.8H94.2v2.8v0.4v2.3v0.5v2.3h-5.5v2.8h-0.3v2.8h-3v2.8H80
@@ -3047,7 +3275,7 @@ export default class Home extends PureComponent {
 	v0.4v2.3v0.4v2.4h-3.2v-2.4v-0.4V112v-0.4v-2.2h3.2V111.5z"
                                 />
                                 <polygon
-                                  class="st0"
+                                  className="st0"
                                   fill="var(--button-bg-color)"
                                   points="169.9,33.4 166.7,33.4 166.7,30.4 163.6,30.4 163.6,33.4 157.3,33.4 157.3,36.5 153.9,36.5 153.9,39.7 
 	150.8,39.7 150.8,42.8 147.6,42.8 147.6,45.8 144.5,45.8 144.5,49 141.3,49 141.3,52.1 138.3,52.1 138.3,55.1 135.1,55.1 
@@ -3082,7 +3310,7 @@ export default class Home extends PureComponent {
                             <div className="icon-Box icon06">
                               <svg viewBox="0 0 200 200">
                                 <path
-                                  class="st0"
+                                  className="st0"
                                   fill="var(--button-bg-color)"
                                   d="M150.2,56.9v-3.6h-2.7v-2.7v-0.3v-2.9h-2.7v-3.1h-7.7v-2.5h-7.4v-1.9v-0.6v-2.6h-29.6H100H70.2v2.6v0.6v1.9
 	h-7.4v2.5h-7.7v3.1h-2.7v2.9v0.3v2.7h-2.7v3.6h-2.7v50.9h2.7v2.8h2.7v8.3h0.6v2.7h2.1v2.2v0.5v2.7h2v2.4v0.7v2.3v0.2v3H63v2.7v0.3
@@ -3094,7 +3322,7 @@ export default class Home extends PureComponent {
                                 />
                                 <g>
                                   <polygon
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     points="65.3,69.7 69.8,69.7 69.8,67 77.6,67 77.6,69.7 80.4,69.7 80.4,72.4 82.7,72.4 82.7,75.3 85.1,75.3 
 		85.1,78.2 85.2,78.2 85.2,81.2 77.6,81.2 77.6,78.3 70.2,78.3 70.2,81.2 65.3,81.2 65.3,83.7 65.3,84.4 65.3,86.9 70.2,86.9 
@@ -3103,7 +3331,7 @@ export default class Home extends PureComponent {
 		72.9,61.5 70.2,61.5 70.2,63.8 67.7,63.8 67.7,66.5 65.3,66.5 65.3,68.8 62.8,68.8 62.8,72 65.3,72 	"
                                   />
                                   <polygon
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     points="134.7,68.8 134.7,66.5 132.3,66.5 132.3,63.8 129.8,63.8 129.8,61.5 127.1,61.5 127.1,58.9 
 		120.3,58.9 120.3,61.5 117.3,61.5 117.3,63.8 114.9,63.8 114.9,66.5 107.2,66.5 107.2,69.2 107.2,69.7 107.2,72.1 107.2,72.4 
@@ -3113,7 +3341,7 @@ export default class Home extends PureComponent {
 		134.7,69.7 134.7,72 137.2,72 137.2,68.8 	"
                                   />
                                   <polygon
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     points="132.2,111.1 129.8,111.1 129.8,113.7 127.4,113.7 127.4,116.4 124.9,116.4 124.9,119.5 107.2,119.5 
 		107.2,116.9 107.2,116.4 107.2,114.3 107.2,113.7 107.2,111.1 100,111.1 100,111.1 92.8,111.1 92.8,113.7 92.8,114.3 92.8,116.4 
@@ -3140,13 +3368,13 @@ export default class Home extends PureComponent {
                               <svg viewBox="0 0 200 200">
                                 <g>
                                   <path
-                                    class="st0"
+                                    className="st0"
                                     fill="var(--button-bg-color)"
                                     d="M155.9,51.4v-2.7h-2.7v-2.7h-2.2v-2.3H71.2v5h-2.2v5h-2.4v72h2.2v4.9h2.5v2.4h6.8v2.4h70.2V133h10v-2.4v-0.5
 		v-1.5v-2.9V51.4H155.9z M73.9,125.7V55.8v-2.1v-2.3h75.8h1.2v74.3H73.9z"
                                   />
                                   <polygon
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     points="93.8,140.1 83.7,140.1 83.7,155.3 49,155.3 49,119.8 49,118.4 63.8,118.4 63.8,111 49,111 49,115.6 
 		44.3,115.6 44.3,118.4 41.8,118.4 41.8,155.3 44.3,155.3 44.3,158.2 49,158.2 49,162.8 86.2,162.8 86.2,158.2 91.2,158.2 
@@ -3171,7 +3399,7 @@ export default class Home extends PureComponent {
                                 <g>
                                   <g>
                                     <polygon
-                                      class="st0"
+                                      className="st0"
                                       fill="var(--button-bg-color)"
                                       points="70.1,81.8 70.1,84.9 70.1,88.1 72.7,88.1 72.7,91.2 75.2,91.2 75.2,94 75.2,94.1 75.2,96.9 
 			82.9,96.9 82.9,94.1 82.9,94 82.9,90.9 82.4,90.9 82.4,88 79.7,88 79.7,84.9 79.7,81.7 77.9,81.7 77.9,78.6 75.2,78.6 75.2,76.1 
@@ -3180,20 +3408,20 @@ export default class Home extends PureComponent {
                                     <rect
                                       x="109.4"
                                       y="103.7"
-                                      class="st0"
+                                      className="st0"
                                       fill="var(--button-bg-color)"
                                       width="14.6"
                                       height="8.8"
                                     />
                                     <polygon
-                                      class="st0"
+                                      className="st0"
                                       fill="var(--button-bg-color)"
                                       points="77.3,123.4 75.2,123.4 75.2,126.1 75.2,130.9 70.3,130.9 70.3,138 70.3,143.3 68.2,143.3 68.2,145.5 
 			77.3,145.5 77.3,143.3 77.3,138 80.2,138 80.2,130.9 85.2,130.9 85.2,126.1 85.2,123.4 87.6,123.4 87.6,120.4 77.3,120.4 		"
                                     />
                                   </g>
                                   <path
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     d="M77.8,53.7v-3.1h-5v-3.1v-3.2h-4.9v-2.8h-3v-2.1v-0.8v-2.4H40.5v2.4v0.8v2.1H38v2.8h-7.4v2.6v0.6V50v0.1v3v0.1
 		v2.9v0.2v12.8h4.9V74h5v2.7h7.2v4.2h17.2v-4.2h5.3v-3.1h2.6v-4.3h2.7v-3h2.4v-3v-0.2v-3v-3.2L77.8,53.7L77.8,53.7z M68.3,60.1v3
@@ -3201,7 +3429,7 @@ export default class Home extends PureComponent {
 		V60.1z"
                                   />
                                   <path
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     d="M109.4,103.7v-2.2h-3.6v-2.2v-2.3h-3.6v-2H100v-1.5v-0.6V91H82.3v1.7v0.6v1.5h-1.8v2h-5.4v1.9v0.4v1.8v0.1v2.2
 		v0.1v2.1v0.1v9.3h3.6v3.6h3.6v2h5.2v3H100v-3h3.8v-2.2h1.9V115h2v-2.2h1.7v-2.2v-0.1v-2.2V106L109.4,103.7L109.4,103.7z
@@ -3209,14 +3437,14 @@ export default class Home extends PureComponent {
 		v0.1v2.2h4.1v2.2V108.3z"
                                   />
                                   <path
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     d="M176.4,101.7V98h-5.6v-3.7v-3.8h-5.4v-3.3h-3.3v-2.5v-1v-2.9H135v2.9v1v2.5h-2.8v3.3H124v3.1v0.7v3v0.1v3.6
 		v0.1v3.4v0.2V120h5.5v5.8h5.5v3.2h8v5h19.1v-5h5.9v-3.7h2.9v-5.1h3v-3.6h2.7v-3.6v-0.2v-3.6v-3.8v-3.8H176.4z M165.9,109.3v3.6v0.2
 		v3.3h-2.8v3.6h-1v2.7h-5v3.1h-13.6H143V120h-8v-15.2v-0.2v-3.4h2.8v-3.7h5.2v-3.1v-0.7V91h16.6v3.3V98v0.1v3.7h6.3v3.7V109.3z"
                                   />
                                   <path
-                                    class="st1"
+                                    className="st1"
                                     fill="var(--button-bg-color)"
                                     d="M79.2,154.2v-1.5h-2.3v-1.5v-1.6h-2.3v-1.4h-1.4v-1v-0.4v-1.2H61.8v1.2v0.4v1h-1.2v1.4h-3.5v1.3v0.3v1.2v0v1.5
 		v0v1.4v0.1v6.4h2.3v2.4h2.3v1.3h3.4v2.1h8v-2.1h2.5v-1.5h1.2V162h1.3v-1.5h1.1V159v-0.1v-1.5v-1.6L79.2,154.2L79.2,154.2z
@@ -3306,11 +3534,11 @@ export default class Home extends PureComponent {
                           keyBoardControl={true}
                           customTransition="all 1sec"
                           transitionDuration={900}
-                          containerClass="carousel-container ani-1"
+                          containerclassName="carousel-container ani-1"
                           // removeArrowOnDeviceType={["tablet", "mobile"]}
                           deviceType={this.props.deviceType}
-                          dotListClass="custom-dot-list-style"
-                          itemClass="carousel-item-padding-40-px"
+                          dotListclassName="custom-dot-list-style"
+                          itemclassName="carousel-item-padding-40-px"
                         >
                           <div className="sbSlide">
                             {" "}
@@ -3402,8 +3630,8 @@ export default class Home extends PureComponent {
                           are used to support SMART through automatic buybacks.{" "}
                         </div>
 
-                        <div class="stActMBX">
-                          <div class="stActSbx01 wow zoomIn" data-wow-delay="0.1s">
+                        <div className="stActMBX">
+                          <div className="stActSbx01 wow zoomIn" data-wow-delay="0.1s">
                             {" "}
                             <span>
                               Total Amount Swapped
@@ -3417,7 +3645,7 @@ export default class Home extends PureComponent {
                               ></AnimatedNumber>
                             </div>{" "}
                           </div>
-                          <div class="stActSbx01 wow zoomIn" data-wow-delay="0.2s">
+                          <div className="stActSbx01 wow zoomIn" data-wow-delay="0.2s">
                             {" "}
                             <span>Fees Generated</span>
                             <div className="container">
@@ -3429,7 +3657,7 @@ export default class Home extends PureComponent {
                               ></AnimatedNumber>
                             </div>{" "}
                           </div>
-                          <div class="stActSbx01 wow zoomIn" data-wow-delay="0.3s">
+                          <div className="stActSbx01 wow zoomIn" data-wow-delay="0.3s">
                             {" "}
                             <span>
                               Smart Bought and Burned
@@ -3443,7 +3671,7 @@ export default class Home extends PureComponent {
                               ></AnimatedNumber>
                             </div>{" "}
                           </div>
-                          <div class="stActSbx01 wow zoomIn" data-wow-delay="0.4s">
+                          <div className="stActSbx01 wow zoomIn" data-wow-delay="0.4s">
                             {" "}
                             <span>Total Fees Reimbursed</span>
                             <div className="container">
@@ -3454,7 +3682,7 @@ export default class Home extends PureComponent {
                                 configs={[{ "mass": 1, "tension": 140, "friction": 126 }, { "mass": 1, "tension": 130, "friction": 114 }, { "mass": 1, "tension": 150, "friction": 112 }, { "mass": 1, "tension": 130, "friction": 120 }]}
                               ></AnimatedNumber> </div>{" "}
                           </div>
-                          <div class="stActSbx01 wow zoomIn" data-wow-delay="0.5s">
+                          <div className="stActSbx01 wow zoomIn" data-wow-delay="0.5s">
                             {" "}
                             <span>
                               Total reimbursement staking
@@ -3509,7 +3737,7 @@ export default class Home extends PureComponent {
                         {/* <div className="ssTitle01">Market Prices </div>
                                     <div className="ssSearchBox">
                                         <div className="ssSearchMBox01">
-                                            <i class="fas fa-search"></i>
+                                            <i className="fas fa-search"></i>
                                             <input
                                                 type="text"
                                                 placeholder="Search coin name or token name"
@@ -3518,7 +3746,7 @@ export default class Home extends PureComponent {
                                         </div>
                                         <div className="ssSearchMBox02">
                                             Choose amount of token to compare prices
-                      <div class="sswapSelectbx">
+                      <div className="sswapSelectbx">
                                                 <select
                                                     name="slct"
                                                     id="slct"
@@ -3691,7 +3919,7 @@ export default class Home extends PureComponent {
                                     </div>
                                     <div className="sswapBreadCome">
                                         <a href="#">
-                                            <i class="fas fa-angle-left"></i>
+                                            <i className="fas fa-angle-left"></i>
                                         </a>
                                         <a href="#" className="active">
                                             1
@@ -3703,7 +3931,7 @@ export default class Home extends PureComponent {
                     ...
                     <a href="#">45</a>
                                         <a href="#">
-                                            <i class="fas fa-angle-right"></i>
+                                            <i className="fas fa-angle-right"></i>
                                         </a>
                                     </div> */}
 

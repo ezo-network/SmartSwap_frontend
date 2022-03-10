@@ -10,8 +10,8 @@ data[Number(process.env.REACT_APP_BSC_CHAIN_ID)] = {};
 data[Number(process.env.REACT_APP_POLYGON_CHAIN_ID)] = {};
 
 data.allowedNetwork = [
-    Number(process.env.REACT_APP_ETH_CHAIN_ID), 
-    Number(process.env.REACT_APP_BSC_CHAIN_ID), 
+    Number(process.env.REACT_APP_ETH_CHAIN_ID),
+    Number(process.env.REACT_APP_BSC_CHAIN_ID),
     Number(process.env.REACT_APP_POLYGON_CHAIN_ID)
 ];
 
@@ -58,34 +58,39 @@ data.pureToken = [
 ];
 
 data.contractAddressesByPairs = {
-    smartswap:{
+    smartswap: {
         "ETH/BNB": process.env.REACT_APP_ETH_BNB_SMARTSWAP_CONTRACT_ADDRESS,
-        "ETH/MATIC": process.env.REACT_APP_ETH_MATIC_SMART_SWAP_CONTRACT_ADDRESS,        
-        "BNB/ETH": process.env.REACT_APP_BNB_ETH_SMARTSWAP_CONTRACT_ADDRESS,        
-        "BNB/MATIC": process.env.REACT_APP_BNB_MATIC_SMART_SWAP_CONTRACT_ADDRESS,        
-        "MATIC/BNB": process.env.REACT_APP_MATIC_BNB_SMART_SWAP_CONTRACT_ADDRESS,        
-        "MATIC/ETH": process.env.REACT_APP_MATIC_ETH_SMART_SWAP_CONTRACT_ADDRESS,        
+        "ETH/MATIC": process.env.REACT_APP_ETH_MATIC_SMART_SWAP_CONTRACT_ADDRESS,
+        "BNB/ETH": process.env.REACT_APP_BNB_ETH_SMARTSWAP_CONTRACT_ADDRESS,
+        "BNB/MATIC": process.env.REACT_APP_BNB_MATIC_SMART_SWAP_CONTRACT_ADDRESS,
+        "MATIC/BNB": process.env.REACT_APP_MATIC_BNB_SMART_SWAP_CONTRACT_ADDRESS,
+        "MATIC/ETH": process.env.REACT_APP_MATIC_ETH_SMART_SWAP_CONTRACT_ADDRESS,
     },
     expedite: {
 
     },
     reimbursement: {
-
+        "ETH/BNB": process.env.REACT_APP_ETH_BNB_REIMBURSEMENT_CONTRACT_ADDRESS,
+        "ETH/MATIC": process.env.REACT_APP_ETH_MATIC_REIMBURSEMENT_CONTRACT_ADDRESS,
+        "BNB/ETH": process.env.REACT_APP_BNB_ETH_REIMBURSEMENT_CONTRACT_ADDRESS,
+        "BNB/MATIC": process.env.REACT_APP_BNB_MATIC_REIMBURSEMENT_CONTRACT_ADDRESS,
+        "MATIC/BNB": process.env.REACT_APP_MATIC_BNB_REIMBURSEMENT_CONTRACT_ADDRESS,
+        "MATIC/ETH": process.env.REACT_APP_MATIC_ETH_REIMBURSEMENT_CONTRACT_ADDRESS,
     }
 }
 
 
-data.getSmartswapContractAddressByPairs = function(tokenSymbolA, tokenSymbolB){
+data.getSmartswapContractAddressByPairs = function (tokenSymbolA, tokenSymbolB) {
     const key = tokenSymbolA + '/' + tokenSymbolB;
     return this.contractAddressesByPairs.smartswap[key];
 }
 
-data.getExpediteContractAddressByPairs = function(tokenSymbolA, tokenSymbolB){
+data.getExpediteContractAddressByPairs = function (tokenSymbolA, tokenSymbolB) {
     const key = tokenSymbolA + '/' + tokenSymbolB;
     return this.contractAddressesByPairs.expedite[key];
 }
 
-data.getReimbursementContractAddressByPairs = function(tokenSymbolA, tokenSymbolB){
+data.getReimbursementContractAddressByPairs = function (tokenSymbolA, tokenSymbolB) {
     const key = tokenSymbolA + '/' + tokenSymbolB;
     return this.contractAddressesByPairs.reimbursement[key];
 }
@@ -199,6 +204,21 @@ data.tokenDetails = {
     //     approveRequire: true
     // }
 }
+
+data.getTokenList = function () {
+
+    var result = [];
+
+    for (var i in data.tokenDetails)
+        result.push({
+            value: data.tokenDetails[i].symbol,
+            label: data.tokenDetails[i].symbol,
+            networkId: data.tokenDetails[i].networkId,
+        });
+
+    return result;
+}
+
 
 // mainnet config -------------------------------------------------------------------------end
 
@@ -324,6 +344,10 @@ data.addressByToken = {
     "0x0000000000000000000000000000000000000002": {
         name: "Ethereum",
         symbol: "ETH"
+    },
+    "0x0000000000000000000000000000000000000004": {
+        name: "POLYGON",
+        symbol: "MATIC"
     }
 }
 
