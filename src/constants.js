@@ -3,8 +3,8 @@ var CONSTANT = function () { }
 CONSTANT.COINGECKO_URL = "https://api.coingecko.com/api/v3";
 
 // CONSTANT.PrePath = "https://smartswap.exchange";
-CONSTANT.PrePath = "https://bswap.info";
-// CONSTANT.PrePath = "http://localhost:3000";
+// CONSTANT.PrePath = "https://bswap.info";
+CONSTANT.PrePath = "http://localhost:3000";
 
 CONSTANT.API_URL = "https://api.smartswap.exchange";
 

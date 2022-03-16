@@ -1,6 +1,6 @@
 :root {
-  /* --button-bg-color: #5c6bc0; */
-  --button-bg-color: #5c6bc0;
+  /* --button-bg-color: #91dc27; */
+  --button-bg-color: #91dc27;
   --text-color: #ffffff;
   --swap-btn-color: #91dc27;
   --req-bg: url();
@@ -351,7 +351,7 @@ td {
   background: none;
   width: 55px;
   height: 55px;
-  transform: scale(1.2);
+  /* transform: scale(1.2); */
 }
 .st0 {
   filter: brightness(2);
