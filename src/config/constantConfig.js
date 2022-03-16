@@ -67,7 +67,12 @@ data.contractAddressesByPairs = {
         "MATIC/ETH": process.env.REACT_APP_MATIC_ETH_SMART_SWAP_CONTRACT_ADDRESS,
     },
     expedite: {
-
+        "ETH/BNB": process.env.REACT_APP_ETH_BNB_EXPEDITE_CONTRACT_ADDRESS,
+        "ETH/MATIC": process.env.REACT_APP_ETH_MATIC_EXPEDITE_CONTRACT_ADDRESS,
+        "BNB/ETH": process.env.REACT_APP_BNB_ETH_EXPEDITE_CONTRACT_ADDRESS,
+        "BNB/MATIC": process.env.REACT_APP_BNB_MATIC_EXPEDITE_CONTRACT_ADDRESS,
+        "MATIC/BNB": process.env.REACT_APP_MATIC_BNB_EXPEDITE_CONTRACT_ADDRESS,
+        "MATIC/ETH": process.env.REACT_APP_MATIC_ETH_EXPEDITE_CONTRACT_ADDRESS,
     },
     reimbursement: {
         "ETH/BNB": process.env.REACT_APP_ETH_BNB_REIMBURSEMENT_CONTRACT_ADDRESS,
@@ -100,7 +105,7 @@ data.cexTypes = {
     "BINANCE": {
         symbol: "BINANCE",
         icon: "images/cex/binance.png"
-    }, 
+    },
     "MEXC": {
         symbol: "MEXC",
         icon: "images/cex/mexc.png"

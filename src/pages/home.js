@@ -163,7 +163,9 @@ export default class Home extends PureComponent {
         56: "0x0000000000000000000000000000000000000000",
         1: "0x0000000000000000000000000000000000000000",
         97: "0x0000000000000000000000000000000000000000",
-        42: "0x0000000000000000000000000000000000000000"
+        42: "0x0000000000000000000000000000000000000000",
+        80001: "0x0000000000000000000000000000000000000000",
+        137: "0x0000000000000000000000000000000000000000",
       },
       loadingHistory: false,
       selectedOptionSend: { value: tokenDetails.BNB.symbol, label: tokenDetails.BNB.symbol, networkId: tokenDetails.BNB.networkId },
@@ -513,33 +515,38 @@ export default class Home extends PureComponent {
     this.setState({ btnClick: true });
     await web3Config.connectWallet(0);
     let networkId = web3Config.getNetworkId();
+    let selectedCurId = constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId;
     if (!constantConfig.allowedNetwork.includes(networkId)) {
       notificationConfig.error("Please Select Ethereum or BSC or Polygon Main Network");
       this.setState({ btnClick: false });
       return;
     }
-    if (
-      constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId !==
-      networkId &&
-      (networkId === 97 || networkId === 56)
-    ) {
-      notificationConfig.warning("Change metamask network to Ethereum!");
-      return;
-    } else if (
-      constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId !==
-      networkId &&
-      (networkId === 42 || networkId === 1)
-    ) {
-      notificationConfig.warning("Change metamask network to Binance!");
-      return;
-    } else if (
-      constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId !==
-      networkId &&
-      (networkId === 80001 || networkId === 137)
-    ) {
-      notificationConfig.warning("Change metamask network to Polygon!");
+    if (selectedCurId !== networkId) {
+      notificationConfig.warning("Change metamask network to " + CONSTANT.NETWORK_ID[selectedCurId] + "!");
       return;
     }
+    // if (
+    //   constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId !==
+    //   networkId &&
+    //   (networkId === 97 || networkId === 56)
+    // ) {
+    //   notificationConfig.warning("Change metamask network to Ethereum!");
+    //   return;
+    // } else if (
+    //   constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId !==
+    //   networkId &&
+    //   (networkId === 42 || networkId === 1)
+    // ) {
+    //   notificationConfig.warning("Change metamask network to Binance!");
+    //   return;
+    // } else if (
+    //   constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId !==
+    //   networkId &&
+    //   (networkId === 80001 || networkId === 137)
+    // ) {
+    //   notificationConfig.warning("Change metamask network to Polygon!");
+    //   return;
+    // }
     this.setState(
       {
         web3: web3Config.getWeb3(),
@@ -923,7 +930,7 @@ export default class Home extends PureComponent {
               (this.state.currencyPrices["ETH"] / this.state.currencyPrices["MATIC"])).toFixed(0)).toString()
           )
         )
-      } else if (selectedOptionReceive.networkId === 1 || selectedOptionReceive.networkId === 42) {
+      } else if (selectedOptionReceive.networkId === 56 || selectedOptionReceive.networkId === 97) {
         prcsFees = Number(
           web3Js.utils.fromWei(
             ((330000 *
@@ -1957,6 +1964,7 @@ export default class Home extends PureComponent {
               sentTxTime={sentTxTime.toString()}
               recivedTxTime={recivedTxTime.toString()}
               filledAprice={element.filledAprice}
+              chainId={element.chainId}
               expedite={this.expedite}
             />
           );
@@ -1977,6 +1985,7 @@ export default class Home extends PureComponent {
               sentTxTime={sentTxTime.toString()}
               recivedTxTime={recivedTxTime.toString()}
               filledAprice={element.filledAprice}
+              chainId={element.chainId}
               expedite={this.expedite}
             />
           );
@@ -2038,12 +2047,18 @@ export default class Home extends PureComponent {
     );
   };
 
-  async expedite(txId, processAmount) {
+  async expedite(txId, processAmount, sentChainId) {
     let web3 = web3Config.getWeb3();
     let networkId = web3Config.getNetworkId();
     console.log(networkId)
     let address = web3Config.getAddress();
     if (web3 === null) return 0;
+
+    if (sentChainId !== networkId) {
+      notificationConfig.warning("Change metamask network to " + CONSTANT.NETWORK_ID[sentChainId] + "!");
+      return;
+    }
+
     let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), networkId);
 
     let allFees = await this.calculateSwapFees(processAmount);
@@ -2219,20 +2234,20 @@ export default class Home extends PureComponent {
                                               <button className="border-left-0 ani-1"><img src="images/bnb.png" alt="" /> BNB</button>
                                             </div>
                                             {/* <div className="relative select-item-wrap curICPL"> */}
-                                              {/* <img src={
+                                            {/* <img src={
                                                 "images/currencies/" +
                                                 data.tokenDetails[
                                                   this.state.selectedSendCurrency
                                                 ].iconName +
                                                 ".png"
                                               } />{this.state.selectedSendCurrency} */}
-                                              {/* <Select
+                                            {/* <Select
                                                 value={this.state.selectedOptionSend}
                                                 onChange={this.handleChange.bind(this, "send")}
                                                 options={this.state.sendCurrencyList}
                                               /> */}
-                                              {/* <select> */}
-                                              {/* <option
+                                            {/* <select> */}
+                                            {/* <option
                                                   value={this.state.selectedSendCurrency}
                                                   data-icon={
                                                     "images/currencies/" +
@@ -2255,7 +2270,7 @@ export default class Home extends PureComponent {
                                                     }
                                                   })
                                                 } */}
-                                              {/* <option value="btc" data-icon="images/bnb.png"> BNB</option>
+                                            {/* <option value="btc" data-icon="images/bnb.png"> BNB</option>
                                                 <option value="eth" data-icon="images/eth.png"> ETH</option>
                                                 <option
                                                   value={this.state.selectedSendCurrency}
@@ -2267,7 +2282,7 @@ export default class Home extends PureComponent {
                                                     ".png"
                                                   }
                                                 > {this.state.selectedSendCurrency}</option> */}
-                                              {/* </select> */}
+                                            {/* </select> */}
                                             {/* </div> */}
                                           </div>
                                         </div>
@@ -2317,12 +2332,12 @@ export default class Home extends PureComponent {
                                               <button className="border-left-0 ani-1"><img src="images/eth-icon.png" alt="" /> ETH</button>
                                             </div>
                                             {/* <div className="relative select-item-wrap curICPL02"> */}
-                                              {/* <Select
+                                            {/* <Select
                                                 value={this.state.selectedOptionReceive}
                                                 onChange={this.handleChange.bind(this, "receive")}
                                                 options={this.state.recieveCurrencyList}
                                               /> */}
-                                              {/* <select>
+                                            {/* <select>
                                                 <option
                                                   value={this.state.selectedReceiveCurrency}
                                                   data-icon={
@@ -2372,7 +2387,7 @@ export default class Home extends PureComponent {
                                             }
                                           ></i>
                                         </span>
-                                         <img src="images/connect-img.png" alt="" /> CONNECT YOUR WALLET</button>
+                                          <img src="images/connect-img.png" alt="" /> CONNECT YOUR WALLET</button>
 
                                       ) : constantConfig.tokenDetails[
                                         this.state.selectedSendCurrency
@@ -2621,7 +2636,7 @@ export default class Home extends PureComponent {
                                 </label>
                               </div>
                             )}
-        
+
                             {/* <div className="swap-Link03">
                                                 <a href="javascript:void();">P2C</a> | <a href="javascript:void();">P2G</a> | <a
                                                     href="javascript:void();">P2P</a>
@@ -3100,7 +3115,7 @@ export default class Home extends PureComponent {
                             </div>
                             <div className="text-Content">
                               <div className="text-Title">
-                                100% <br /> multichain 
+                                100% <br /> multichain
                               </div>
                               <p> No wraps, no side-chain, no light chain, 100% true one-click swap between all blockchains</p>
                             </div>
@@ -3108,17 +3123,17 @@ export default class Home extends PureComponent {
                           <div className="swap-Box01">
                             <div className="icon-Box icon01">
                               <svg>
-                              <g>
-                                <path class="cst0" d="M26.6,48.5c-0.8,0-1.5-0.6-1.5-1.5V1.5c0-0.8,0.6-1.5,1.5-1.5c0.8,0,1.5,0.6,1.5,1.5V47
+                                <g>
+                                  <path class="cst0" d="M26.6,48.5c-0.8,0-1.5-0.6-1.5-1.5V1.5c0-0.8,0.6-1.5,1.5-1.5c0.8,0,1.5,0.6,1.5,1.5V47
                                     C28.1,47.8,27.4,48.5,26.6,48.5"/>
-                                <path class="cst1" d="M45.7,48.5H7.5c-0.8,0-1.5-0.6-1.5-1.5c0-0.8,0.6-1.5,1.5-1.5h38.2c0.8,0,1.5,0.6,1.5,1.5
+                                  <path class="cst1" d="M45.7,48.5H7.5c-0.8,0-1.5-0.6-1.5-1.5c0-0.8,0.6-1.5,1.5-1.5h38.2c0.8,0,1.5,0.6,1.5,1.5
                                     C47.2,47.8,46.5,48.5,45.7,48.5"/>
-                                <path class="cst1" d="M46.2,12.4H7.1c-0.8,0-1.5-0.6-1.5-1.5c0-0.8,0.6-1.5,1.5-1.5h39.2c0.8,0,1.5,0.6,1.5,1.5
+                                  <path class="cst1" d="M46.2,12.4H7.1c-0.8,0-1.5-0.6-1.5-1.5c0-0.8,0.6-1.5,1.5-1.5h39.2c0.8,0,1.5,0.6,1.5,1.5
                                     C47.7,11.8,47,12.4,46.2,12.4"/>
-                                <path class="cst1" d="M19.9,25.3L19.9,25.3c0-0.3-0.1-0.4-0.2-0.6l-8.5-14.5C11,9.8,10.5,9.5,10,9.5c-0.5,0-1,0.3-1.3,0.7L0.2,24.7
+                                  <path class="cst1" d="M19.9,25.3L19.9,25.3c0-0.3-0.1-0.4-0.2-0.6l-8.5-14.5C11,9.8,10.5,9.5,10,9.5c-0.5,0-1,0.3-1.3,0.7L0.2,24.7
                                     C0.1,24.9,0.1,25,0,25.2v0.1c0,0.1,0,0.1,0,0.2v0c0,3.8,4.4,6.8,10,6.8s10-3,10-6.8v0C19.9,25.4,19.9,25.4,19.9,25.3 M10,13.9
                                     l6,10.2H4L10,13.9z M10,29.4c-3.1,0-5.4-1.1-6.5-2.5h13C15.4,28.3,13,29.4,10,29.4"/>
-                                <path class="cst0" d="M52.9,25.3L52.9,25.3c0-0.3-0.1-0.4-0.2-0.6l-8.5-14.5c-0.3-0.5-0.7-0.7-1.3-0.7c-0.5,0-1,0.3-1.3,0.7
+                                  <path class="cst0" d="M52.9,25.3L52.9,25.3c0-0.3-0.1-0.4-0.2-0.6l-8.5-14.5c-0.3-0.5-0.7-0.7-1.3-0.7c-0.5,0-1,0.3-1.3,0.7
                                     l-8.5,14.5c-0.1,0.2-0.1,0.3-0.2,0.5v0.1c0,0.1,0,0.1,0,0.2v0c0,3.8,4.4,6.8,10,6.8s10-3,10-6.8v0C52.9,25.4,52.9,25.4,52.9,25.3
                                     M42.9,13.9l6,10.2H37L42.9,13.9z M42.9,29.4c-3.1,0-5.4-1.1-6.5-2.5h13C48.4,28.3,46,29.4,42.9,29.4"/>
                                 </g>
@@ -3169,16 +3184,16 @@ export default class Home extends PureComponent {
                             <div className="icon-Box icon03">
                               <svg>
                                 <g>
-                                <path class="cst0" d="M26.5,38.9V42h-2.7v-3c-2.7-0.2-5.4-1-6.9-2.2l1.5-3.4c1.4,1,3.4,1.8,5.4,2v-4.6c-3.1-0.8-6.5-1.8-6.5-5.7
+                                  <path class="cst0" d="M26.5,38.9V42h-2.7v-3c-2.7-0.2-5.4-1-6.9-2.2l1.5-3.4c1.4,1,3.4,1.8,5.4,2v-4.6c-3.1-0.8-6.5-1.8-6.5-5.7
                                   c0-2.9,2.1-5.5,6.5-5.9v-3.1h2.7v3c2.1,0.2,4.1,0.7,5.6,1.7L30.8,24c-1.4-0.8-2.9-1.3-4.2-1.4v4.7C29.6,28,33,29,33,32.9
                                   C33,35.8,30.9,38.3,26.5,38.9 M23.8,26.6v-4c-1.5,0.3-2,1.1-2,2C21.7,25.7,22.5,26.2,23.8,26.6 M28.5,33.3c0-1-0.8-1.5-2-1.9v3.8
                                   C27.9,34.9,28.5,34.2,28.5,33.3"/>
-                                <path class="cst1" d="M26.4,4.1V0.7c0-0.3-0.2-0.6-0.6-0.7c-0.4-0.1-0.8-0.1-1.1,0.1l-6.3,4.9c-0.2,0.2-0.3,0.3-0.3,0.5
+                                  <path class="cst1" d="M26.4,4.1V0.7c0-0.3-0.2-0.6-0.6-0.7c-0.4-0.1-0.8-0.1-1.1,0.1l-6.3,4.9c-0.2,0.2-0.3,0.3-0.3,0.5
                                   c0,0.2,0.1,0.4,0.3,0.5l6.3,4.9c0.3,0.2,0.6,0.3,1.1,0.2s0.6-0.3,0.6-0.7V7.2c10.9,1,19.5,10.1,19.5,21.3
                                   c0,11.8-9.6,21.4-21.4,21.4c-11.8,0-21.4-9.6-21.4-21.4c0-6.3,2.7-11.9,7-15.8L8.7,9.9C3.4,14.4,0,21.1,0,28.5C0,42,11,53,24.5,53
                                   S49,42,49,28.5C49,15.6,39.1,5.1,26.4,4.1"/>
-                              </g>
-                            </svg>
+                                </g>
+                              </svg>
                             </div>
                             <div className="text-Content">
                               <div className="text-Title">
@@ -3200,9 +3215,9 @@ export default class Home extends PureComponent {
                               </p>
                             </div>
                             <div id="reimburTip" style={{ display: "none" }}>
-                              <p style={{marginTop:'0px'}}>SmartSwap users have the option to receive 100% reimbursement for their gas and swap fees. Users are able to claim reimbursements via the reimbursement staking contract. To release reimbursements users must stake the 1:1 equal amount of SMART for one year, but will be able to release partial amounts of the reimbursement if withdrawn at any time before the 1 year period . The pending balance accumulates and the user is able to claim the rest. </p>
-                              <p style={{marginBottom:'0px'}}>Example </p>
-                              <p style={{marginTop:'0px', marginBottom:'0px'}}>If over the year a user spent over $1000 or more on gas, at any time he can be reimbursed for such cost even if the SMART token value is higher due to appreciation. </p>
+                              <p style={{ marginTop: '0px' }}>SmartSwap users have the option to receive 100% reimbursement for their gas and swap fees. Users are able to claim reimbursements via the reimbursement staking contract. To release reimbursements users must stake the 1:1 equal amount of SMART for one year, but will be able to release partial amounts of the reimbursement if withdrawn at any time before the 1 year period . The pending balance accumulates and the user is able to claim the rest. </p>
+                              <p style={{ marginBottom: '0px' }}>Example </p>
+                              <p style={{ marginTop: '0px', marginBottom: '0px' }}>If over the year a user spent over $1000 or more on gas, at any time he can be reimbursed for such cost even if the SMART token value is higher due to appreciation. </p>
                             </div>
                           </div>
                           <div className="swap-Box01">
@@ -3232,10 +3247,10 @@ export default class Home extends PureComponent {
                             <div className="icon-Box icon06">
                               <svg>
                                 <g>
-                                  <path class="cst0" d="M5.8,13.6c0,0,6-3.9,10.1,3.1c0,0,3.3,1.2,2.2-1.8S10.7,9,5.8,13.6"/>
-                                  <path class="cst0" d="M6.6,19.2c0,0,3.7-3.3,7.5,0C14.1,19.2,10.7,22.1,6.6,19.2"/>
-                                  <path class="cst0" d="M36,13.6c0,0-6-3.9-10.1,3.1c0,0-3.3,1.2-2.2-1.8C24.9,12,31.1,9,36,13.6"/>
-                                  <path class="cst0" d="M35.2,19.2c0,0-3.7-3.3-7.5,0C27.6,19.2,31,22.1,35.2,19.2"/>
+                                  <path class="cst0" d="M5.8,13.6c0,0,6-3.9,10.1,3.1c0,0,3.3,1.2,2.2-1.8S10.7,9,5.8,13.6" />
+                                  <path class="cst0" d="M6.6,19.2c0,0,3.7-3.3,7.5,0C14.1,19.2,10.7,22.1,6.6,19.2" />
+                                  <path class="cst0" d="M36,13.6c0,0-6-3.9-10.1,3.1c0,0-3.3,1.2-2.2-1.8C24.9,12,31.1,9,36,13.6" />
+                                  <path class="cst0" d="M35.2,19.2c0,0-3.7-3.3-7.5,0C27.6,19.2,31,22.1,35.2,19.2" />
                                   <path class="cst0" d="M27.6,35c-3.8,0-5.5-4-5.5-4H21h-1.1c0,0-1.7,4-5.5,4s-7.2-4.6-7.2-4.6s2.6,6.8,6.9,6.8s6.9-2.4,6.9-2.4
                                     s2.5,2.4,6.9,2.4s6.9-6.8,6.9-6.8S31.4,35,27.6,35"/>
                                   <path class="cst1" d="M41.5,4.8C41.2,4.5,33.8,0,21,0S0.8,4.6,0.5,4.8L0,5.1v25.6l0,0.2c2.6,12.2,19.7,22,20.4,22.4l0.5,0.3l0.5-0.3
@@ -3273,9 +3288,9 @@ export default class Home extends PureComponent {
                           <div className="swap-Box01">
                             <div className="icon-Box icon09">
                               <svg>
-                                <rect x="15.9" y="14.3" transform="matrix(-0.7819 0.6234 -0.6234 -0.7819 43.8185 24.7639)" class="cst0" width="3.4" height="11.6"/>
-                                <rect x="29.8" y="28" class="cst0" width="8.9" height="3.4"/>
-                                <rect x="12.5" y="38.4" transform="matrix(-0.4212 0.9069 -0.9069 -0.4212 63.2795 39.8947)" class="cst0" width="12.8" height="3.4"/>
+                                <rect x="15.9" y="14.3" transform="matrix(-0.7819 0.6234 -0.6234 -0.7819 43.8185 24.7639)" class="cst0" width="3.4" height="11.6" />
+                                <rect x="29.8" y="28" class="cst0" width="8.9" height="3.4" />
+                                <rect x="12.5" y="38.4" transform="matrix(-0.4212 0.9069 -0.9069 -0.4212 63.2795 39.8947)" class="cst0" width="12.8" height="3.4" />
                                 <g>
                                   <path class="cst1" d="M24.5,36.1c-3.9,0-7.2-3.2-7.2-7.2s3.2-7.2,7.2-7.2s7.2,3.2,7.2,7.2S28.4,36.1,24.5,36.1 M24.5,25.2
                                     c-2.1,0-3.7,1.7-3.7,3.7c0,2.1,1.7,3.7,3.7,3.7s3.7-1.7,3.7-3.7C28.2,26.9,26.5,25.2,24.5,25.2"/>
@@ -3327,7 +3342,7 @@ export default class Home extends PureComponent {
                           style={{ justifyContent: "center" }}
                         >
                           <Link to="/ownLicence" className="ssBtn01 ani-1">
-                          FREE SMARTSWAP LICENSE
+                            FREE SMARTSWAP LICENSE
                           </Link>
                           <Link
                             to="/"
@@ -3553,7 +3568,7 @@ export default class Home extends PureComponent {
                           style={{ justifyContent: "center" }}
                         >
                           <Link to="/ownLicence" className="ssBtn01">
-                          FREE SMARTSWAP LICENSE
+                            FREE SMARTSWAP LICENSE
                           </Link>
                           <Link
                             to="/"
@@ -3802,12 +3817,12 @@ export default class Home extends PureComponent {
                               alt=""
                             />
                           </div>
-                          <div className="VPSubBX01"> 
+                          <div className="VPSubBX01">
                             <img
                               src="images/venture-partners/vpICON-02.png?v1"
                               alt=""
                             />
-                           Hassan (Hatu) Sheikh
+                            Hassan (Hatu) Sheikh
                           </div>
                           <div className="VPSubBX01">
                             <img
@@ -3820,7 +3835,7 @@ export default class Home extends PureComponent {
                               src="images/venture-partners/bitangels.png"
                               alt=""
                             />
-                           Michael Terpin
+                            Michael Terpin
                           </div>
                           <div className="VPSubBX01">
                             <img
@@ -3913,7 +3928,7 @@ export default class Home extends PureComponent {
                               alt=""
                             />
                           </div>
-                          <div className="VPSubBX01"> 
+                          <div className="VPSubBX01">
                             <img
                               src="images/venture-partners/vpICON-018.png"
                               alt=""
@@ -3931,7 +3946,7 @@ export default class Home extends PureComponent {
                               alt=""
                             />
                           </div>
-                          <div className="VPSubBX01"> 
+                          <div className="VPSubBX01">
                             <img
                               src="images/venture-partners/vpICON-021.png"
                               alt=""
@@ -3991,7 +4006,7 @@ export default class Home extends PureComponent {
                               alt=""
                             />
                           </div>
-                          <div className="VPSubBX01"> 
+                          <div className="VPSubBX01">
                             <img
                               src="images/venture-partners/vpICON-032.png"
                               alt=""
@@ -4009,7 +4024,7 @@ export default class Home extends PureComponent {
                               alt=""
                             />
                           </div>
-                          <div className="VPSubBX01"> 
+                          <div className="VPSubBX01">
                             <img
                               src="images/venture-partners/vpICON-035.png"
                               alt=""
@@ -4021,7 +4036,7 @@ export default class Home extends PureComponent {
                               alt=""
                             />
                           </div>
-                          <div className="VPSubBX01"> 
+                          <div className="VPSubBX01">
                             <img
                               src="images/venture-partners/vpICON-037.png"
                               alt=""
