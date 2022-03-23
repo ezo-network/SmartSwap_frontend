@@ -70,7 +70,8 @@ export default class RightSideMenu extends PureComponent {
                   href="javascript:void(0);"
                   className="rmDotLink active MenuClose"
                 >
-                  <i className="fas fa-circle"></i>
+                  {/* <i class="fas fa-times"></i> */}
+                  <img src="images/menu-close.png" alt="" />
                 </a>
               </div>
               <div className="msb-Linkbox01">
@@ -151,6 +152,7 @@ export default class RightSideMenu extends PureComponent {
                     SmartSwap Liquidity Process
                   </a>
                   <a href="javascript:void(0);">Ledger</a>
+                  <a href="javascript:void(0);">100% Fee Reimbursement</a>
                 </div>
               </div>
               <div className="msb-Linkbox02">
@@ -281,13 +283,13 @@ export default class RightSideMenu extends PureComponent {
               <div className="footer-Bottom">
                 <div className="footer-Logo">
                   <a href="javascript:void(0);">
-                    <img src="images/logo.png" alt="" />
+                    <img src="images/menu-rb-logo.png" alt="" />
                   </a>
                 </div>
                 <p>© 2021 SmartSwap Exchange All rights reserved</p>
                 <div className="footer-Text">
-                  <p>
-                    <img src="images/atomFoundation-logo.png" alt="" />{" "}
+                  <p className="pob">
+                  Powered by <img src="images/atomFoundation-logo.png" alt="" />
                   </p>
                   <p>
                     Atom Foundation is a Decentralized Financial (DeFi) liquidity ecosystem powered by proprietary protocols which underlines zero volatility platforms, a NFT (Non-fungible token) and altcoin marketplace with downside protection, post dex offerings (PDO), a dynamic AMM with multiple swap exchanges, cross network aggregation, as well as a CBDC alternative and price support game theoretic model.{" "}

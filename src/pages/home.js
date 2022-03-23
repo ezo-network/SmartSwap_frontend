@@ -2196,9 +2196,69 @@ export default class Home extends PureComponent {
                                 </li>
                               </ul>
 
+                              {/* swap completed successfully box */}
+                              {/* <div className="cs-box">
+                                <div>
+                                  <img src="images/big-check.png" alt="" />
+                                  <p className="b-text">100% OF THE SWAP COMPLETED SUCCESSFULLY</p>
+                                  <a href="#">Check the ledger below</a>
+                                </div>
+                              </div> */}
+
+                              {/* max priority fee box design */}
+
+                              {/* <div className="mx-box">
+                                <div className="mx-close">
+                                  <img src="images/grey-close.png" alt="" />
+                                </div>
+                                <div className="label-line">
+                                  <p>
+                                    <b>MAX PRIORITY FEE <i className="help-circle">
+                                    <i
+                                      className="fas fa-question-circle protip"
+                                      data-pt-position="top"
+                                      data-pt-title="Help Text"
+                                      aria-hidden="true"
+                                    ></i>
+                                    </i>
+                                    </b>
+                                  </p>
+                                  <p> Estimated high: 5 Gwei </p>
+                                </div>
+                                <div className="input-outer">
+                                  <input type="text" placeholder="5.00" />
+                                  <button>Gwei</button>
+                                </div>
+                                <div className="label-line">
+                                  <p>
+                                    <b>MAX FEE <i className="help-circle">
+                                    <i
+                                      className="fas fa-question-circle protip"
+                                      data-pt-position="top"
+                                      data-pt-title="Help Text"
+                                      aria-hidden="true"
+                                    ></i>
+                                    </i>
+                                    </b>
+                                  </p>
+                                  <p> Estimated high: 42 Gwei </p>
+                                </div>
+                                <div className="input-outer">
+                                  <input type="text" placeholder="5.00" />
+                                  <button>Gwei</button>
+                                </div>
+                                <div className="label-line">
+                                  <p><b>Wait time</b></p>
+                                  <p>~12 sec</p>
+                                </div>
+                                <div className="label-line">
+                                  <p><b>Fee range</b></p>
+                                  <p>41.12–74.07 Gwei</p>
+                                </div>
+                              </div> */}
                               <div className="tab-content-n-main">
                                 <div id="tab-1" className="tab-content-n current-n">
-                                  <div className="">
+                                <div className="">
                                     <div className="form-group-n  items-center-n">
                                       <div className="d-flex balance-row">
                                         <div className="b-text">
@@ -2418,7 +2478,12 @@ export default class Home extends PureComponent {
                                         }}>SWAP</button>
                                       )}
 
-                                      <p className="font-11 color-light-n mb-0-n">{this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ? "You are swapping $" + this.state.sendFundAmount + " of " + this.state.selectedSendCurrency + " to $" + this.state.sendFundAmount + " of " + this.state.selectedReceiveCurrency : null}</p>
+                                      <p className="font-11 color-light-n">{this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ? "You are swapping $" + this.state.sendFundAmount + " of " + this.state.selectedSendCurrency + " to $" + this.state.sendFundAmount + " of " + this.state.selectedReceiveCurrency : null}</p>
+
+                                      {/* New Updated Design */}
+                                      {/* <p className="font-11 color-light-n">You are swapping <span className="color-white">$100</span> of BNB to <span className="color-white">$100</span> of ETH  |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></p> */}
+                                      {/* <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p> */}
+                                      {/* <p className="font-11 color-light-n">26.31% still pending <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i> | &nbsp;&nbsp;<a href="#" className="color-light-n">Start new swap</a></p> */}
                                     </div>
                                   </div>
                                 </div>
@@ -2611,7 +2676,12 @@ export default class Home extends PureComponent {
                             ) : (
                               <div className="powertextBX">
                                 <div className="d-flex">
-                                  Powered by <img src="images/smLOGO.png" />
+                                  <p>
+                                    Powered by 
+                                    <img src="images/smLOGO.png" /> 
+                                    {/* <a href="#">Start new swap</a> */}
+                                  </p>
+                                  {/* <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p> */}
                                 </div>
                                 <label>
                                   <p className="active">Slippage free </p>
