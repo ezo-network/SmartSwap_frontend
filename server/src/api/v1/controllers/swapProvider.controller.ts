@@ -250,28 +250,32 @@ const swapProviderController = {
                 Object.assign(filter, {
                     'cexData.key': request['cexApiKey']
                 });
+
+                let spAddress = (request.smartContractAddress).toLowerCase(); // self address to ignore while checking
+                let exist = await swapProviderController.apiKeyCheck(spAddress, request['cexApiKey']);
+                if(exist === true){
+                    return res.status(422).json({
+                        "messageType": 'error',
+                        "message": "This API key already registered."
+                    });
+                }
+
             }
 
             if ('cexApiSecret' in request){
                 Object.assign(filter, {
                     'cexData.secret': request['cexApiSecret']
                 });
+
+                let spAddress = (request.smartContractAddress).toLowerCase(); // self address to ignore while checking
+                let exist = await swapProviderController.apiSecretCheck(spAddress, request['cexApiSecret']);
+                if(exist === true){
+                    return res.status(422).json({
+                        "messageType": 'error',
+                        "message": "This API key already registered." // same message to manuplate
+                    });
+                }
             }
-
-            // if(('cexApiKey' in request)  && ('cexApiSecret' in request)){
-            //     let apiCheck = await swapProviderController.binanceApiCheck(request['cexApiKey'], request['cexApiSecret']);
-                
-            //     if(apiCheck == false){
-            //         return res.status(422).json({
-            //             "Message": "Invalid API Keys"
-            //         });                    
-            //     }
-
-            //     Object.assign(filter, {
-            //         'active': true
-            //     });
-
-            // }
 
 
             if ('withdrawMode' in request){
@@ -690,6 +694,34 @@ const swapProviderController = {
             }
         } catch(err){
             print.info(`❌ Error From updateGasAndFeeAmountHandler:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+        }
+    },
+
+    apiKeyCheck: async(spAddress, apiKey) => {
+        try {
+            const keyExist = await SwapProvider.find({
+                'smartContractAddress': {
+                    $nin: [spAddress]
+                },
+                'cexData.key': apiKey.trim()
+            });
+            return keyExist.length > 0 ? true : false;            
+        } catch(err) {
+            print.info(`❌ Error From apiKeyCheck:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
+        }
+    },
+
+    apiSecretCheck: async(spAddress, apiSecret) => {
+        try {
+            const apiSecretKey = await SwapProvider.find({
+                'smartContractAddress': {
+                    $nin: [spAddress]
+                },                
+                'cexData.secret': apiSecret.trim()
+            });
+            return apiSecretKey.length > 0 ? true : false;            
+        } catch(err) {
+            print.info(`❌ Error From apiSecretCheck:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
         }
     }
     

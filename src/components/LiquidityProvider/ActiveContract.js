@@ -612,6 +612,18 @@ export default class ActiveContract extends Component {
                     this.getAllTests();
 
                 }, 5000);
+            } 
+            
+            if (response.status === 422){
+                if(response.data.messageType === 'error'){
+                    notificationConfig.error(response.data.message);
+                    this.setState({
+                        updated: false,
+                        updateButtonText: 'SAVE TO UPDATE CONTRACT',
+                        updating: false,
+                        loadingIcon: false
+                    });
+                }
             }
         } catch (err) {
             notificationConfig.error('Something went wrong!');
