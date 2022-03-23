@@ -177,9 +177,37 @@ export default class ActiveContract extends Component {
 
     }
 
-    copyText(entryText){
-        navigator.clipboard.writeText(entryText);
-        notificationConfig.success('Address copied.make sure to cross check');
+    copyText = async() => {
+        const textToCopy = this.state.spContractAddress;
+        if(textToCopy === undefined || textToCopy === null){
+            notificationConfig.error('Address copied error. Address blank.');
+        }
+        if (navigator.clipboard && window.isSecureContext) {
+            // navigator clipboard api method'
+            return navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                notificationConfig.success('Address copied. Make sure to cross-check');
+            }).catch(() => {            
+                notificationConfig.error('Address copied error.');
+            });
+        } else {
+            // text area method
+            let textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            // make the textarea out of viewport
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            return new Promise((res, rej) => {
+                // here the magic happens
+                document.execCommand('copy') ? res() : rej();
+                textArea.remove();
+                notificationConfig.success('Address copied. Make sure to cross-check');
+            });
+        }
     }
 
     getContractBal = async () => {
