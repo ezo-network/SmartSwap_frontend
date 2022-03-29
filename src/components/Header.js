@@ -97,6 +97,10 @@ export default class Header extends PureComponent {
             <img className="logoimage" src={logoPath} alt="" />
           </a>
         </div>
+        <div className="leftMenu">
+          <Link to='#' className="active">PERSONAL</Link>
+          <Link to='#'>PROJECTS</Link>
+        </div>
         <div className="rightMenu">
           {cloneData && cloneData.isPreview && (
             <>
@@ -131,7 +135,7 @@ export default class Header extends PureComponent {
             style={{ color: this.state.web3 !== null ? "#91dc27" : "white" }}
           >
             {/* <i className="fas fa-ellipsis-h"></i> */}
-            <i className="fas fa-circle"></i>
+            {/* <i className="fas fa-circle"></i> */}
           </a>
         </div>
         <div id="langBox" className="autoClose n-collapse">

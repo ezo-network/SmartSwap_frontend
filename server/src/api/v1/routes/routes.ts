@@ -12,7 +12,6 @@ export default function (app: Express) {
   app.post("/update-tx-hash", validateRequest(requestValidations.updateTransactionHashRequest), swapProviderController.updateTransactionHash);
   app.post("/update", validateRequest(requestValidations.updateRequest), swapProviderController.update);
   app.get("/get-contract-address", validateRequest(requestValidations.getContractAddressRequest), swapProviderController.getContractAddress);
-  app.get("/event", swapProviderController.addSwapProvider);
   app.post("/active-contracts", validateRequest(requestValidations.getActiveContractsRequest), swapProviderController.getActiveContracts);
   app.post("/test-suite", swapProviderController.testSuite);
 

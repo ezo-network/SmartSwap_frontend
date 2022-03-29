@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 
 import swapFactoryAbi from "../abis/swapFactory.json";
 import tokenAbi from "../abis/tokenAbi.json";
-import constantConfig from "../config/constantConfig";
+import constantConfig, { addressByToken, contractAddressesByPairs } from "../config/constantConfig";
 import web3Config from "../config/web3Config";
 import notificationConfig from "../config/notificationConfig";
 var BigNumber = require('big-number');
@@ -81,6 +81,7 @@ class SwapFactoryContract extends EventEmitter {
 
         this.web3.getSigner(0).sendTransaction(tx).then(result => {
             txCb(result.hash)
+            console.log(result)
             result.wait().then(async (receipt) => {
                 receiptCb(receipt);
             })
@@ -105,7 +106,7 @@ class SwapFactoryContract extends EventEmitter {
 
     async swap(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, txCb, receiptCb) {
         let amountNew = (Number(amount) + Number(fee.totalFees)).toString();
-
+        let pair = contractAddressesByPairs.smartswap[addressByToken[tokenA].symbol + "/" + addressByToken[tokenB].symbol];
         let receiver = web3Config.getAddress();
         let licensee = licenseeAddress;
         let fees = web3Js.utils.toHex(((Number(fee.companyFees) + Number(fee.reimbursementFees)) * 10 ** 18).toFixed()).replace("0x", "");
@@ -117,7 +118,7 @@ class SwapFactoryContract extends EventEmitter {
         licensee = licensee.replace("0x", "");
 
         var payload = `0xe0e45f0e${this.pad32Bytes(tokenA)}${this.pad32Bytes(tokenB)}${this.pad32Bytes(receiver)}${this.pad32Bytes(newamount)}${this.pad32Bytes(licensee)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(fees)}`
-        this.sendTransaction(payload, amountNew, "270000", this.swapFactoryAddress, txCb, receiptCb)
+        this.sendTransaction(payload, amountNew, "270000", pair, txCb, receiptCb)
     }
 
     async expedite(txID, processAmount, txCb, receiptCb) {
@@ -171,6 +172,7 @@ class SwapFactoryContract extends EventEmitter {
         }
         console.log(swapAmount)
         let newamount = web3Js.utils.toHex(swapAmount).replace("0x", "");
+        let pair = contractAddressesByPairs.smartswap[addressByToken[tokenA].symbol + "/" + addressByToken[tokenB].symbol];
         tokenA = tokenA.replace("0x", "");
         tokenB = tokenB.replace("0x", "");
         receiver = receiver.replace("0x", "");
@@ -180,7 +182,7 @@ class SwapFactoryContract extends EventEmitter {
         var payload = `0xe0e45f0e${this.pad32Bytes(tokenA)}${this.pad32Bytes(tokenB)}${this.pad32Bytes(receiver)}${this.pad32Bytes(newamount)}${this.pad32Bytes(licensee)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(0)}${this.pad32Bytes(fees)}`
 
         const tx = {
-            to: this.swapFactoryAddress,
+            to: pair,
             data: payload,
             gasPrice: web3Js.utils.toHex(web3Js.utils.toWei(gasPrice, "gwei")),
             gasLimit: web3Js.utils.toHex(gasLimit),

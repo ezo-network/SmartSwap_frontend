@@ -10,6 +10,7 @@ import TaskScheduler from './api/v1/taskScheduler/index';
 
 let print = log.createLogger('Logs', 'trace');
 
+
 mongoose.connect(db.url, db.configs);
 
 const port = constants.SERVER_PORT as number;
@@ -20,7 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors())
 
-app.listen(port, host, () => {
+app.listen(port, host, async() => {
     print.info(`Server listing at http://${host}:${port}`);
 
     routes(app);

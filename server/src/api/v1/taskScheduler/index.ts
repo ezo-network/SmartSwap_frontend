@@ -49,7 +49,7 @@ class TaskScheduler {
     static async start(){
         await new CronJob({
             /* every 10 seconds */
-            cronTime: '*/10 * * * * *',
+            cronTime: '*/20 * * * * *',
             onTick: async() => {
                 await TaskScheduler.amountDestributionTaskHandler();
             },

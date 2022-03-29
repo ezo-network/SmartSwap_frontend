@@ -4,29 +4,28 @@ import {
 import web3Js from 'web3';
 import { ethers } from 'ethers';
 import spContractAbi from "../abis/spContract.json";
+import web3Config from "../config/web3Config";
 
 
 class SPContract extends EventEmitter {
 
-    constructor(web3, networkId, contractAddress) {
+    constructor(web3, contractAddress) {
         super();
         this.web3 = web3;
-        this.networkId = networkId;
         this.contractAddress = contractAddress;
 
         this.spContractInstance = new ethers.Contract(
             this.contractAddress,
             spContractAbi,
-            web3.getSigner(0)
+            this.web3.getSigner(0)
         );
-
     }
 
     async sendTransaction(payload, value, gasLimit, to, txCb, receiptCb) {
         let gasPrice = "0";
-        if (this.networkId === 56 || this.networkId === 97)
+        if (web3Config.getNetworkId() === process.env.REACT_APP_BSC_CHAIN_ID)
             gasPrice = "20";
-        else if (this.networkId === 42)
+        else if (web3Config.getNetworkId() === process.env.REACT_APP_ETH_CHAIN_ID)
             gasPrice = "30";
         else {
             const response = await fetch('https://ethgasstation.info/json/ethgasAPI.json');

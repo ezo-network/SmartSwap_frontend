@@ -60,7 +60,8 @@ const requestValidations = {
 
   getActiveContractsRequest: object({
     body: object({
-      spAccount: string().required('sp wallet address is required.')
+      spAccount: string().required('sp wallet address is required.'),
+      networkId: number().required('Network id is required.')
     })
   }),
   
@@ -94,6 +95,7 @@ const requestValidations = {
         then: number().required("[withdrawAfterCalls] Required -  Withdraw after X repeats")
       }),
 
+      cexType: string().nullable(true),
       cexApiKey: string().nullable(true),
       cexApiSecret: string().nullable(true),
 
@@ -101,7 +103,7 @@ const requestValidations = {
 
       spreadAmount: number().nullable(true),
 
-      withdrawPercent: number().nullable(true)
+      withdrawPercent: number().nullable(true),
 
     })
   })

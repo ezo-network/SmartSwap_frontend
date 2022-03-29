@@ -14,7 +14,7 @@ export interface BinanceSpotOrder extends Document {
     asset: string,
     type: string,
     side: string,
-    orderId: number,
+    orderId: string,
     price: string,
     origQty: string,
     executedQty: string,
@@ -92,7 +92,7 @@ const Order: Schema = new mongoose.Schema({
             required: false,
         },        
         orderId: {
-            type: Number,
+            type: String,
             required: true,
         },
         price: {

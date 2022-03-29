@@ -6,15 +6,15 @@ export interface ISwapProviderTest extends Document {
     contractOwnerCheck: boolean,
     contractGasAndFeeCheck: boolean,
     spProfitPercentCheck: boolean,
-    binanceApiKeysCheck: boolean,
-    binanceApiValidateCheck: boolean,
-    binanceAccountCheck: boolean,
-    binanceBalanceCheck: boolean,
-    binanceTransferCheck: boolean,
-    binanceWithdrawCheck: boolean,
-    binanceIpWhiteListCheck: boolean,
-    binanceSpAddressWhiteListCheck: boolean,
-    binanceWithdrawEnabledCheck: boolean
+    apiKeysCheck: boolean,
+    apiValidateCheck: boolean,
+    accountCheck: boolean,
+    balanceCheck: boolean,
+    transferCheck: boolean,
+    withdrawCheck: boolean,
+    ipWhiteListCheck: boolean,
+    spAddressWhiteListCheck: boolean,
+    withdrawEnabledCheck: boolean
 };
 
 const SwapProviderTest: Schema = new mongoose.Schema({
@@ -38,47 +38,47 @@ const SwapProviderTest: Schema = new mongoose.Schema({
         required: true,
         default: false
     },
-    binanceApiKeysCheck: {
+    apiKeysCheck: {
         type: Boolean,
         required: true,
         default: false
     },
-    binanceApiValidateCheck: {
+    apiValidateCheck: {
         type: Boolean,
         required: true,
         default: false
     },
-    binanceAccountCheck: {
+    accountCheck: {
         type: Boolean,
         required: true,
         default: false
     },
-    binanceBalanceCheck: {
+    balanceCheck: {
         type: Boolean,
         required: true,
         default: false
     },
-    binanceTransferCheck: {
+    transferCheck: {
         type: Boolean,
         required: true,
         default: false
     },
-    binanceWithdrawCheck: {
+    withdrawCheck: {
         type: Boolean,
         required: true,
         default: false
     },
-    binanceIpWhiteListCheck: {
+    ipWhiteListCheck: {
         type: Boolean,
         required: true,
         default: false
     },
-    binanceSpAddressWhiteListCheck: {
+    spAddressWhiteListCheck: {
         type: Boolean,
         required: true,
         default: false
     },
-    binanceWithdrawEnabledCheck: {
+    withdrawEnabledCheck: {
         type: Boolean,
         required: true,
         default: false
