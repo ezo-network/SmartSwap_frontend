@@ -17,7 +17,7 @@ const constants = {
             ADDRESS: '0x0000000000000000000000000000000000000002',
             ASSET: 'ETH',
             MIN_WITHDRAW_AMOUNT: 0.01,
-            MIN_AMOUNT_TO_TEST_TRANSFER: 0.00000001,
+            MIN_AMOUNT_TO_TEST_TRANSFER: 0.01,
             NETWORK: 'ETH',
             CHAIN_ON_MEXC: 'ETH'
         },
@@ -28,7 +28,7 @@ const constants = {
             ADDRESS: '0x0000000000000000000000000000000000000001',
             ASSET: 'BNB',
             MIN_WITHDRAW_AMOUNT: 0.01,
-            MIN_AMOUNT_TO_TEST_TRANSFER: 0.00000001,
+            MIN_AMOUNT_TO_TEST_TRANSFER: 0.01,
             NETWORK: 'BSC',
             CHAIN_ON_MEXC: 'BEP20(BSC)'
         },
@@ -38,8 +38,8 @@ const constants = {
             PROVIDER: process.env.POLYGON_CHAIN_PROVIDER,
             ADDRESS: '0x0000000000000000000000000000000000000004',
             ASSET: 'MATIC',
-            MIN_WITHDRAW_AMOUNT: 0.3,
-            MIN_AMOUNT_TO_TEST_TRANSFER: 0.00000001,
+            MIN_WITHDRAW_AMOUNT: 5,
+            MIN_AMOUNT_TO_TEST_TRANSFER: 1,
             NETWORK: 'MATIC',
             CHAIN_ON_MEXC: "MATIC"
         },
