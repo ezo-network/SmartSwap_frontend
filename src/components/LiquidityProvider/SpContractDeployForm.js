@@ -118,16 +118,18 @@ export default class SpContractDeployForm extends Component {
             selectedTokenA: token,
             tokenA: this.state.coinList[token]['address'],
             networkId: web3Config.getNetworkId(),
-            spAccount: web3Config.getAddress()
+            spAccount: web3Config.getAddress(),
+            isOpen1: false
         });
         this.setGasFeeAndAmountMinMaxRanges(token);
-        notificationConfig.info('Token reset. Please set Gas and Fee again.');
+        //notificationConfig.info('Token reset. Please set Gas and Fee again.');
     };
 
     changeTokenB(token) {
         this.setState({
             selectedTokenB: token,
-            tokenB: this.state.coinList[token]['address']
+            tokenB: this.state.coinList[token]['address'],
+            isOpen2: false
         });
     };
 
@@ -242,6 +244,15 @@ export default class SpContractDeployForm extends Component {
         }
 
         let token = _.find(this.state.coinList, { "networkId": Number(networkId) });
+        let selectedTokenA = _.find(this.state.coinList, { 
+            "symbol": (this.state.selectedTokenA).toString().toUpperCase() 
+        });
+
+        if(networkId !== Number(selectedTokenA.networkId)){
+            notificationConfig.error(`Please connect wallet to ${selectedTokenA.networkName} network or switch token A to active network.`);
+            return;
+        }
+
         if(token){
             this.changeTokenA(token.symbol);
             this.setGasFeeAndAmountMinMaxRanges(token.symbol);
