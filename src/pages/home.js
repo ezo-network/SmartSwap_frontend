@@ -2488,7 +2488,7 @@ export default class Home extends PureComponent {
                                         </div>
                                         <div className="d-flex jc-sb">
                                           <p className="form-label font-normal mb-0">≈ {this.state.actualSendFundAmount.toFixed(5)} | 1 {this.state.selectedSendCurrency} : ${this.state.currencyPrices[this.state.selectedSendCurrency]}</p>
-                                          <p className="form-label font-normal mb-0">~ $39,075</p>
+                                          {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
                                         </div>
                                       </div>
                                       <div className="form-ic">
@@ -2618,7 +2618,7 @@ export default class Home extends PureComponent {
                                         </div>
                                         <div className="d-flex jc-sb">
                                           <p className="form-label font-normal mb-0">≈ {this.state.approxReceiveFundAmount.toFixed(5)} | 1 {this.state.selectedReceiveCurrency} : ${this.state.currencyPrices[this.state.selectedReceiveCurrency]}</p>
-                                          <p className="form-label font-normal mb-0">~ $39,075</p>
+                                          {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
                                         </div>
                                       </div>
                                     </div>
@@ -3656,7 +3656,7 @@ export default class Home extends PureComponent {
                             {" "}
                             <img src={SBLogo02} alt="" />{" "}
                           </div>
-                          <div className="sbSlide disable">
+                          <div className="sbSlide">
                             {" "}
                             <img src={SBLogo03} alt="" />{" "}
                           </div>
