@@ -98,8 +98,9 @@ export default class Header extends PureComponent {
           </a>
         </div>
         <div className="leftMenu">
-          <Link to='#' className="active">PERSONAL</Link>
-          <Link to='#'>PROJECTS</Link>
+          <Link to='#' className="active">SMARTSWAP</Link>
+          <Link to='#'>SMARTBRIDGE EXTENSION</Link>
+          <Link to='#'>SMARTBRIDGE FOR PROJECTS</Link>
         </div>
         <div className="rightMenu">
           {cloneData && cloneData.isPreview && (

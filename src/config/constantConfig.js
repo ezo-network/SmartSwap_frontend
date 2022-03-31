@@ -137,6 +137,7 @@ data.tokenDetails = {
         symbol: "BNB",
         name: "Binance Coin",
         networkId: Number(process.env.REACT_APP_BSC_CHAIN_ID),
+        networkName: "BSC",
         coingecko_id: "binancecoin",
         address: "0x0000000000000000000000000000000000000001",
         isActive: true,
@@ -152,6 +153,7 @@ data.tokenDetails = {
         symbol: "ETH",
         name: "Ethereum",
         networkId: Number(process.env.REACT_APP_ETH_CHAIN_ID),
+        networkName: "ETHEREUM",
         coingecko_id: "ethereum",
         address: "0x0000000000000000000000000000000000000002",
         isActive: true,
@@ -168,6 +170,7 @@ data.tokenDetails = {
         symbol: "MATIC",
         name: "MATIC",
         networkId: Number(process.env.REACT_APP_POLYGON_CHAIN_ID),
+        networkName: "POLYGON",
         coingecko_id: "matic-network",
         address: "0x0000000000000000000000000000000000000004",
         isActive: true,
@@ -231,11 +234,52 @@ data.getTokenList = function () {
             value: data.tokenDetails[i].symbol,
             label: data.tokenDetails[i].symbol,
             networkId: data.tokenDetails[i].networkId,
+            networkName: data.tokenDetails[i].networkName,
         });
 
     return result;
 }
 
+data.getNetworkList = function () {
+
+    var result = [];
+
+    for (var i in data.tokenDetails)
+        result.push({
+            value: data.tokenDetails[i].symbol,
+            label: data.tokenDetails[i].networkName,
+            networkId: data.tokenDetails[i].networkId,
+            networkName: data.tokenDetails[i].networkName,
+        });
+
+    return result;
+}
+
+data.getTokenByName = function (tokenName) {
+    var result = {};
+    for (var i in data.tokenDetails) {
+        if (tokenName === data.tokenDetails[i].symbol) {
+            result["value"] = data.tokenDetails[i].symbol;
+            result["label"] = data.tokenDetails[i].symbol;
+            result["networkId"] = data.tokenDetails[i].networkId;
+            result["networkName"] = data.tokenDetails[i].networkName;
+        }
+    }
+    return result;
+}
+
+data.getTokenByNetwork = function (networkName) {
+    var result = {};
+    for (var i in data.tokenDetails) {
+        if (networkName === data.tokenDetails[i].networkName) {
+            result["value"] = data.tokenDetails[i].symbol;
+            result["label"] = data.tokenDetails[i].networkName;
+            result["networkId"] = data.tokenDetails[i].networkId;
+            result["networkName"] = data.tokenDetails[i].networkName;
+        }
+    }
+    return result;
+}
 
 // mainnet config -------------------------------------------------------------------------end
 

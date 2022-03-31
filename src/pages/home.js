@@ -7,7 +7,7 @@ import web3Config from "../config/web3Config";
 import Validation from "../helper/validation";
 import swapFactoryAbi from "../abis/swapFactory.json";
 import tokenAbi from "../abis/tokenAbi.json";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
+import constantConfig, { getNetworkList, getTokenByName, getTokenByNetwork, getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
 import SwapFactoryContract from "../helper/swapFactoryContract";
 import { LoopCircleLoading } from "react-loadingg";
@@ -49,6 +49,8 @@ import SBLogo011 from "../assets/images/sb-ICO-011.png";
 import BigNumber from "big-number/big-number";
 import Select from 'react-select';
 import Switch from "react-switch";
+import Collapse from "@kunukn/react-collapse";
+import Dropdown from "../components/DropDown";
 
 const responsive = {
   desktop: {
@@ -168,11 +170,19 @@ export default class Home extends PureComponent {
         137: "0x0000000000000000000000000000000000000000",
       },
       loadingHistory: false,
-      selectedOptionSend: { value: tokenDetails.BNB.symbol, label: tokenDetails.BNB.symbol, networkId: tokenDetails.BNB.networkId },
-      selectedOptionReceive: { value: tokenDetails.ETH.symbol, label: tokenDetails.ETH.symbol, networkId: tokenDetails.ETH.networkId },
+      selectedOptionSend: getTokenByName("BNB"),
+      selectedOptionReceive: getTokenByName("ETH"),
       selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs("BNB", "ETH"),
       sendCurrencyList: getTokenList().filter(function (value, index, arr) {
         return value.label !== "ETH" && value.label !== "BNB";
+      }),
+      selectedNetworkOptionSend: getTokenByNetwork("BSC"),
+      selectedNetworkOptionReceive: getTokenByNetwork("ETHEREUM"),
+      sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+        return value.label !== "ETHEREUM" && value.label !== "BSC";
+      }),
+      recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+        return value.label !== "BSC" && value.label !== "ETHEREUM";
       }),
       recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
         return value.label !== "BNB" && value.label !== "ETH";
@@ -627,9 +637,9 @@ export default class Home extends PureComponent {
   }
 
   async fetchTransactionStatus(hash) {
-    // let url = CONSTANT.API_URL + "/ledger/" + "0xcaba174a8ec3edd18e14d7dfc79e68fd0ae4193f";
+    // let url = CONSTANT.API_URL + "/ledgers/" + "0xcaba174a8ec3edd18e14d7dfc79e68fd0ae4193f";
 
-    let url = process.env.REACT_APP_LEDGER_HOST + "ledger/tx/" + hash;
+    let url = process.env.REACT_APP_LEDGER_HOST + "ledgers/tx/" + hash;
 
     console.log(url);
 
@@ -1653,7 +1663,7 @@ export default class Home extends PureComponent {
   }
   changeCurrency(check) {
     // if(check && this.state.web3 === null){
-    let { selectedSendCurrency, selectedReceiveCurrency, selectedOptionSend, selectedOptionReceive } = this.state;
+    let { selectedSendCurrency, selectedReceiveCurrency, selectedOptionSend, selectedOptionReceive, selectedNetworkOptionSend, selectedNetworkOptionReceive } = this.state;
 
     this.setState(
       {
@@ -1661,12 +1671,20 @@ export default class Home extends PureComponent {
         selectedReceiveCurrency: selectedSendCurrency,
         selectedOptionSend: selectedOptionReceive,
         selectedOptionReceive: selectedOptionSend,
+        selectedNetworkOptionSend: selectedNetworkOptionReceive,
+        selectedNetworkOptionReceive: selectedNetworkOptionSend,
         selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedReceiveCurrency, selectedSendCurrency),
         sendCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.label !== selectedOptionSend.label && selectedOptionReceive.label !== value.label;
+          return value.value !== selectedOptionSend.value && selectedOptionReceive.value !== value.value;
         }),
         recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.label !== selectedOptionReceive.label && selectedOptionSend.label !== value.label;
+          return value.value !== selectedOptionReceive.value && selectedOptionSend.value !== value.value;
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOptionSend.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOptionReceive.value && selectedOptionSend.value !== value.value;
         }),
         sendFundAmount: "",
         estimatedGasFee: "0"
@@ -1681,29 +1699,81 @@ export default class Home extends PureComponent {
   }
 
   handleChange = (name, selectedOption) => {
-    const { selectedOptionSend, selectedOptionReceive } = this.state;
+    const { selectedOptionSend, selectedOptionReceive, selectedNetworkOptionSend, selectedNetworkOptionReceive } = this.state;
     if (name === "send") {
       this.setState({
-        selectedSendCurrency: selectedOption.label,
+        selectedSendCurrency: selectedOption.value,
         selectedOptionSend: selectedOption,
-        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.label, selectedOptionReceive.label),
+        selectedNetworkOptionSend: getTokenByNetwork(selectedOption.networkName),
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedOptionReceive.value),
         sendCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.label !== selectedOption.label && selectedOptionSend.label !== value.label;
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
         }),
         recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.label !== selectedOption.label && selectedOptionReceive.label !== value.label;
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
         }),
       })
     } else if (name === "receive") {
       this.setState({
-        selectedReceiveCurrency: selectedOption.label,
+        selectedReceiveCurrency: selectedOption.value,
         selectedOptionReceive: selectedOption,
-        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.label, selectedOption.label,),
+        selectedNetworkOptionReceive: getTokenByNetwork(selectedOption.networkName),
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.value, selectedOption.value),
         sendCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.label !== selectedOption.label && selectedOptionSend.label !== value.label;
+          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
         }),
         recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return (value.label !== selectedOption.label && selectedOptionReceive.label !== value.label);
+          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
+        }),
+      })
+    } else if (name === "sendNetwork") {
+      this.setState({
+        selectedNetworkOptionSend: selectedOption,
+        selectedSendCurrency: getTokenByName(selectedOption.value).value,
+        selectedOptionSend: getTokenByName(selectedOption.value),
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedOptionReceive.value),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+      })
+    } else if (name === "receiveNetwork") {
+      this.setState({
+        selectedNetworkOptionReceive: selectedOption,
+        selectedReceiveCurrency: getTokenByName(selectedOption.value).value,
+        selectedOptionReceive: getTokenByName(selectedOption.value),
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.value, selectedOption.value),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
         }),
       })
     }
@@ -1858,7 +1928,7 @@ export default class Home extends PureComponent {
   async fetchedUserTransaction(address) {
     // var userTxs = StableCoinStore.getFetchedUserTxs();
     this.setState({ loadingHistory: true })
-    let url = process.env.REACT_APP_LEDGER_HOST + 'ledger/' + (address).toLocaleLowerCase();
+    let url = process.env.REACT_APP_LEDGER_HOST + 'ledgers/' + (address).toLocaleLowerCase();
     console.log(process.env.REACT_APP_LEDGER_HOST)
 
     let json;
@@ -1927,13 +1997,13 @@ export default class Home extends PureComponent {
           constantConfig.addressByToken[element.tokenB].symbol;
 
         element["sentTxLink"] =
-          constantConfig[(element.chainId === 56 || element.chainId === 97) ? process.env.REACT_APP_BSC_CHAIN_ID : process.env.REACT_APP_ETH_CHAIN_ID].explorer +
+          constantConfig[Number(element.chainId)].explorer +
           "/tx/" +
           element.txHash;
 
         if (element.relationship.claim.approveHash !== undefined && element.relationship.claim.approveHash !== null) {
           element["recivedTxLink"] =
-            constantConfig[(element.chainId === 1 || element.chainId === 42) ? process.env.REACT_APP_BSC_CHAIN_ID : process.env.REACT_APP_ETH_CHAIN_ID].explorer +
+            constantConfig[Number(element.crossChainId)].explorer +
             "/tx/" +
             element.relationship.claim.approveHash;
           element["oracleTx"] = element.relationship.claim.approveHash;
@@ -2087,6 +2157,18 @@ export default class Home extends PureComponent {
   }
 
   render() {
+    const options = [
+      { label: 'Ethereum', value: 'Ethereum' },
+      { label: 'BSC', value: 'BSC' },
+      { label: 'Polygon', value: 'Polygon' },
+    ];
+
+    const optionsToken = [
+      { label: 'ETH', value: 'ETH' },
+      { label: 'BNB', value: 'BNB' },
+      { label: 'MATIC', value: 'MATIC' },
+    ];
+
     return (
       <>
         {this.state.isloading ? (
@@ -2258,13 +2340,13 @@ export default class Home extends PureComponent {
                               </div> */}
                               <div className="tab-content-n-main">
                                 <div id="tab-1" className="tab-content-n current-n">
-                                <div className="">
+                                  <div className="">
                                     <div className="form-group-n  items-center-n">
                                       <div className="d-flex balance-row">
                                         <div className="b-text">
                                           Balance: 0 &nbsp;<span>MAX</span>
                                         </div>
-                                        <img src="images/slider-icon.png" alt="" />
+                                        {/* <img src="images/slider-icon.png" alt="" /> */}
                                       </div>
                                       <div className="flex-1 w-100-sm flex-auto-sm">
                                         <div className="inputs-wrap light-controls-n">
@@ -2285,13 +2367,71 @@ export default class Home extends PureComponent {
                                                 autoComplete="off"
                                               />
                                             </div>
+
                                             <div className="input-box2">
                                               <label for="" className="form-label">BLOCKCHAIN</label>
-                                              <button className="ani-1"><img src="images/bnb.png" alt="" /> BSC</button>
+                                              {/* <button className="ani-1"><img src="images/bnb.png" alt="" /> BSC</button> */}
+                                              <Select
+                                                value={this.state.selectedNetworkOptionSend}
+                                                onChange={this.handleChange.bind(this, "sendNetwork")}
+                                                options={this.state.sendNetworkList}
+                                                styles={{
+                                                  control: (styles) => ({ ...styles, backgroundColor: '#EDECEF', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #ffffff", fontSize: "16px" }),
+                                                  singleValue: (provided, state) => ({
+                                                    ...provided,
+                                                    color: "black",
+                                                    // fontSize: state.selectProps.myFontSize
+                                                  }),
+                                                  option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                                    // const color = chroma(data.color);
+                                                    console.log({ data, isDisabled, isFocused, isSelected });
+                                                    return {
+                                                      ...styles,
+                                                      backgroundColor: isFocused ? "#999999" : null,
+                                                      color: "black",
+                                                      fontWeight: "bold"
+                                                    };
+                                                  },
+                                                  indicatorSeparator: (styles) => ({ display: 'none' })
+                                                }}
+                                              />
                                             </div>
+                                            {/* <div className='custom-dropdown'>
+                                              <button onClick={() => { setIsOpen(state => !state); onToggleClick(); }} className={showActive ? 'active' : ''}>BNB <i class="fa fa-caret-down"></i></button>
+                                              <Collapse onInit={onInit} isOpen={isOpen}>
+                                                <div className='nn-list'>
+                                                  <p>ETH</p>
+                                                </div>
+                                              </Collapse>
+                                            </div> */}
                                             <div className="input-box2">
                                               <label for="" className="form-label">TOKEN</label>
-                                              <button className="border-left-0 ani-1"><img src="images/bnb.png" alt="" /> BNB</button>
+                                              {/* <button className="border-left-0 ani-1"><img src="images/bnb.png" alt="" /> BNB</button> */}
+
+                                              <Select
+                                                value={this.state.selectedOptionSend}
+                                                onChange={this.handleChange.bind(this, "send")}
+                                                options={this.state.sendCurrencyList}
+                                                styles={{
+                                                  control: (styles) => ({ ...styles, backgroundColor: '#EDECEF', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #ffffff", fontSize: "16px" }),
+                                                  singleValue: (provided, state) => ({
+                                                    ...provided,
+                                                    color: "black",
+                                                    // fontSize: state.selectProps.myFontSize
+                                                  }),
+                                                  option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                                    // const color = chroma(data.color);
+                                                    console.log({ data, isDisabled, isFocused, isSelected });
+                                                    return {
+                                                      ...styles,
+                                                      backgroundColor: isFocused ? "#999999" : null,
+                                                      color: "black",
+                                                      fontWeight: "bold"
+                                                    };
+                                                  },
+                                                  indicatorSeparator: (styles) => ({ display: 'none' })
+                                                }}
+                                              />
                                             </div>
                                             {/* <div className="relative select-item-wrap curICPL"> */}
                                             {/* <img src={
@@ -2362,6 +2502,9 @@ export default class Home extends PureComponent {
                                         </a>
                                         <a className="green-arrow"
                                           href="javascript:void(0);"
+                                          onClick={() => {
+                                            this.changeCurrency(true);
+                                          }}
                                         >
                                           <img src="images/green-arrow.png" alt="" />
                                         </a>
@@ -2385,11 +2528,60 @@ export default class Home extends PureComponent {
                                             </div>
                                             <div className="input-box2 ver2">
                                               <label for="" className="form-label">BLOCKCHAIN</label>
-                                              <button className="ani-1"><img src="images/eth-icon.png" alt="" /> Ethereum</button>
+                                              {/* <button className="ani-1"><img src="images/eth-icon.png" alt="" /> Ethereum</button> */}
+                                              <Select
+                                                value={this.state.selectedNetworkOptionReceive}
+                                                onChange={this.handleChange.bind(this, "receiveNetwork")}
+                                                options={this.state.recieveNetworkList}
+                                                styles={{
+                                                  control: (styles) => ({ ...styles, backgroundColor: '#20232A', color: 'white', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #0D0E13", fontSize: "16px" }),
+                                                  singleValue: (provided, state) => ({
+                                                    ...provided,
+                                                    color: "white",
+                                                    // fontSize: state.selectProps.myFontSize
+                                                  }),
+                                                  option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                                    // const color = chroma(data.color);
+                                                    console.log({ data, isDisabled, isFocused, isSelected });
+                                                    return {
+                                                      ...styles,
+                                                      backgroundColor: isFocused ? "#999999" : null,
+                                                      color: "black",
+                                                      fontWeight: "bold"
+                                                    };
+                                                  },
+                                                  indicatorSeparator: (styles) => ({ display: 'none' })
+                                                }}
+                                              />
                                             </div>
                                             <div className="input-box2 ver2">
                                               <label for="" className="form-label">TOKEN</label>
-                                              <button className="border-left-0 ani-1"><img src="images/eth-icon.png" alt="" /> ETH</button>
+                                              {/* <button className="border-left-0 ani-1"><img src="images/eth-icon.png" alt="" /> ETH</button> */}
+                                              <Select
+                                                value={this.state.selectedOptionReceive}
+                                                onChange={this.handleChange.bind(this, "receive")}
+                                                options={this.state.recieveCurrencyList}
+                                                styles={{
+                                                  control: (styles) => ({ ...styles, backgroundColor: '#20232A', color: "white", height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #0D0E13", fontSize: "16px" }),
+                                                  singleValue: (provided, state) => ({
+                                                    ...provided,
+                                                    color: "white",
+                                                    // fontSize: state.selectProps.myFontSize
+                                                  }),
+                                                  option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                                    // const color = chroma(data.color);
+                                                    console.log({ data, isDisabled, isFocused, isSelected });
+                                                    return {
+                                                      ...styles,
+                                                      backgroundColor: isFocused ? "#999999" : null,
+                                                      color: "black",
+                                                      fontWeight: "bold",
+                                                      borderRadius: "0"
+                                                    };
+                                                  },
+                                                  indicatorSeparator: (styles) => ({ display: 'none' }),
+                                                }}
+                                              />
                                             </div>
                                             {/* <div className="relative select-item-wrap curICPL02"> */}
                                             {/* <Select
@@ -2677,36 +2869,36 @@ export default class Home extends PureComponent {
                               <div className="powertextBX">
                                 <div className="d-flex">
                                   <p>
-                                    Powered by 
-                                    <img src="images/smLOGO.png" /> 
+                                    Powered by
+                                    <img src="images/smLOGO.png" />
                                     {/* <a href="#">Start new swap</a> */}
                                   </p>
                                   {/* <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p> */}
                                 </div>
-                                <label>
-                                  <p className="active">Slippage free </p>
-                                  <Switch
-                                    checked={this.state.checked1}
-                                    onChange={this.handleChange1}
-                                    handleDiameter={14}
-                                    offColor="#2e303a"
-                                    onColor="#2e303a"
-                                    offHandleColor="#91dc27"
-                                    onHandleColor="#91dc27"
-                                    height={18}
-                                    width={32}
-                                    borderRadius={0}
-                                    activeBoxShadow="0px 0px 0px 0px #fffc35"
-                                    uncheckedIcon={false}
-                                    checkedIcon={false}
-                                    className="react-switch"
-                                    id="small-radius-switch"
-                                  />
-                                  <p>Slippage</p>
-                                </label>
                               </div>
                             )}
-
+                            <label>
+                              <p className="active">Slippage free </p>
+                              <Switch
+                                checked={this.state.checked1}
+                                onChange={this.handleChange1}
+                                handleDiameter={14}
+                                offColor="#2e303a"
+                                onColor="#2e303a"
+                                offHandleColor="#91dc27"
+                                onHandleColor="#91dc27"
+                                height={18}
+                                width={32}
+                                borderRadius={0}
+                                activeBoxShadow="0px 0px 0px 0px #fffc35"
+                                uncheckedIcon={false}
+                                checkedIcon={false}
+                                className="react-switch"
+                                id="small-radius-switch"
+                                disabled={true}
+                              />
+                              <p>Slippage</p>
+                            </label>
                             {/* <div className="swap-Link03">
                                                 <a href="javascript:void();">P2C</a> | <a href="javascript:void();">P2G</a> | <a
                                                     href="javascript:void();">P2P</a>

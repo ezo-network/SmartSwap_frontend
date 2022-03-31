@@ -1223,7 +1223,8 @@ export default class ActiveContract extends Component {
                                             defaultValue={this.state.cexApiKeyMasked !== null ? this.state.cexApiKeyMasked : 'Your Cex API Key'}
                                             onChange={event => this.setState({ cexApiKey: event.target.value})}
                                             ref={(input) => this.cexApiKey = input}
-                                            readOnly={this.state.cexApiKeyEditable}
+                                            onClick={() => this.clearKeys('key')}
+                                            //readOnly={this.state.cexApiKeyEditable}
                                         />
                                         <a href="javascript:void(0)" className="absolute-ic-n">
                                             <i class="fas fa-times" onClick={() => this.clearKeys('key')}></i>
@@ -1248,7 +1249,8 @@ export default class ActiveContract extends Component {
                                             defaultValue={this.state.cexApiSecretMasked !== null ? this.state.cexApiSecretMasked : 'Your Cex API Secret'}
                                             onChange={event => this.setState({ cexApiSecret: event.target.value})}
                                             ref={(input) => this.cexApiSecret = input}
-                                            readOnly={this.state.cexApiSecretEditable}
+                                            onClick={() => this.clearKeys('secret')}
+                                            //readOnly={this.state.cexApiSecretEditable}
                                         />
                                         <a href="javascript:void(0)" onClick={() => this.clearKeys('secret')} className="absolute-ic-n">
                                             <i class="fas fa-times"></i>
