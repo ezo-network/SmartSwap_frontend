@@ -11,7 +11,7 @@ const MIN_SPREAD_RANGE=0;
 const MAX_SPREAD_RANGE=1;
 const MAX_WITHDRAW_PERCENT=45;
 const SANDBOX_MODE=false;
-const PRICE_SOURCE="binance"; // coingecko OR binance
+const PRICE_SOURCE="coingecko"; // coingecko OR binance
 
 export default class LiquidityProvider extends PureComponent {
     constructor(props) {
@@ -59,10 +59,11 @@ export default class LiquidityProvider extends PureComponent {
             this.setState({
                 tokenPrices: {
                     'ETH': response["ethereum"]["usd"],
-                    'BNB': response["binancecoin"]["usd"]
+                    'BNB': response["binancecoin"]["usd"],
+                    'MATIC': response["matic-network"]["usd"]
                 }
             });
-        } 
+        }
 
         if(PRICE_SOURCE === "binance"){
             const exchange = new ccxt.binance();
