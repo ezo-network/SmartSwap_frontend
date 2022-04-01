@@ -254,8 +254,8 @@ export default class SpContractDeployForm extends Component {
         }
 
         if(token){
-            this.changeTokenA(token.symbol);
-            this.setGasFeeAndAmountMinMaxRanges(token.symbol);
+            //this.changeTokenA(token.symbol); // enable if connect wallet button autometic switch to active network
+            //this.setGasFeeAndAmountMinMaxRanges(token.symbol); // if above condition true then we need to enable this to reset gas fee slider token and amount
             let alternateToken = this.getAlternateToken(token.symbol);
             this.changeTokenB(alternateToken[0]);
             this.setState({
