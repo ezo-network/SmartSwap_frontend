@@ -462,43 +462,23 @@ const swapProviderController = {
         try {
             const { 
                 txid,
-                docId,
-                blockNumber,
-                networkId
+                docId
             } = req.body;
-
 
             let fsp = await SwapProvider.findOne({
                 _id: docId
             });            
 
-            if(fsp !== null){
-                let args = {
-                    networkId: networkId,
-                    blockNumber: blockNumber,
-                    txhash: txid,
-                    tokenA: fsp.tokenA.address,
-                    tokenB: fsp.tokenB.address
-                }
-                print.info(args);
-    
-                let event = await swapProviderController.fetchEvent(args);
-    
-    
-                print.info("updaing event:", event);
-    
+            if(fsp !== null){    
                 let usp = await SwapProvider.updateOne({
                     _id: docId
                 }, {
-                    txid: txid,
-                    fromBlock: blockNumber,
-                    smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
+                    txid: txid
                 });
     
                 if(usp.ok == 1){
                     return res.status(200).json({
-                        "Message": "Record updated",
-                        smartContractAddress: event['returnValues']['spContract']
+                        "Message": "Record updated"
                     });
                 }
             }
@@ -723,7 +703,93 @@ const swapProviderController = {
         } catch(err) {
             print.info(`❌ Error From apiSecretCheck:`, err.constructor.name, err.message, ' at:' + new Date().toJSON());
         }
-    }
+    },
+
+    getContractDeploymentTransactionStatus: async(txHash = null) => {
+        let filterArgs = {
+            smartContractAddress: null,                
+            active: false,
+            txid: { $ne: null }
+        };
+
+        if(txHash !== null) {
+            filterArgs['txid'] = txHash // for a single contract deployment transaction status
+        } else {
+            filterArgs['txid'] = { $ne: null } // for all pending contract deployment transaction status
+        }
+
+        let swapProviders = await await SwapProvider.find(filterArgs);
+        if(swapProviders.length > 0){
+            print.info(`getting deployment transaction status for ${swapProviders.length} Swap providers`);
+            for(let i=0; i<swapProviders.length; i++){
+                let sp = swapProviders[i];
+                const networkConfig = _.find(constants.NETWORKS, { "NETWORK_ID": Number(sp.networkId) });            
+                const provider = networkConfig['PROVIDER'];
+                const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
+                await web3.eth.getTransactionReceipt(sp.txid).then(async(receipt) => {
+                    print.info(receipt);
+                    let args = {
+                        networkId: Number(sp.networkId),
+                        blockNumber: receipt.blockNumber,
+                        txhash: sp.txid,
+                        tokenA: sp.tokenA.address,
+                        tokenB: sp.tokenB.address
+                    }
+                    print.info(args);
+        
+                    let event = await swapProviderController.fetchEvent(args);
+                    print.info(`updaing event for sp ${sp._id}:`, event);
+        
+                    let usp = await SwapProvider.updateOne({
+                        _id: sp._id
+                    }, {
+                        fromBlock: receipt.blockNumber,
+                        smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
+                    });
+    
+                    if(usp.ok == 1){
+                        print.info(`SP ${sp._id} contract address fetched and updated into record successfully.`);
+                    }
+    
+                }).catch(async(error) => {
+                    print.info({
+                        errorOrigin: 'getContractDeploymentTransactionStatus func',
+                        error: error
+                    });
+                });
+            }
+        } else {
+            print.info(`❌ There is no new pending contract depolyment to fetch transaction status`);
+        }
+    },
+
+    getContractAddressStatus: async(req: Request, res: Response) => {
+        try {
+            const {
+                spAccount, networkId, smartContractAddress, tokenA, tokenB
+            } = req.body;
+
+            let args = {
+                'walletAddresses.spAccount' : (spAccount).toLowerCase(),
+                'networkId': Number(networkId),
+                'smartContractAddress': (smartContractAddress).toLowerCase(),
+                'tokenA.address': tokenA,
+                'tokenB.address': tokenB
+            };
+
+            let isContractAddressExists = await SwapProvider.findOne(args);
+            
+            if (isContractAddressExists){
+                return res.status(200).send(true); 
+            }  else {
+                return res.status(200).send(false);
+            }
+
+        }  catch (err) {
+            err['errorOrigin'] = "getContractAddressStatus";
+            return res.status(500).json({ message: err });
+        }
+    },
     
 }
 
