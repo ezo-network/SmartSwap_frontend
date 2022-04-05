@@ -754,7 +754,8 @@ const swapProviderController = {
                 }).catch(async(error) => {
                     print.info({
                         errorOrigin: 'getContractDeploymentTransactionStatus func',
-                        error: error
+                        error: error.constructor.name, 
+                        message: error.message
                     });
                 });
             }
