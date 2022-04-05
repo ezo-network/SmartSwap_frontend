@@ -254,8 +254,8 @@ export default class SpContractDeployForm extends Component {
         }
 
         if(token){
-            this.changeTokenA(token.symbol);
-            this.setGasFeeAndAmountMinMaxRanges(token.symbol);
+            //this.changeTokenA(token.symbol); // enable if connect wallet button autometic switch to active network
+            //this.setGasFeeAndAmountMinMaxRanges(token.symbol); // if above condition true then we need to enable this to reset gas fee slider token and amount
             let alternateToken = this.getAlternateToken(token.symbol);
             this.changeTokenB(alternateToken[0]);
             this.setState({
@@ -411,16 +411,24 @@ export default class SpContractDeployForm extends Component {
                     response.data.walletAddresses.toReceive,
                     Web3.utils.fromWei((response.data.gasAndFeeAmount.$numberDecimal).toString(), 'ether'),
                     async (hash) => {
-                        this.setState({
-                            txid: response.data._id,
-                        });
+                        if(hash !== null || hash !== undefined){
+                            // update tx hash to db
+                            let args = {
+                                data: {
+                                    docId: response.data._id,
+                                    txid: hash
+                                },
+                                path: 'update-tx-hash',
+                                method: 'POST'
+                            }
+                            response = await AxiosRequest.request(args);
+                            console.log(response);
+                        }
                     },
                     async (response) => {
-
                         console.log({
                             "Contract response:": response
                         });
-
                         if(response.code === 4001){
                             this.setState({
                                 confirmed: false,
@@ -433,37 +441,13 @@ export default class SpContractDeployForm extends Component {
                         }
 
                         if (response.status === 1) {
-                            // update tx hash to db
-                            let args = {
-                                data: {
-                                    docId: this.state.txid,
-                                    txid: response.transactionHash,
-                                    blockNumber: response.blockNumber,
-                                    networkId: web3Config.getNetworkId()
-                                },
-                                path: 'update-tx-hash',
-                                method: 'POST'
-                            }
-                            response = await AxiosRequest.request(args);
-
-                            if (response.status === 200) {
-                                await this.getActiveContracts();
-                                this.setState({
-                                    smartSwapContractAddress: (response.data['smartContractAddress']).toLowerCase(),
-                                    confirmed: true,
-                                    deployButtonText: "Contract Deployed",
-                                    loadingIcon: false,
-                                    isActiveContractExist: true
-                                });
-                                notificationConfig.success('Swap provider Added');
-                            }
+                            const newSpContactAddress = response.logs[0].address;
+                            // get deployment status
+                            await this.getContractDepolymentStatus(newSpContactAddress);
                         }
-
                     }
                 );
             }
-
-
 
             if (response.status === 400) {
                 this.setState({
@@ -562,6 +546,42 @@ export default class SpContractDeployForm extends Component {
             });
             notificationConfig.error('Failed to connect to server.');
         }
+    }
+
+
+    async getContractDepolymentStatus(smartContractAddress){
+        let args = {
+            data: {
+                spAccount: this.state.spAccount,
+                networkId: web3Config.getNetworkId(),
+                smartContractAddress: smartContractAddress,
+                tokenA: this.state.tokenA,
+                tokenB: this.state.tokenB
+            },
+            path: 'get-contract-status',
+            method: 'POST'
+        }
+
+        var networkPromise = await AxiosRequest.request(args);
+        var timeOutPromise = new Promise(function(resolve, reject) {
+            setTimeout(resolve, 5000, 'Timeout Done');
+        });
+        Promise.all(
+        [networkPromise, timeOutPromise]).then(async(responses) => {
+            if(responses[0].data === true){
+                await this.getActiveContracts();
+                this.setState({
+                    smartSwapContractAddress: (smartContractAddress).toLowerCase(),
+                    confirmed: true,
+                    deployButtonText: "Contract Deployed",
+                    loadingIcon: false,
+                    isActiveContractExist: true
+                });
+                notificationConfig.success('Swap provider Added');
+            } else {
+                await this.getContractDepolymentStatus(smartContractAddress);
+            }
+        });
     }
     
 

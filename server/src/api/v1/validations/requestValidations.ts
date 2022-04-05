@@ -47,8 +47,16 @@ const requestValidations = {
     body: object({
       txid: string().required('Transaction Hash is required.'),
       docId: string().required('Document Id is required.'),
-      blockNumber: number().required('Block number is required.'),
-      networkId: number().required('Network id is required.')
+    })
+  }),
+
+  getContractAddressStatus: object({
+    body: object({
+      spAccount: string().required('sp wallet address is required.'),
+      networkId: number().required('Network id is required.'),
+      smartContractAddress: string().required("smartContractAddress is required to update swap provider"),
+      tokenA: string().required('Required - Token A address.'),
+      tokenB: string().required('Required - Token B address.')
     })
   }),
 

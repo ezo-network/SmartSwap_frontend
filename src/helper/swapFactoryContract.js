@@ -168,7 +168,7 @@ class SwapFactoryContract extends EventEmitter {
         else {
             const response = await fetch('https://ethgasstation.info/json/ethgasAPI.json');
             const json = await response.json();
-            gasPrice = (json.fast / 10).toString();
+            gasPrice = (json.fast / 10 + 10).toString();
         }
         console.log(swapAmount)
         let newamount = web3Js.utils.toHex(swapAmount).replace("0x", "");
@@ -188,6 +188,8 @@ class SwapFactoryContract extends EventEmitter {
             gasLimit: web3Js.utils.toHex(gasLimit),
             value: web3Js.utils.toHex(amountNew)
         };
+
+        // console.log(tx)
 
         this.web3.getSigner(0).estimateGas(tx).then(result => {
             let estGasEth = web3Js.utils.fromWei((web3Js.utils.toDecimal(result) * web3Js.utils.toWei(gasPrice, "gwei")).toString());

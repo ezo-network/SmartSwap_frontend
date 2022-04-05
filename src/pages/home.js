@@ -2670,7 +2670,10 @@ export default class Home extends PureComponent {
                                         }}>SWAP</button>
                                       )}
 
-                                      <p className="font-11 color-light-n">{this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ? "You are swapping $" + this.state.sendFundAmount + " of " + this.state.selectedSendCurrency + " to $" + this.state.sendFundAmount + " of " + this.state.selectedReceiveCurrency : null}</p>
+                                      {this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ?
+                                        <p className="font-11 color-light-n">You are swapping ${this.state.sendFundAmount} of {this.state.selectedSendCurrency} to ${this.state.sendFundAmount} of {this.state.selectedReceiveCurrency}
+                                          <> |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></></p>
+                                        : null}
 
                                       {/* New Updated Design */}
                                       {/* <p className="font-11 color-light-n">You are swapping <span className="color-white">$100</span> of BNB to <span className="color-white">$100</span> of ETH  |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></p> */}
@@ -2878,7 +2881,7 @@ export default class Home extends PureComponent {
                               </div>
                             )}
                             <label>
-                              <p className="active">Slippage free </p>
+                              <p className="active" style={{ paddingRight: "10px" }}>Slippage free </p>
                               <Switch
                                 checked={this.state.checked1}
                                 onChange={this.handleChange1}
@@ -2897,7 +2900,7 @@ export default class Home extends PureComponent {
                                 id="small-radius-switch"
                                 disabled={true}
                               />
-                              <p>Slippage</p>
+                              <p style={{ paddingLeft: "10px" }}>Slippage</p>
                             </label>
                             {/* <div className="swap-Link03">
                                                 <a href="javascript:void();">P2C</a> | <a href="javascript:void();">P2G</a> | <a

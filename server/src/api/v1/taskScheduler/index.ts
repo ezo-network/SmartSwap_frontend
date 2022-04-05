@@ -44,7 +44,23 @@ class TaskScheduler {
         this.scheduledTask = null;
         this.scheduler = false;
         print.info('\n⌛ - updateGasAndFeeAmountHandler Job finished.'+ " : time:  " + new Date());
-    }    
+    }
+    
+    // getContractDeploymentTransactionStatus
+    static async contractDeploymentTransactionStatusHandler(){
+        if(this.scheduler == true) {
+            print.info(`\n⌛ - ${this.scheduledTask} is already running time:  ` + new Date());
+            return;
+        }
+
+        print.info('\n⌛ - contractDeploymentTransactionStatusHandler Job started.' + " : time:  " + new Date());
+        this.scheduledTask = 'contractDeploymentTransactionStatusHandler';
+        this.scheduler = true;
+        await swapProviderController.getContractDeploymentTransactionStatus();
+        this.scheduledTask = null;
+        this.scheduler = false;
+        print.info('\n⌛ - contractDeploymentTransactionStatusHandler Job finished.'+ " : time:  " + new Date());        
+    }
 
     static async start(){
         await new CronJob({
@@ -63,6 +79,17 @@ class TaskScheduler {
             cronTime: '*/05 * * * * *',
             onTick: async() => {
                 await TaskScheduler.updateGasAndFeeAmountHandler();
+            },
+            start: true,
+            runOnInit: false,
+            timeZone: "GMT"
+        });
+
+        await new CronJob({
+            /* every 05 seconds */
+            cronTime: '*/02 * * * * *',
+            onTick: async() => {
+                await TaskScheduler.contractDeploymentTransactionStatusHandler();
             },
             start: true,
             runOnInit: false,
