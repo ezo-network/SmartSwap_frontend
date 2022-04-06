@@ -40,6 +40,7 @@ const requestValidations = {
       withdrawPercent: number().required('[withdrawPercent] Required. And valid range is from 0% to 45%'),
       // cexApiKey: string().required('[cexApiKey] Required - Your specific API key to the CEX of your choice'),
       // cexApiSecret: string().required('[cexApiSecret] Required - Your specific API key secret to the CEX of your choice'),
+      cexType: string().required('[cexType] Required.')
     })
   }),
 

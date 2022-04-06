@@ -37,6 +37,9 @@ export default class SpContractDeployForm extends Component {
             minGasAndFeeAmount: 0,
             maxGasAndFeeAmount: 100,
             minStepForGasAndFeeAmount: 0,
+            cexList: constantConfig.cexTypes,
+            selectedCex: 'BINANCE',
+            cexListOpen: false,
             swapSpeedMode: 'UPFRONT',
             withdrawPercent: 45,
             spreadAmount: 100,
@@ -132,6 +135,11 @@ export default class SpContractDeployForm extends Component {
             isOpen2: false
         });
     };
+
+    swapTokens(){
+        this.changeTokenA(this.state.selectedTokenB);
+        this.changeTokenB(this.state.selectedTokenA);
+    }
 
     getAlternateToken(token){
         let tokensList = Object.assign({}, this.state.coinList);
@@ -256,8 +264,8 @@ export default class SpContractDeployForm extends Component {
         if(token){
             //this.changeTokenA(token.symbol); // enable if connect wallet button autometic switch to active network
             //this.setGasFeeAndAmountMinMaxRanges(token.symbol); // if above condition true then we need to enable this to reset gas fee slider token and amount
-            let alternateToken = this.getAlternateToken(token.symbol);
-            this.changeTokenB(alternateToken[0]);
+            //let alternateToken = this.getAlternateToken(token.symbol); // if above condition true then changeTokenB will need a random token so use this
+            this.changeTokenB(this.state.selectedTokenB);
             this.setState({
                 web3: web3Config.getWeb3(),
                 btnClick: false,
@@ -390,7 +398,8 @@ export default class SpContractDeployForm extends Component {
                 accumulateFundsLimit: this.state.accumulateFundsLimit,
                 stopRepeatsMode: this.state.stopRepeatsMode,
                 withdrawMode: this.state.withdrawMode,
-                withdrawPercent: this.state.withdrawPercent
+                withdrawPercent: this.state.withdrawPercent,
+                cexType: this.state.selectedCex
             }),
             path: 'become-swap-provider',
             method: 'POST'
@@ -438,6 +447,7 @@ export default class SpContractDeployForm extends Component {
                                 isActiveContractExist: false
                             });
                             notificationConfig.error('Deploying cancelled. Please try again');
+                            await this.getActiveContracts();
                         }
 
                         if (response.status === 1) {
@@ -492,7 +502,8 @@ export default class SpContractDeployForm extends Component {
         let args = {
             data: {
                 spAccount: web3Config.getAddress(),
-                networkId: web3Config.getNetworkId()
+                networkId: web3Config.getNetworkId(),
+                cexType: (this.state.selectedCex).toUpperCase()
             },
             path: 'active-contracts',
             method: 'POST'
@@ -583,6 +594,20 @@ export default class SpContractDeployForm extends Component {
             }
         });
     }
+
+    toggleCexList(changedCex = null){
+        const currentState = this.state.cexListOpen;
+        this.setState({
+            cexListOpen: !currentState
+        });     
+
+        if(changedCex){
+            this.setState({
+                selectedCex: changedCex
+            });                 
+        }
+
+    }
     
 
 
@@ -635,7 +660,12 @@ export default class SpContractDeployForm extends Component {
                                 </div>
                             </div>
                         </div>
-                        <div className="FlyICO03"> {"<>"} </div>
+                        <div className="FlyICO03">
+                            {/* <button onClick={() => this.swapTokens()}>{"<>"}</button> */}
+                            <button class="swap-token-side grey-arrow" href="javascript:void(0);" onClick={() => this.swapTokens()}>
+                                <img src="images/green-arrow.png" alt="Swap token sides"></img>
+                            </button>
+                        </div>
                     </div>
                     <div className="LiProfSbox02">
                         <div className="LiProLable">Choose token B to receive from SmartSwap</div>
@@ -734,6 +764,52 @@ export default class SpContractDeployForm extends Component {
                                 <label>{this.state.clientSideErrorMessage.amountA}</label>
                             </div>
                         }                                                            
+                    </div>
+                    <div className='LiProfSbox01'>
+                        <div className="mb-20px-n">
+                            <div className="LiProLable">CEX
+                                <i className="help-circle">
+                                    <i 
+                                        className="fas fa-question-circle protip" 
+                                        data-pt-position="top" 
+                                        data-pt-title="Choose CEX Of your choice from the below listed CEX. Note that once cex set it can't be changed in the future. Choose carefully" 
+                                        aria-hidden="true"
+                                    ></i>
+                                </i>
+                            </div>
+                            <div className="LiproDropdown">
+                                <button className='LiproDDbtn01' onClick={() => this.toggleCexList()}>
+                                    <div className="ddIconBX">
+                                        <span>
+                                            <img src={this.state.cexList[this.state.selectedCex]['icon']} alt=""/>
+                                        </span> 
+                                        {this.state.cexList[this.state.selectedCex]['symbol']}
+                                    </div>
+                                    <i className="fas fa-caret-down"></i>
+                                </button>
+                                <div className="ddContainer">
+                                    <Collapse isOpen={(this.state.cexListOpen)} className={"collapse-css-transition"} >
+                                        {
+                                            Object.keys(this.state.cexList).map((cex) => (
+                                                <button
+                                                    //disabled={this.props.contractData.cexData.type !== null}
+                                                    key={this.state.cexList[cex]['symbol']} className='LiproDDbtn01'
+                                                    onClick={() => {
+                                                        this.toggleCexList(this.state.cexList[cex]['symbol']);
+                                                    }}
+                                                >
+                                                    <div className="ddIconBX"> 
+                                                        <span> 
+                                                            <img src={this.state.cexList[cex]['icon']} alt="" />
+                                                        </span> {this.state.cexList[cex]['symbol']}
+                                                    </div>
+                                                </button>
+                                            ))
+                                        }
+                                    </Collapse>
+                                </div>
+                            </div>                                    
+                        </div>                                
                     </div>
                     <div className='spacerLine'></div>
 
