@@ -25,8 +25,10 @@ const swapProviderController = {
                 gasAndFeeAmount, spProfitPercent, accumulateFundsLimit, 
                 stopRepeatsMode, stopRepeatsOnDate, stopRepeatsAfterCalls,
                 withdrawMode, withdrawOnDate, withdrawAfterCalls, 
-                txid, smartContractAddress, swapSpeedMode, withdrawPercent  
+                txid, smartContractAddress, swapSpeedMode, withdrawPercent, cexType
             } = req.body;
+
+            const validCexTypes = ["BINANCE", "MEXC"];
 
             // validations
             if(tokenA == tokenB){
@@ -105,6 +107,14 @@ const swapProviderController = {
                 });                
             }
 
+            if(!validCexTypes.includes((cexType).toUpperCase())){
+                return res.status(422).json({ 
+                    errorMessage: {
+                        error: "Provided cex type is not a active CEX yet." 
+                    }
+                });                                
+            }
+
             // SP exist?
             const isSwapProviderExists: ISwapProvider = await SwapProvider.findOne({
                 'walletAddresses.spAccount' : (spAccount).toLowerCase(),
@@ -114,12 +124,32 @@ const swapProviderController = {
                 'smartContractAddress': {
                     $exists: true, 
                     $ne: null
-                }                                
+                }, 
+                'cexData.type': (cexType).toUpperCase()
             }).exec();
             
             if (isSwapProviderExists) return res.status(401).json({ errorMessage: {
                 error: "Swap provider already exists" 
-            } }); 
+            } });
+
+            // sp deployment pending ?
+            const isSwapProviderPending: ISwapProvider = await SwapProvider.findOne({
+                'walletAddresses.spAccount' : (spAccount).toLowerCase(),
+                'networkId': networkId,
+                'tokenA.address': tokenA,
+                'tokenB.address': tokenB,
+                'smartContractAddress': null, 
+                'txid': {
+                    $exists: true, 
+                    $ne: null
+                }, 
+                'cexData.type': (cexType).toUpperCase()
+            }).exec();
+            
+            
+            if (isSwapProviderPending) return res.status(401).json({ errorMessage: {
+                error: "Swap provider contract deployment is already in process."
+            } });            
 
             // save into db
             let spArgs = {
@@ -153,7 +183,10 @@ const swapProviderController = {
                 },
                 withdrawPercent: withdrawPercent <= 45 ? withdrawPercent : 45,
                 withdrawReinitiate: false,
-                updateGasAndFeeAmount: false
+                updateGasAndFeeAmount: false,
+                cexData: {
+                    type: (cexType).toUpperCase()
+                }
             };
             const swapProvider = await new SwapProvider(spArgs).save().then(async(sp) => {
                 await new SwapProviderTest({
@@ -727,28 +760,42 @@ const swapProviderController = {
                 const provider = networkConfig['PROVIDER'];
                 const web3 = new web3Js(new web3Js.providers.HttpProvider(provider));
                 await web3.eth.getTransactionReceipt(sp.txid).then(async(receipt) => {
-                    print.info(receipt);
-                    let args = {
-                        networkId: Number(sp.networkId),
-                        blockNumber: receipt.blockNumber,
-                        txhash: sp.txid,
-                        tokenA: sp.tokenA.address,
-                        tokenB: sp.tokenB.address
-                    }
-                    print.info(args);
-        
-                    let event = await swapProviderController.fetchEvent(args);
-                    print.info(`updaing event for sp ${sp._id}:`, event);
-        
-                    let usp = await SwapProvider.updateOne({
-                        _id: sp._id
-                    }, {
-                        fromBlock: receipt.blockNumber,
-                        smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
+                    print.info({
+                        receipt: receipt
                     });
-    
-                    if(usp.ok == 1){
-                        print.info(`SP ${sp._id} contract address fetched and updated into record successfully.`);
+                    if(receipt.status === true){
+                        print.info(`SP ${sp._id} contract deployed successfully.`);
+                        let args = {
+                            networkId: Number(sp.networkId),
+                            blockNumber: receipt.blockNumber,
+                            txhash: sp.txid,
+                            tokenA: sp.tokenA.address,
+                            tokenB: sp.tokenB.address
+                        }
+                        print.info(args);
+            
+                        let event = await swapProviderController.fetchEvent(args);
+                        print.info(`updaing event for sp ${sp._id}:`, event);
+            
+                        let usp = await SwapProvider.updateOne({
+                            _id: sp._id
+                        }, {
+                            fromBlock: receipt.blockNumber,
+                            smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
+                        });
+        
+                        if(usp.ok == 1){
+                            print.info(`SP ${sp._id} contract address fetched and updated into record successfully.`);
+                        }
+                    } else {
+                        print.info(`❌ SP ${sp._id} contract deployment failed.`);
+                        // reset txid to make this sp deployment blank
+                        await SwapProvider.updateOne({
+                            _id: sp._id
+                        }, {
+                            txid: null,
+                            message: `Contract deployment failed - tx(${sp.txid})`
+                        });
                     }
     
                 }).catch(async(error) => {
