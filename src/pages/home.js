@@ -229,9 +229,9 @@ export default class Home extends PureComponent {
   };
   componentWillMount = async () => {
     await this.fetchPrice();
-    // setInterval(async () => {
-    //   await this.fetchPrice();
-    // }, 300000)
+    setInterval(async () => {
+      await this.fetchPrice();
+    }, 60000)
 
   };
   componentDidMount = async () => {
@@ -564,6 +564,9 @@ export default class Home extends PureComponent {
       },
       async () => {
         await this.fetchedUserTransaction(web3Config.getAddress());
+        setInterval(async () => {
+          await this.fetchedUserTransaction(web3Config.getAddress());
+        }, 60000);
         // await this.getData([web3Config.getAddress()])
         // this.changeCurrency(false)
         // setInterval(() => {
@@ -2179,9 +2182,9 @@ export default class Home extends PureComponent {
               <div className="fsbg_sad01"></div>
               <div className="fsbg_container">
                 <video loop autoPlay muted className="fullscreen-bg__video">
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.webm"} type="video/webm" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4"} type="video/mp4" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv"} type="video/ogg" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.webm?v=1.18"} type="video/webm" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4?v=1.18"} type="video/mp4" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv?v=1.18"} type="video/ogg" />
                 </video>
               </div>
             </div>
