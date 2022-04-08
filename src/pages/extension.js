@@ -228,47 +228,7 @@ export default class Home extends PureComponent {
     }
   };
 
-  async fetchPrice() {
-    let MarketCap = [];
-    let tableDataLocal = [];
-    let tableDataLocalcoingecko = [];
-    let Uniobj = {};
-    let Panobj = {};
-    var { currencyPrices } = this.state;
-    let wbnbPrice = 0;
-
-    let liveETHPrice = 0;
-
-    await axios
-      .get(
-        `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple%2Cmatic-network&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`
-      )
-      .then((res) => {
-        tableDataLocalcoingecko = res.data;
-      })
-      .catch((err) => {
-        console.log("error", err);
-      });
-
-    currencyPrices["ETH"] = tableDataLocalcoingecko["ethereum"]["usd"];
-
-    currencyPrices["BNB"] = tableDataLocalcoingecko["binancecoin"]["usd"];
-
-    currencyPrices["MATIC"] = tableDataLocalcoingecko["matic-network"]["usd"];
-
-    currencyPrices["JNTR/e"] = 0.062166;
-    currencyPrices["JNTR/b"] = 0.054237;
-    currencyPrices["JNTR"] = 0.532;
-
-    this.setState(
-      {
-        currencyPrices: currencyPrices,
-      },
-      () => {
-        this.forceUpdate();
-      }
-    );
-  }
+  
   
   setSendCurrency(currency) {
     this.setState({ selectedSendCurrency: currency }, () => {
