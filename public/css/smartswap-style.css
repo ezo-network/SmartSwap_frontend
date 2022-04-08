@@ -9321,3 +9321,17 @@ a.dc-file {
 a.dc-file:hover {
   color: #0303ff;
 }
+
+.swap-token-side {
+  background: none;
+  outline: none;
+  border: none;
+}
+
+.swap-token-side img {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
