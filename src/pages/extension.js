@@ -1,8 +1,5 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link, Redirect } from "react-router-dom";
 import web3Config from "../config/web3Config";
-import swapFactoryAbi from "../abis/swapFactory.json";
-import tokenAbi from "../abis/tokenAbi.json";
 import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
 import SwapFactoryContract from "../helper/swapFactoryContract";
@@ -10,13 +7,11 @@ import CONSTANT from "../constants";
 import Header from "../components/Header";
 import RightSideMenu from "../components/RightSideMenu";
 import axios from "axios";
-import "react-multi-carousel/lib/styles.css";
 import { isValidAddress } from 'ethereumjs-util';
-import reimbursementAbi from "../abis/reimbursementAbi.json";
 
 
 const $ = window.$;
-export default class Home extends PureComponent {
+export default class Extension extends PureComponent {
   constructor(props) {
     super();
     this.state = { checked1: false };

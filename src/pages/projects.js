@@ -1,8 +1,6 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import web3Config from "../config/web3Config";
-import swapFactoryAbi from "../abis/swapFactory.json";
-import tokenAbi from "../abis/tokenAbi.json";
 import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
 import SwapFactoryContract from "../helper/swapFactoryContract";
@@ -10,13 +8,11 @@ import CONSTANT from "../constants";
 import Header from "../components/Header";
 import RightSideMenu from "../components/RightSideMenu";
 import axios from "axios";
-import "react-multi-carousel/lib/styles.css";
 import { isValidAddress } from 'ethereumjs-util';
-import reimbursementAbi from "../abis/reimbursementAbi.json";
 
 
 const $ = window.$;
-export default class Home extends PureComponent {
+export default class Projects extends PureComponent {
   constructor(props) {
     super();
     this.state = { checked1: false };
@@ -269,7 +265,7 @@ export default class Home extends PureComponent {
       }
     );
   }
-
+  
   setSendCurrency(currency) {
     this.setState({ selectedSendCurrency: currency }, () => {
       this.closePopup("sendCurPop");
@@ -280,7 +276,7 @@ export default class Home extends PureComponent {
       this.closePopup("receiveCurPop");
     });
   }
-
+ 
   async expedite(txId, processAmount, sentChainId) {
     let web3 = web3Config.getWeb3();
     let networkId = web3Config.getNetworkId();
@@ -299,11 +295,11 @@ export default class Home extends PureComponent {
     await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
       (hash) => {
         this.setState({
-
+        
         });
       },
       (receipt) => {
-
+    
         notificationConfig.success("Expedite Success");
       }
     );
@@ -320,9 +316,9 @@ export default class Home extends PureComponent {
               <div className="fsbg_sad01"></div>
               <div className="fsbg_container">
                 <video loop autoPlay muted className="fullscreen-bg__video">
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.webm?v=1.18"} type="video/webm" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4?v=1.18"} type="video/mp4" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv?v=1.18"} type="video/ogg" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.webm"} type="video/webm" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4"} type="video/mp4" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv"} type="video/ogg" />
                 </video>
               </div>
             </div>
@@ -422,18 +418,18 @@ export default class Home extends PureComponent {
                           <p><span>//user should approve tokens transfer before calling this function.</span></p>
                           <p><span>//if no licensee set it to address(0)</span></p>
                           <p>function swap(</p>
-                          <p>address tokenA, <span>// token that user send to swap ( address(1) for BNB, address(2) for ETH)</span></p>
-                          <p>address tokenB, <span>// token that user want to receive ( address(1) for BNB, address(2) for ETH)</span></p>
-                          <p>address receiver, <span>// address that will receive tokens on other chain (user's wallet address)</span></p>
-                          <p>uint256 amountA,  <span>// amount of tokens user sends to swap</span></p>
-                          <p>address licensee,   <span>// for now, = address(0)</span></p>
-                          <p>bool isInvestment,  <span>// for now, = false</span></p>
-                          <p>uint128 minimumAmountToClaim,   <span>// do not claim on user behalf less of this amount. Only exception if order fulfilled. For now, = 0</span></p>
-                          <p>uint128 limitPice   <span>// Do not match user if token A price less this limit. For now, = 0</span></p>
-                          <p>)</p>
-                          <p>external</p>
-                          <p>payable</p>
-                          <p><span>returns (bool)</span></p>
+                             <p>address tokenA, <span>// token that user send to swap ( address(1) for BNB, address(2) for ETH)</span></p>
+                             <p>address tokenB, <span>// token that user want to receive ( address(1) for BNB, address(2) for ETH)</span></p>
+                             <p>address receiver, <span>// address that will receive tokens on other chain (user's wallet address)</span></p>
+                             <p>uint256 amountA,  <span>// amount of tokens user sends to swap</span></p>
+                             <p>address licensee,   <span>// for now, = address(0)</span></p>
+                             <p>bool isInvestment,  <span>// for now, = false</span></p>
+                             <p>uint128 minimumAmountToClaim,   <span>// do not claim on user behalf less of this amount. Only exception if order fulfilled. For now, = 0</span></p>
+                             <p>uint128 limitPice   <span>// Do not match user if token A price less this limit. For now, = 0</span></p>
+                             <p>)</p>
+                             <p>external</p>
+                             <p>payable</p>
+                             <p><span>returns (bool)</span></p>
                         </div>
                         <div className="Box-bottom">
                           <Link to='#'>See example for live SmartBridge button for UniSwap V2 DEXs clone</Link>
