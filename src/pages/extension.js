@@ -1,5 +1,4 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
 import web3Config from "../config/web3Config";
 import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
@@ -12,7 +11,7 @@ import { isValidAddress } from 'ethereumjs-util';
 
 
 const $ = window.$;
-export default class Projects extends PureComponent {
+export default class Extension extends PureComponent {
   constructor(props) {
     super();
     this.state = { checked1: false };
@@ -224,47 +223,7 @@ export default class Projects extends PureComponent {
     }
   };
 
-  async fetchPrice() {
-    let MarketCap = [];
-    let tableDataLocal = [];
-    let tableDataLocalcoingecko = [];
-    let Uniobj = {};
-    let Panobj = {};
-    var { currencyPrices } = this.state;
-    let wbnbPrice = 0;
-
-    let liveETHPrice = 0;
-
-    await axios
-      .get(
-        `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple%2Cmatic-network&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`
-      )
-      .then((res) => {
-        tableDataLocalcoingecko = res.data;
-      })
-      .catch((err) => {
-        console.log("error", err);
-      });
-
-    currencyPrices["ETH"] = tableDataLocalcoingecko["ethereum"]["usd"];
-
-    currencyPrices["BNB"] = tableDataLocalcoingecko["binancecoin"]["usd"];
-
-    currencyPrices["MATIC"] = tableDataLocalcoingecko["matic-network"]["usd"];
-
-    currencyPrices["JNTR/e"] = 0.062166;
-    currencyPrices["JNTR/b"] = 0.054237;
-    currencyPrices["JNTR"] = 0.532;
-
-    this.setState(
-      {
-        currencyPrices: currencyPrices,
-      },
-      () => {
-        this.forceUpdate();
-      }
-    );
-  }
+  
   
   setSendCurrency(currency) {
     this.setState({ selectedSendCurrency: currency }, () => {
@@ -363,80 +322,20 @@ export default class Projects extends PureComponent {
                 >
                   <div className="container-Grid">
                     <div className="boost-outer">
-                      <div className="boost-left">
-                        <h2>Boost your web3 dApp sales by giving your customers the best payment experience</h2>
-                        <p>Super easy one-click multichain solution allowing customers to pay with any token or blockchain while you get the token on the blockchain you need.</p>
-                        <p className="green">Instead of Deploying Your Project on Multiple Blockchains, Deploy One SmartBridge to Welcome All Type of Users</p>
-                        <div className="down-block">
-                          <img src="images/down-arrow.png" alt="" />
-                        </div>
+                      <div className="boost-left ver2">
+                        <h2>Best Market Prices on dApps</h2>
+                        <p>Super easy one click smart bridge solution allowing you to pay with any token from any blockchain to any project on any blockchain.</p>
+                        <p className="green ver2">Gain $100 of SMART when using SmartBridge
+                          <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="left" data-pt-title="help text" aria-hidden="true"></i></i>
+                        </p>
+                        <a class="ssBtn01 ani-1 cs-btn" href="#">ADD TO BROWSER</a>
+                        {/* <a class="ssBtn01 ani-1 cs-btn" href="#">COMING SOON</a> */}
                       </div>
-                      <div className="boost-right">
-                        <img src="images/mobile-frame.png" alt="" />
+                      <div className="boost-right ver2">
+                        <img src="images/extension-screen.png" alt="" />
                       </div>
                     </div>
-                    <div className="o-outer">
-                      <div className="o-left">
-                        {/* <p className="option">OPTION 1</p> */}
-                        <h3>ONE-CLICK SmartBridge</h3>
-                        <p>This code will allow users to push by ONE click any token from any network, and receive the final assets that the project is offering. The One-Click SmartBridge allows users one-click access from any token on any network to the final asset the project offers.</p>
-                        
-                        <div className="Box-bottom">
-                          <p className="need-text">You need to call this function in SmartBridge contract</p>
-                          <i className="fas fa-copy"></i>
-                        </div>
-                        <div className="code-block">
-                          {/* <p><span>//user should approve tokens transfer before calling this function.</span></p>
-                          <p><span>//if no licensee set it to address(0)</span></p>
-                          <p>function swap(</p>
-                             <p>address tokenA, <span>// token that user send to swap ( address(1) for BNB, address(2) for ETH)</span></p>
-                             <p>address tokenB, <span>// token that user want to receive ( address(1) for BNB, address(2) for ETH)</span></p>
-                             <p>address receiver, <span>// address that will receive tokens on other chain (user's wallet address)</span></p>
-                             <p>uint256 amountA,  <span>// amount of tokens user sends to swap</span></p>
-                             <p>address licensee,   <span>// for now, = address(0)</span></p>
-                             <p>bool isInvestment,  <span>// for now, = false</span></p>
-                             <p>uint128 minimumAmountToClaim,   <span>// do not claim on user behalf less of this amount. Only exception if order fulfilled. For now, = 0</span></p>
-                             <p>uint128 limitPice   <span>// Do not match user if token A price less this limit. For now, = 0</span></p>
-                             <p>)</p>
-                             <p>external</p>
-                             <p>payable</p>
-                             <p><span>returns (bool)</span></p> */}
-                             <p className="cs">COMING SOON</p>
-                        </div>
-                        <div className="Box-bottom ver2">
-                          <Link to='#' className="dc-file">Download ABI of smart contract file</Link>
-                          <Link to='#'>See example for live SmartBridge button for UniSwap V2 DEXs clone</Link>
-                        </div>
-                        
-                      </div>
-                      {/* <div className="o-left pl-15">
-                        <p className="option">OPTION 2</p>
-                        <h3>Quick Bridge Window</h3>
-                        <p>This code will allow users to push any token from any network, and receive back to their wallet a stablecoin (like USDT) that belongs to the network that complies with the project, once receiving that stablecoin, users will not need to leave the project page and can interact with the project like a regular transaction.</p>
-                        <p className="mb-45">The Quick Bridge Window allows users to push any token on any network to receive a stablecoin on the network that complies with your project. Once the project receives the stablecoin, users will not need to leave the project page, they can interact directly with the project.</p>
-                        <div className="code-block">
-                          <p><span>//user should approve tokens transfer before calling this function.</span></p>
-                          <p><span>//if no licensee set it to address(0)</span></p>
-                          <p>function swap(</p>
-                             <p>address tokenA, <span>// token that user send to swap ( address(1) for BNB, address(2) for ETH)</span></p>
-                             <p>address tokenB, <span>// token that user want to receive ( address(1) for BNB, address(2) for ETH)</span></p>
-                             <p>address receiver, <span>// address that will receive tokens on other chain (user's wallet address)</span></p>
-                             <p>uint256 amountA,  <span>// amount of tokens user sends to swap</span></p>
-                             <p>address licensee,   <span>// for now, = address(0)</span></p>
-                             <p>bool isInvestment,  <span>// for now, = false</span></p>
-                             <p>uint128 minimumAmountToClaim,   <span>// do not claim on user behalf less of this amount. Only exception if order fulfilled. For now, = 0</span></p>
-                             <p>uint128 limitPice   <span>// Do not match user if token A price less this limit. For now, = 0</span></p>
-                             <p>)</p>
-                             <p>external</p>
-                             <p>payable</p>
-                             <p><span>returns (bool)</span></p>
-                        </div>
-                        <div className="Box-bottom">
-                          <Link to='#'>See example for live SmartBridge button for UniSwap V2 DEXs clone</Link>
-                          <i className="fas fa-copy"></i>
-                        </div>
-                      </div> */}
-                    </div>
+                    
                   </div>
                 </div>
               </div>

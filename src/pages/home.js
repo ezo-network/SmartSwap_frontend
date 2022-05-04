@@ -229,9 +229,9 @@ export default class Home extends PureComponent {
   };
   componentWillMount = async () => {
     await this.fetchPrice();
-    // setInterval(async () => {
-    //   await this.fetchPrice();
-    // }, 300000)
+    setInterval(async () => {
+      await this.fetchPrice();
+    }, 60000)
 
   };
   componentDidMount = async () => {
@@ -564,6 +564,9 @@ export default class Home extends PureComponent {
       },
       async () => {
         await this.fetchedUserTransaction(web3Config.getAddress());
+        setInterval(async () => {
+          await this.fetchedUserTransaction(web3Config.getAddress());
+        }, 60000);
         // await this.getData([web3Config.getAddress()])
         // this.changeCurrency(false)
         // setInterval(() => {
@@ -2179,9 +2182,9 @@ export default class Home extends PureComponent {
               <div className="fsbg_sad01"></div>
               <div className="fsbg_container">
                 <video loop autoPlay muted className="fullscreen-bg__video">
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.webm"} type="video/webm" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4"} type="video/mp4" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv"} type="video/ogg" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.webm?v=1.18"} type="video/webm" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4?v=1.18"} type="video/mp4" />
+                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv?v=1.18"} type="video/ogg" />
                 </video>
               </div>
             </div>
@@ -2350,22 +2353,25 @@ export default class Home extends PureComponent {
                                       </div>
                                       <div className="flex-1 w-100-sm flex-auto-sm">
                                         <div className="inputs-wrap light-controls-n">
-                                          {/* <span className="currency-ic-n">
-                                            $
-                                          </span> */}
+                                          
                                           <div className="inputs-wrap-control">
                                             <div className="input-box1">
                                               <label for="" className="form-label">from</label>
-                                              <input
-                                                type="text"
-                                                className="form-control-n"
-                                                placeholder="0"
-                                                id="input04"
-                                                value={this.state.sendFundAmount}
-                                                onKeyDown={(e) => Validation.floatOnly(e)}
-                                                onChange={this.recivedToken.bind(this)}
-                                                autoComplete="off"
-                                              />
+                                              <div className="i-outer">
+                                                <input
+                                                  type="text"
+                                                  className="form-control-n"
+                                                  placeholder="0"
+                                                  id="input04"
+                                                  value={this.state.sendFundAmount}
+                                                  onKeyDown={(e) => Validation.floatOnly(e)}
+                                                  onChange={this.recivedToken.bind(this)}
+                                                  autoComplete="off"
+                                                />
+                                                <span className="currency-ic-n">
+                                                  $
+                                                </span>
+                                              </div>
                                             </div>
 
                                             <div className="input-box2">
@@ -2376,7 +2382,7 @@ export default class Home extends PureComponent {
                                                 onChange={this.handleChange.bind(this, "sendNetwork")}
                                                 options={this.state.sendNetworkList}
                                                 styles={{
-                                                  control: (styles) => ({ ...styles, backgroundColor: '#EDECEF', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #ffffff", fontSize: "16px" }),
+                                                  control: (styles) => ({ ...styles, backgroundColor: '#EDECEF', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #ffffff", borderRight: "0px", fontSize: "16px" }),
                                                   singleValue: (provided, state) => ({
                                                     ...provided,
                                                     color: "black",
@@ -2511,20 +2517,22 @@ export default class Home extends PureComponent {
                                       </div>
                                       <div className="flex-1 w-100-sm flex-auto-sm">
                                         <div className="inputs-wrap dark-controls-n">
-                                          {/* <span className="currency-ic-n">
-                                            $
-                                          </span> */}
                                           <div className="inputs-wrap-control">
                                             <div className="input-box1 ver2">
                                               <label for="" className="form-label">to</label>
-                                              <input
-                                                type="text"
-                                                className="form-control-n"
-                                                placeholder="0"
-                                                readOnly=""
-                                                disabled
-                                                value={this.state.sendFundAmount}
-                                              />
+                                              <div className="i-outer">
+                                                <input
+                                                  type="text"
+                                                  className="form-control-n"
+                                                  placeholder="0"
+                                                  readOnly=""
+                                                  disabled
+                                                  value={this.state.sendFundAmount}
+                                                />
+                                                <span className="currency-ic-n ver2">
+                                                  $
+                                                </span>
+                                              </div>
                                             </div>
                                             <div className="input-box2 ver2">
                                               <label for="" className="form-label">BLOCKCHAIN</label>
@@ -2534,7 +2542,7 @@ export default class Home extends PureComponent {
                                                 onChange={this.handleChange.bind(this, "receiveNetwork")}
                                                 options={this.state.recieveNetworkList}
                                                 styles={{
-                                                  control: (styles) => ({ ...styles, backgroundColor: '#20232A', color: 'white', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #0D0E13", fontSize: "16px" }),
+                                                  control: (styles) => ({ ...styles, backgroundColor: '#20232A', color: 'white', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #0D0E13", borderRight: "0px", fontSize: "16px" }),
                                                   singleValue: (provided, state) => ({
                                                     ...provided,
                                                     color: "white",
@@ -2553,6 +2561,7 @@ export default class Home extends PureComponent {
                                                   indicatorSeparator: (styles) => ({ display: 'none' })
                                                 }}
                                               />
+                                              
                                             </div>
                                             <div className="input-box2 ver2">
                                               <label for="" className="form-label">TOKEN</label>
@@ -2669,16 +2678,17 @@ export default class Home extends PureComponent {
                                           this.swap();
                                         }}>SWAP</button>
                                       )}
-
-                                      {this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ?
-                                        <p className="font-11 color-light-n">You are swapping ${this.state.sendFundAmount} of {this.state.selectedSendCurrency} to ${this.state.sendFundAmount} of {this.state.selectedReceiveCurrency}
-                                          <> |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></></p>
-                                        : null}
-
-                                      {/* New Updated Design */}
-                                      {/* <p className="font-11 color-light-n">You are swapping <span className="color-white">$100</span> of BNB to <span className="color-white">$100</span> of ETH  |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></p> */}
-                                      {/* <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p> */}
-                                      {/* <p className="font-11 color-light-n">26.31% still pending <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i> | &nbsp;&nbsp;<a href="#" className="color-light-n">Start new swap</a></p> */}
+                                      <div className="swap-outer">
+                                        {this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ?
+                                          <p className="font-11 color-light-n">You are swapping ${this.state.sendFundAmount} of {this.state.selectedSendCurrency} to ${this.state.sendFundAmount} of {this.state.selectedReceiveCurrency}
+                                            <> |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></></p>
+                                          : null}
+                                          {/* New Updated Design */}
+                                        {/* <p className="font-11 color-light-n">You are swapping <span className="color-white">$100</span> of BNB to <span className="color-white">$100</span> of ETH  |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></p> */}
+                                        {/* <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p> */}
+                                        {/* <p className="font-11 color-light-n">26.31% still pending <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i> | &nbsp;&nbsp;<a href="#" className="color-light-n">Start new swap</a></p> */}
+                                      </div>
+                                      
                                     </div>
                                   </div>
                                 </div>
@@ -2880,7 +2890,7 @@ export default class Home extends PureComponent {
                                 </div>
                               </div>
                             )}
-                            <label>
+                            <label className="slippage-outer">
                               <p className="active" style={{ paddingRight: "10px" }}>Slippage free </p>
                               <Switch
                                 checked={this.state.checked1}
@@ -3409,7 +3419,16 @@ export default class Home extends PureComponent {
                                 100% <br />
                                 value match
                               </div>
-                              <p>Select the slippage free option to receive new crypto equal to the exact value you sent</p>
+                              <p>Select the slippage free option to receive new crypto equal to the exact value you sent
+                                <i className="help-circle">
+                                  <i
+                                    className="fas fa-question-circle protip"
+                                    data-pt-position="top"
+                                    data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options"
+                                    aria-hidden="true"
+                                  ></i>
+                                </i>
+                              </p>
                             </div>
                           </div>
                           <div className="swap-Box01">
@@ -3480,7 +3499,7 @@ export default class Home extends PureComponent {
                               </p>
                             </div>
                             <div id="reimburTip" style={{ display: "none" }}>
-                              <p style={{ marginTop: '0px' }}>SmartSwap users have the option to receive 100% reimbursement for their gas and swap fees. Users are able to claim reimbursements via the reimbursement staking contract. To release reimbursements users must stake the 1:1 equal amount of SMART for one year, but will be able to release partial amounts of the reimbursement if withdrawn at any time before the 1 year period . The pending balance accumulates and the user is able to claim the rest. </p>
+                              <p style={{ marginTop: '0px' }}>SmartSwap users have the option to receive 100% reimbursement for their gas and swap fees. Users are able to claim reimbursements via the reimbursement staking contract. To release reimbursements users must stake the 1:1 equal amount of SMART for one year, but will be able to release partial amounts of the reimbursement if withdrawn at any time before the 1 year period . The pending balance accumulates and the user is able to claim the rest.</p>
                               <p style={{ marginBottom: '0px' }}>Example </p>
                               <p style={{ marginTop: '0px', marginBottom: '0px' }}>If over the year a user spent over $1000 or more on gas, at any time he can be reimbursed for such cost even if the SMART token value is higher due to appreciation. </p>
                             </div>

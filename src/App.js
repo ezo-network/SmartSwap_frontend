@@ -8,6 +8,7 @@ import {
 
 import Home from './pages/home';
 import Projects from './pages/projects';
+import Extension from './pages/extension';
 import ownLicence from './pages/ownLicence';
 import ownLicence02 from './pages/ownLicence02';
 import SmartSwapLicence from './pages/smartSwapLicence';
@@ -28,6 +29,9 @@ const DefaultRouter = () => (
     </Switch>
     <Switch>
       <Route path="/projects" component={Projects} />
+    </Switch>
+    <Switch>
+      <Route path="/extension" component={Extension} />
     </Switch>
   </Router>
 )

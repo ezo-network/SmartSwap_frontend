@@ -74,6 +74,11 @@ export default class RightSideMenu extends PureComponent {
                   <img src="images/menu-close.png" alt="" />
                 </a>
               </div>
+              <div className="leftMenu mobile-block">
+                <Link to='/' className="active">SMARTSWAP</Link>
+                <Link to='/extension'>SMARTBRIDGE EXTENSION</Link>
+                <Link to='/projects'>SMARTBRIDGE FOR PROJECTS</Link>
+              </div>
               <div className="msb-Linkbox01">
                 <Link to="/ownLicence">Launch Branded SmartSwap</Link>
                 <a
