@@ -67,11 +67,7 @@ class SwapFactoryContractPairWise extends EventEmitter {
             console.log(error);
 
             if (this.component === "LiquidityProvider") {
-                if (error.code === 4001) {
-                    //user rejected the transaction
-                    console.log('user rejected the transaction to become swap provider')
-                    receiptCb(error);
-                }
+                receiptCb(error);
             }
         });
     }

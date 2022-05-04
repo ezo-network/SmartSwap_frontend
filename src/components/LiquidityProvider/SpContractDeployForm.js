@@ -17,6 +17,8 @@ var _ = require('lodash');
 export default class SpContractDeployForm extends Component {
     constructor(props) {
         super();
+        this.setDropdownWrapperRef = this.setDropdownWrapperRef.bind(this);
+        this.handleClickOutside = this.handleClickOutside.bind(this);
         this.state = {
             web3: null,
             coinList: tokenDetails,
@@ -75,22 +77,14 @@ export default class SpContractDeployForm extends Component {
             // detect Network account change
             window.ethereum.on('chainChanged', networkId => {
                 console.log('chainChanged', networkId);
-                this.setState({
-                    web3: null,
-                    confirmed: false,
-                    spData: null
-                });
+                this.resetWallet();
     
                 this.connectWallet();
             });
     
             window.ethereum.on('accountsChanged', accounts => {
                 console.log('account Changed');
-                this.setState({
-                    web3: null,
-                    confirmed: false,
-                    spData: null                                    
-                });
+                this.resetWallet();
                 // on account change currently disconnecting wallet so we can again check active contract on wallet connect 
     
                 this.connectWallet();
@@ -106,6 +100,39 @@ export default class SpContractDeployForm extends Component {
         });
 
         this.setGasFeeAndAmountMinMaxRanges('ETH');
+        document.addEventListener("mousedown", this.handleClickOutside);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("mousedown", this.handleClickOutside);
+    }
+
+    toggleCexList(changedCex = null){
+        const currentState = this.state.cexListOpen;
+        this.setState({
+            cexListOpen: !currentState
+        });     
+
+        if(changedCex){
+            this.setState({
+                selectedCex: changedCex
+            });
+            this.resetWallet();
+        }
+    }
+
+    handleClickOutside(event) {
+        if (this.dropdownWrapperRef && !this.dropdownWrapperRef.contains(event.target)) {
+            this.setState({
+                isOpen1: false,
+                isOpen2: false,
+                cexListOpen: false
+            });
+        }
+    }
+
+    setDropdownWrapperRef(node) {
+        this.dropdownWrapperRef = node;
     }
 
     toggle = index => {
@@ -116,7 +143,17 @@ export default class SpContractDeployForm extends Component {
         //this.toggleActiveContractSection();
     };
 
+    resetWallet() {
+        this.setState({
+            web3: null,
+            confirmed: false,
+            spData: null
+        });
+    }
+
     changeTokenA(token) {
+
+        
         this.setState({
             selectedTokenA: token,
             tokenA: this.state.coinList[token]['address'],
@@ -126,6 +163,7 @@ export default class SpContractDeployForm extends Component {
         });
         this.setGasFeeAndAmountMinMaxRanges(token);
         //notificationConfig.info('Token reset. Please set Gas and Fee again.');
+        this.resetWallet();
     };
 
     changeTokenB(token) {
@@ -134,6 +172,8 @@ export default class SpContractDeployForm extends Component {
             tokenB: this.state.coinList[token]['address'],
             isOpen2: false
         });
+
+        this.resetWallet();
     };
 
     swapTokens(){
@@ -438,7 +478,7 @@ export default class SpContractDeployForm extends Component {
                         console.log({
                             "Contract response:": response
                         });
-                        if(response.code === 4001){
+                        if(response.code === 4001 || response.code === -32603){
                             this.setState({
                                 confirmed: false,
                                 deployButtonText: "DEPLOY SMART CONTRACT",
@@ -446,7 +486,12 @@ export default class SpContractDeployForm extends Component {
                                 loadingIcon: false,
                                 isActiveContractExist: false
                             });
-                            notificationConfig.error('Deploying cancelled. Please try again');
+                            if(response.code === 4001){
+                                notificationConfig.error('Deploying cancelled. Please try again');
+                            }
+                            if(response.code === -32603){
+                                notificationConfig.error('Intrinsic gas too low');
+                            }
                             await this.getActiveContracts();
                         }
 
@@ -503,7 +548,9 @@ export default class SpContractDeployForm extends Component {
             data: {
                 spAccount: web3Config.getAddress(),
                 networkId: web3Config.getNetworkId(),
-                cexType: (this.state.selectedCex).toUpperCase()
+                cexType: (this.state.selectedCex).toUpperCase(),
+                tokenA: this.state.tokenA,
+                tokenB: this.state.tokenB
             },
             path: 'active-contracts',
             method: 'POST'
@@ -595,22 +642,6 @@ export default class SpContractDeployForm extends Component {
         });
     }
 
-    toggleCexList(changedCex = null){
-        const currentState = this.state.cexListOpen;
-        this.setState({
-            cexListOpen: !currentState
-        });     
-
-        if(changedCex){
-            this.setState({
-                selectedCex: changedCex
-            });                 
-        }
-
-    }
-    
-
-
     render() {
 
         const smallError = {
@@ -639,7 +670,7 @@ export default class SpContractDeployForm extends Component {
                                         <div className="ddIconBX"> <span> <img src={this.state.coinList[this.state.selectedTokenA]['icon']} alt="" /></span> {this.state.coinList[this.state.selectedTokenA]['symbol']}</div>
                                         <i className="fas fa-caret-down"></i>
                                     </button>
-                                    <div className="ddContainer">
+                                    <div className="ddContainer" ref={this.setDropdownWrapperRef}>
                                         <Collapse isOpen={this.state.isOpen1} className={"collapse-css-transition"} >
                                             {
                                                 Object.keys(this.state.coinList).map((coin) => (
@@ -674,7 +705,7 @@ export default class SpContractDeployForm extends Component {
                                 <div className="ddIconBX"> <span> <img src={this.state.coinList[this.state.selectedTokenB]['icon']} alt="" /></span> {this.state.coinList[this.state.selectedTokenB]['symbol']}</div>
                                 <i className="fas fa-caret-down"></i>
                             </button>
-                            <div className="ddContainer">
+                            <div className="ddContainer" ref={this.setDropdownWrapperRef}>
                                 <Collapse isOpen={this.state.isOpen2} className={"collapse-css-transition"} >
                                     {
                                         Object.keys(this.state.coinList).map((coin) => (
@@ -788,7 +819,7 @@ export default class SpContractDeployForm extends Component {
                                     <i className="fas fa-caret-down"></i>
                                 </button>
                                 <div className="ddContainer">
-                                    <Collapse isOpen={(this.state.cexListOpen)} className={"collapse-css-transition"} >
+                                    <Collapse isOpen={(this.state.cexListOpen)} ref={this.setDropdownWrapperRef} className={"collapse-css-transition"} >
                                         {
                                             Object.keys(this.state.cexList).map((cex) => (
                                                 <button
