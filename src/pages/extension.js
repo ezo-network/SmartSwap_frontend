@@ -84,6 +84,7 @@ export default class Extension extends PureComponent {
       isSubdomain: false,
       noSubDomain: false,
       subDomainName: "",
+      comingSoonHover:false,
       amounts: {
         totalAmountSwapped: 0,
         feesGenerated: 0,
@@ -328,7 +329,7 @@ export default class Extension extends PureComponent {
                         <p className="green ver2">Gain $100 of SMART when using SmartBridge
                           <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="left" data-pt-title="help text" aria-hidden="true"></i></i>
                         </p>
-                        <a class="ssBtn01 ani-1 cs-btn" href="#">ADD TO BROWSER</a>
+                        <a class="ssBtn01 ani-1 cs-btn" href="#" onMouseEnter={(e)=>this.setState({comingSoonHover:true})} onMouseLeave={(e)=>this.setState({comingSoonHover:false})}>{this.state.comingSoonHover ?"COMING SOON" :"ADD TO BROWSER"}</a>
                         {/* <a class="ssBtn01 ani-1 cs-btn" href="#">COMING SOON</a> */}
                       </div>
                       <div className="boost-right ver2">
