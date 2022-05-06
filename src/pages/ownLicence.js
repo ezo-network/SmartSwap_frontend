@@ -1995,7 +1995,7 @@ export default class ownLicence extends PureComponent {
                                   style={{
                                     padding: "20px 15px",
                                     width: "100%",
-                                    backgroundColor: "#271e3a",
+                                    backgroundColor: "#16171e",
                                     color: "#fff",
                                     border: 0,
                                   }}

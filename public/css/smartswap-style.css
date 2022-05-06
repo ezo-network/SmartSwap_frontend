@@ -834,7 +834,7 @@ body {
 }
 
 .smartSwap .langBoxContainer {
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgb(5 5 7 / 95%);
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
@@ -3007,7 +3007,7 @@ ul {
 }
 
 .smartSwap .wallet-Popup {
-  background: rgba(14, 4, 36, 0.95);
+  background: rgb(5 5 7 / 95%);
   width: 100%;
   height: 100%;
   position: fixed;
@@ -3182,8 +3182,8 @@ ul {
 }
 
 .smartSwap .tab-Nav .tab-Link.active {
-  color: #41a7dc;
-  border-bottom-color: #41a7dc;
+  color: #91dc27;
+  border-bottom-color: #91dc27;
 }
 
 .smartSwap #coin-Popup .wallet-popupBlock {
@@ -3794,7 +3794,7 @@ ul {
 }
 
 .smartSwap .langBoxContainer {
-  background-color: rgba(14, 4, 36, 0.8);
+  background-color: rgb(5 5 7 / 95%);
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
@@ -3998,7 +3998,7 @@ ul {
 }
 
 .smartSwap .reserve-Block .form-Block .email-Box input {
-  background: #271e3a;
+  background: #16171e;
   height: 100px;
   color: #fff;
   font-size: 30px;
@@ -4070,7 +4070,7 @@ ul {
 .smartSwap .reserve-Block .form-Block .form-Wrap .form-Box input {
   height: 65px;
   width: 100%;
-  background: #271e3a;
+  background: #16171e;
   border: 2px solid #000;
   color: #fff;
   padding: 15px;
@@ -5166,7 +5166,7 @@ select:focus {
 }
 
 .gwFormSFormbox01 input {
-  background-color: #271e3a;
+  background-color: #16171e;
   border: 0px;
   border-radius: 0px;
   height: 63px;
@@ -5215,7 +5215,7 @@ select:focus {
   width: 24px;
   height: 24px;
   border: 2px solid rgba(0, 0, 0, 1);
-  background: rgba(39, 30, 58, 1);
+  background: #16171e;
 }
 
 .gwFormSFormbox02 .md-radio label,
@@ -5240,7 +5240,7 @@ select:focus {
 
 .gwFormBTN01 {
   display: block;
-  background-color: #515fa8;
+  background-color: #9d9d9d;
   -webkit-box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.2);
   box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.2);
   width: 100%;
@@ -5258,7 +5258,7 @@ select:focus {
 }
 
 .gwFormBTN01:hover {
-  background-color: #3c4991;
+  background-color: #797979;
 }
 
 .gwFormBTN01.greenBack {
@@ -5965,7 +5965,7 @@ select:focus {
 }
 
 .reserve-Block .form-Block .email-Box input {
-  background: #271e3a;
+  background: #16171e;
   height: 100px;
   color: #fff;
   font-size: 30px;
@@ -6037,7 +6037,7 @@ select:focus {
 .reserve-Block .form-Block .form-Wrap .form-Box input {
   height: 65px;
   width: 100%;
-  background: #271e3a;
+  background: #16171e;
   border: 2px solid #000;
   color: #fff;
   padding: 15px;
@@ -6290,7 +6290,7 @@ select:focus {
 .gwFormRMbox {
   width: 50%;
   padding-left: 30px;
-  border-left: 1px solid #271e3a;
+  border-left: 1px solid #16171e;
 }
 
 .SSMainInputBX {
@@ -6309,7 +6309,7 @@ select:focus {
   width: calc(100% - 108px);
   height: 63px;
   padding: 10px;
-  background-color: #271e3a;
+  background-color: #16171e;
   border-radius: 0;
 }
 
@@ -6422,7 +6422,7 @@ select:focus {
   width: calc(100% - 96px);
   display: flex;
   align-items: center;
-  background-color: #43375e;
+  background-color: #16171e;
   height: 63px;
   border: 2px solid #000;
   padding: 17px;
@@ -6453,7 +6453,7 @@ select:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #43375e;
+  color: #333;
   font-size: 30px;
 }
 
@@ -6515,7 +6515,7 @@ select:focus {
 }
 
 .setCodeTable table tr {
-  border-bottom: 1px solid #271e3a;
+  border-bottom: 1px solid #16171e;
 }
 
 .setCodeTable table tr th,
@@ -6682,7 +6682,7 @@ select:focus {
 .LiproDropdown {
   width: 100%;
   height: 62px;
-  background-color: #271e3a;
+  background-color: #16171e;
   border: 2px solid #000000;
   position: relative;
 }
@@ -6730,7 +6730,7 @@ select:focus {
 .LiproInput01 {
   width: 100%;
   height: 62px;
-  background-color: #271e3a;
+  background-color: #16171e;
   border: 2px solid #000000;
   display: flex;
   align-items: center;
@@ -6765,14 +6765,14 @@ select:focus {
 .spacerLine {
   width: 100%;
   height: 1px;
-  background-color: #271e3a;
+  background-color: #16171e;
   margin: 15px 0;
 }
 
 .spacerLine02 {
   width: 100%;
   height: 1px;
-  background-color: #271e3a;
+  background-color: #16171e;
   margin: 50px 0 60px 0;
 }
 
@@ -6888,7 +6888,7 @@ select:focus {
   width: 100%;
   max-width: 964px;
   margin: 0 auto;
-  background-color: #271e3a;
+  background-color: #16171e;
   height: 72px;
   border: 2px solid #000;
   margin-top: 56px;
@@ -7090,7 +7090,7 @@ select:focus {
 }
 
 .dragorInput .input-range__track {
-  background: #271e3a;
+  background: #16171e;
   cursor: pointer;
   display: block;
   height: 26px;
@@ -7107,7 +7107,7 @@ select:focus {
 }
 
 .dragorInput .input-range__track--active {
-  background: #44385d;
+  background: rgb(54 56 64 / 90%);
 }
 
 .dragorInput .input-range {
@@ -7232,7 +7232,7 @@ select:focus {
   width: 100%;
   max-width: 1060px;
   margin: 0 auto;
-  border: 1px solid #271e3a;
+  border: 1px solid #16171e;
   margin-bottom: 45px;
   padding: 40px 40px 40px 114px;
 }
@@ -7244,7 +7244,7 @@ select:focus {
 .spContrlInputBX input {
   width: 100%;
   height: 72px;
-  background-color: #271e3a;
+  background-color: #16171e;
   border: 2px solid #000;
   padding: 0 50px 0 10px;
   font-size: 30px;
@@ -7351,14 +7351,14 @@ select:focus {
 }
 
 .smrtvsatoTable01 table tr td {
-  border: 1px solid #0f0525;
-  background-color: #1a112e;
+  border: 1px solid #000;
+  background-color: #16171e;
   padding: 18px;
 }
 
 .smrtvsatoTable01 table tr th {
-  border: 1px solid #0f0525;
-  background-color: #1a112e;
+  border: 1px solid #000;
+  background-color: #16171e;
 }
 
 .smrtvsatoTable01 table tr th img {
@@ -7371,7 +7371,7 @@ select:focus {
 
 .smrtvsatoTable01 table tr td:nth-last-child(01),
 .smrtvsatoTable01 table tr th:nth-last-child(01) {
-  background-color: #432b75;
+  background-color: #343746;
   color: #fff;
 }
 
@@ -7380,11 +7380,11 @@ select:focus {
 }
 
 .smrtvsatoTable01 table tr:hover td {
-  background-color: #211837;
+  background-color: #050507;
 }
 
 .smrtvsatoTable01 table tr:hover td:nth-last-child(01) {
-  background-color: #4b2f87;
+  background-color: #616683;
 }
 
 .redTxt01 {
@@ -7410,14 +7410,14 @@ select:focus {
 
 .gwFormBRBox01 {
   padding: 30px 22px;
-  border: 2px solid #271e3a;
+  border: 2px solid #16171e;
   position: relative;
   margin: 10px 0 30px 0;
 }
 
 .gwFormBTN02 {
   display: block;
-  background-color: #515fa8;
+  background-color: #9d9d9d;
   -webkit-box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.2);
   box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.2);
   width: 100%;
@@ -7429,7 +7429,7 @@ select:focus {
 }
 
 .gwFormBTN02:hover {
-  background-color: #3c4991;
+  background-color: #797979;
 }
 
 .gwFormBTN02.greenC {
@@ -7480,7 +7480,7 @@ select:focus {
 }
 
 .LicInputBX01 input {
-  background-color: #271e3a;
+  background-color: #16171e;
   border: 0px;
   border-radius: 0px;
   height: 63px;
@@ -8074,13 +8074,14 @@ p.withdrawOnContractAlert {
 }
 
 .withdrawSlider .dragorInput .input-range__track {
-  background: rgb(33 33 33);
+  background: #212121;
 }
 
 .withdrawSlider .input-range__track.input-range__track--active {
   width: 45% !important;
   border-right: 3px solid black;
-  background: #43385d;
+  /* background: #43385d; */
+  background: rgb(54 56 64 / 90%);
 }
 
 /* tab css */
