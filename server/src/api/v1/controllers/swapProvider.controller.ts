@@ -574,7 +574,7 @@ const swapProviderController = {
 
     getActiveContracts: async(req: Request, res: Response) => {
         const {
-            spAccount, networkId
+            spAccount, tokenA, tokenB, cexType
         } = req.body;
 
         try{
@@ -584,7 +584,9 @@ const swapProviderController = {
                     $exists: true,
                     $ne: null
                 },
-                'networkId': Number(networkId)
+                'cexData.type': (cexType).toUpperCase(),
+                'tokenA.address': tokenA,
+                'tokenB.address': tokenB                
             }).lean().exec();
 
             
@@ -763,39 +765,43 @@ const swapProviderController = {
                     print.info({
                         receipt: receipt
                     });
-                    if(receipt.status === true){
-                        print.info(`SP ${sp._id} contract deployed successfully.`);
-                        let args = {
-                            networkId: Number(sp.networkId),
-                            blockNumber: receipt.blockNumber,
-                            txhash: sp.txid,
-                            tokenA: sp.tokenA.address,
-                            tokenB: sp.tokenB.address
-                        }
-                        print.info(args);
+                    if(receipt !== null){
+                        if(receipt.status === true){
+                            print.info(`SP ${sp._id} contract deployed successfully.`);
+                            let args = {
+                                networkId: Number(sp.networkId),
+                                blockNumber: receipt.blockNumber,
+                                txhash: sp.txid,
+                                tokenA: sp.tokenA.address,
+                                tokenB: sp.tokenB.address
+                            }
+                            print.info(args);
+                
+                            let event = await swapProviderController.fetchEvent(args);
+                            print.info(`updaing event for sp ${sp._id}:`, event);
+                
+                            let usp = await SwapProvider.updateOne({
+                                _id: sp._id
+                            }, {
+                                fromBlock: receipt.blockNumber,
+                                smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
+                            });
             
-                        let event = await swapProviderController.fetchEvent(args);
-                        print.info(`updaing event for sp ${sp._id}:`, event);
-            
-                        let usp = await SwapProvider.updateOne({
-                            _id: sp._id
-                        }, {
-                            fromBlock: receipt.blockNumber,
-                            smartContractAddress: (event['returnValues']['spContract']).toLowerCase()
-                        });
-        
-                        if(usp.ok == 1){
-                            print.info(`SP ${sp._id} contract address fetched and updated into record successfully.`);
+                            if(usp.ok == 1){
+                                print.info(`SP ${sp._id} contract address fetched and updated into record successfully.`);
+                            }
+                        } else {
+                            print.info(`❌ SP ${sp._id} contract deployment failed.`);
+                            // reset txid to make this sp deployment blank
+                            await SwapProvider.updateOne({
+                                _id: sp._id
+                            }, {
+                                txid: null,
+                                message: `Contract deployment failed - tx(${sp.txid})`
+                            });
                         }
                     } else {
-                        print.info(`❌ SP ${sp._id} contract deployment failed.`);
-                        // reset txid to make this sp deployment blank
-                        await SwapProvider.updateOne({
-                            _id: sp._id
-                        }, {
-                            txid: null,
-                            message: `Contract deployment failed - tx(${sp.txid})`
-                        });
+                        print.info(`❌ SP ${sp._id} contract deployment pending (tx hash: ${sp.txid}) on blockchain.`);
                     }
     
                 }).catch(async(error) => {
