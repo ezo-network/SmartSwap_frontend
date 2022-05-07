@@ -25,7 +25,7 @@ export default class SidePopup extends PureComponent {
     render() {
 
         return (
-            <div className={`side-Popup ${this.props.sideBar && 'active'}` }>
+            <div className={`side-Popup  ${this.props.sideBar && 'active'}` }>
                 <div className="popup-Box">
 
                     <div className="sidePopup-tablink">

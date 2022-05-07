@@ -28,7 +28,10 @@ const swapProviderController = {
                 txid, smartContractAddress, swapSpeedMode, withdrawPercent, cexType
             } = req.body;
 
-            const validCexTypes = ["BINANCE", "MEXC"];
+            const validCexTypes = [
+                "BINANCE", 
+                // "MEXC" deactivated
+            ];
 
             // validations
             if(tokenA == tokenB){
@@ -110,7 +113,7 @@ const swapProviderController = {
             if(!validCexTypes.includes((cexType).toUpperCase())){
                 return res.status(422).json({ 
                     errorMessage: {
-                        error: "Provided cex type is not a active CEX yet." 
+                        error: "Provided cex type is not an active CEX yet." 
                     }
                 });                                
             }

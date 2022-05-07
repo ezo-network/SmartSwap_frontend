@@ -88,7 +88,7 @@ export default class HowItWorks extends PureComponent {
                                                <span>(Uniswap, Pancake, etc)</span></th>
                                             <th align="center" valign="middle" scope="col">Binance Bridge</th>
                                             <th align="center" valign="middle" scope="col">
-                                            <img src="images/logo.png" alt=""/>
+                                            <img src="images/menu-rb-logo.png" alt=""/>
                                             </th>
                                         </tr>
                                         <tr>
