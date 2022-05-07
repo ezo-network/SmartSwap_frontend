@@ -106,10 +106,13 @@ data.cexTypes = {
         symbol: "BINANCE",
         icon: "images/cex/binance.png"
     },
-    "MEXC": {
-        symbol: "MEXC",
-        icon: "images/cex/mexc.png"
-    }
+    /**
+     * Deactivated mexc cex - because cex not properly functional
+     */
+    // "MEXC": {
+    //     symbol: "MEXC",
+    //     icon: "images/cex/mexc.png"
+    // }
 }
 
 data.tokenDetails = {
