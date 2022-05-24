@@ -191,7 +191,9 @@ export default class Home extends PureComponent {
         [process.env.REACT_APP_ETH_CHAIN_ID]: null,
         [process.env.REACT_APP_BSC_CHAIN_ID]: null,
         [process.env.REACT_APP_POLYGON_CHAIN_ID]: null,
-      }
+      },
+      allowCurrentTxExpedite: 0,
+      currentTxExpediteData: {}
     };
   }
 
@@ -627,7 +629,7 @@ export default class Home extends PureComponent {
         // this.init()
         setTimeout(async () => {
           await this.fetchTransactionStatus(receipt.transactionHash);
-        }, 120000);
+        }, 2000);
 
         this.setState({
           swapLoading: false,
@@ -688,12 +690,21 @@ export default class Home extends PureComponent {
 
               console.log("oracle tx end");
             }
+          } else {
+            let curTxExData = {};
+            curTxExData["txHash"] = result.data.txHash;
+            curTxExData["processAmount"] = result.data.processAmount;
+            curTxExData["chainId"] = result.data.chainId;
+            this.setState({
+              allowCurrentTxExpedite: 1,
+              currentTxExpediteData: curTxExData,
+            })
           }
         })
         .catch((err) => {
           console.log("error", err);
         });
-    }, 60000);
+    }, 5000);
 
     // setInterval(async () => {
     //     await axios
@@ -2144,6 +2155,9 @@ export default class Home extends PureComponent {
         });
       },
       (receipt) => {
+        this.setState({
+          allowCurrentTxExpedite: 2
+        })
         // this.init()
         // setTimeout(async () => {
         //   await this.fetchTransactionStatus(receipt.transactionHash);
@@ -2353,7 +2367,7 @@ export default class Home extends PureComponent {
                                       </div>
                                       <div className="flex-1 w-100-sm flex-auto-sm">
                                         <div className="inputs-wrap light-controls-n">
-                                          
+
                                           <div className="inputs-wrap-control">
                                             <div className="input-box1">
                                               <label for="" className="form-label">from</label>
@@ -2561,7 +2575,7 @@ export default class Home extends PureComponent {
                                                   indicatorSeparator: (styles) => ({ display: 'none' })
                                                 }}
                                               />
-                                              
+
                                             </div>
                                             <div className="input-box2 ver2">
                                               <label for="" className="form-label">TOKEN</label>
@@ -2683,12 +2697,12 @@ export default class Home extends PureComponent {
                                           <p className="font-11 color-light-n">You are swapping ${this.state.sendFundAmount} of {this.state.selectedSendCurrency} to ${this.state.sendFundAmount} of {this.state.selectedReceiveCurrency}
                                             <> |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></></p>
                                           : null}
-                                          {/* New Updated Design */}
+                                        {/* New Updated Design */}
                                         {/* <p className="font-11 color-light-n">You are swapping <span className="color-white">$100</span> of BNB to <span className="color-white">$100</span> of ETH  |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></p> */}
                                         {/* <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p> */}
                                         {/* <p className="font-11 color-light-n">26.31% still pending <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i> | &nbsp;&nbsp;<a href="#" className="color-light-n">Start new swap</a></p> */}
                                       </div>
-                                      
+
                                     </div>
                                   </div>
                                 </div>
@@ -3150,6 +3164,15 @@ export default class Home extends PureComponent {
                                         >
                                           Waiting to be match with counter-party
                                         </a>
+                                        {this.state.allowCurrentTxExpedite === 1 ? (
+                                          <a
+                                            href="javascript:void(0);"
+                                            className="ani-1"
+                                            style={{ color: "white" }}
+                                            onClick={() => this.expedite(this.state.currentTxExpediteData.txHash, this.state.currentTxExpediteData.processAmount, this.state.currentTxExpediteData.chainId)}
+                                          >
+                                            Expedite
+                                          </a>) : null}
                                       </p>
                                     </div>
                                   )}
