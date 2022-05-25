@@ -629,7 +629,7 @@ export default class Home extends PureComponent {
         // this.init()
         setTimeout(async () => {
           await this.fetchTransactionStatus(receipt.transactionHash);
-        }, 2000);
+        }, 5000);
 
         this.setState({
           swapLoading: false,
@@ -670,15 +670,16 @@ export default class Home extends PureComponent {
               console.log(result.data.relationship.claim.approveHash);
               if (result.data.relationship.claim.approveHash !== undefined || result.data.relationship.claim.approveHash !== null) {
                 let txLinkReturn =
-                  constantConfig[(result.data.chainId === 1 || result.data.chainId === 42) ? process.env.REACT_APP_BSC_CHAIN_ID : process.env.REACT_APP_ETH_CHAIN_ID].explorer +
+                  constantConfig[Number(result.data.crossChainId)].explorer +
                   "/tx/" +
                   result.data.relationship.claim.approveHash;
 
-                result.data["recivedAmount"] = "0";
-                result.data.counterParties.map(async (elementCounterParties, key) => {
-                  let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
-                  result.data["recivedAmount"] = Number(result.data["recivedAmount"]) + Number(rcAmount);
-                })
+
+                result.data["recivedAmount"] = web3Js.utils.fromWei(result.data.estimatedForeignAmount);
+                // result.data.counterParties.map(async (elementCounterParties, key) => {
+                //   let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
+                //   result.data["recivedAmount"] = Number(result.data["recivedAmount"]) + Number(rcAmount);
+                // })
 
                 this.updateLedgerAfterResponse(
                   result.data.relationship.claim.approveHash,
@@ -691,14 +692,17 @@ export default class Home extends PureComponent {
               console.log("oracle tx end");
             }
           } else {
-            let curTxExData = {};
-            curTxExData["txHash"] = result.data.txHash;
-            curTxExData["processAmount"] = result.data.processAmount;
-            curTxExData["chainId"] = result.data.chainId;
-            this.setState({
-              allowCurrentTxExpedite: 1,
-              currentTxExpediteData: curTxExData,
-            })
+            if (result.data.canExpedite) {
+              let curTxExData = {};
+              let { allowCurrentTxExpedite } = this.state;
+              curTxExData["txHash"] = result.data.txHash;
+              curTxExData["processAmount"] = result.data.processAmount;
+              curTxExData["chainId"] = result.data.chainId;
+              this.setState({
+                allowCurrentTxExpedite: (allowCurrentTxExpedite === 0) ? 1 : 2,
+                currentTxExpediteData: curTxExData,
+              })
+            }
           }
         })
         .catch((err) => {
@@ -3172,7 +3176,9 @@ export default class Home extends PureComponent {
                                             onClick={() => this.expedite(this.state.currentTxExpediteData.txHash, this.state.currentTxExpediteData.processAmount, this.state.currentTxExpediteData.chainId)}
                                           >
                                             Expedite
-                                          </a>) : null}
+                                          </a>) : this.state.allowCurrentTxExpedite === 2 ? (
+                                            "Expedited"
+                                          ) : null}
                                       </p>
                                     </div>
                                   )}
