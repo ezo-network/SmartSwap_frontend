@@ -3017,7 +3017,7 @@ export default class Home extends PureComponent {
                                 <div className="icon-Box">
                                   <i className="fas fa-check"></i>
                                 </div>
-                                100% of the swap completed successfully
+                                Swap sent successfully
                                 <a
                                   href="javascript:void(0);"
                                   onClick={() => {
