@@ -3182,8 +3182,8 @@ export default class Home extends PureComponent {
                                             "Expedited"
                                           ) :
                                           <AnimatedNumbers
-                                            value={10000000000}
-                                            duration={10000000000000}
+                                            value={1000}
+                                            duration={1000000}
                                             formatValue={(n) => n.toFixed(0)}
                                           />
                                         }
