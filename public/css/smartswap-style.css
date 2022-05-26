@@ -2720,14 +2720,14 @@ input {
 
 .transaction-histroryBox p a {
   font-size: 12px;
-  color: #ff3737;
+  color: #91dc27;
   text-align: right;
   margin-top: 5px;
   font-weight: 400;
 }
 
 .bb-traHSection .transaction-histroryBox p a:hover {
-  color: #f34d50;
+  color: #91dc27;
 }
 
 .bb-traHSection .arrow-Box {
@@ -5481,14 +5481,14 @@ select:focus {
 
 .transaction-histroryBox p a {
   font-size: 12px;
-  color: #ff3737;
+  color: #91dc27;
   text-align: right;
   margin-top: 5px;
   font-weight: 400;
 }
 
 .bb-traHSection .transaction-histroryBox p a:hover {
-  color: #f34d50;
+  color: #91dc27;
 }
 
 .bb-traHSection .arrow-Box {

@@ -30,6 +30,8 @@ import LedgerHistory from "../components/LedgerHistory";
 import NoDomain from "../components/NoDomain";
 import Carousel from "react-multi-carousel";
 import AnimatedNumber from "react-animated-numbers";
+import AnimatedNumbers from "react-animated-number";
+
 import "react-multi-carousel/lib/styles.css";
 import { isValidAddress } from 'ethereumjs-util';
 import reimbursementAbi from "../abis/reimbursementAbi.json";
@@ -3164,9 +3166,9 @@ export default class Home extends PureComponent {
                                                             </span> */}
                                         <a
                                           href="javascript:void(0);"
-                                          className="ani-1"
+                                          className="ani-1 green"
                                         >
-                                          Waiting to be match with counter-party
+                                          Swap in progress...
                                         </a>
                                         {this.state.allowCurrentTxExpedite === 1 ? (
                                           <a
@@ -3178,7 +3180,13 @@ export default class Home extends PureComponent {
                                             Expedite
                                           </a>) : this.state.allowCurrentTxExpedite === 2 ? (
                                             "Expedited"
-                                          ) : null}
+                                          ) :
+                                          <AnimatedNumbers
+                                            value={10000000000}
+                                            duration={10000000000000}
+                                            formatValue={(n) => n.toFixed(0)}
+                                          />
+                                        }
                                       </p>
                                     </div>
                                   )}
