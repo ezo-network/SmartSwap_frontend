@@ -305,6 +305,7 @@ export default class Home extends PureComponent {
     }
 
     // this.fetchTransactionStatus()
+    await this.fetchTransactionStatus("0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339");
   };
 
   async updateTotalAmounts() {
@@ -646,7 +647,9 @@ export default class Home extends PureComponent {
   async fetchTransactionStatus(hash) {
     // let url = CONSTANT.API_URL + "/ledgers/" + "0xcaba174a8ec3edd18e14d7dfc79e68fd0ae4193f";
 
-    let url = process.env.REACT_APP_LEDGER_HOST + "ledgers/tx/" + hash;
+    // let url = process.env.REACT_APP_LEDGER_HOST + "ledgers/tx/" + hash;
+
+    let url = "http://18.224.106.204:8080/ledger/tx/0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339"
 
     console.log(url);
 
@@ -660,12 +663,7 @@ export default class Home extends PureComponent {
           console.log(result);
           if (result.data.status === "FULFILLED" && result.data.relationship.claim.approveHash !== null) {
             console.log(result.data);
-            // if (result.data.length > 0) {
-            //     result.data.map((ele) => {
-            //         console.log(ele.sentTx)
 
-            //     })
-            // }
             if (result.data.txHash === this.state.txIdSent) {
               console.log("in end");
               console.log("oracle tx start");
@@ -701,7 +699,7 @@ export default class Home extends PureComponent {
               curTxExData["processAmount"] = result.data.processAmount;
               curTxExData["chainId"] = result.data.chainId;
               this.setState({
-                allowCurrentTxExpedite: (allowCurrentTxExpedite === 0) ? 1 : 2,
+                allowCurrentTxExpedite: (allowCurrentTxExpedite === 0) ? 1 : allowCurrentTxExpedite,
                 currentTxExpediteData: curTxExData,
               })
             }
@@ -2155,6 +2153,7 @@ export default class Home extends PureComponent {
     await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
       (hash) => {
         this.setState({
+          allowCurrentTxExpedite: 2
           // swapLoading: true,
           // txIdSent: hash,
           // txLinkSend: data[networkId].explorer + "/tx/" + hash,
@@ -2162,7 +2161,7 @@ export default class Home extends PureComponent {
       },
       (receipt) => {
         this.setState({
-          allowCurrentTxExpedite: 2
+          allowCurrentTxExpedite: 3
         })
         // this.init()
         // setTimeout(async () => {
@@ -3179,6 +3178,8 @@ export default class Home extends PureComponent {
                                           >
                                             Expedite
                                           </a>) : this.state.allowCurrentTxExpedite === 2 ? (
+                                            "Expediting...."
+                                          ) : this.state.allowCurrentTxExpedite === 3 ? (
                                             "Expedited"
                                           ) :
                                           <AnimatedNumbers
