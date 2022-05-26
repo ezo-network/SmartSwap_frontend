@@ -305,7 +305,7 @@ export default class Home extends PureComponent {
     }
 
     // this.fetchTransactionStatus()
-    await this.fetchTransactionStatus("0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339");
+    // await this.fetchTransactionStatus("0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339");
   };
 
   async updateTotalAmounts() {
@@ -647,9 +647,9 @@ export default class Home extends PureComponent {
   async fetchTransactionStatus(hash) {
     // let url = CONSTANT.API_URL + "/ledgers/" + "0xcaba174a8ec3edd18e14d7dfc79e68fd0ae4193f";
 
-    // let url = process.env.REACT_APP_LEDGER_HOST + "ledgers/tx/" + hash;
+    let url = process.env.REACT_APP_LEDGER_HOST + "ledgers/tx/" + hash;
 
-    let url = "http://18.224.106.204:8080/ledger/tx/0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339"
+    // let url = "http://18.224.106.204:8080/ledger/tx/0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339"
 
     console.log(url);
 
