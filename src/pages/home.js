@@ -2155,7 +2155,7 @@ export default class Home extends PureComponent {
 
     // await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
 
-    let url = process.env.REACT_APP_API_HOST + "processing-fee/" + "42" + "-" + "97";
+    let url = process.env.REACT_APP_API_HOST + "processing-fee/" + sentChainId + "-" + crossChainId;
 
     let json;
     await axios
