@@ -64,7 +64,7 @@ export default function LedgerHistory(props) {
                                 href="javascript:void(0);"
                                 className="ani-1"
                                 style={{ color: "white" }}
-                                onClick={() => props.expedite(props.sentTx, props.sentAmount, props.chainId)}
+                                onClick={() => props.expedite(props.sentTx, props.sentAmount, props.chainId, props.crossChainId)}
                             >
                                 Expedite
                             </a>

@@ -53,6 +53,7 @@ import Select from 'react-select';
 import Switch from "react-switch";
 import Collapse from "@kunukn/react-collapse";
 import Dropdown from "../components/DropDown";
+import Counter from "../components/Counter";
 
 const responsive = {
   desktop: {
@@ -698,6 +699,7 @@ export default class Home extends PureComponent {
               curTxExData["txHash"] = result.data.txHash;
               curTxExData["processAmount"] = result.data.processAmount;
               curTxExData["chainId"] = result.data.chainId;
+              curTxExData["crossChainId"] = result.data.crossChainId;
               this.setState({
                 allowCurrentTxExpedite: (allowCurrentTxExpedite === 0) ? 1 : allowCurrentTxExpedite,
                 currentTxExpediteData: curTxExData,
@@ -2135,7 +2137,7 @@ export default class Home extends PureComponent {
     );
   };
 
-  async expedite(txId, processAmount, sentChainId) {
+  async expedite(txId, processAmount, sentChainId, crossChainId) {
     let web3 = web3Config.getWeb3();
     let networkId = web3Config.getNetworkId();
     console.log(networkId)
@@ -2149,8 +2151,26 @@ export default class Home extends PureComponent {
 
     let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), networkId);
 
-    let allFees = await this.calculateSwapFees(processAmount);
-    await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
+    // let allFees = await this.calculateSwapFees(processAmount);
+
+    // await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
+
+    let url = process.env.REACT_APP_API_HOST + "processing-fee/" + "42" + "-" + "97";
+
+    let json;
+    await axios
+      .get(url)
+      .then((res) => {
+        console.log(res)
+        json = res.data;
+      })
+      .catch((err) => {
+        console.log('error', err);
+      });
+
+    console.log(json.result * 1.1)
+
+    await swapFactory.expedite(txId, ((json.result * 1.1) * 10 ** 18).toFixed(),
       (hash) => {
         this.setState({
           allowCurrentTxExpedite: 2
@@ -2190,6 +2210,8 @@ export default class Home extends PureComponent {
       { label: 'BNB', value: 'BNB' },
       { label: 'MATIC', value: 'MATIC' },
     ];
+
+    let counter = 0;
 
     return (
       <>
@@ -3174,7 +3196,7 @@ export default class Home extends PureComponent {
                                             href="javascript:void(0);"
                                             className="ani-1"
                                             style={{ color: "white" }}
-                                            onClick={() => this.expedite(this.state.currentTxExpediteData.txHash, this.state.currentTxExpediteData.processAmount, this.state.currentTxExpediteData.chainId)}
+                                            onClick={() => this.expedite(this.state.currentTxExpediteData.txHash, this.state.currentTxExpediteData.processAmount, this.state.currentTxExpediteData.chainId, this.state.currentTxExpediteData.crossChainId)}
                                           >
                                             Expedite
                                           </a>) : this.state.allowCurrentTxExpedite === 2 ? (
@@ -3182,11 +3204,7 @@ export default class Home extends PureComponent {
                                           ) : this.state.allowCurrentTxExpedite === 3 ? (
                                             "Expedited"
                                           ) :
-                                          <AnimatedNumbers
-                                            value={1000}
-                                            duration={1000000}
-                                            formatValue={(n) => n.toFixed(0)}
-                                          />
+                                          <Counter />
                                         }
                                       </p>
                                     </div>
