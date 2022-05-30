@@ -58,7 +58,7 @@ export default function LedgerHistory(props) {
                                 href="javascript:void(0);"
                                 className="ani-1"
                             >
-                                Pending due to network gas limit
+                                Waiting to be match with counter-party
                             </a>
                             <a
                                 href="javascript:void(0);"
