@@ -60,14 +60,16 @@ export default function LedgerHistory(props) {
                             >
                                 Waiting to be match with counter-party
                             </a>
-                            <a
-                                href="javascript:void(0);"
-                                className="ani-1"
-                                style={{ color: "white" }}
-                                onClick={() => props.expedite(props.sentTx, props.sentAmount, props.chainId, props.crossChainId)}
-                            >
-                                Expedite
-                            </a>
+                            {props.canExpedite ?
+                                <a
+                                    href="javascript:void(0);"
+                                    className="ani-1"
+                                    style={{ color: "white" }}
+                                    onClick={() => props.expedite(props.sentTx, props.sentAmount, props.chainId, props.crossChainId)}
+                                >
+                                    Expedite
+                                </a>
+                                : null}
                         </p>
                     </div>
                 )}

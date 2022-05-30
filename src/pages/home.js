@@ -2077,6 +2077,7 @@ export default class Home extends PureComponent {
               filledAprice={element.filledAprice}
               chainId={element.chainId}
               expedite={this.expedite}
+              canExpedite={element.canExpedite}
             />
           );
         }
