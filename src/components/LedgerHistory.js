@@ -58,16 +58,18 @@ export default function LedgerHistory(props) {
                                 href="javascript:void(0);"
                                 className="ani-1"
                             >
-                                Pending due to network gas limit
+                                Waiting to be match with counter-party
                             </a>
-                            <a
-                                href="javascript:void(0);"
-                                className="ani-1"
-                                style={{ color: "white" }}
-                                onClick={() => props.expedite(props.sentTx, props.sentAmount, props.chainId)}
-                            >
-                                Expedite
-                            </a>
+                            {props.canExpedite ?
+                                <a
+                                    href="javascript:void(0);"
+                                    className="ani-1"
+                                    style={{ color: "white" }}
+                                    onClick={() => props.expedite(props.sentTx, props.sentAmount, props.chainId, props.crossChainId)}
+                                >
+                                    Expedite
+                                </a>
+                                : null}
                         </p>
                     </div>
                 )}

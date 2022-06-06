@@ -20,6 +20,7 @@
     "izitoast-react": "^1.0.16",
     "odometer": "^0.4.8",
     "react": "^17.0.1",
+    "react-animated-number": "^0.4.4",
     "react-animated-numbers": "^0.6.1",
     "react-color": "^2.19.3",
     "react-custom-scrollbars": "^4.2.1",

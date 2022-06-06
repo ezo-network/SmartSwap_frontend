@@ -30,6 +30,8 @@ import LedgerHistory from "../components/LedgerHistory";
 import NoDomain from "../components/NoDomain";
 import Carousel from "react-multi-carousel";
 import AnimatedNumber from "react-animated-numbers";
+import AnimatedNumbers from "react-animated-number";
+
 import "react-multi-carousel/lib/styles.css";
 import { isValidAddress } from 'ethereumjs-util';
 import reimbursementAbi from "../abis/reimbursementAbi.json";
@@ -51,6 +53,7 @@ import Select from 'react-select';
 import Switch from "react-switch";
 import Collapse from "@kunukn/react-collapse";
 import Dropdown from "../components/DropDown";
+import Counter from "../components/Counter";
 
 const responsive = {
   desktop: {
@@ -191,7 +194,9 @@ export default class Home extends PureComponent {
         [process.env.REACT_APP_ETH_CHAIN_ID]: null,
         [process.env.REACT_APP_BSC_CHAIN_ID]: null,
         [process.env.REACT_APP_POLYGON_CHAIN_ID]: null,
-      }
+      },
+      allowCurrentTxExpedite: 0,
+      currentTxExpediteData: {}
     };
   }
 
@@ -301,6 +306,7 @@ export default class Home extends PureComponent {
     }
 
     // this.fetchTransactionStatus()
+    // await this.fetchTransactionStatus("0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339");
   };
 
   async updateTotalAmounts() {
@@ -627,7 +633,7 @@ export default class Home extends PureComponent {
         // this.init()
         setTimeout(async () => {
           await this.fetchTransactionStatus(receipt.transactionHash);
-        }, 120000);
+        }, 5000);
 
         this.setState({
           swapLoading: false,
@@ -644,6 +650,8 @@ export default class Home extends PureComponent {
 
     let url = process.env.REACT_APP_LEDGER_HOST + "ledgers/tx/" + hash;
 
+    // let url = "http://18.224.106.204:8080/ledger/tx/0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339"
+
     console.log(url);
 
     var txCheckInterval = setInterval(async () => {
@@ -656,27 +664,23 @@ export default class Home extends PureComponent {
           console.log(result);
           if (result.data.status === "FULFILLED" && result.data.relationship.claim.approveHash !== null) {
             console.log(result.data);
-            // if (result.data.length > 0) {
-            //     result.data.map((ele) => {
-            //         console.log(ele.sentTx)
 
-            //     })
-            // }
             if (result.data.txHash === this.state.txIdSent) {
               console.log("in end");
               console.log("oracle tx start");
               console.log(result.data.relationship.claim.approveHash);
               if (result.data.relationship.claim.approveHash !== undefined || result.data.relationship.claim.approveHash !== null) {
                 let txLinkReturn =
-                  constantConfig[(result.data.chainId === 1 || result.data.chainId === 42) ? process.env.REACT_APP_BSC_CHAIN_ID : process.env.REACT_APP_ETH_CHAIN_ID].explorer +
+                  constantConfig[Number(result.data.crossChainId)].explorer +
                   "/tx/" +
                   result.data.relationship.claim.approveHash;
 
-                result.data["recivedAmount"] = "0";
-                result.data.counterParties.map(async (elementCounterParties, key) => {
-                  let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
-                  result.data["recivedAmount"] = Number(result.data["recivedAmount"]) + Number(rcAmount);
-                })
+
+                result.data["recivedAmount"] = web3Js.utils.fromWei(result.data.estimatedForeignAmount);
+                // result.data.counterParties.map(async (elementCounterParties, key) => {
+                //   let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
+                //   result.data["recivedAmount"] = Number(result.data["recivedAmount"]) + Number(rcAmount);
+                // })
 
                 this.updateLedgerAfterResponse(
                   result.data.relationship.claim.approveHash,
@@ -688,12 +692,25 @@ export default class Home extends PureComponent {
 
               console.log("oracle tx end");
             }
+          } else {
+            if (result.data.canExpedite) {
+              let curTxExData = {};
+              let { allowCurrentTxExpedite } = this.state;
+              curTxExData["txHash"] = result.data.txHash;
+              curTxExData["processAmount"] = result.data.processAmount;
+              curTxExData["chainId"] = result.data.chainId;
+              curTxExData["crossChainId"] = result.data.crossChainId;
+              this.setState({
+                allowCurrentTxExpedite: (allowCurrentTxExpedite === 0) ? 1 : allowCurrentTxExpedite,
+                currentTxExpediteData: curTxExData,
+              })
+            }
           }
         })
         .catch((err) => {
           console.log("error", err);
         });
-    }, 60000);
+    }, 5000);
 
     // setInterval(async () => {
     //     await axios
@@ -2060,6 +2077,7 @@ export default class Home extends PureComponent {
               filledAprice={element.filledAprice}
               chainId={element.chainId}
               expedite={this.expedite}
+              canExpedite={element.canExpedite}
             />
           );
         }
@@ -2120,7 +2138,7 @@ export default class Home extends PureComponent {
     );
   };
 
-  async expedite(txId, processAmount, sentChainId) {
+  async expedite(txId, processAmount, sentChainId, crossChainId) {
     let web3 = web3Config.getWeb3();
     let networkId = web3Config.getNetworkId();
     console.log(networkId)
@@ -2134,16 +2152,38 @@ export default class Home extends PureComponent {
 
     let swapFactory = new SwapFactoryContract(web3Config.getWeb3(), networkId);
 
-    let allFees = await this.calculateSwapFees(processAmount);
-    await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
+    // let allFees = await this.calculateSwapFees(processAmount);
+
+    // await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
+
+    let url = process.env.REACT_APP_API_HOST + "processing-fee/" + sentChainId + "-" + crossChainId;
+
+    let json;
+    await axios
+      .get(url)
+      .then((res) => {
+        console.log(res)
+        json = res.data;
+      })
+      .catch((err) => {
+        console.log('error', err);
+      });
+
+    console.log(json.result * 1.1)
+
+    await swapFactory.expedite(txId, ((json.result * 1.1) * 10 ** 18).toFixed(),
       (hash) => {
         this.setState({
+          allowCurrentTxExpedite: 2
           // swapLoading: true,
           // txIdSent: hash,
           // txLinkSend: data[networkId].explorer + "/tx/" + hash,
         });
       },
       (receipt) => {
+        this.setState({
+          allowCurrentTxExpedite: 3
+        })
         // this.init()
         // setTimeout(async () => {
         //   await this.fetchTransactionStatus(receipt.transactionHash);
@@ -2171,6 +2211,8 @@ export default class Home extends PureComponent {
       { label: 'BNB', value: 'BNB' },
       { label: 'MATIC', value: 'MATIC' },
     ];
+
+    let counter = 0;
 
     return (
       <>
@@ -2353,7 +2395,7 @@ export default class Home extends PureComponent {
                                       </div>
                                       <div className="flex-1 w-100-sm flex-auto-sm">
                                         <div className="inputs-wrap light-controls-n">
-                                          
+
                                           <div className="inputs-wrap-control">
                                             <div className="input-box1">
                                               <label for="" className="form-label">from</label>
@@ -2561,7 +2603,7 @@ export default class Home extends PureComponent {
                                                   indicatorSeparator: (styles) => ({ display: 'none' })
                                                 }}
                                               />
-                                              
+
                                             </div>
                                             <div className="input-box2 ver2">
                                               <label for="" className="form-label">TOKEN</label>
@@ -2683,12 +2725,12 @@ export default class Home extends PureComponent {
                                           <p className="font-11 color-light-n">You are swapping ${this.state.sendFundAmount} of {this.state.selectedSendCurrency} to ${this.state.sendFundAmount} of {this.state.selectedReceiveCurrency}
                                             <> |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></></p>
                                           : null}
-                                          {/* New Updated Design */}
+                                        {/* New Updated Design */}
                                         {/* <p className="font-11 color-light-n">You are swapping <span className="color-white">$100</span> of BNB to <span className="color-white">$100</span> of ETH  |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></p> */}
                                         {/* <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p> */}
                                         {/* <p className="font-11 color-light-n">26.31% still pending <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i> | &nbsp;&nbsp;<a href="#" className="color-light-n">Start new swap</a></p> */}
                                       </div>
-                                      
+
                                     </div>
                                   </div>
                                 </div>
@@ -2999,7 +3041,7 @@ export default class Home extends PureComponent {
                                 <div className="icon-Box">
                                   <i className="fas fa-check"></i>
                                 </div>
-                                100% of the swap completed successfully
+                                Swap sent successfully
                                 <a
                                   href="javascript:void(0);"
                                   onClick={() => {
@@ -3146,10 +3188,25 @@ export default class Home extends PureComponent {
                                                             </span> */}
                                         <a
                                           href="javascript:void(0);"
-                                          className="ani-1"
+                                          className="ani-1 green"
                                         >
-                                          Waiting to be match with counter-party
+                                          Swap in progress...
                                         </a>
+                                        {this.state.allowCurrentTxExpedite === 1 ? (
+                                          <a
+                                            href="javascript:void(0);"
+                                            className="ani-1"
+                                            style={{ color: "white" }}
+                                            onClick={() => this.expedite(this.state.currentTxExpediteData.txHash, this.state.currentTxExpediteData.processAmount, this.state.currentTxExpediteData.chainId, this.state.currentTxExpediteData.crossChainId)}
+                                          >
+                                            Expedite
+                                          </a>) : this.state.allowCurrentTxExpedite === 2 ? (
+                                            "Expediting...."
+                                          ) : this.state.allowCurrentTxExpedite === 3 ? (
+                                            "Expedited"
+                                          ) :
+                                          <Counter />
+                                        }
                                       </p>
                                     </div>
                                   )}
