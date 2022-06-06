@@ -2056,6 +2056,7 @@ export default class Home extends PureComponent {
               filledAprice={element.filledAprice}
               chainId={element.chainId}
               expedite={this.expedite}
+              crossChainId={element.crossChainId}
             />
           );
         } else {
@@ -2078,6 +2079,7 @@ export default class Home extends PureComponent {
               chainId={element.chainId}
               expedite={this.expedite}
               canExpedite={element.canExpedite}
+              crossChainId={element.crossChainId}
             />
           );
         }
@@ -2156,7 +2158,7 @@ export default class Home extends PureComponent {
 
     // await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
 
-    let url = process.env.REACT_APP_API_HOST + "processing-fee/" + sentChainId + "-" + crossChainId;
+    let url = process.env.REACT_APP_LEDGER_HOST + "processing-fee/" + sentChainId + "-" + crossChainId;
 
     let json;
     await axios
