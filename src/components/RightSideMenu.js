@@ -81,14 +81,14 @@ export default class RightSideMenu extends PureComponent {
               </div>
               <div className="msb-Linkbox01">
                 <Link to="/ownLicence">Launch Branded SmartSwap</Link>
-                <a
+                {/* <a
                   href="#"
                   onClick={() => {
                     this.props.openPopup("LiquidityProvider");
                   }}
                 >
                   Become an Swap Provider (SP){" "}
-                </a>
+                </a> */}
                 <a href="#">Buy SMART</a>
               </div>
               <div className="msb-Linkbox02">
