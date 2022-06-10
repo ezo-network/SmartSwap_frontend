@@ -36,7 +36,7 @@ CONSTANT.WEB_RPC_PROVIDER_ETHEREUM = Number(process.env.REACT_APP_ETH_CHAIN_ID) 
 
 CONSTANT.WEB_RPC_PROVIDER_BINANCE = Number(process.env.REACT_APP_ETH_CHAIN_ID) === 1 ? 'https://bsc-dataseed.binance.org' : 'https://data-seed-prebsc-1-s1.binance.org:8545';
 
-CONSTANT.RPC_PROVIDER_POLYGON = Number(process.env.REACT_APP_POLYGON_CHAIN_ID) === 137 ? 'https://rpc-mainnet.matic.network' : 'https://matic-mumbai.chainstacklabs.com';
+CONSTANT.RPC_PROVIDER_POLYGON = Number(process.env.REACT_APP_POLYGON_CHAIN_ID) === 137 ? 'https://polygon-rpc.com' : 'https://matic-mumbai.chainstacklabs.com';
 
 
 export default CONSTANT;

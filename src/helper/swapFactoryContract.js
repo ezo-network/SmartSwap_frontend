@@ -105,7 +105,8 @@ class SwapFactoryContract extends EventEmitter {
     }
 
     async swap(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, txCb, receiptCb) {
-        let amountNew = (Number(amount) + Number(fee.totalFees)).toString();
+        // let amountNew = (Number(amount) + Number(fee.totalFees)).toString();
+        const amountNew = new BigNumber(amount).add(new BigNumber(fee.totalFees)).toString();
         let pair = contractAddressesByPairs.smartswap[addressByToken[tokenA].symbol + "/" + addressByToken[tokenB].symbol];
         let receiver = web3Config.getAddress();
         let licensee = licenseeAddress;
@@ -155,7 +156,8 @@ class SwapFactoryContract extends EventEmitter {
     }
 
     async estimateSwapGasFee(tokenA, tokenB, amount, swapAmount, fee, licenseeAddress, gasLimit, estGasCb) {
-        let amountNew = (Number(amount) + Number(fee.totalFees)).toString();
+        // const amountNew = (Number(amount) + Number(fee.totalFees)).toString();
+        const amountNew = new BigNumber(amount).add(new BigNumber(fee.totalFees)).toString();
 
         let receiver = web3Config.getAddress();
         let licensee = licenseeAddress;
@@ -171,6 +173,7 @@ class SwapFactoryContract extends EventEmitter {
             gasPrice = (json.fast / 10 + 10).toString();
         }
         console.log(swapAmount)
+        console.log(amountNew)
         let newamount = web3Js.utils.toHex(swapAmount).replace("0x", "");
         let pair = contractAddressesByPairs.smartswap[addressByToken[tokenA].symbol + "/" + addressByToken[tokenB].symbol];
         tokenA = tokenA.replace("0x", "");
