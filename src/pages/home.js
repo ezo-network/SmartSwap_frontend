@@ -1676,8 +1676,9 @@ export default class Home extends PureComponent {
       {
         currencyPrices: currencyPrices,
       },
-      () => {
+      async () => {
         this.forceUpdate();
+        await this.setAmount(this.state.sendFundAmount)
       }
     );
   }
@@ -1973,6 +1974,9 @@ export default class Home extends PureComponent {
         let sentTxTime = "";
         let recivedTxTime = "";
 
+        sentTxTime = new Date(Number(element.srTime + "000")).toUTCString()
+        recivedTxTime = new Date(Number(element.approveTime + "000")).toUTCString()
+
         // sent transaction time calculation
         // if (element.sentChainId === 1) {
         //   sentTxTime = new Date(
@@ -2051,11 +2055,12 @@ export default class Home extends PureComponent {
               recivedCurrency={element.recivedCurrency}
               oracleTx={element.oracleTx}
               recivedTxLink={element.recivedTxLink}
-              sentTxTime={sentTxTime.toString()}
+              sentTxTime={sentTxTime}
               recivedTxTime={recivedTxTime.toString()}
               filledAprice={element.filledAprice}
               chainId={element.chainId}
               expedite={this.expedite}
+              isExpedited={element.isExpedited}
               crossChainId={element.crossChainId}
             />
           );
@@ -2073,12 +2078,13 @@ export default class Home extends PureComponent {
               recivedCurrency={element.recivedCurrency}
               oracleTx={element.oracleTx}
               recivedTxLink={element.recivedTxLink}
-              sentTxTime={sentTxTime.toString()}
+              sentTxTime={sentTxTime}
               recivedTxTime={recivedTxTime.toString()}
               filledAprice={element.filledAprice}
               chainId={element.chainId}
               expedite={this.expedite}
               canExpedite={element.canExpedite}
+              isExpedited={element.isExpedited}
               crossChainId={element.crossChainId}
             />
           );
@@ -2182,7 +2188,7 @@ export default class Home extends PureComponent {
           // txLinkSend: data[networkId].explorer + "/tx/" + hash,
         });
       },
-      (receipt) => {
+      async (receipt) => {
         this.setState({
           allowCurrentTxExpedite: 3
         })
@@ -2196,6 +2202,7 @@ export default class Home extends PureComponent {
         //   showLedger: true,
         //   wrapBox: "success",
         // });
+        await this.fetchedUserTransaction(web3Config.getAddress());
         notificationConfig.success("Expedite Success");
       }
     );
@@ -2292,7 +2299,8 @@ export default class Home extends PureComponent {
                       </div>
                       <div className="smvTitle02 wow fadeInUp" data-wow-delay="0.2s">
                         {/* Unlimited Liquidity CeFi to Defi Decentralized Bridge <span style={{ color: '#525252' }}>|</span> AMM Alternative */}
-                        Best multichain rates available with slippage free transactions or with a DeFi aggregator
+                        {/* Best multichain rates available with slippage free transactions or with a DeFi aggregator */}
+                        Best multichain rates available from slippage or slippage free transactions with P2P and CeDeFi
                       </div>
                       {this.state.wrapBox === "swap" ? (
                         <>
@@ -2400,7 +2408,7 @@ export default class Home extends PureComponent {
 
                                           <div className="inputs-wrap-control">
                                             <div className="input-box1">
-                                              <label for="" className="form-label">from</label>
+                                              <label htmlFor="" className="form-label">from</label>
                                               <div className="i-outer">
                                                 <input
                                                   type="text"
@@ -2419,7 +2427,7 @@ export default class Home extends PureComponent {
                                             </div>
 
                                             <div className="input-box2">
-                                              <label for="" className="form-label">BLOCKCHAIN</label>
+                                              <label htmlFor="" className="form-label">BLOCKCHAIN</label>
                                               {/* <button className="ani-1"><img src="images/bnb.png" alt="" /> BSC</button> */}
                                               <Select
                                                 value={this.state.selectedNetworkOptionSend}
@@ -2455,7 +2463,7 @@ export default class Home extends PureComponent {
                                               </Collapse>
                                             </div> */}
                                             <div className="input-box2">
-                                              <label for="" className="form-label">TOKEN</label>
+                                              <label htmlFor="" className="form-label">TOKEN</label>
                                               {/* <button className="border-left-0 ani-1"><img src="images/bnb.png" alt="" /> BNB</button> */}
 
                                               <Select
@@ -2563,7 +2571,7 @@ export default class Home extends PureComponent {
                                         <div className="inputs-wrap dark-controls-n">
                                           <div className="inputs-wrap-control">
                                             <div className="input-box1 ver2">
-                                              <label for="" className="form-label">to</label>
+                                              <label htmlFor="" className="form-label">to</label>
                                               <div className="i-outer">
                                                 <input
                                                   type="text"
@@ -2579,7 +2587,7 @@ export default class Home extends PureComponent {
                                               </div>
                                             </div>
                                             <div className="input-box2 ver2">
-                                              <label for="" className="form-label">BLOCKCHAIN</label>
+                                              <label htmlFor="" className="form-label">BLOCKCHAIN</label>
                                               {/* <button className="ani-1"><img src="images/eth-icon.png" alt="" /> Ethereum</button> */}
                                               <Select
                                                 value={this.state.selectedNetworkOptionReceive}
@@ -2608,7 +2616,7 @@ export default class Home extends PureComponent {
 
                                             </div>
                                             <div className="input-box2 ver2">
-                                              <label for="" className="form-label">TOKEN</label>
+                                              <label htmlFor="" className="form-label">TOKEN</label>
                                               {/* <button className="border-left-0 ani-1"><img src="images/eth-icon.png" alt="" /> ETH</button> */}
                                               <Select
                                                 value={this.state.selectedOptionReceive}
@@ -2740,7 +2748,7 @@ export default class Home extends PureComponent {
                                   <div className="">
                                     <div className="form-group-n d-flex items-center-n">
                                       <div className="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" className="form-label">from</label>
+                                        <label htmlFor="" className="form-label">from</label>
                                         <div className="inputs-wrap light-controls-n">
                                           <span className="currency-ic-n">
                                             $
@@ -2761,7 +2769,7 @@ export default class Home extends PureComponent {
                                         <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
                                       </div>
                                       <div className="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" className="form-label">to</label>
+                                        <label htmlFor="" className="form-label">to</label>
                                         <div className="inputs-wrap dark-controls-n">
                                           <span className="currency-ic-n">
                                             $
@@ -2789,7 +2797,7 @@ export default class Home extends PureComponent {
                                   <div className="">
                                     <div className="form-group-n d-flex items-center-n">
                                       <div className="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" className="form-label">from</label>
+                                        <label htmlFor="" className="form-label">from</label>
                                         <div className="inputs-wrap light-controls-n">
                                           <span className="currency-ic-n">
                                             $
@@ -2810,7 +2818,7 @@ export default class Home extends PureComponent {
                                         <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
                                       </div>
                                       <div className="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" className="form-label">to</label>
+                                        <label htmlFor="" className="form-label">to</label>
                                         <div className="inputs-wrap dark-controls-n">
                                           <span className="currency-ic-n">
                                             $
@@ -2842,7 +2850,7 @@ export default class Home extends PureComponent {
                                   <div className="">
                                     <div className="form-group-n d-flex items-center-n">
                                       <div className="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" className="form-label">from</label>
+                                        <label htmlFor="" className="form-label">from</label>
                                         <div className="inputs-wrap light-controls-n">
                                           <span className="currency-ic-n">
                                             $
@@ -2864,7 +2872,7 @@ export default class Home extends PureComponent {
                                         <a href=""><img src="images/form-middle-ic.png" alt="" /></a>
                                       </div>
                                       <div className="flex-1 w-100-sm flex-auto-sm">
-                                        <label for="" className="form-label">to</label>
+                                        <label htmlFor="" className="form-label">to</label>
                                         <div className="inputs-wrap dark-controls-n">
                                           <span className="currency-ic-n">
                                             $
@@ -3192,7 +3200,7 @@ export default class Home extends PureComponent {
                                           href="javascript:void(0);"
                                           className="ani-1 green"
                                         >
-                                          Swap in progress...
+                                          Waiting to be match with counter-party...
                                         </a>
                                         {this.state.allowCurrentTxExpedite === 1 ? (
                                           <a
@@ -3900,9 +3908,9 @@ export default class Home extends PureComponent {
                               height="315"
                               src="https://www.youtube.com/embed/LKtJ6oaFak0"
                               title="YouTube video player"
-                              frameborder="0"
+                              frameBorder="0"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowfullscreen
+                              allowFullScreen
                             ></iframe>
                           </div>
                         </div>

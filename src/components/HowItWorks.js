@@ -80,15 +80,15 @@ export default class HowItWorks extends PureComponent {
                             </div>
                             <div className='smrtvsatoTable01'>
 
-                                <table width="100%" border="0" cellspacing="0" cellpadding="10">
+                                <table width="100%" border="0" cellSpacing="0" cellPadding="10">
                                     <tbody>
                                         <tr>
                                             <th scope="col">&nbsp;</th>
                                             <th align="center" valign="middle" scope="col">DEXs <br />
-                                               <span>(Uniswap, Pancake, etc)</span></th>
+                                                <span>(Uniswap, Pancake, etc)</span></th>
                                             <th align="center" valign="middle" scope="col">Binance Bridge</th>
                                             <th align="center" valign="middle" scope="col">
-                                            <img src="images/menu-rb-logo.png" alt=""/>
+                                                <img src="images/menu-rb-logo.png" alt="" />
                                             </th>
                                         </tr>
                                         <tr>

@@ -1,6 +1,8 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent, useState } from "react";
 
 export default function LedgerHistory(props) {
+
+    const [isExpedite, setIsExpedite] = useState(false);
 
     return (
 
@@ -61,14 +63,17 @@ export default function LedgerHistory(props) {
                                 Waiting to be match with counter-party
                             </a>
                             {props.canExpedite ?
-                                <a
-                                    href="javascript:void(0);"
-                                    className="ani-1"
-                                    style={{ color: "white" }}
-                                    onClick={() => props.expedite(props.sentTx, props.sentAmount, props.chainId, props.crossChainId)}
-                                >
-                                    Expedite
-                                </a>
+                                props.isExpedited ?
+                                    <a style={{ color: "#91dc27" }}>Expedited <i class="far fa-check-circle"></i></a>
+                                    :
+                                    isExpedite ? <a style={{ color: "#F29339" }}>Expediting...</a> : <a
+                                        href="javascript:void(0);"
+                                        className="ani-1"
+                                        style={{ color: "white" }}
+                                        onClick={() => { setIsExpedite(true); props.expedite(props.sentTx, props.sentAmount, props.chainId, props.crossChainId) }}
+                                    >
+                                        Expedite
+                                    </a>
                                 : null}
                         </p>
                     </div>
