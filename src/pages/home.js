@@ -312,9 +312,9 @@ export default class Home extends PureComponent {
   async updateTotalAmounts() {
     let ttAm = 0;
     await axios
-      .get(`https://api.smartswap.exchange/summary`)
+      .get(`https://api.smartswap.exchange/summaries`)
       .then((res) => {
-
+        console.log(res.data.data)
         if (res.data.data.totalUsd) {
 
           ttAm = (Number(res.data.data.totalUsd) + 1170526).toFixed(0)
