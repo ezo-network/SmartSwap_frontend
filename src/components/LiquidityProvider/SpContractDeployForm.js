@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import ActiveContract from "./ActiveContract";
 import Web3 from 'web3';
 import Collapse from "@kunukn/react-collapse";
@@ -52,7 +52,7 @@ export default class SpContractDeployForm extends Component {
             stopRepeatsAfterCalls: 200,
             withdrawMode: 3,
             withdrawOnDate: new Date(),
-            withdrawAfterCalls: 250,            
+            withdrawAfterCalls: 250,
             txid: null,
             smartSwapContractAddress: 'Deploy contract to get this address.',
             confirmed: false,
@@ -78,15 +78,15 @@ export default class SpContractDeployForm extends Component {
             window.ethereum.on('chainChanged', networkId => {
                 console.log('chainChanged', networkId);
                 this.resetWallet();
-    
+
                 this.connectWallet();
             });
-    
+
             window.ethereum.on('accountsChanged', accounts => {
                 console.log('account Changed');
                 this.resetWallet();
                 // on account change currently disconnecting wallet so we can again check active contract on wallet connect 
-    
+
                 this.connectWallet();
             });
         }
@@ -107,13 +107,13 @@ export default class SpContractDeployForm extends Component {
         document.removeEventListener("mousedown", this.handleClickOutside);
     }
 
-    toggleCexList(changedCex = null){
+    toggleCexList(changedCex = null) {
         const currentState = this.state.cexListOpen;
         this.setState({
             cexListOpen: !currentState
-        });     
+        });
 
-        if(changedCex){
+        if (changedCex) {
             this.setState({
                 selectedCex: changedCex
             });
@@ -153,7 +153,7 @@ export default class SpContractDeployForm extends Component {
 
     changeTokenA(token) {
 
-        
+
         this.setState({
             selectedTokenA: token,
             tokenA: this.state.coinList[token]['address'],
@@ -176,26 +176,26 @@ export default class SpContractDeployForm extends Component {
         this.resetWallet();
     };
 
-    swapTokens(){
+    swapTokens() {
         this.changeTokenA(this.state.selectedTokenB);
         this.changeTokenB(this.state.selectedTokenA);
     }
 
-    getAlternateToken(token){
+    getAlternateToken(token) {
         let tokensList = Object.assign({}, this.state.coinList);
         delete tokensList[token];
         return Object.entries(tokensList)[0];
     }
 
-    checkAmountA(value, minValue){
+    checkAmountA(value, minValue) {
         var clientSideErrorMessage;
-        if(Number(value) < minValue){        
+        if (Number(value) < minValue) {
             this.setState({
                 clientSideError: true
             });
-            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = { ...this.state.clientSideErrorMessage }
             clientSideErrorMessage.amountA = `Minimum amount is $${minValue}`;
-            this.setState({clientSideErrorMessage});
+            this.setState({ clientSideErrorMessage });
             //notificationConfig.success(`Test ${testType} fetched`);
             return;
         } else {
@@ -203,31 +203,31 @@ export default class SpContractDeployForm extends Component {
                 amountA: Number(value)
             });
 
-            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = { ...this.state.clientSideErrorMessage }
             clientSideErrorMessage.amountA = null;
-            this.setState({clientSideErrorMessage});
+            this.setState({ clientSideErrorMessage });
         }
-        
+
         this.clientSideError();
     }
 
     changeSpread(value, minSpreadRange, maxSpreadRange) {
         var clientSideErrorMessage;
-        if(Number(value) > maxSpreadRange || Number(value) < minSpreadRange){            
+        if (Number(value) > maxSpreadRange || Number(value) < minSpreadRange) {
             this.setState({
                 clientSideError: true
             });
-            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = { ...this.state.clientSideErrorMessage }
             clientSideErrorMessage.spProfitPercent = `Please provide a valid input between ${minSpreadRange}-${maxSpreadRange} range`;
-            this.setState({clientSideErrorMessage});
+            this.setState({ clientSideErrorMessage });
             return;
         } else {
             this.setState({
                 spProfitPercent: Number(value)
             });
-            clientSideErrorMessage = {...this.state.clientSideErrorMessage}
+            clientSideErrorMessage = { ...this.state.clientSideErrorMessage }
             clientSideErrorMessage.spProfitPercent = null;
-            this.setState({clientSideErrorMessage});
+            this.setState({ clientSideErrorMessage });
         }
 
         this.clientSideError();
@@ -243,8 +243,8 @@ export default class SpContractDeployForm extends Component {
         });
     }
 
-    validateWithdrawOnContractFromCexSlider(maxWithdrawPercent){
-        if(this.state.withdrawPercent > maxWithdrawPercent){
+    validateWithdrawOnContractFromCexSlider(maxWithdrawPercent) {
+        if (this.state.withdrawPercent > maxWithdrawPercent) {
             notificationConfig.error('You must keep balance on your CEX account at least 55% of the total amount');
             this.setState({
                 withdrawPercent: maxWithdrawPercent
@@ -254,21 +254,21 @@ export default class SpContractDeployForm extends Component {
         return true;
     };
 
-    clientSideError(){
-        let check  = !Object.values(this.state.clientSideErrorMessage).every(o => o === null);
+    clientSideError() {
+        let check = !Object.values(this.state.clientSideErrorMessage).every(o => o === null);
 
         console.log({
             error: check
         });
 
-        if(check){
+        if (check) {
             this.setState({
                 clientSideError: true
             });
         } else {
             this.setState({
                 clientSideError: false
-            });            
+            });
         }
         return check;
     };
@@ -292,16 +292,16 @@ export default class SpContractDeployForm extends Component {
         }
 
         let token = _.find(this.state.coinList, { "networkId": Number(networkId) });
-        let selectedTokenA = _.find(this.state.coinList, { 
-            "symbol": (this.state.selectedTokenA).toString().toUpperCase() 
+        let selectedTokenA = _.find(this.state.coinList, {
+            "symbol": (this.state.selectedTokenA).toString().toUpperCase()
         });
 
-        if(networkId !== Number(selectedTokenA.networkId)){
+        if (networkId !== Number(selectedTokenA.networkId)) {
             notificationConfig.error(`Please connect wallet to ${selectedTokenA.networkName} network or switch token A to active network.`);
             return;
         }
 
-        if(token){
+        if (token) {
             //this.changeTokenA(token.symbol); // enable if connect wallet button autometic switch to active network
             //this.setGasFeeAndAmountMinMaxRanges(token.symbol); // if above condition true then we need to enable this to reset gas fee slider token and amount
             //let alternateToken = this.getAlternateToken(token.symbol); // if above condition true then changeTokenB will need a random token so use this
@@ -313,7 +313,7 @@ export default class SpContractDeployForm extends Component {
                 spAccount: web3Config.getAddress(),
                 spData: null
             });
-    
+
             await this.getActiveContracts();
         }
 
@@ -324,40 +324,40 @@ export default class SpContractDeployForm extends Component {
 
         let allowedNetworks = constantConfig.allowedNetwork;
 
-        if(!Web3.utils.isAddress(this.state.walletAddressToSend)){
+        if (!Web3.utils.isAddress(this.state.walletAddressToSend)) {
             notificationConfig.error('Please provide a valid wallet address that send token A');
             return;
         }
 
-        if(!Web3.utils.isAddress(this.state.walletAddressToReceive)){
+        if (!Web3.utils.isAddress(this.state.walletAddressToReceive)) {
             notificationConfig.error('Please provide a valid wallet address that receive token B');
             return;
         }
 
-        if(this.state.tokenA === this.state.tokenB){
+        if (this.state.tokenA === this.state.tokenB) {
             notificationConfig.error("Token A and Token B can't be the same");
-            return;            
+            return;
         }
 
-        if(!allowedNetworks.includes(Number(this.state.networkId))){
+        if (!allowedNetworks.includes(Number(this.state.networkId))) {
             notificationConfig.error("Selected network is not allowed.");
-            return;                        
+            return;
         }
 
-        if(Number(this.state.spProfitPercent) > 1 || Number(this.state.spProfitPercent) < 0){
+        if (Number(this.state.spProfitPercent) > 1 || Number(this.state.spProfitPercent) < 0) {
             this.setState({
                 clientSideErrorMessage: "Please provide a valid input between 0-1 range",
                 clientSideError: true
             });
-            return;           
+            return;
         } else {
             this.setState({
                 clientSideError: false
-            });            
+            });
         }
 
         let validationPass = await this.validateWithdrawOnContractFromCexSlider(this.props.maxWithdrawPercent);
-        if(validationPass === false){
+        if (validationPass === false) {
             return;
         }
 
@@ -460,7 +460,7 @@ export default class SpContractDeployForm extends Component {
                     response.data.walletAddresses.toReceive,
                     Web3.utils.fromWei((response.data.gasAndFeeAmount.$numberDecimal).toString(), 'ether'),
                     async (hash) => {
-                        if(hash !== null || hash !== undefined){
+                        if (hash !== null || hash !== undefined) {
                             // update tx hash to db
                             let args = {
                                 data: {
@@ -478,7 +478,7 @@ export default class SpContractDeployForm extends Component {
                         console.log({
                             "Contract response:": response
                         });
-                        if(response.code === 4001 || response.code === -32603){
+                        if (response.code === 4001 || response.code === -32603) {
                             this.setState({
                                 confirmed: false,
                                 deployButtonText: "DEPLOY SMART CONTRACT",
@@ -486,10 +486,10 @@ export default class SpContractDeployForm extends Component {
                                 loadingIcon: false,
                                 isActiveContractExist: false
                             });
-                            if(response.code === 4001){
+                            if (response.code === 4001) {
                                 notificationConfig.error('Deploying cancelled. Please try again');
                             }
-                            if(response.code === -32603){
+                            if (response.code === -32603) {
                                 notificationConfig.error('Intrinsic gas too low');
                             }
                             await this.getActiveContracts();
@@ -607,7 +607,7 @@ export default class SpContractDeployForm extends Component {
     }
 
 
-    async getContractDepolymentStatus(smartContractAddress){
+    async getContractDepolymentStatus(smartContractAddress) {
         let args = {
             data: {
                 spAccount: this.state.spAccount,
@@ -621,25 +621,25 @@ export default class SpContractDeployForm extends Component {
         }
 
         var networkPromise = await AxiosRequest.request(args);
-        var timeOutPromise = new Promise(function(resolve, reject) {
+        var timeOutPromise = new Promise(function (resolve, reject) {
             setTimeout(resolve, 5000, 'Timeout Done');
         });
         Promise.all(
-        [networkPromise, timeOutPromise]).then(async(responses) => {
-            if(responses[0].data === true){
-                await this.getActiveContracts();
-                this.setState({
-                    smartSwapContractAddress: (smartContractAddress).toLowerCase(),
-                    confirmed: true,
-                    deployButtonText: "Contract Deployed",
-                    loadingIcon: false,
-                    isActiveContractExist: true
-                });
-                notificationConfig.success('Swap provider Added');
-            } else {
-                await this.getContractDepolymentStatus(smartContractAddress);
-            }
-        });
+            [networkPromise, timeOutPromise]).then(async (responses) => {
+                if (responses[0].data === true) {
+                    await this.getActiveContracts();
+                    this.setState({
+                        smartSwapContractAddress: (smartContractAddress).toLowerCase(),
+                        confirmed: true,
+                        deployButtonText: "Contract Deployed",
+                        loadingIcon: false,
+                        isActiveContractExist: true
+                    });
+                    notificationConfig.success('Swap provider Added');
+                } else {
+                    await this.getContractDepolymentStatus(smartContractAddress);
+                }
+            });
     }
 
     render() {
@@ -693,7 +693,7 @@ export default class SpContractDeployForm extends Component {
                         </div>
                         <div className="FlyICO03">
                             {/* <button onClick={() => this.swapTokens()}>{"<>"}</button> */}
-                            <button class="swap-token-side grey-arrow" href="javascript:void(0);" onClick={() => this.swapTokens()}>
+                            <button className="swap-token-side grey-arrow" href="javascript:void(0);" onClick={() => this.swapTokens()}>
                                 <img src="images/green-arrow.png" alt="Swap token sides"></img>
                             </button>
                         </div>
@@ -764,10 +764,10 @@ export default class SpContractDeployForm extends Component {
                     <div className="LiProfSbox01 ">
                         <div className="LiProLable d-flex">Choose the total amount you are authorizing the API<br></br> to use
                             <i className="help-circle">
-                                <i 
-                                    className="fas fa-question-circle protip" 
-                                    data-pt-position="top" 
-                                    data-pt-title="The total amount includes the amount that will be send to your smart contract, the stable coin amount that will be left on your CEX account and the funds that will be use to place short order when needed." 
+                                <i
+                                    className="fas fa-question-circle protip"
+                                    data-pt-position="top"
+                                    data-pt-title="The total amount includes the amount that will be send to your smart contract, the stable coin amount that will be left on your CEX account and the funds that will be use to place short order when needed."
                                     aria-hidden="true"
                                 ></i>
                             </i>
@@ -794,16 +794,16 @@ export default class SpContractDeployForm extends Component {
                             <div className="error-Msg" style={smallError}>
                                 <label>{this.state.clientSideErrorMessage.amountA}</label>
                             </div>
-                        }                                                            
+                        }
                     </div>
                     <div className='LiProfSbox01'>
                         <div className="mb-20px-n">
                             <div className="LiProLable">CEX
                                 <i className="help-circle">
-                                    <i 
-                                        className="fas fa-question-circle protip" 
-                                        data-pt-position="top" 
-                                        data-pt-title="Choose CEX Of your choice from the below listed CEX. Note that once cex set it can't be changed in the future. Choose carefully" 
+                                    <i
+                                        className="fas fa-question-circle protip"
+                                        data-pt-position="top"
+                                        data-pt-title="Choose CEX Of your choice from the below listed CEX. Note that once cex set it can't be changed in the future. Choose carefully"
                                         aria-hidden="true"
                                     ></i>
                                 </i>
@@ -812,8 +812,8 @@ export default class SpContractDeployForm extends Component {
                                 <button className='LiproDDbtn01' onClick={() => this.toggleCexList()}>
                                     <div className="ddIconBX">
                                         <span>
-                                            <img src={this.state.cexList[this.state.selectedCex]['icon']} alt=""/>
-                                        </span> 
+                                            <img src={this.state.cexList[this.state.selectedCex]['icon']} alt="" />
+                                        </span>
                                         {this.state.cexList[this.state.selectedCex]['symbol']}
                                     </div>
                                     <i className="fas fa-caret-down"></i>
@@ -829,8 +829,8 @@ export default class SpContractDeployForm extends Component {
                                                         this.toggleCexList(this.state.cexList[cex]['symbol']);
                                                     }}
                                                 >
-                                                    <div className="ddIconBX"> 
-                                                        <span> 
+                                                    <div className="ddIconBX">
+                                                        <span>
                                                             <img src={this.state.cexList[cex]['icon']} alt="" />
                                                         </span> {this.state.cexList[cex]['symbol']}
                                                     </div>
@@ -839,8 +839,8 @@ export default class SpContractDeployForm extends Component {
                                         }
                                     </Collapse>
                                 </div>
-                            </div>                                    
-                        </div>                                
+                            </div>
+                        </div>
                     </div>
                     <div className='spacerLine'></div>
 
@@ -917,8 +917,8 @@ export default class SpContractDeployForm extends Component {
                             />
                         </div>
                         <p className="withdrawOnContractAlert">
-                        You must keep balance on your CEX account at least 55% of the total amount
-                        </p>                        
+                            You must keep balance on your CEX account at least 55% of the total amount
+                        </p>
                     </div>
 
                     <div className='spacerLine'></div>
@@ -1040,7 +1040,7 @@ export default class SpContractDeployForm extends Component {
                                             dateFormat="dd/MM/yyyy"
                                             ref={(input) => this.stopRepeatsOnDate = input}
                                         />
-                                        <i class="fas fa-calendar-alt FlyICO"></i>
+                                        <i className="fas fa-calendar-alt FlyICO"></i>
                                     </div>
                                 </div>
                             </div>
@@ -1138,9 +1138,9 @@ export default class SpContractDeployForm extends Component {
                     <>
                         <div className="LiProTitle03">Below is your Swap Provider smart contract address</div>
                         {this.state.spData.map((data, index) => {
-                            return <ActiveContract 
+                            return <ActiveContract
                                 key={index}
-                                index={index+1}
+                                index={index + 1}
                                 contractData={data}
                                 coinList={this.state.coinList}
                                 stepOpen={true}
@@ -1153,7 +1153,7 @@ export default class SpContractDeployForm extends Component {
                         })}
                     </>
                 }
-            </>         
+            </>
         )
     }
 };

@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import data, { tokenDetails } from "../config/constantConfig"; 
+import data, { tokenDetails } from "../config/constantConfig";
 
 export default class LiquidityFountainSP extends PureComponent {
     constructor(props) {
@@ -34,14 +34,14 @@ export default class LiquidityFountainSP extends PureComponent {
 
         return (
             <div className="main-Popup wallet-Popup" id="LiquidityFountainSP">
-             
+
                 <div className="container-Grid">
 
-                <div class="peerTitle01">Liquidity Fountain for SPs</div>
-		<div class="peerText01">When users swap tokens on SmartSwap, the protocol takes the market price. SP’s are buying those tokens on the CEX through the API integrated on their account. The API is set to buy the tokens below the average market price to gain a spread. The structure creates a send, receive, repeat loop similar to a fountain that mines for SPs more of their favorite tokens without having to lock funds or wrap any tokens.</div>
+                    <div className="peerTitle01">Liquidity Fountain for SPs</div>
+                    <div className="peerText01">When users swap tokens on SmartSwap, the protocol takes the market price. SP’s are buying those tokens on the CEX through the API integrated on their account. The API is set to buy the tokens below the average market price to gain a spread. The structure creates a send, receive, repeat loop similar to a fountain that mines for SPs more of their favorite tokens without having to lock funds or wrap any tokens.</div>
 
 
-            <div className='lfforSPIMGBX'><img src="images/lfforSP-img.png"   alt="" /></div>
+                    <div className='lfforSPIMGBX'><img src="images/lfforSP-img.png" alt="" /></div>
 
                 </div>
 
