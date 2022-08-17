@@ -9,13 +9,13 @@ export default function LedgerHistory(props) {
         <div className="transaction-histroryWrap">
             <div className="transaction-histroryBox">
                 <div className="Title02 orange-Color">Send</div>
-                <div className="trasaction-Amt"> {props.sentAmount} {props.sentCurrency}
-                    {/* <span>({(Number(props.sentAmount) * Number(props.filledAprice)).toFixed(2)})</span>  */}
+                <div className="trasaction-Amt"> {Number(props.processAmount).toFixed(6)} {props.sentCurrency}
+                    {props.tokenAPrices === undefined ? null : <span>(${(Number(props.processAmount) * Number(props.tokenAPrices)).toFixed(2)})</span>}
                 </div>
                 <div className="trasaction-Date">{props.sentTxTime}</div>
                 <div className="trasaction-Box">
                     <div className="trasaction-Status"><span className="icon-Box"><i className="fas fa-check-circle"></i></span>Transaction Submitted</div>
-                    <div className="trans-Id">{props.sentTx}</div>
+                    <div className="trans-Id">{props.txHash}</div>
                     <a href={props.sentTxLink} className="view-Trans ani-1" target="_blank">View transaction</a>
                 </div>
             </div>
@@ -24,8 +24,8 @@ export default function LedgerHistory(props) {
                 {props.oracleTx !== undefined ? (
                     <div>
                         <div className="Title02 green-Color">Received <span></span></div>
-                        <div className="trasaction-Amt"> {props.recivedAmount} {props.recivedCurrency}
-                            {/* <span>({(Number(props.recivedAmount) * Number(props.filledBprice)).toFixed(2)})</span>  */}
+                        <div className="trasaction-Amt"> {Number(props.estimatedForeignAmount).toFixed(6)} {props.recivedCurrency}
+                            <span> (${(Number(props.estimatedForeignAmount) * Number(props.tokenBPrices)).toFixed(2)})</span>
                         </div>
                         <div className="trasaction-Date">{props.recivedTxTime}</div>
                         <div className="trasaction-Box">
@@ -56,24 +56,29 @@ export default function LedgerHistory(props) {
                             {/* <span>
                         <a href="javascript:void(0);"><i className="fas fa-cog"></i></a>
                     </span> */}
-                            <a
-                                href="javascript:void(0);"
-                                className="ani-1"
-                            >
-                                Waiting to be match with counter-party
-                            </a>
                             {props.canExpedite ?
                                 props.isExpedited ?
                                     <a style={{ color: "#91dc27" }}>Expedited <i class="far fa-check-circle"></i></a>
                                     :
-                                    isExpedite ? <a style={{ color: "#F29339" }}>Expediting...</a> : <a
-                                        href="javascript:void(0);"
-                                        className="ani-1"
-                                        style={{ color: "white" }}
-                                        onClick={() => { setIsExpedite(true); props.expedite(props.sentTx, props.sentAmount, props.chainId, props.crossChainId) }}
-                                    >
-                                        Expedite
-                                    </a>
+                                    isExpedite ?
+                                        <a style={{ color: "#F29339" }}>Expediting...</a>
+                                        :
+                                        <>
+                                            <a
+                                                href="javascript:void(0);"
+                                                className="ani-1"
+                                            >
+                                                Waiting to be match with counter-party
+                                            </a>
+                                            <a
+                                                href="javascript:void(0);"
+                                                className="ani-1"
+                                                style={{ color: "white" }}
+                                                onClick={() => { setIsExpedite(true); props.expedite(props) }}
+                                            >
+                                                Expedite
+                                            </a>
+                                        </>
                                 : null}
                         </p>
                     </div>

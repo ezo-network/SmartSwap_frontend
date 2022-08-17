@@ -1849,6 +1849,7 @@ export default class Home extends PureComponent {
       actualSendFundAmount: 0,
       approxReceiveFundAmount: 0,
       showLedger: false,
+      allowCurrentTxExpedite: 0
     });
   }
   async listenTransferEvent() {
@@ -1994,44 +1995,6 @@ export default class Home extends PureComponent {
         sentTxTime = new Date(Number(element.srTime + "000")).toUTCString()
         recivedTxTime = new Date(Number(element.approveTime + "000")).toUTCString()
 
-        // sent transaction time calculation
-        // if (element.sentChainId === 1) {
-        //   sentTxTime = new Date(
-        //     Number(
-        //       (
-        //         await this.state.web3Ethereum.eth.getBlock((await this.state.web3Ethereum.eth.getTransaction(element.sentTx)).blockNumber)
-        //       ).timestamp.toString() + "000"
-        //     )
-        //   );
-        // } else if (element.sentChainId === 56) {
-        //   sentTxTime = new Date(
-        //     Number(
-        //       (
-        //         await this.state.web3Binance.eth.getBlock((await this.state.web3Binance.eth.getTransaction(element.sentTx)).blockNumber)
-        //       ).timestamp.toString() + "000"
-        //     )
-        //   );
-        // }
-        // // received transaction time calculation
-        // if (element.oracleTx !== undefined && element.oracleTx !== null) {
-        //   if (element.recivedChainId === 1) {
-        //     recivedTxTime = new Date(
-        //       Number(
-        //         (
-        //           await this.state.web3Ethereum.eth.getBlock((await this.state.web3Ethereum.eth.getTransaction(element.oracleTx)).blockNumber)
-        //         ).timestamp.toString() + "000"
-        //       )
-        //     );
-        //   } else if (element.recivedChainId === 56) {
-        //     recivedTxTime = new Date(
-        //       Number(
-        //         (
-        //           await this.state.web3Binance.eth.getBlock((await this.state.web3Binance.eth.getTransaction(element.oracleTx)).blockNumber)
-        //         ).timestamp.toString() + "000"
-        //       )
-        //     );
-        //   }
-        // }
         element["sentCurrency"] =
           constantConfig.addressByToken[element.tokenA].symbol;
         element["recivedCurrency"] =
@@ -2052,7 +2015,7 @@ export default class Home extends PureComponent {
 
 
 
-        element["recivedAmount"] = web3Js.utils.fromWei(element.estimatedForeignAmount);
+        // element["recivedAmount"] = web3Js.utils.fromWei(element.estimatedForeignAmount);
         // element.counterParties.map(async (elementCounterParties, key) => {
         //   let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
         //   element["recivedAmount"] = Number(element["recivedAmount"]) + Number(rcAmount);
@@ -2062,19 +2025,20 @@ export default class Home extends PureComponent {
           userTxsUI.push(
             // <LedgerHistory />
             <LedgerHistory
-              sentAmount={web3Js.utils.fromWei(element.processAmount)}
+              processAmount={web3Js.utils.fromWei(element.processAmount)}
+              claimedAmount={web3Js.utils.fromWei(element.claimedAmount)}
               sentCurrency={element.sentCurrency}
               sentAPrice={element.sentAPrice}
-              sentTx={element.txHash}
+              txHash={element.txHash}
               sentTxLink={element.sentTxLink}
-              filledBprice={element.filledBprice}
-              recivedAmount={element.recivedAmount}
+              tokenBPrices={element.tokenBPrices.prices[0]}
+              estimatedForeignAmount={web3Js.utils.fromWei(element.estimatedForeignAmount)}
               recivedCurrency={element.recivedCurrency}
               oracleTx={element.oracleTx}
               recivedTxLink={element.recivedTxLink}
               sentTxTime={sentTxTime}
               recivedTxTime={recivedTxTime.toString()}
-              filledAprice={element.filledAprice}
+              tokenAPrices={element.tokenAPrices.prices[0]}
               chainId={element.chainId}
               expedite={this.expedite}
               isExpedited={element.isExpedited}
@@ -2085,19 +2049,20 @@ export default class Home extends PureComponent {
           userPendingTxsUI.push(
             // <LedgerHistory />
             <LedgerHistory
-              sentAmount={web3Js.utils.fromWei(element.processAmount)}
+              processAmount={web3Js.utils.fromWei(element.processAmount)}
+              claimedAmount={web3Js.utils.fromWei(element.claimedAmount)}
               sentCurrency={element.sentCurrency}
               sentAPrice={element.sentAPrice}
-              sentTx={element.txHash}
+              txHash={element.txHash}
               sentTxLink={element.sentTxLink}
-              filledBprice={element.filledBprice}
-              recivedAmount={element.recivedAmount}
+              tokenBPrices={element.tokenBPrices.prices[0]}
+              estimatedForeignAmount={web3Js.utils.fromWei(element.estimatedForeignAmount)}
               recivedCurrency={element.recivedCurrency}
               oracleTx={element.oracleTx}
               recivedTxLink={element.recivedTxLink}
               sentTxTime={sentTxTime}
               recivedTxTime={recivedTxTime.toString()}
-              filledAprice={element.filledAprice}
+              tokenAPrices={element.tokenAPrices.prices[0]}
               chainId={element.chainId}
               expedite={this.expedite}
               canExpedite={element.canExpedite}
@@ -2163,15 +2128,21 @@ export default class Home extends PureComponent {
     );
   };
 
-  async expedite(txId, processAmount, sentChainId, crossChainId) {
+  async expedite(currentTxExpediteData) {
+    const {
+      txHash,
+      processAmount,
+      chainId,
+      crossChainId
+    } = currentTxExpediteData;
     let web3 = web3Config.getWeb3();
     let networkId = web3Config.getNetworkId();
     console.log(networkId)
     let address = web3Config.getAddress();
     if (web3 === null) return 0;
 
-    if (sentChainId !== networkId) {
-      notificationConfig.warning("Change metamask network to " + CONSTANT.NETWORK_ID[sentChainId] + "!");
+    if (chainId !== networkId) {
+      notificationConfig.warning("Change metamask network to " + CONSTANT.NETWORK_ID[chainId] + "!");
       return;
     }
 
@@ -2179,9 +2150,9 @@ export default class Home extends PureComponent {
 
     // let allFees = await this.calculateSwapFees(processAmount);
 
-    // await swapFactory.expedite(txId, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
+    // await swapFactory.expedite(txHash, (((Number(allFees.processingFees) * 0.10 + Number(allFees.processingFees))) * 10 ** 18).toFixed(),
 
-    let url = process.env.REACT_APP_LEDGER_HOST + "processing-fee/" + sentChainId + "-" + crossChainId;
+    let url = process.env.REACT_APP_LEDGER_HOST + "processing-fee/" + chainId + "-" + crossChainId;
 
     let json;
     await axios
@@ -2196,7 +2167,7 @@ export default class Home extends PureComponent {
 
     console.log(json.result * 1.1)
 
-    await swapFactory.expedite(txId, ((json.result * 1.1) * 10 ** 18).toFixed(),
+    await swapFactory.expedite(txHash, ((json.result * 1.1) * 10 ** 18).toFixed(),
       (hash) => {
         this.setState({
           allowCurrentTxExpedite: 2
@@ -2717,7 +2688,7 @@ export default class Home extends PureComponent {
                                             }
                                           ></i>
                                         </span>
-                                          <img src="images/connect-img.png" alt="" /> CONNECT YOUR WALLET</button>
+                                          <img src={"images/receiveCurrencies/" + this.state.selectedSendCurrency + ".png"} alt="" /> CONNECT YOUR WALLET</button>
 
                                       ) : constantConfig.tokenDetails[
                                         this.state.selectedSendCurrency
@@ -3210,29 +3181,36 @@ export default class Home extends PureComponent {
                                         </div>
                                       </div>
                                       <p>
-                                        {/* <span>
-                                                                <a href="javascript:void(0);"><i className="fas fa-cog"></i></a>
-                                                            </span> */}
-                                        <a
-                                          href="javascript:void(0);"
-                                          className="ani-1 green"
-                                        >
-                                          Waiting to be match with counter-party...
-                                        </a>
                                         {this.state.allowCurrentTxExpedite === 1 ? (
-                                          <a
-                                            href="javascript:void(0);"
-                                            className="ani-1"
-                                            style={{ color: "white" }}
-                                            onClick={() => this.expedite(this.state.currentTxExpediteData.txHash, this.state.currentTxExpediteData.processAmount, this.state.currentTxExpediteData.chainId, this.state.currentTxExpediteData.crossChainId)}
-                                          >
-                                            Expedite
-                                          </a>) : this.state.allowCurrentTxExpedite === 2 ? (
+                                          <>
+                                            <a
+                                              href="javascript:void(0);"
+                                              className="ani-1 green"
+                                            >
+                                              Waiting to be match with counter-party...
+                                            </a>
+                                            <a
+                                              href="javascript:void(0);"
+                                              className="ani-1"
+                                              style={{ color: "white" }}
+                                              onClick={() => this.expedite(this.state.currentTxExpediteData)}
+                                            >
+                                              Expedite
+                                            </a>
+                                          </>) : this.state.allowCurrentTxExpedite === 2 ? (
                                             "Expediting...."
                                           ) : this.state.allowCurrentTxExpedite === 3 ? (
                                             <a style={{ color: "#91dc27" }}>Expedited <i class="far fa-check-circle"></i></a>
                                           ) :
-                                          <Counter />
+                                          <>
+                                            <a
+                                              href="javascript:void(0);"
+                                              className="ani-1 green"
+                                            >
+                                              Waiting to be match with counter-party...
+                                            </a>
+                                            <Counter />
+                                          </>
                                         }
                                       </p>
                                     </div>
