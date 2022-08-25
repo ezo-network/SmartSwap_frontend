@@ -124,7 +124,9 @@ export default class Home extends PureComponent {
       txLinkSend: "",
       txLinkReturn: "",
       receiveFundAmount: "",
+      receiveAmountUsd: null,
       sendFundAmount: "",
+      sentAmountUsd: null,
       actualSendFundAmount: 0,
       approxReceiveFundAmount: 0,
       allTxHistoryUI: null,
@@ -678,7 +680,7 @@ export default class Home extends PureComponent {
           // console.log(res.data)
           let result = res.data;
           console.log(result);
-          if (result.data.status === "FULFILLED" && result.data.relationship.claim.approveHash !== null) {
+          if (result.data.status === "FULFILLED" && result.data.relationship.claim.approveHash !== null && result.data.approveTime !== null) {
             console.log(result.data);
 
             if (result.data.txHash === this.state.txIdSent) {
@@ -692,16 +694,21 @@ export default class Home extends PureComponent {
                   result.data.relationship.claim.approveHash;
 
 
-                result.data["recivedAmount"] = web3Js.utils.fromWei(result.data.estimatedForeignAmount);
+                result.data["hash"] = result.data.relationship.claim.approveHash;
+                result.data["txLinkReturn"] = txLinkReturn
+                result.data["returnAmount"] = web3Js.utils.fromWei(result.data.estimatedForeignAmount);
+                result.data["sentTxTime"] = new Date(Number(result.data.srTime + "000")).toUTCString();
+                result.data["txReceiveTime"] = new Date(Number(result.data.approveTime + "000")).toUTCString();
+                result.data["sentAmountUsd"] = (Number(web3Js.utils.fromWei(result.data.processAmount)) * Number(result.data.tokenAPrices.prices[0])).toFixed(2);
+                result.data["receiveAmountUsd"] = (Number(web3Js.utils.fromWei(result.data.estimatedForeignAmount)) * Number(result.data.tokenBPrices.prices[0])).toFixed(2);
+                // sentTxTime = new Date(Number(element.srTime + "000")).toUTCString()
                 // result.data.counterParties.map(async (elementCounterParties, key) => {
                 //   let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
                 //   result.data["recivedAmount"] = Number(result.data["recivedAmount"]) + Number(rcAmount);
                 // })
 
                 this.updateLedgerAfterResponse(
-                  result.data.relationship.claim.approveHash,
-                  txLinkReturn,
-                  result.data.recivedAmount
+                  result.data
                 );
                 clearInterval(txCheckInterval);
               }
@@ -719,6 +726,7 @@ export default class Home extends PureComponent {
               this.setState({
                 allowCurrentTxExpedite: (allowCurrentTxExpedite === 0) ? 1 : allowCurrentTxExpedite,
                 currentTxExpediteData: curTxExData,
+                txSentTime: new Date(Number(result.data.srTime + "000")).toUTCString()
               })
             }
           }
@@ -1839,12 +1847,14 @@ export default class Home extends PureComponent {
       txIdSent: null,
       txSentStatus: "pending",
       txSentTime: null,
+      sentAmountUsd: null,
       tokenReceive: "0",
       txReceiveTime: null,
       txIdReceive: null,
       txLinkSend: "",
       txLinkReturn: "",
       receiveFundAmount: "",
+      receiveAmountUsd: null,
       sendFundAmount: "",
       actualSendFundAmount: 0,
       approxReceiveFundAmount: 0,
@@ -1942,18 +1952,20 @@ export default class Home extends PureComponent {
       }, 10000);
     }
   }
-  updateLedgerAfterResponse(hash, txLinkReturn, returnAmount) {
+  updateLedgerAfterResponse(ledgerData) {
     this.setState(
       {
         isSendingOrder: false,
         txSentStatus: "Success",
-        // txSentTime: new Date().toUTCString(),
+        txSentTime: ledgerData.sentTxTime,
+        sentAmountUsd: ledgerData.sentAmountUsd,
         tokenReceive: "2",
-        // txReceiveTime: new Date().toUTCString(),
-        txIdReceive: hash,
+        txReceiveTime: ledgerData.txReceiveTime,
+        txIdReceive: ledgerData.hash,
         whichButton: "4",
-        txLinkReturn: txLinkReturn,
-        receiveFundAmount: returnAmount,
+        txLinkReturn: ledgerData.txLinkReturn,
+        receiveFundAmount: ledgerData.returnAmount,
+        receiveAmountUsd: ledgerData.receiveAmountUsd,
       },
       async () => {
         //   await this.enableInputs();
@@ -3101,9 +3113,9 @@ export default class Home extends PureComponent {
                                     Send
                                   </div>
                                   <div className="trasaction-Amt">
-                                    {this.state.actualSendFundAmount}{" "}
+                                    {Number(this.state.actualSendFundAmount).toFixed(6)}{" "}
                                     {this.state.selectedSendCurrency}
-                                    {/* <span>({this.state.sendFundAmount})</span> */}
+                                    <span>{this.state.sentAmountUsd ? "($" + this.state.sentAmountUsd + ")" : null}</span>
                                   </div>
                                   <div className="trasaction-Date">
                                     {this.state.txSentTime}
@@ -3135,9 +3147,9 @@ export default class Home extends PureComponent {
                                         Received <span></span>
                                       </div>
                                       <div className="trasaction-Amt">
-                                        {this.state.receiveFundAmount}{" "}
+                                        {Number(this.state.receiveFundAmount).toFixed(6)}{" "}
                                         {this.state.selectedReceiveCurrency}
-                                        {/* <span>(${this.state.sendFundAmount})</span>  */}
+                                        <span>{this.state.receiveAmountUsd ? "($" + this.state.receiveAmountUsd + ")" : null}</span>
                                       </div>
                                       <div className="trasaction-Date">
                                         {this.state.txReceiveTime}
@@ -3195,7 +3207,15 @@ export default class Home extends PureComponent {
                                               style={{ color: "white" }}
                                               onClick={() => this.expedite(this.state.currentTxExpediteData)}
                                             >
-                                              Expedite
+                                              Expedite to skip pending
+                                              <i className="help-circle">
+                                                <i
+                                                  className="fas fa-question-circle protip"
+                                                  data-pt-position="top"
+                                                  data-pt-title="It seems like there is no p2p swap available yet. If you don't want to wait, please pay expedite fee to for instant swaps using a swap provider"
+                                                  aria-hidden="true"
+                                                ></i>
+                                              </i>
                                             </a>
                                           </>) : this.state.allowCurrentTxExpedite === 2 ? (
                                             "Expediting...."
