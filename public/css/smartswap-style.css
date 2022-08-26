@@ -489,7 +489,7 @@ body {
   text-overflow: ellipsis;
 }
 
-.smartSwap .rightMenu a.rmDotLink {
+.smartSwap .rightMenu a.rmDotLink, .rmDotLink02 {
   margin-right: 21px;
   margin-left: 34px;
   margin-top: 0;
@@ -501,7 +501,7 @@ body {
   position: relative;
 }
 
-.smartSwap .rightMenu a.rmDotLink:before {
+.smartSwap .rightMenu a.rmDotLink:before, .rmDotLink02:before {
   content: "";
   background-color: #fff;
   width: 8px;
@@ -513,7 +513,7 @@ body {
   animation: pulse 2s infinite;
 }
 
-.smartSwap .rightMenu a.rmDotLink:after {
+.smartSwap .rightMenu a.rmDotLink:after, .rmDotLink02:after {
   content: "";
   background-color: #fff;
   width: 4px;
@@ -525,9 +525,9 @@ body {
   animation: pulse 2s infinite;
 }
 
-.smartSwap .rightMenu a.rmDotLink:hover,
-.smartSwap .rightMenu a.rmDotLink:hover::after,
-.smartSwap .rightMenu a.rmDotLink:hover:before {
+.smartSwap .rightMenu a.rmDotLink:hover, .rmDotLink02:hover,
+.smartSwap .rightMenu a.rmDotLink:hover::after, .rmDotLink02:hover::after
+.smartSwap .rightMenu a.rmDotLink:hover:before, .rmDotLink02:hover:before {
   background-color: #91dc27;
 }
 

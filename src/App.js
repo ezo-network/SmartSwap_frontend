@@ -12,6 +12,7 @@ import Extension from './pages/extension';
 import ownLicence from './pages/ownLicence';
 import ownLicence02 from './pages/ownLicence02';
 import SmartSwapLicence from './pages/smartSwapLicence';
+import FreeListing from './pages/free-listing';
 
 const DefaultRouter = () => (
   <Router>
@@ -32,6 +33,9 @@ const DefaultRouter = () => (
     </Switch>
     <Switch>
       <Route path="/extension" component={Extension} />
+    </Switch>
+    <Switch>
+      <Route path="/freelisting" component={FreeListing} />
     </Switch>
   </Router>
 )
