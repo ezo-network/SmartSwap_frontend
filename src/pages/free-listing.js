@@ -22,6 +22,8 @@ import Screen06 from "./fl-screen06";
 import Screen07 from "./fl-screen07";
 import Screen08 from "./fl-screen08";
 import Screen09 from "./fl-screen09";
+import Screen10 from "./fl-screen10";
+import Screen11 from "./fl-screen11";
 
 const $ = window.$;
 export default class Projects extends PureComponent {
@@ -53,8 +55,10 @@ export default class Projects extends PureComponent {
                 <Screen06 />
                 <Screen07/>
                 <Screen08/>
-                */}
                 <Screen09/>
+                <Screen10/>
+                */}
+                <Screen11/>
                 
             </div>
           </main>
