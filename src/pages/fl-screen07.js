@@ -20,6 +20,8 @@ import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
 import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
 import Lineimg from "../assets/freelisting-images/line01.png";
 import addImg from "../assets/images/add-chain.png";
+import Badge from "../assets/freelisting-images/imgIco02.png";
+
 
 
 
@@ -47,79 +49,18 @@ export default class Screen5 extends PureComponent {
           <div className="main">
             <MContainer>
               <CMbx>
-                <ProgressBar> <span style={{ width: '75%' }}></span> </ProgressBar>
 
-                <ProGTitle01> <i>4</i> Create a bridge </ProGTitle01>
+                <ProGTitle01> <i className="hasImg"><img alt="badge" src={Badge}></img></i> Project, claim the deployer ownership and become a master validator for your own token</ProGTitle01>
 
-                <ProRow>
-                  <span className="labelNo">1</span>
-                  <ProRowCol1>
-                    <ProICOTitle>Current chain</ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco06} /> SMART </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco01} /> BSC </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColImg><img src={addImg}></img></ProColImg>
-                  </ProRowCol1>
-                  <ProRowCol1>
-                    <ProICOTitle>Destination chain </ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco06} /> SMART </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco03} /> Polygon </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColBtn>
-                      <button className="Btn01">CREATE A BRIDGE</button>
-                    </ProColBtn>
-                  </ProRowCol1>
-                </ProRow>
-
-                <ProRow>
-                  <span className="labelNo">2</span>
-                  <ProRowCol1>
-                    <ProICOTitle>Current chain</ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco04} /> PDO </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco03} /> Polygon </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColImg><img src={addImg}></img></ProColImg>
-                  </ProRowCol1>
-                  <ProRowCol1>
-                    <ProICOTitle>Destination chain </ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco04} /> sbPDO </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco01} /> BSC </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColBtn>
-                      <label className="Btn02"><i class="fa fa-check" aria-hidden="true"></i> Bridge Created</label>
-                    </ProColBtn>
-                  </ProRowCol1>
-                </ProRow>
-
-                <ProRow>
-                  <span className="labelNo">3</span>
-                  <ProRowCol1>
-                    <ProICOTitle>Current chain</ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco05} /> JNTR </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco02} /> Ethereum </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColImg><img src={addImg}></img></ProColImg>
-                  </ProRowCol1>
-                  <ProRowCol1>
-                    <ProICOTitle>Destination chain </ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco05} /> sbJNTR </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco03} /> Polygon </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColBtn>
-                      <button className="Btn01">CREATE A BRIDGE</button>
-                    </ProColBtn>
-                  </ProRowCol1>
-                </ProRow>
+                <ProPera>No need for projects to trust cross-chain solutions for bridging needs. SmartBridge allows projects to become a must validators meaning no transaction takes place without other validators consensus to the project.</ProPera>
+                <ProPera>Further, SmartBridge allows projects to take ownership of the deployer, leaving them fully in control of project tokens on any chain.</ProPera>
+                
 
                 <BtnMbox>
-                  <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button className="Btn01">FINISH</button>
+                    <BtnRight>
+                        <button className="Btn01">CONNECT YOUR WALLET</button>
+                        <p>Connect with the wallet used to deploy the original token</p>
+                    </BtnRight>
 
 
                 </BtnMbox>
@@ -155,7 +96,15 @@ width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:
 
 const ProGTitle01 = styled(FlexDiv)` 
     font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
-    i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  } 
+    i::not(.hasImg){ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  
+    } 
+    .hasImg {
+        margin-right: 25px;
+        margin-bottom: -18px;
+        img {
+            width:63px;
+        }
+    }
 `
  
 const ProICOMbx01 = styled.div` width:100%; `
@@ -177,7 +126,7 @@ const ProICOSbx02 = styled(FlexDiv)`
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
 
-  .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
+  .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 30px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
 
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
 
@@ -245,8 +194,24 @@ const ProICOTitle = styled.span`
   font-weight: bold;
 `
 
+const ProPera = styled.p `
+    width: 100%;
+    color: #aaaaaa;
+    font-size: 18px;
+    line-height: 30px;
+    margin: 0 0 30px;
+    `
 
-
+    const BtnRight = styled.div `
+        margin-left: auto;
+        min-width: 430px;
+        text-align: center;
+        p {
+            font-size: 12px;
+            margin: -5px 0 0 0;
+            color: #aaa;
+        }
+    `
 
 
 
