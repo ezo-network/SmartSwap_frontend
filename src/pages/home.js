@@ -179,20 +179,12 @@ export default class Home extends PureComponent {
       selectedOptionSend: getTokenByName("BNB"),
       selectedOptionReceive: getTokenByName("ETH"),
       selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs("BNB", "ETH"),
-      sendCurrencyList: getTokenList().filter(function (value, index, arr) {
-        return value.label !== "ETH" && value.label !== "BNB";
-      }),
+      sendCurrencyList: getTokenList(),
       selectedNetworkOptionSend: getTokenByNetwork("BSC"),
       selectedNetworkOptionReceive: getTokenByNetwork("ETHEREUM"),
-      sendNetworkList: getNetworkList().filter(function (value, index, arr) {
-        return value.label !== "ETHEREUM" && value.label !== "BSC";
-      }),
-      recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
-        return value.label !== "BSC" && value.label !== "ETHEREUM";
-      }),
-      recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-        return value.label !== "BNB" && value.label !== "ETH";
-      }),
+      sendNetworkList: getNetworkList(),
+      recieveNetworkList: getNetworkList(),
+      recieveCurrencyList: getTokenList(),
       web3Provider: {
         [process.env.REACT_APP_ETH_CHAIN_ID]: null,
         [process.env.REACT_APP_BSC_CHAIN_ID]: null,
@@ -1720,18 +1712,6 @@ export default class Home extends PureComponent {
         selectedNetworkOptionSend: selectedNetworkOptionReceive,
         selectedNetworkOptionReceive: selectedNetworkOptionSend,
         selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedReceiveCurrency, selectedSendCurrency),
-        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.value !== selectedOptionSend.value && selectedOptionReceive.value !== value.value;
-        }),
-        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.value !== selectedOptionReceive.value && selectedOptionSend.value !== value.value;
-        }),
-        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return value.value !== selectedOptionSend.value && selectedOptionReceive.value !== value.value;
-        }),
-        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return value.value !== selectedOptionReceive.value && selectedOptionSend.value !== value.value;
-        }),
         sendFundAmount: "",
         estimatedGasFee: "0"
       },
@@ -1746,82 +1726,50 @@ export default class Home extends PureComponent {
 
   handleChange = (name, selectedOption) => {
     const { selectedOptionSend, selectedOptionReceive, selectedNetworkOptionSend, selectedNetworkOptionReceive } = this.state;
-    if (name === "send") {
-      this.setState({
-        selectedSendCurrency: selectedOption.value,
-        selectedOptionSend: selectedOption,
-        selectedNetworkOptionSend: getTokenByNetwork(selectedOption.networkName),
-        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedOptionReceive.value),
-        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+    if (name === "send" || name === "sendNetwork") {
+      if (selectedOption.value === selectedOptionReceive.value) {
+        let selectedReceiveOptionNew = getTokenList().filter(function (value, index, arr) {
           return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        }),
-        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        }),
-        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        }),
-        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        }),
-      })
-    } else if (name === "receive") {
-      this.setState({
-        selectedReceiveCurrency: selectedOption.value,
-        selectedOptionReceive: selectedOption,
-        selectedNetworkOptionReceive: getTokenByNetwork(selectedOption.networkName),
-        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.value, selectedOption.value),
-        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+        })[0];
+        this.setState({
+          selectedSendCurrency: selectedOption.value,
+          selectedOptionSend: getTokenByName(selectedOption.value),
+          selectedNetworkOptionSend: getTokenByNetwork(selectedOption.networkName),
+          selectedReceiveCurrency: selectedReceiveOptionNew.value,
+          selectedOptionReceive: selectedReceiveOptionNew,
+          selectedNetworkOptionReceive: getTokenByNetwork(selectedReceiveOptionNew.networkName),
+          selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedReceiveOptionNew.value),
+        })
+      } else {
+        this.setState({
+          selectedSendCurrency: selectedOption.value,
+          selectedOptionSend: getTokenByName(selectedOption.value),
+          selectedNetworkOptionSend: getTokenByNetwork(selectedOption.networkName),
+          selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedOptionReceive.value),
+        })
+      }
+    } else if (name === "receive" || name === "receiveNetwork") {
+      if (selectedOption.value === selectedOptionSend.value) {
+        let selectedSendOptionNew = getTokenList().filter(function (value, index, arr) {
           return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
-        }),
-        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
-        }),
-        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
-        }),
-        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
-        }),
-      })
-    } else if (name === "sendNetwork") {
-      this.setState({
-        selectedNetworkOptionSend: selectedOption,
-        selectedSendCurrency: getTokenByName(selectedOption.value).value,
-        selectedOptionSend: getTokenByName(selectedOption.value),
-        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedOptionReceive.value),
-        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        }),
-        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        }),
-        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        }),
-        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        }),
-      })
-    } else if (name === "receiveNetwork") {
-      this.setState({
-        selectedNetworkOptionReceive: selectedOption,
-        selectedReceiveCurrency: getTokenByName(selectedOption.value).value,
-        selectedOptionReceive: getTokenByName(selectedOption.value),
-        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.value, selectedOption.value),
-        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
-        }),
-        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
-          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
-        }),
-        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
-        }),
-        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
-          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
-        }),
-      })
+        })[0];
+        this.setState({
+          selectedReceiveCurrency: selectedOption.value,
+          selectedOptionReceive: getTokenByName(selectedOption.value),
+          selectedNetworkOptionReceive: getTokenByNetwork(selectedOption.networkName),
+          selectedSendCurrency: selectedSendOptionNew.value,
+          selectedOptionSend: selectedSendOptionNew,
+          selectedNetworkOptionSend: getTokenByNetwork(selectedSendOptionNew.networkName),
+          selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedSendOptionNew.value),
+        })
+      } else {
+        this.setState({
+          selectedReceiveCurrency: selectedOption.value,
+          selectedOptionReceive: getTokenByName(selectedOption.value),
+          selectedNetworkOptionReceive: getTokenByNetwork(selectedOption.networkName),
+          selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.value, selectedOption.value),
+        })
+      }
     }
   };
 
