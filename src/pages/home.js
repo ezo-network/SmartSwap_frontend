@@ -14,6 +14,7 @@ import { LoopCircleLoading } from "react-loadingg";
 import CONSTANT from "../constants";
 import data from "../config/constantConfig";
 import Header from "../components/Header";
+import HeadFreeListing from "../components/Header02";
 import RightSideMenu from "../components/RightSideMenu";
 import WalletPopup from "../components/WalletPopup";
 import CoinPopup from "../components/CoinPopup";
@@ -28,6 +29,9 @@ import CefiToDefi from "../components/CefiToDefi";
 import axios from "axios";
 import LedgerHistory from "../components/LedgerHistory";
 import NoDomain from "../components/NoDomain";
+import PopupToken01 from "../components/PopupToken01";
+import PopupToken02 from "../components/PopupToken02";
+import PopupToken03 from "../components/PopupToken03";
 import Carousel from "react-multi-carousel";
 import AnimatedNumber from "react-animated-numbers";
 import AnimatedNumbers from "react-animated-number";
@@ -36,6 +40,11 @@ import "react-multi-carousel/lib/styles.css";
 import { isValidAddress } from 'ethereumjs-util';
 import reimbursementAbi from "../abis/reimbursementAbi.json";
 import SelectToken from "./select_token"
+
+import tabicon1 from "../assets/images/tabicon1.png";
+import tabicon12 from "../assets/images/tabicon1-2.png";
+import swapImg from "../assets/images/reverticon.png";
+
 
 import SBLogo01 from "../assets/images/sb-ICO-01.png";
 import SBLogo02 from "../assets/images/sb-ICO-02.png";
@@ -48,6 +57,7 @@ import SBLogo08 from "../assets/images/sb-ICO-08.png";
 import SBLogo09 from "../assets/images/sb-ICO-09.png";
 import SBLogo010 from "../assets/images/sb-ICO-010.png";
 import SBLogo011 from "../assets/images/sb-ICO-011.png";
+import SmartExchange from "../assets/images/smart-exchange.png";
 import BigNumber from "big-number/big-number";
 import Select from 'react-select';
 import Switch from "react-switch";
@@ -2237,14 +2247,19 @@ export default class Home extends PureComponent {
               ></RightSideMenu>
               {/* <!--======================= RIGHT SIDE MENU END  =====================-->
                     <!--======================= HEADER START =====================--> */}
-              <Header
+              {/* <Header
                 web3={this.state.web3}
                 web3Config={web3Config}
                 cloneData={this.state.cloneData}
                 isSubdomain={this.state.isSubdomain}
                 clearPreview={this.clearPreview}
-              ></Header>
+              ></Header> */}
+              <HeadFreeListing />
               {/* <!--======================= HEADER END =====================--> */}
+
+              {/* <PopupToken01></PopupToken01> */}
+               {/* <PopupToken02></PopupToken02> */}
+              {/* <PopupToken03></PopupToken03> */}
               <div className="backgroundBlock" onClick={this.handleClick} >
                 <div
                   className={
@@ -2283,21 +2298,27 @@ export default class Home extends PureComponent {
                       //     this.openPopup('About');
                       // }}
                       >
-                        <span>One click</span> DECENTRALIZED MULTICHAIN SMART SWAP
+                        <span>One click</span> DECENTRALIZED CROSS-CHAIN SWAP
                       </div>
                       <div className="smvTitle02 wow fadeInUp" data-wow-delay="0.2s">
                         {/* Unlimited Liquidity CeFi to Defi Decentralized Bridge <span style={{ color: '#525252' }}>|</span> AMM Alternative */}
                         {/* Best multichain rates available with slippage free transactions or with a DeFi aggregator */}
-                        Best multichain rates available from slippage or slippage free transactions with P2P and CeDeFi
+                        Best cross-chain rates available with slippage or zero slippage transactions with p2p and CeDeFi
                       </div>
                       {this.state.wrapBox === "swap" ? (
                         <>
                           <div className="tab-container">
                             <div className="tab-main-wrapper">
                               <ul className="tabs-n">
+                                <li className="tab-link" data-tab="tab-1">
+                                  <div>
+                                    NATIVE TOKENS
+                                    <span className="text-sm-n">LIVE BETA</span>
+                                  </div>
+                                </li>
                                 <li className="tab-link current-n" data-tab="tab-1">
                                   <div>
-                                    CRYPTO
+                                    BRIDGE TOKENS
                                     <span className="text-sm-n">LIVE BETA</span>
                                   </div>
                                 </li>
@@ -2309,13 +2330,13 @@ export default class Home extends PureComponent {
                                 </li>
                                 <li className="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>
                                   <div>
-                                    FOREX
+                                  dFX
                                     <span className="text-sm-n">COMING SOON</span>
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none' }}>
                                   <div>
-                                    STOCKS
+                                  dSTOCKS
                                     <span className="text-sm-n">COMING SOON</span>
                                   </div>
                                 </li>
@@ -2384,13 +2405,53 @@ export default class Home extends PureComponent {
                               <div className="tab-content-n-main">
                                 <div id="tab-1" className="tab-content-n current-n">
                                   <div className="">
-                                    <div className="form-group-n  items-center-n">
-                                      <div className="d-flex balance-row">
-                                        <div className="b-text">
-                                          Balance: {Number(this.state.userBalance).toFixed(4)} &nbsp;<span>MAX</span>
+                                    <div className="tabRow">
+                                      <div className="tabCol">
+                                        <div className="d-flex balance-row">
+                                          <div className="b-text">
+                                            Balance: {Number(this.state.userBalance).toFixed(4)} &nbsp;<span>MAX</span>
+                                          </div>
                                         </div>
-                                        {/* <img src="images/slider-icon.png" alt="" /> */}
                                       </div>
+                                      <div className="tabCol">
+                                        <span className="color-green">Check authenticity </span>
+                                      </div>
+                                    </div>
+                                    <div className="tabRow">
+                                      <div className="tabCol">
+                                        <label>SEND</label>
+                                        <div className="inputIcon white"><i><img src={tabicon1}></img></i><input type="text" value="100"></input></div>
+                                        <figure>
+                                          <div className="figIcon">
+                                            <img src={tabicon1}></img>
+                                          </div>
+                                          <figcaption>
+                                            <span>JNTR</span>
+                                            <span>ETHEREUM</span>
+                                          </figcaption>
+                                        </figure>
+                                      </div>
+                                      <div className="tabDivider"><a className="swap" href=""><img src={swapImg}></img></a></div>
+                                      <div className="tabCol">
+                                        <label>RECEIVE</label>
+                                        <div className="inputIcon black"><i><img src={tabicon12}></img></i><input type="text" value="100"></input></div>
+                                        <figure>
+                                          <div className="figIcon">
+                                            <img src={tabicon12}></img>
+                                          </div>
+                                          <figcaption>
+                                            <span>JNTR</span>
+                                            <span>BSC</span>
+                                          </figcaption>
+                                        </figure>
+                                      </div>
+                                    </div>
+                                    <div className="tabRow hasBtn">
+                                      <button className="btn btn-primary"><b><img src={SBLogo01}></img></b>BRIDGE FOR FREE</button>
+                                      <p>Bridge to any EVM chain for free with 1:1 wrap value</p>
+                                    </div>
+                                    <div className="d-none form-group-n  items-center-n">
+                                      
                                       <div className="flex-1 w-100-sm flex-auto-sm">
                                         <div className="inputs-wrap light-controls-n">
 
@@ -2671,7 +2732,7 @@ export default class Home extends PureComponent {
                                         </div>
                                       </div>
                                     </div>
-                                    <div className="text-center">
+                                    <div className="text-center d-none">
                                       {this.state.web3 === null ||
                                         constantConfig.tokenDetails[
                                           this.state.selectedSendCurrency
@@ -2923,14 +2984,20 @@ export default class Home extends PureComponent {
                                 <div className="d-flex">
                                   <p>
                                     Powered by
-                                    <img src="images/smLOGO.png" />
+                                    <img src={SmartExchange} />
+
+                                    <div className="powertextBX-links">
+                                      <a href="">Free listing</a>
+                                      <span>|</span>
+                                      <a href="">Free license</a>
+                                    </div>
                                     {/* <a href="#">Start new swap</a> */}
                                   </p>
                                   {/* <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p> */}
                                 </div>
                               </div>
                             )}
-                            <label className="slippage-outer">
+                            {/* <label className="slippage-outer">
                               <p className="active" style={{ paddingRight: "10px" }}>Slippage free </p>
                               <Switch
                                 checked={this.state.checked1}
@@ -2951,7 +3018,7 @@ export default class Home extends PureComponent {
                                 disabled={true}
                               />
                               <p style={{ paddingLeft: "10px" }}>Slippage</p>
-                            </label>
+                            </label> */}
                             {/* <div className="swap-Link03">
                                                 <a href="javascript:void();">P2C</a> | <a href="javascript:void();">P2G</a> | <a
                                                     href="javascript:void();">P2P</a>
@@ -2974,6 +3041,17 @@ export default class Home extends PureComponent {
                                                         SmartSwap reimburses users with ZERO/1 at 100%.</p>
                                                 </div>
                                             </div> */}
+                          </div>
+
+                          <div>
+                            <div className="dropdown">
+                              <h4 className="dropdown-title">Ledger</h4>
+                            </div>
+                            <div className="btn-grp">
+                              <a className="btn btn-primary" href="#">FREE SMARTSWAP LICENSE</a>
+                              <a className="btn btn-secondary" href="#">BECOME A SWAP PROVIDER</a>
+                              <a className="btn btn-secondary" href="#">FREE LISTING</a>
+                            </div>
                           </div>
                         </>
                       ) : this.state.wrapBox === "success" ? (
