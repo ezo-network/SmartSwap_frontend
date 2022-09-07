@@ -50,10 +50,6 @@ export default class Projects extends PureComponent {
         explorerUrl: null,
         txHash: null
       },
-      destinationTokenData: {
-        tokenAddress: null,
-        chainId: null,
-      },
       filteredDestinationNetworks: [],
       isdestinationNetworksFiltered: false,
       networks: [],
@@ -67,6 +63,7 @@ export default class Projects extends PureComponent {
     this.tokenAddedOnSourceChainCallback = this.tokenAddedOnSourceChainCallback.bind(this);
     this.wrappedTokenFetchedCallback = this.wrappedTokenFetchedCallback.bind(this);
     this.destinationNetworksSelectedCallback = this.destinationNetworksSelectedCallback.bind(this)
+    this.switchNetworkCallback = this.switchNetworkCallback.bind(this)
   }
 
   async componentDidMount() {
@@ -84,7 +81,7 @@ export default class Projects extends PureComponent {
   }
 
   async sourceTokenSelectedCallback(sourceToken, sourceTokenAddress, sourceTokenIcon, sourceChain, sourceChainId, sourceChainIcon, explorerUrl) {
-    await this.getbridge(sourceChainId).then(async () => {
+    await this.getBridge(sourceChainId).then(async () => {
       if (this.state.bridgeAddress !== null) {
         await this.isProjectExist(sourceChainId, sourceTokenAddress).then(async () => {
 
@@ -177,6 +174,10 @@ export default class Projects extends PureComponent {
     });
   }
 
+  async switchNetworkCallback(chainId){
+    await this.getBridge(chainId);
+  }
+
   async getNetworkList(){
     try {
       const {
@@ -218,7 +219,7 @@ export default class Projects extends PureComponent {
     }    
   }
 
-  async getbridge(sourceTokenChainId){
+  async getBridge(sourceTokenChainId){
     try {
       const {
         response, 
@@ -358,6 +359,7 @@ export default class Projects extends PureComponent {
                   <Screen05
                     chainId={this.state.chainId} 
                     web3Instance={this.state.web3Instance}
+                    bridgeContractAddress={this.state.bridgeAddress}
                     projectId={this.state.projectId}
                     networks={this.state.networks}
                     tokens={this.state.tokens}
@@ -366,6 +368,7 @@ export default class Projects extends PureComponent {
                     onWrappedTokensFetched={this.wrappedTokenFetchedCallback}
                     wrappedTokens={this.state.wrappedTokens}
                     onBackButtonClicked={this.backButtonClickedCallback}
+                    onSwitchNetwork={this.switchNetworkCallback}
                   />
                 }
 

@@ -46,7 +46,8 @@ export default class Screen5 extends PureComponent {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: Web3.utils.toHex(chainId) }],
-      }).then(async(response) => {
+      }).then((response) => {
+        this.props.onSwitchNetwork(Number(chainId));
       }).catch(error => {
         console.error(error);
       });
@@ -81,6 +82,117 @@ export default class Screen5 extends PureComponent {
   async addWrappedTokenOnDestinationChain() {
     try {
       await this.activeToken();
+      const bridgeContract = new BridgeContract(this.props.web3Instance, this.props.bridgeContractAddress);
+      await bridgeContract.addWrappedTokenOnDestinationChain(
+        this.state.addWrappedTokenSignedParams.token,
+        this.state.addWrappedTokenSignedParams.chainID,
+        this.state.addWrappedTokenSignedParams.decimals,
+        this.state.addWrappedTokenSignedParams.name,
+        this.state.addWrappedTokenSignedParams.symbol,
+        this.state.addWrappedTokenSignedParams.signature,
+        async (hash) => {
+          console.log({
+            hash: hash
+          });
+
+          if (hash !== null || hash !== undefined) {
+            // update tx hash to db
+          }
+        },
+        async (response) => {
+          
+          // handle response 
+          console.log({
+            "Contract response:": response
+          });
+
+          response = {
+              "to": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
+              "from": "0xA03476C7a7bd9eeEAcB0F4Cea7a8093cc2827EdD",
+              "contractAddress": null,
+              "transactionIndex": 3,
+              "gasUsed": {
+                  "type": "BigNumber",
+                  "hex": "0x01e871"
+              },
+              "logsBloom": "0x00000000000000010000008000000000800000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000010003000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+              "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6",
+              "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
+              "logs": [
+                  {
+                      "transactionIndex": 3,
+                      "blockNumber": 22515012,
+                      "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
+                      "address": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
+                      "topics": [
+                          "0xef4ec9b3cfaa22dd32688bf4ac3c820e8b468ffb6452f61717fb9d845f3c5263",
+                          "0x000000000000000000000000000080383847bd75f91c168269aa74004877592f"
+                      ],
+                      "data": "0x00000000000000000000000000000000000000000000000000000000000000610000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000045a6574610000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000045a45544100000000000000000000000000000000000000000000000000000000",
+                      "logIndex": 22,
+                      "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6"
+                  }
+              ],
+              "blockNumber": 22515012,
+              "confirmations": 4,
+              "cumulativeGasUsed": {
+                  "type": "BigNumber",
+                  "hex": "0x0bed71"
+              },
+              "effectiveGasPrice": {
+                  "type": "BigNumber",
+                  "hex": "0x02540be400"
+              },
+              "status": 1,
+              "type": 0,
+              "byzantium": true
+          } 
+
+          if (response.code === "ACTION_REJECTED"){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.reason);
+          }
+          
+          if (response.code === "UNPREDICTABLE_GAS_LIMIT"){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.reason);
+          }
+
+          if (response.code === -32016){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.message);
+          }
+
+          if (response.status === 1) {
+            await this.props.onTokenAddedSuccessfully(response.transactionHash)
+          }
+
+      });
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+
+  async attachWrapToken(projectId = null, tokenName = null, chain = null, chainId = null) {
+    try { 
+      if(
+        projectId == null
+        ||
+        tokenName == null
+        ||
+        chain == null
+        ||
+        chainId == null
+      ){
+        notificationConfig.error('Could not saved wrapped token.');
+        return;
+      }
     } catch (err) {
       console.error(err.message);
     }

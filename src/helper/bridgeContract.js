@@ -102,6 +102,56 @@ class BridgeContract extends EventEmitter {
         switch (action.type) {}
     }
 
+    async addWrappedTokenOnDestinationChain(tokenAddress, chainId, decimals, name, symbol, sig, txCb, receiptCb){
+        try {
+
+            console.log({
+                tokenAddress: tokenAddress,
+                chainId: chainId,
+                decimals: decimals,
+                name: name,
+                symbol: symbol,
+                sig: sig
+            });
+
+            // address will be valid etherium bc address
+            tokenAddress = web3Js.utils.toHex(tokenAddress);
+            tokenAddress = tokenAddress.slice(2);
+
+            chainId = web3Js.utils.toHex(chainId);
+
+            decimals = web3Js.utils.toHex(decimals);
+
+            name = web3Js.utils.toHex(name);
+
+            symbol = web3Js.utils.toHex(symbol);
+
+            sig = sig.slice(2);
+            sig = web3Js.utils.toHex([sig]);
+
+
+            const payload = ethers.utils.defaultAbiCoder.encode([ 
+                "address", 
+                "uint256", 
+                "uint256", 
+                "string", 
+                "string", 
+                "bytes[]" 
+            ], [ 
+                tokenAddress,
+                chainId,
+                decimals,
+                name,
+                symbol,
+                [sig]
+            ]);
+
+            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+        } catch (error){
+            console.log(error);
+            return error;   
+        }
+    }
 }
 
 

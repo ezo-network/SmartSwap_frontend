@@ -357,6 +357,41 @@ const BridgeApiHelper = {
             error,
             code
         }
+    },
+
+    attachWrapTokenOnProject: async(projectId, tokenName, chain, chainId) => {
+        let response, error, code;
+
+        if(
+            projectId == null
+            ||
+            tokenName == null
+            ||
+            chain == null
+            ||
+            chainId == null
+        ){
+            error = 'mandatory parameters are missing';
+            code = 422;
+            return {
+                response, 
+                error,
+                code
+            }
+        }
+
+        try { 
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }    
     }
 }
 
