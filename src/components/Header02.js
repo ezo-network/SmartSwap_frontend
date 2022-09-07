@@ -40,7 +40,7 @@ export default class HeadFreeListing extends PureComponent {
             </Nav>
 
             <RMbox>
-                <a href="javascript:void(0);" class=""><img src={JPico} alt='Jackpot' /> </a>
+                <a href="#" className=""><img src={JPico} alt='Jackpot' /> </a>
             <Rtimer>
                 <span>1</span>  
                 <span>1</span>:    
@@ -53,8 +53,8 @@ export default class HeadFreeListing extends PureComponent {
                 <span>3</span>    
                 <span>4</span>    
             </Rtimer>
-            <a href="javascript:void(0);" class="link01" >Rewards program</a>
-            <a href="javascript:void(0);" class="rmDotLink02"></a>
+            <a href="#" className="link01" >Rewards program</a>
+            <a href="#" className="rmDotLink02"></a>
             </RMbox>
         </LHead>
 

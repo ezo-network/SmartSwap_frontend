@@ -76,7 +76,15 @@ export default function LedgerHistory(props) {
                                                 style={{ color: "white" }}
                                                 onClick={() => { setIsExpedite(true); props.expedite(props) }}
                                             >
-                                                Expedite
+                                                Expedite to skip pending
+                                                <i className="help-circle">
+                                                    <i
+                                                        className="fas fa-question-circle protip"
+                                                        data-pt-position="top"
+                                                        data-pt-title="It seems like there is no p2p swap available yet. If you don't want to wait, please pay expedite fee to for instant swaps using a swap provider"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                </i>
                                             </a>
                                         </>
                                 : null}

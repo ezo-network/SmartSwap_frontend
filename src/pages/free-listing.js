@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import web3Config from "../config/web3Config";
 import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
 import CONSTANT from "../constants";
 import Header from "../components/Header";
 import RightSideMenu from "../components/RightSideMenu";
@@ -25,18 +24,273 @@ import Screen09 from "./fl-screen09";
 import Screen10 from "./fl-screen10";
 import Screen11 from "./fl-screen11";
 
+import BridgeApiHelper from "../helper/bridgeApiHelper";
+
 const $ = window.$;
 export default class Projects extends PureComponent {
   constructor(props) {
     super();
-    this.state = { checked1: false };
-    
+
     this.state = {
-      web3: null,
-      web3Check: false, 
+      web3Instance: null,
+      walletConnected: false,
+      accountAddress: null,
+      chainId: null,
+      isSourceTokenSelected: false,
+      bridgeAddress: null,
+      isProjectExist: null,
+      projectId: null,
+      sourceTokenData: {
+        name: null,
+        address: null,
+        icon: null,
+        chainIcon: null,
+        chainId: null,
+        chain: null,
+        explorerUrl: null,
+        txHash: null
+      },
+      destinationTokenData: {
+        tokenAddress: null,
+        chainId: null,
+      },
+      filteredDestinationNetworks: [],
+      isdestinationNetworksFiltered: false,
+      networks: [],
+      tokens: [],
+      wrappedTokens: [],
     };
+
+    this.walletConnectCallback = this.walletConnectCallback.bind(this);
+    this.sourceTokenSelectedCallback = this.sourceTokenSelectedCallback.bind(this);
+    this.backButtonClickedCallback = this.backButtonClickedCallback.bind(this);
+    this.tokenAddedOnSourceChainCallback = this.tokenAddedOnSourceChainCallback.bind(this);
+    this.wrappedTokenFetchedCallback = this.wrappedTokenFetchedCallback.bind(this);
+    this.destinationNetworksSelectedCallback = this.destinationNetworksSelectedCallback.bind(this)
   }
+
+  async componentDidMount() {
+    await this.getNetworkList();
+    await this.getTokenList();
+  }
+
+  walletConnectCallback(walletConnected, web3Instance) {
+    this.setState({
+      walletConnected: walletConnected,
+      web3Instance: web3Instance,
+      chainId: web3Config.getNetworkId(),
+      accountAddress: web3Config.getAddress()
+    });
+  }
+
+  async sourceTokenSelectedCallback(sourceToken, sourceTokenAddress, sourceTokenIcon, sourceChain, sourceChainId, sourceChainIcon, explorerUrl) {
+    await this.getbridge(sourceChainId).then(async () => {
+      if (this.state.bridgeAddress !== null) {
+        await this.isProjectExist(sourceChainId, sourceTokenAddress).then(async () => {
+
+          this.setState(prevState => {
+            const sourceTokenData = prevState.sourceTokenData;
+            sourceTokenData['name'] = sourceToken;
+            sourceTokenData['address'] = sourceTokenAddress;
+            sourceTokenData['icon'] = sourceTokenIcon;
+            sourceTokenData['chain'] = sourceChain;
+            sourceTokenData['chainId'] = sourceChainId;
+            sourceTokenData['chainIcon'] = sourceChainIcon;
+            sourceTokenData['explorerUrl'] = explorerUrl;
+            return {
+              isSourceTokenSelected: true,
+              sourceTokenData,
+            };
+          });
+
+        });
+      } else {
+        notificationConfig.error('Bridge not found for selected network.');
+      }
+    });
+  }
+
+  backButtonClickedCallback(onStep){
+    if(onStep === 3){
+      this.setState({
+        isSourceTokenSelected: false,
+        bridgeAddress: null
+      });
+    }
+
+    if(onStep === 2){
+      this.setState({
+        isSourceTokenSelected: false
+      });
+    }
+
+    if(onStep === 4){
+      this.setState({
+        isdestinationNetworksFiltered: false,
+        //filteredDestinationNetworks: []
+      });
+    }
+  }
+
+  async wrappedTokenFetchedCallback(wrappedTokens){
+    this.setState({
+      wrappedTokens: wrappedTokens
+    });
+  }
+  
+  async tokenAddedOnSourceChainCallback(txHash) {
+    try {
+      const {
+        response, 
+        error,
+        code
+      } = await BridgeApiHelper.createNewProject(
+        this.state.accountAddress,
+        this.state.sourceTokenData.name,
+        this.state.sourceTokenData.address,
+        this.state.sourceTokenData.chain,
+        this.state.sourceTokenData.chainId,
+        txHash
+      );
+
+      if(code === 201){
+        console.log({
+          createNewProject: response
+        });
+        this.setState({
+          projectId: response
+        });
+        await this.isProjectExist(this.state.sourceTokenData.chainId, this.state.sourceTokenData.address);
+      } else {
+        console.error(error)
+      }
+
+    } catch (error){
+      console.error(error)
+    }    
+  }
+
+  destinationNetworksSelectedCallback(filteredDestinationNetworks){
+    this.setState({
+      filteredDestinationNetworks: filteredDestinationNetworks,
+      isdestinationNetworksFiltered: true
+    });
+  }
+
+  async getNetworkList(){
+    try {
+      const {
+        response, 
+        error,
+        code
+      } = await BridgeApiHelper.getNetworkList();
+  
+      if(code === 200){
+        this.setState({
+          networks: response
+        });
+      } else {
+        console.error(error)
+      }
+    } catch (error){
+      console.error(error)
+    }
+  }
+
+  async getTokenList(){
+    try {
+      const {
+        response, 
+        error,
+        code
+      } = await BridgeApiHelper.getTokenList();
       
+      if(code === 200){
+        this.setState({
+          tokens: response
+        });
+      } else {
+        console.error(error)
+      }
+
+    } catch (error){
+      console.error(error)
+    }    
+  }
+
+  async getbridge(sourceTokenChainId){
+    try {
+      const {
+        response, 
+        error,
+        code
+      } = await BridgeApiHelper.getBridge(sourceTokenChainId);
+  
+      if(code === 200){
+        this.setState({
+          bridgeAddress: response.address
+        });
+      } else {
+        console.error(error)
+      }
+    } catch (error){
+      console.error(error)
+    }
+  }
+
+  async isProjectExist(sourceTokenChainId, sourceTokenAddress) {
+    try {
+      const {
+        response, 
+        error,
+        code
+      } = await BridgeApiHelper.isProjectExist(sourceTokenChainId, sourceTokenAddress);
+      
+      if(code === 200){
+        this.setState({
+          isProjectExist: response
+        });
+
+        if(response === true){
+          await this.getProject(sourceTokenChainId, sourceTokenAddress);
+        }
+      } else {
+        console.error(error)
+      }
+
+    } catch (error){
+      console.error(error)
+    }
+  }
+
+  async getProject(sourceTokenChainId, sourceTokenAddress) {
+    try {
+      const {
+        response, 
+        error,
+        code
+      } = await BridgeApiHelper.getProject(sourceTokenChainId, sourceTokenAddress);
+      
+      if(code === 200){
+        this.setState({
+          projectId: response._id
+        });
+
+        this.setState(prevState => {
+          const sourceTokenData = prevState.sourceTokenData;
+          sourceTokenData['txHash'] = response.txHash;
+          return {
+            sourceTokenData,
+          };
+        });
+      } else {
+        console.error(error)
+      }
+
+    } catch (error){
+      console.error(error)
+    }
+  }
 
   render() {
     return (
@@ -46,20 +300,75 @@ export default class Projects extends PureComponent {
             <div className="main">  
                 <HeadFreeListing />
 
-                {/* 
-                <Screen01 /> 
-                <Screen02 /> 
-                <Screen03 /> 
-                <Screen04 />
-                <Screen05 />
-                <Screen06 />
-                <Screen07/>
-                <Screen08/>
-                <Screen09/>
-                <Screen10/>
-              */}
-              <Screen11/>
-                
+                <Screen01
+                  onWalletConnectButtonClick={this.walletConnectCallback} 
+                  walletConnected={this.state.walletConnected}
+                />
+
+                {this.state.walletConnected === true && this.state.web3Instance !== null && this.state.isSourceTokenSelected === false &&
+                  <Screen02 
+                    chainId={this.state.chainId} 
+                    web3Instance={this.state.web3Instance} 
+                    accountAddress={this.state.accountAddress}
+                    onSourceTokenSelected={this.sourceTokenSelectedCallback}
+                    networks={this.state.networks}
+                    tokens={this.state.tokens}
+                  />
+                }
+
+                {
+                  this.state.walletConnected === true &&
+                  this.state.web3Instance !== null &&
+                  this.state.isSourceTokenSelected === true &&
+                  this.state.isProjectExist === false &&
+                  <Screen03
+                    chainId={this.state.chainId}
+                    web3Instance={this.state.web3Instance}
+                    bridgeContractAddress={this.state.bridgeAddress}
+                    selectedSourceTokenData={this.state.sourceTokenData}
+                    onBackButtonClicked={this.backButtonClickedCallback}
+                    onTokenAddedSuccessfully={this.tokenAddedOnSourceChainCallback}
+                  />
+                }
+
+                {
+                  this.state.walletConnected === true &&
+                  this.state.web3Instance !== null &&
+                  this.state.isSourceTokenSelected === true &&
+                  this.state.isProjectExist === true &&
+                  this.state.isdestinationNetworksFiltered === false &&
+                  <Screen04
+                    chainId={this.state.chainId}
+                    web3Instance={this.state.web3Instance}
+                    projectId={this.state.projectId}
+                    networks={this.state.networks}
+                    selectedSourceTokenChainId={this.state.sourceTokenData.chainId}
+                    onBackButtonClicked={this.backButtonClickedCallback}
+                    onDestinationNetworksSelected={this.destinationNetworksSelectedCallback}
+                  />
+                }
+
+
+                {
+                  this.state.walletConnected === true &&
+                  this.state.web3Instance !== null &&
+                  this.state.isSourceTokenSelected === true &&
+                  this.state.isProjectExist === true &&
+                  this.state.isdestinationNetworksFiltered === true &&
+                  <Screen05
+                    chainId={this.state.chainId} 
+                    web3Instance={this.state.web3Instance}
+                    projectId={this.state.projectId}
+                    networks={this.state.networks}
+                    tokens={this.state.tokens}
+                    selectedSourceTokenData={this.state.sourceTokenData}
+                    selectedDestinationNetworks={this.state.filteredDestinationNetworks}
+                    onWrappedTokensFetched={this.wrappedTokenFetchedCallback}
+                    wrappedTokens={this.state.wrappedTokens}
+                    onBackButtonClicked={this.backButtonClickedCallback}
+                  />
+                }
+
             </div>
           </main>
       </>
