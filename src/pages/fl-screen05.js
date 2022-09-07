@@ -1,27 +1,12 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
+import _ from "lodash";
+import Web3 from 'web3';
 import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
-import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
-import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
-import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
-import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
-import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
-import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
-import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
 import Lineimg from "../assets/freelisting-images/line01.png";
 import addImg from "../assets/images/add-chain.png";
-
-
+import BridgeApiHelper from "../helper/bridgeApiHelper";
+import BridgeContract from "../helper/bridgeContract";
 
 
 const $ = window.$;
@@ -29,17 +14,94 @@ export default class Screen5 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
-
-    };
-
-    this.state = {
-      web3: null,
-      web3Check: false,
+      addWrappedTokenSignedParams: []
     };
   }
 
+  async componentDidMount() {
+    await this.getWrappedTokens(this.props.projectId);
+  }
+
+  async getWrappedTokens(sourceTokenChainId) {
+    try {
+      const {
+        response,
+        error,
+        code
+      } = await BridgeApiHelper.getWrappedTokens(sourceTokenChainId);
+
+      if (code === 200) {
+        this.props.onWrappedTokensFetched(response);
+      } else {
+        console.error(error)
+      }
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async switchNetwork(chainId) {
+    if (Number(this.props.chainId) !== Number(chainId)) {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: Web3.utils.toHex(chainId) }],
+      }).then(async(response) => {
+      }).catch(error => {
+        console.error(error);
+      });
+    } else {
+
+    }
+  }
+
+  async activeToken() {
+    try {
+      const { response, error, code } = await BridgeApiHelper.activateToken(
+        this.props.selectedSourceTokenData.chainId,
+        this.props.selectedSourceTokenData.txHash
+      );
+
+      if (code === 200) {
+        this.setState({
+          addWrappedTokenSignedParams: response
+        });
+      } else {
+        console.error({
+          error: error,
+          code: code
+        });
+      }
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+
+
+  async addWrappedTokenOnDestinationChain() {
+    try {
+      await this.activeToken();
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
 
   render() {
+
+    let networksData = [];
+    const selectedDestinationNetworks = this.props.selectedDestinationNetworks;
+    selectedDestinationNetworks.forEach(networkId => {
+      const wrappedToken = _.find(this.props.wrappedTokens, { chainId: networkId });
+      const networkConfig = _.find(this.props.networks, { chainId: networkId });
+      let networkData = networkConfig;
+      if (wrappedToken !== undefined) {
+        networkData['wrappedTokenExist'] = true;
+      } else {
+        networkData['wrappedTokenExist'] = false;
+      }
+      networksData.push(networkData);
+    });
+
     return (
       <>
         <main id="main" className="smartSwap">
@@ -47,85 +109,64 @@ export default class Screen5 extends PureComponent {
           <div className="main">
             <MContainer>
               <CMbx>
-                <ProgressBar> <span style={{ width: '75%' }}></span> </ProgressBar>
+                <ProgressBar>
+                  <span style={{ width: '75%' }}></span>
+                </ProgressBar>
 
-                <ProGTitle01> <i>4</i> Create a bridge </ProGTitle01>
+                <ProGTitle01>
+                  <i>4</i> Create a bridge
+                </ProGTitle01>
 
-                <ProRow>
-                  <span className="labelNo">1</span>
-                  <ProRowCol1>
-                    <ProICOTitle>Current chain</ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco06} /> SMART </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco01} /> BSC </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColImg><img src={addImg}></img></ProColImg>
-                  </ProRowCol1>
-                  <ProRowCol1>
-                    <ProICOTitle>Destination chain </ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco06} /> SMART </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco03} /> Polygon </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColBtn>
-                      <button className="Btn01">CREATE A BRIDGE</button>
-                    </ProColBtn>
-                  </ProRowCol1>
-                </ProRow>
-
-                <ProRow>
-                  <span className="labelNo">2</span>
-                  <ProRowCol1>
-                    <ProICOTitle>Current chain</ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco04} /> PDO </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco03} /> Polygon </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColImg><img src={addImg}></img></ProColImg>
-                  </ProRowCol1>
-                  <ProRowCol1>
-                    <ProICOTitle>Destination chain </ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco04} /> sbPDO </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco01} /> BSC </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColBtn>
-                      <label className="Btn02"><i class="fa fa-check" aria-hidden="true"></i> Bridge Created</label>
-                    </ProColBtn>
-                  </ProRowCol1>
-                </ProRow>
-
-                <ProRow>
-                  <span className="labelNo">3</span>
-                  <ProRowCol1>
-                    <ProICOTitle>Current chain</ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco05} /> JNTR </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco02} /> Ethereum </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColImg><img src={addImg}></img></ProColImg>
-                  </ProRowCol1>
-                  <ProRowCol1>
-                    <ProICOTitle>Destination chain </ProICOTitle>
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco05} /> sbJNTR </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco03} /> Polygon </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProColBtn>
-                      <button className="Btn01">CREATE A BRIDGE</button>
-                    </ProColBtn>
-                  </ProRowCol1>
-                </ProRow>
+                {networksData.length > 0 && networksData.map(function (network, i) {
+                  return (
+                    <ProRow key={i}>
+                      <span className="labelNo">{i + 1}</span>
+                      <ProRowCol1>
+                        <ProICOTitle>Current chain</ProICOTitle>
+                        <ProICOSbx01 className="selected">
+                          <ProICOSbx02>
+                            <img src={window.location.href + '/images/free-listing/tokens/' + this.props.selectedSourceTokenData.icon} />
+                            {this.props.selectedSourceTokenData.name}
+                          </ProICOSbx02>
+                          <ProICOSbx02>
+                            <img src={window.location.href + '/images/free-listing/chains/' + this.props.selectedSourceTokenData.chainIcon} />
+                            {this.props.selectedSourceTokenData.chain}
+                          </ProICOSbx02>
+                        </ProICOSbx01>
+                        <ProColImg><img src={addImg}></img></ProColImg>
+                      </ProRowCol1>
+                      <ProRowCol1>
+                        <ProICOTitle>Destination chain </ProICOTitle>
+                        <ProICOSbx01 className="selected">
+                          <ProICOSbx02>
+                            <img src={window.location.href + '/images/free-listing/tokens/' + this.props.selectedSourceTokenData.icon} />
+                            sb{this.props.selectedSourceTokenData.name}
+                          </ProICOSbx02>
+                          <ProICOSbx02>
+                            <img src={window.location.href + '/images/free-listing/chains/' + network.icon} />
+                            {network.name}
+                          </ProICOSbx02>
+                        </ProICOSbx01>
+                        <ProColBtn>
+                          {network.wrappedTokenExist === true && (
+                            <label className="Btn02"><i className="fa fa-check" aria-hidden="true"></i> Bridge Created</label>
+                          )}
+                          {network.wrappedTokenExist === false && Number(network.chainId) === Number(this.props.chainId) && (
+                            <button onClick={e => this.addWrappedTokenOnDestinationChain()} className="Btn01">CREATE A BRIDGE</button>
+                          )}
+                          {network.wrappedTokenExist === false && Number(network.chainId) !== Number(this.props.chainId) && (
+                            <button onClick={e => this.switchNetwork(network.chainId)} className="Btn01">SWITCH NETWORK</button>
+                          )}
+                        </ProColBtn>
+                      </ProRowCol1>
+                    </ProRow>
+                  )
+                }.bind(this))}
 
                 <BtnMbox>
-                  <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                  <button onClick={() => this.props.onBackButtonClicked(4)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
                   <button className="Btn01">FINISH</button>
-
-
                 </BtnMbox>
-
-
-
 
               </CMbx>
             </MContainer>
@@ -157,7 +198,7 @@ const ProGTitle01 = styled(FlexDiv)`
     font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
     i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  } 
 `
- 
+
 const ProICOMbx01 = styled.div` width:100%; `
 const ProICOMbx02 = styled(FlexDiv)`
     align-items:flex-start; justify-content: flex-start; margin:30px -18px 0 -18px;
@@ -167,7 +208,7 @@ const ProICOSbx01 = styled.button`
   display: flex; align-items: center; justify-content: flex-start;
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
-` 
+`
 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
@@ -183,7 +224,7 @@ const BtnMbox = styled(FlexDiv)`
 
 `
 
-const ProRow = styled.div `
+const ProRow = styled.div`
   display: flex;
   width: 100%;
   align-items: center;
@@ -201,7 +242,7 @@ const ProRow = styled.div `
     margin-right: 25px;
   }
   `
-const ProRowCol1 = styled.div `
+const ProRowCol1 = styled.div`
   display: flex;
   width: 50%;
   align-items: center;
@@ -212,12 +253,12 @@ const ProRowCol1 = styled.div `
     flex-grow: 1;
   }
 `
-const ProColImg = styled.div `
+const ProColImg = styled.div`
   flex-grow: 1;
   text-align: center;
   width: calc(50% - 36px);
   `
-const ProColBtn = styled.div `
+const ProColBtn = styled.div`
   flex-grow: 1;
   width: calc(50% - 36px);
   padding-left: 30px;

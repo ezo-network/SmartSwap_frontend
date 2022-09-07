@@ -1,4 +1,6 @@
 import React, { PureComponent, lazy, Suspense } from "react";
+import Web3 from 'web3';
+import _ from "lodash";
 import { Link } from "react-router-dom";
 import web3Config from "../config/web3Config";
 import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
@@ -20,25 +22,109 @@ import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
 import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
 import Lineimg from "../assets/freelisting-images/line01.png";
 
-
-
-
 const $ = window.$;
-export default class Screen1 extends PureComponent {
+export default class Screen2 extends PureComponent {
   constructor(props) {
     super();
-    this.state = {
-
-    };
 
     this.state = {
-      web3: null,
-      web3Check: false,
+      filteredToken: "",   
+      selectedSource: {
+        token: null,
+        tokenAddress: null,
+        tokenIcon: null,
+        chain: null,
+        chainId: null,
+        chainIcon: null,
+        explorerUrl: null
+      }
     };
+
   }
 
+  async switchNetwork(token, tokenAddress, tokenIcon, chain, chainId, chainIcon, explorerUrl) {
+    const sourceObject = {
+      selectedSource: {
+        token: token,
+        tokenAddress: tokenAddress,
+        tokenIcon: tokenIcon,
+        chain: chain,
+        chainId: chainId,
+        chainIcon: chainIcon,
+        explorerUrl: explorerUrl
+      }      
+    }
+    if(Number(this.props.chainId) !== Number(chainId)){
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: Web3.utils.toHex(chainId)}],
+      }).then(response => {
+        this.setState(sourceObject);
+      }).catch(error => {
+        console.error(error);
+      });
+    } else {
+      this.setState(sourceObject);
+    }
+  }
+
+  setSourceToken(){
+
+    if(
+      this.state.selectedSource.token == null
+      ||
+      this.state.selectedSource.tokenAddress == null
+      ||
+      this.state.selectedSource.tokenIcon == null
+      ||
+      this.state.selectedSource.chain == null
+      ||
+      this.state.selectedSource.chainId == null
+      ||
+      this.state.selectedSource.chainIcon == null
+      ||
+      this.state.selectedSource.explorerUrl == null
+    ){
+      notificationConfig.error('Please select a token first.');
+      return;
+    }
+
+    this.props.onSourceTokenSelected(
+      this.state.selectedSource.token,
+      this.state.selectedSource.tokenAddress, 
+      this.state.selectedSource.tokenIcon, 
+      this.state.selectedSource.chain,
+      this.state.selectedSource.chainId,
+      this.state.selectedSource.chainIcon,
+      this.state.selectedSource.explorerUrl
+    );
+
+  }
+
+  filterTokens = (token) => {
+    this.setState({ filteredToken: token });
+  };
 
   render() {
+
+    let finalFilteredTokens = [];
+    const filteredTokens = this.props.tokens.filter(token => {
+      if(token.name.match(new RegExp(this.state.filteredToken, "i"))){
+        return token;
+      }
+    });
+
+
+    filteredTokens.forEach(token => {
+      const network = _.find(this.props.networks, { chainId: token.chainId });
+      if(network !== undefined){
+        token['chain'] = network.name;
+        token['chainIcon'] = network.icon;
+        token['explorerUrl'] = network.explorerUrl;
+      }
+      finalFilteredTokens.push(token);        
+    });
+
     return (
       <>
         <main id="main" className="smartSwap">
@@ -49,52 +135,50 @@ export default class Screen1 extends PureComponent {
                 <ProgressBar> <span style={{ width: '25%' }}></span> </ProgressBar>
 
                 <ProGTitle01> <i>1</i> Select the token to bridge</ProGTitle01>
-                <ProInputbx> <input type="text" placeholder="Search tokens" /> </ProInputbx>
+                <ProInputbx> 
+                  <input 
+                    onChange={e => this.filterTokens(e.target.value)}
+                    type="text"
+                    placeholder="Search tokens"
+                    value={this.state.filteredToken}
+                  />
+                </ProInputbx>
                 <ProICOMbx01>
                   <ProICOMbx02>
-
-                    <ProICOSbx01 className="selected">
-                      <ProICOSbx02> <img src={ImgIco01} /> BSC </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco01} /> BNB </ProICOSbx02>
-                    </ProICOSbx01>
-
-                    <ProICOSbx01>
-                      <ProICOSbx02> <img src={ImgIco02} /> Ethereum </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco02} /> ETH </ProICOSbx02>
-                    </ProICOSbx01>
-
-                    <ProICOSbx01>
-                      <ProICOSbx02> <img src={ImgIco03} /> Polygon </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco03} /> MATIC </ProICOSbx02>
-                    </ProICOSbx01>
-
-                    <ProICOSbx01>
-                      <ProICOSbx02> <img src={ImgIco01} /> BSC </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco04} /> PDO </ProICOSbx02>
-                    </ProICOSbx01>
-
-                    <ProICOSbx01>
-                      <ProICOSbx02> <img src={ImgIco01} /> BSC </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco05} /> JNTR </ProICOSbx02>
-                    </ProICOSbx01>
-
-                    <ProICOSbx01>
-                      <ProICOSbx02> <img src={ImgIco01} /> BSC </ProICOSbx02>
-                      <ProICOSbx02> <img src={ImgIco06} /> SMART </ProICOSbx02>
-                    </ProICOSbx01>
+                  
+                    {finalFilteredTokens.length > 0 && finalFilteredTokens.map((token, i) => {
+                      return (
+                      <ProICOSbx01 
+                        key={i} 
+                        chainId={token.chainId} 
+                        className={(this.state.selectedSource.tokenAddress === null ? '' : this.state.selectedSource.tokenAddress).toLowerCase() === (token.address).toLowerCase() ? 'selected' : ''}
+                        onClick={() => this.switchNetwork(
+                          token.symbol, 
+                          token.address, 
+                          token.icon,
+                          token.chain, 
+                          token.chainId,
+                          token.chainIcon,
+                          token.explorerUrl
+                        )}
+                      >
+                        <ProICOSbx02> 
+                          <img src={window.location.href + '/images/free-listing/tokens/' + ((token.icon).toString()).toLowerCase()} />{token.symbol}
+                        </ProICOSbx02>
+                        <ProICOSbx02> 
+                            <img src={window.location.href + '/images/free-listing/chains/' + ((token.chainIcon).toString()).toLowerCase()} />{token.chain}
+                        </ProICOSbx02>
+                      </ProICOSbx01>
+                      )
+                    })}
 
                   </ProICOMbx02>
                 </ProICOMbx01>
 
                 <BtnMbox>
                   <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button className="Btn01"> NEXT STEP</button>
-
-
+                  <button onClick={() => this.setSourceToken()} className="Btn01"> NEXT STEP</button>
                 </BtnMbox>
-
-
-
 
               </CMbx>
             </MContainer>

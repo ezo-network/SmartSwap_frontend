@@ -1,42 +1,122 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
-import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
-import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
-import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
-import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
-import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
-import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
-import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
-import Lineimg from "../assets/freelisting-images/line01.png";
-
-
-
-
+import { LoopCircleLoading } from 'react-loadingg';
+import BridgeContract from "../helper/bridgeContract";
 const $ = window.$;
+
 export default class Screen3 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
-
-    };
-
-    this.state = {
-      web3: null,
-      web3Check: false,
-    };
+      btnClicked: false 
+    }
   }
 
+  addToken = async () => {
+    try {
+      this.setState({
+        btnClicked: true
+      });
+      console.log({
+        web3: this.props.web3Instance,
+        bridgeContractAddress: this.props.bridgeContractAddress,
+        sourceTokenAddress: this.props.selectedSourceTokenData.address
+      });
+      const bridgeContract = new BridgeContract(this.props.web3Instance, this.props.bridgeContractAddress);
+      await bridgeContract.addTokenOnSourceChain(this.props.selectedSourceTokenData.address, async (hash) => {
+        console.log({
+          hash: hash
+        });
+
+        if (hash !== null || hash !== undefined) {
+          // update tx hash to db
+        }
+      },
+        async (response) => {
+          
+          // handle response 
+          console.log({
+            "Contract response:": response
+          });
+
+          // response = {
+          //     "to": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
+          //     "from": "0xA03476C7a7bd9eeEAcB0F4Cea7a8093cc2827EdD",
+          //     "contractAddress": null,
+          //     "transactionIndex": 3,
+          //     "gasUsed": {
+          //         "type": "BigNumber",
+          //         "hex": "0x01e871"
+          //     },
+          //     "logsBloom": "0x00000000000000010000008000000000800000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000010003000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          //     "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6",
+          //     "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
+          //     "logs": [
+          //         {
+          //             "transactionIndex": 3,
+          //             "blockNumber": 22515012,
+          //             "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
+          //             "address": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
+          //             "topics": [
+          //                 "0xef4ec9b3cfaa22dd32688bf4ac3c820e8b468ffb6452f61717fb9d845f3c5263",
+          //                 "0x000000000000000000000000000080383847bd75f91c168269aa74004877592f"
+          //             ],
+          //             "data": "0x00000000000000000000000000000000000000000000000000000000000000610000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000045a6574610000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000045a45544100000000000000000000000000000000000000000000000000000000",
+          //             "logIndex": 22,
+          //             "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6"
+          //         }
+          //     ],
+          //     "blockNumber": 22515012,
+          //     "confirmations": 4,
+          //     "cumulativeGasUsed": {
+          //         "type": "BigNumber",
+          //         "hex": "0x0bed71"
+          //     },
+          //     "effectiveGasPrice": {
+          //         "type": "BigNumber",
+          //         "hex": "0x02540be400"
+          //     },
+          //     "status": 1,
+          //     "type": 0,
+          //     "byzantium": true
+          // } 
+
+          if (response.code === "ACTION_REJECTED"){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.reason);
+          }
+          
+          if (response.code === "UNPREDICTABLE_GAS_LIMIT"){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.reason);
+          }
+
+          if (response.code === -32016){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.message);
+          }
+
+          if (response.status === 1) {
+            await this.props.onTokenAddedSuccessfully(response.transactionHash)
+          }
+
+        });
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  goToContractOnExplorer(explorerUrl, tokenAddress) {
+    window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
+  }
 
   render() {
     return (
@@ -46,26 +126,35 @@ export default class Screen3 extends PureComponent {
           <div className="main">
             <MContainer>
               <CMbx>
-                <ProgressBar> <span style={{ width: '50%' }}></span> </ProgressBar>
-
-                <ProGTitle01> <i>2</i> Verify the smart contract address </ProGTitle01>
-                <ProInputbx> <input type="text" placeholder=" " /> </ProInputbx>
+                <ProgressBar> 
+                  <span style={{ width: '50%' }}></span> 
+                </ProgressBar>
+                <ProGTitle01> 
+                  <i>2</i> Verify the smart contract address 
+                </ProGTitle01>
+                <ProInputbx> 
+                  <input type="text" placeholder={this.props.selectedSourceTokenData.address} /> 
+                </ProInputbx>
                 <BtnMbox02>
-                    <div>
-                    <button className="Btn03">SMART </button> |  <button className="Btn03">BSC</button>
-                    </div>
-                    <button className="Btn04">Check the contract  <i className="fas fa-external-link-alt"></i></button>
-                </BtnMbox02> 
+                  <div>
+                    <button className="Btn03">{this.props.selectedSourceTokenData.name} </button> | <button className="Btn03">{this.props.selectedSourceTokenData.chain}</button>
+                  </div>
+                  <button onClick={() => this.goToContractOnExplorer(this.props.selectedSourceTokenData.explorerUrl, this.props.selectedSourceTokenData.address)} className="Btn04">Check the contract  <i className="fas fa-external-link-alt"></i></button>
+                </BtnMbox02>
                 <BtnMbox>
-                  <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button className="Btn01">ENABLE</button>
-
-
+                  <button onClick={() => this.props.onBackButtonClicked(3)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                  <button disabled={this.state.btnClicked} onClick={() => this.addToken()} className="Btn01">
+                    {
+                    this.state.btnClicked === true &&
+                    <LoopCircleLoading
+                        height={'20px'}
+                        width={'20px'}
+                        color={'#ffffff'}
+                    />
+                    }
+                    ENABLE
+                  </button>
                 </BtnMbox>
-
-
-
-
               </CMbx>
             </MContainer>
 
@@ -100,7 +189,7 @@ const ProInputbx = styled(FlexDiv)`
     width:100%;
 
     input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
-` 
+`
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
 
@@ -116,6 +205,6 @@ border-top:none;   margin-top:0px;  padding-top:10px; margin-bottom:15px;
     .Btn04{ background-color:transparent; color:#91dc27; border:0; font-size:14px; font-weight:400; :hover{ color:#fff;}}
     .Btn03{ background-color:transparent; color:#a6a2b0; border:0; font-size:12px; font-weight:400; :hover{ color:#91dc27;}}
 
-`  
+`
 
 

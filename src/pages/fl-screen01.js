@@ -19,22 +19,58 @@ const $ = window.$;
 export default class Screen1 extends PureComponent {
   constructor(props) {
     super();
-    this.state = { 
-        
-    };
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (typeof window.ethereum !== 'undefined') {
+        // detect Network account change
+        window.ethereum.on('chainChanged', networkId => {
+            console.log('chainChanged', networkId);
+            this.connectWallet();
+        });
+
+        window.ethereum.on('accountsChanged', async(accounts) => {          
+            if(accounts.length > 0){
+              await web3Config.connectWallet(0);
+              this.props.onWalletConnectButtonClick(true, web3Config.getWeb3());
+            } else {
+              this.props.onWalletConnectButtonClick(false, null);              
+            }
+        });
+
+        window.ethereum.on('disconnect', (error) => {
+          this.props.onWalletConnectButtonClick(false, null);          
+        });
+    }
+  }
+
+  async connectWallet() {
     
-    this.state = {
-      web3: null,
-      web3Check: false, 
-    };
+    if (typeof window.ethereum == 'undefined') {
+      console.log('MetaMask is not installed!');
+      notificationConfig.error('Metamask not found.');
+      return;
+    }
+
+    await web3Config.connectWallet(0).then(response => {
+      console.log(response);
+      if(window.ethereum.isConnected() === true){
+        this.props.onWalletConnectButtonClick(true, web3Config.getWeb3());
+        //notificationConfig.info('Wallet connected');
+      } else {
+        notificationConfig.info('Wallet not connected to metamask');        
+      }
+    }).catch(error => {
+      console.log(error);
+    });
   }
       
 
   render() {
     return (
       <>
-          <main id="main" className="smartSwap">
-           
+        { this.props.walletConnected === false &&
+          <main id="main" className="smartSwap">           
             <div className="main">   
              <MContainer> 
                   <CMbx>
@@ -44,7 +80,7 @@ export default class Screen1 extends PureComponent {
                         Create a cross-chain bridge token to any EVM blockchain by few seconds
                         <span>It's free and open to any project and their users</span>
                       </CStitle01> 
-                      <button className="Btn01 ani-1">CONNECT YOUR WALLET</button> 
+                      <button onClick={() => this.connectWallet()} className="Btn01 ani-1">CONNECT YOUR WALLET</button>
                     </Csubbx01>
                     <Csubbx01 className="v2"> 
                       <CStitle01>
@@ -58,6 +94,7 @@ export default class Screen1 extends PureComponent {
                 
             </div>
           </main>
+        }
       </>
     );
   }
