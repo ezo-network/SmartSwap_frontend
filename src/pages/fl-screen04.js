@@ -3,6 +3,7 @@ import _ from "lodash";
 import notificationConfig from "../config/notificationConfig";
 import styled from 'styled-components';
 import Lineimg from "../assets/freelisting-images/line01.png";
+import BridgeApiHelper from "../helper/bridgeApiHelper";
 const $ = window.$;
 
 export default class Screen4 extends PureComponent {
@@ -11,7 +12,12 @@ export default class Screen4 extends PureComponent {
     this.state = {
       selectedNetworks: [],
       filteredNetwork: "",
+      bridges: []
     };
+  }
+
+  async componentDidMount() {
+    await this.getBridges();
   }
   
   filterNetworks = (network) => {
@@ -39,6 +45,26 @@ export default class Screen4 extends PureComponent {
     this.props.onDestinationNetworksSelected(this.state.selectedNetworks);
   }
 
+  async getBridges(){
+    try {
+      const {
+        response, 
+        error,
+        code
+      } = await BridgeApiHelper.getBridges();
+  
+      if(code === 200){
+        this.setState({
+          bridges: response
+        });
+      } else {
+        console.error(error)
+      }
+    } catch (error){
+      console.error(error)
+    }
+  }
+
   render() {
     let finalFilteredNetworks = [];
     const filteredNetworks = this.props.networks.filter(network => {
@@ -49,12 +75,15 @@ export default class Screen4 extends PureComponent {
 
     filteredNetworks.forEach(network => {
       if(Number(network.chainId) !== Number(this.props.selectedSourceTokenChainId)){
-        if(this.state.selectedNetworks.includes(network.chainId)){
-          network['selectedNetwork'] = true;
-        } else {
-          network['selectedNetwork'] = false;
+        const bridge = _.find(this.state.bridges, { chainId: network.chainId });
+        if(bridge !== undefined){
+          if(this.state.selectedNetworks.includes(network.chainId)){
+            network['selectedNetwork'] = true;
+          } else {
+            network['selectedNetwork'] = false;
+          }
+          finalFilteredNetworks.push(network);
         }
-        finalFilteredNetworks.push(network);
       }
     });
 
@@ -94,8 +123,13 @@ export default class Screen4 extends PureComponent {
                       </ProICOSbx01>
                     }.bind(this) )}
                   </ProICOMbx02>
-                </ProICOMbx01>
 
+                  { finalFilteredNetworks.length == 0 && (
+                    <p>NO BRIDGE FOUND ON ANY DESTINATION CHAIN</p>
+                  )}
+
+                </ProICOMbx01>
+                
                 <BtnMbox>
                   <button onClick={() => this.props.onBackButtonClicked(2)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
                   <button onClick={() => this.setDestinationNetworks()} className="Btn01"> NEXT STEP</button>

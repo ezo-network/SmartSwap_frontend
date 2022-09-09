@@ -55,15 +55,18 @@ export default class Projects extends PureComponent {
       networks: [],
       tokens: [],
       wrappedTokens: [],
+      showWrappedToken: false
     };
 
     this.walletConnectCallback = this.walletConnectCallback.bind(this);
     this.sourceTokenSelectedCallback = this.sourceTokenSelectedCallback.bind(this);
-    this.backButtonClickedCallback = this.backButtonClickedCallback.bind(this);
     this.tokenAddedOnSourceChainCallback = this.tokenAddedOnSourceChainCallback.bind(this);
     this.wrappedTokenFetchedCallback = this.wrappedTokenFetchedCallback.bind(this);
     this.destinationNetworksSelectedCallback = this.destinationNetworksSelectedCallback.bind(this)
     this.switchNetworkCallback = this.switchNetworkCallback.bind(this)
+    this.backButtonClickedCallback = this.backButtonClickedCallback.bind(this);
+    this.finishButtonClicked = this.finishButtonClicked.bind(this);
+    this.addMoreBridgeButtonClicked = this.addMoreBridgeButtonClicked.bind(this)
   }
 
   async componentDidMount() {
@@ -127,6 +130,22 @@ export default class Projects extends PureComponent {
         //filteredDestinationNetworks: []
       });
     }
+  }
+
+  finishButtonClicked() {
+    this.setState({
+      showWrappedToken: true
+    })
+  }
+
+  addMoreBridgeButtonClicked() {
+    this.setState({
+      isSourceTokenSelected: false,
+      isdestinationNetworksFiltered: false,
+      bridgeAddress: null,
+      showWrappedToken: false,
+      wrappedTokens: []
+    });
   }
 
   async wrappedTokenFetchedCallback(wrappedTokens){
@@ -356,10 +375,12 @@ export default class Projects extends PureComponent {
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === true &&
                   this.state.isdestinationNetworksFiltered === true &&
+                  this.state.showWrappedToken === false && 
                   <Screen05
                     chainId={this.state.chainId} 
                     web3Instance={this.state.web3Instance}
                     bridgeContractAddress={this.state.bridgeAddress}
+                    accountAddress={this.state.accountAddress}
                     projectId={this.state.projectId}
                     networks={this.state.networks}
                     tokens={this.state.tokens}
@@ -369,6 +390,26 @@ export default class Projects extends PureComponent {
                     wrappedTokens={this.state.wrappedTokens}
                     onBackButtonClicked={this.backButtonClickedCallback}
                     onSwitchNetwork={this.switchNetworkCallback}
+                    onFinishButtonClicked={this.finishButtonClicked}
+                  />
+                }
+
+
+                {
+                  this.state.walletConnected === true &&
+                  this.state.web3Instance !== null &&
+                  this.state.isSourceTokenSelected === true &&
+                  this.state.isProjectExist === true &&
+                  this.state.isdestinationNetworksFiltered === true &&
+                  this.state.showWrappedToken === true && 
+                  <Screen06
+                    chainId={this.state.chainId} 
+                    web3Instance={this.state.web3Instance}
+                    accountAddress={this.state.accountAddress}
+                    projectId={this.state.projectId}
+                    networks={this.state.networks}
+                    wrappedTokens={this.state.wrappedTokens}
+                    onAddMoreBridgeButtonClicked={this.addMoreBridgeButtonClicked}
                   />
                 }
 

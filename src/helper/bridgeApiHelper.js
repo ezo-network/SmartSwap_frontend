@@ -5,10 +5,12 @@ const apiEndpoints = {
     'project': 'customer/project',
     'projects': 'customer/projects',
     'bridge': 'public/bridge',
+    'bridges': 'public/bridges',
     'getWappedTokens': 'customer/wrapped-tokens',
     'networks': 'public/networks',
     'tokens': 'public/tokens',
-    'activateToken': 'customer/activate-token'
+    'activateToken': 'customer/activate-token',
+    'attachWrappedToken': 'customer/attach-wrap-token'
 }
 
 const BridgeApiHelper = {
@@ -141,6 +143,40 @@ const BridgeApiHelper = {
         }
     },    
 
+    getBridges: async() => {
+        let response, error, code;
+        try {
+
+            const result = await axiosRequest.request({
+                path: apiEndpoints.bridges,
+            });
+
+            if(result.status === 200){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data,
+                    error: undefined
+                }
+            }
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }
+    },    
+
     createNewProject: async(creatorAddress = null, sourceToken = null, sourceTokenAddress = null, sourceChain = null, sourceChainId = null, txHash = null) => {
         let response, error, code;
         try {
@@ -205,9 +241,11 @@ const BridgeApiHelper = {
         }
     },    
 
-    getWrappedTokens: async(projectId = null) => {
+    getWrappedTokens: async(projectId = null, creatorAddress = null) => {
         let response, error, code;
         try {
+
+            let queryString = `?projectId=${projectId}`;
 
             if(projectId === null){
                 error = 'mandatory parameters are missing';
@@ -219,8 +257,12 @@ const BridgeApiHelper = {
                 }
             }
 
+            if(creatorAddress !== null){
+                queryString = queryString + `&creatorAddress=${creatorAddress}`;
+            }
+
             const result = await axiosRequest.request({
-                path: apiEndpoints.getWappedTokens + `?projectId=${projectId}`,
+                path: apiEndpoints.getWappedTokens + queryString,
             });
 
             if(result.status === 200){
@@ -359,7 +401,7 @@ const BridgeApiHelper = {
         }
     },
 
-    attachWrapTokenOnProject: async(projectId, tokenName, chain, chainId) => {
+    attachWrapTokenOnProject: async(projectId = null, tokenName = null, tokenSymbol = null, chainId = null, txHash = null, blockNumber = null, creatorAddress = null) => {
         let response, error, code;
 
         if(
@@ -367,9 +409,15 @@ const BridgeApiHelper = {
             ||
             tokenName == null
             ||
-            chain == null
+            tokenSymbol == null
             ||
             chainId == null
+            ||
+            txHash == null
+            ||
+            blockNumber == null
+            ||
+            creatorAddress == null
         ){
             error = 'mandatory parameters are missing';
             code = 422;
@@ -381,6 +429,33 @@ const BridgeApiHelper = {
         }
 
         try { 
+            const result = await axiosRequest.request({
+                path: apiEndpoints.attachWrappedToken,
+                method: 'POST',
+                data: {
+                    projectId: projectId,
+                    tokenName: tokenName,
+                    tokenSymbol: tokenSymbol,
+                    chainId: chainId,
+                    txHash: txHash,
+                    blockNumber: blockNumber,
+                    creatorAddress: creatorAddress
+                }
+            });
+
+            if(result.status === 200){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
 
         } catch(err){
             error = err;

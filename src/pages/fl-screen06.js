@@ -1,84 +1,141 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
 import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
-import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
-import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
-import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
-import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
-import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
-import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
-import Lineimg from "../assets/freelisting-images/line01.png";
-import addImg from "../assets/images/add-chain.png";
-
-
-
-
+import _ from "lodash";
+import BridgeApiHelper from "../helper/bridgeApiHelper";
 const $ = window.$;
-export default class Screen5 extends PureComponent {
-  constructor(props) {
-    super();
-    this.state = {
-
-    };
-
-    this.state = {
-      web3: null,
-      web3Check: false,
-    };
-  }
 
 
-  render() {
-    return (
-      <>
-        <main id="main" className="smartSwap">
+export default class Screen6 extends PureComponent {
+	
+	mounted = false;
 
-          <div className="main">
-            <MContainer>
-              <CMbx>
-				
-				<SuccessBox>
-					<i class="fa fa-check" aria-hidden="true"></i>
-					<SuccessTitle><span>All done!</span> You successfully set up a new bridge</SuccessTitle>
-				</SuccessBox>
-                
-				<Ulist>
-					<List>
-						<ListTxt className="title">New bridge</ListTxt>
-						<ListTxt className="title">Wrap token smart contract</ListTxt>
-					</List>
-					<List>
-						<ListTxt><span>sbSMART</span><span>POLYGON</span></ListTxt>
-						<ListTxt><ListLink>0xfdsf542df5q4235fca43</ListLink></ListTxt>
-					</List>
-					<List>
-						<ListTxt><span>sbSMART</span><span>POLYGON</span></ListTxt>
-						<ListTxt><ListLink>0xfdsf542df5q4235fca43</ListLink></ListTxt>
-					</List>
-					<ListFooter>
-						<LinkGreen>+ Add more bridges </LinkGreen>
-						<LinkFt>Projects, claim the bridge deployer to become the master validator   <i class="fas fa-external-link-alt"></i></LinkFt>
-					</ListFooter>
-				</Ulist>
-              </CMbx>
-            </MContainer>
+	constructor(props) {
+		super();
+		this.state = {
+			wrappedTokens: [],
+			fetch: true
+		};
+	}
 
-          </div>
-        </main>
-      </>
-    );
-  }
+	async componentDidMount() {
+		this.mounted = true;
+		if(this.mounted === true){
+			this.setState({
+				wrappedTokens: this.props.wrappedTokens
+			});
+	
+			this.props.wrappedTokens.forEach(async(token) => {
+				if(token.address === null){
+					await this.reFetchWrappedTokens();
+				}
+			});
+		}
+	}
+
+	componentWillUnmount() {
+		this.mounted = false;
+	}
+
+	reFetchWrappedTokens = async() => {
+		try {
+			if(this.mounted === true){
+				var networkPromise = await BridgeApiHelper.getWrappedTokens(this.props.projectId, this.props.accountAddress);
+				var timeOutPromise = new Promise(function (resolve, reject) {
+					setTimeout(resolve, 5000, 'Timeout Done');
+				});
+		
+				Promise.all([networkPromise, timeOutPromise]).then(async (responses) => {
+					let pendingAddresses = 0;
+					if (responses[0].code === 200) {
+						let tokens = responses[0].response;
+						if(tokens.length > 0){
+							tokens.forEach(token => {
+								if(token.address === null){
+									pendingAddresses = pendingAddresses + 1;
+								}
+							})
+						}
+						
+						if(this.mounted === true){
+							this.setState({
+								wrappedTokens: tokens
+							});
+						}
+					}
+		
+					if(pendingAddresses === 0){
+		
+					} else {
+						await this.reFetchWrappedTokens();
+					}
+				});
+			}
+		} catch (err){
+			console.error(err.message);
+			notificationConfig.error('Something went wrong');
+		}
+    }
+
+	render() {
+
+		let wrappedTokens = [];
+		this.state.wrappedTokens.forEach(token => {
+			const networkConfig = _.find(this.props.networks, { chainId: token.chainId });
+			token['chain'] = networkConfig['name'];
+			wrappedTokens.push(token);
+		});
+
+		return (
+			<>
+				<main id="main" className="smartSwap">
+
+					<div className="main">
+						<MContainer>
+							<CMbx>
+								{wrappedTokens.length > 0 && (
+								<SuccessBox>
+									<i className="fa fa-check" aria-hidden="true"></i>
+									<SuccessTitle><span>All done!</span> You successfully set up a new bridge</SuccessTitle>
+								</SuccessBox>
+								)}
+
+								{wrappedTokens.length  === 0 && (
+								<SuccessBox>
+									<i className="fa fa-exclamation" aria-hidden="true"></i>
+									<SuccessTitle>You've not wrapped any token yet</SuccessTitle>
+								</SuccessBox>
+								)}
+
+								<Ulist>
+									{wrappedTokens.length > 0 &&
+									<List>
+										<ListTxt className="title">New bridge</ListTxt>
+										<ListTxt className="title">Wrap token smart contract</ListTxt>
+									</List>
+									}
+									{wrappedTokens.length > 0 && wrappedTokens.map(function (wrappedToken, i) {
+										return (
+											<List key={i}>
+												<ListTxt><span>sb{wrappedToken.tokenSymbol}</span><span>{wrappedToken.chain}</span></ListTxt>
+												<ListTxt><ListLink>{wrappedToken.address === null ? 'FETHING...' : wrappedToken.address}</ListLink></ListTxt>
+											</List>
+										)
+									})}
+									<ListFooter>
+										<LinkGreen onClick={e => this.props.onAddMoreBridgeButtonClicked()}>+ Add more bridges </LinkGreen>
+										<LinkFt>Projects, claim the bridge deployer to become the master validator   <i className="fas fa-external-link-alt"></i></LinkFt>
+									</ListFooter>
+								</Ulist>
+							</CMbx>
+						</MContainer>
+
+					</div>
+				</main>
+			</>
+		);
+	}
 }
 
 const FlexDiv = styled.div`
@@ -92,7 +149,7 @@ const CMbx = styled(FlexDiv)`
   width:100%;  margin-top:90px;
 `
 
-const SuccessBox = styled.div `
+const SuccessBox = styled.div`
 	text-align: center;
 	width:100%;
 	margin-bottom: 56px;
@@ -106,9 +163,13 @@ const SuccessBox = styled.div `
 			border: 3px solid #91dc27;
 			color: #91dc27;
 		}
+		&.fa-exclamation {
+			border: 3px solid #ffc107;
+			color: #ffc107;
+		}
 	}
 	`
-const SuccessTitle = styled.div `
+const SuccessTitle = styled.div`
 	font-size: 24px;
 	color: #fff;
 	font-weight: bold;
@@ -118,14 +179,14 @@ const SuccessTitle = styled.div `
 		
 	}
 `
-const Ulist = styled.ul `
+const Ulist = styled.ul`
 	padding: 0;
 	margin: 0;
 	display: table;
 	width: 900px;
 	border-top: 2px solid #3b3e4b;
 `
-const List = styled.li `
+const List = styled.li`
 	padding: 0;
 	margin: 0;
 	list-style: none;
@@ -139,7 +200,7 @@ const List = styled.li `
 		
 	}
 	`
-const ListTxt = styled.div `
+const ListTxt = styled.div`
 	padding: 17px 22px;
 	margin: 0;
 	list-style: none;
@@ -159,13 +220,13 @@ const ListTxt = styled.div `
 	}
 	
 `
-const ListLink = styled.a `
+const ListLink = styled.a`
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	color: #2d52f3;
 `
-const ListFooter = styled.li `
+const ListFooter = styled.li`
 	list-style: none;
 	padding: 0;
 	margin: 0;
@@ -173,14 +234,14 @@ const ListFooter = styled.li `
 	justify-content: space-between;
 	padding: 17px 0;
 `
-const LinkGreen = styled.a `
+const LinkGreen = styled.a`
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	color: #91dc27;
 	font-weight: bold;
 `
-const LinkFt = styled.a `
+const LinkFt = styled.a`
 	padding: 0;
 	margin: 0;
 	list-style: none;

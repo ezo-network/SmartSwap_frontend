@@ -3,6 +3,7 @@ import _ from "lodash";
 import Web3 from 'web3';
 import notificationConfig from "../config/notificationConfig";
 import styled from 'styled-components';
+import { LoopCircleLoading } from 'react-loadingg';
 import Lineimg from "../assets/freelisting-images/line01.png";
 import addImg from "../assets/images/add-chain.png";
 import BridgeApiHelper from "../helper/bridgeApiHelper";
@@ -14,7 +15,9 @@ export default class Screen5 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
-      addWrappedTokenSignedParams: []
+      addWrappedTokenSignedParams: [],
+      btnClicked: false,
+      pendingNetworkSwitchRequest: false
     };
   }
 
@@ -22,13 +25,13 @@ export default class Screen5 extends PureComponent {
     await this.getWrappedTokens(this.props.projectId);
   }
 
-  async getWrappedTokens(sourceTokenChainId) {
+  async getWrappedTokens(sourceTokenChainId, creatorAddress = null) {
     try {
       const {
         response,
         error,
         code
-      } = await BridgeApiHelper.getWrappedTokens(sourceTokenChainId);
+      } = await BridgeApiHelper.getWrappedTokens(sourceTokenChainId, creatorAddress);
 
       if (code === 200) {
         this.props.onWrappedTokensFetched(response);
@@ -42,17 +45,36 @@ export default class Screen5 extends PureComponent {
   }
 
   async switchNetwork(chainId) {
-    if (Number(this.props.chainId) !== Number(chainId)) {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: Web3.utils.toHex(chainId) }],
-      }).then((response) => {
+    try {
+      if (Number(this.props.chainId) !== Number(chainId)) {
+        this.setState({
+          pendingNetworkSwitchRequest: true
+        });
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: Web3.utils.toHex(chainId) }],
+        }).then((response) => {
+          this.setState({
+            pendingNetworkSwitchRequest: false
+          });
+          console.log({response: response});
+          this.props.onSwitchNetwork(Number(chainId));
+        }).catch(error => {
+          console.error(error);
+          if(error.code === -32002){
+            notificationConfig.info('A switch network request is pending. Check metamask.');
+          }
+          if(error.code === 4001){
+            this.setState({
+              pendingNetworkSwitchRequest: false
+            });            
+          }
+        });
+      } else {
         this.props.onSwitchNetwork(Number(chainId));
-      }).catch(error => {
-        console.error(error);
-      });
-    } else {
-
+      }
+    } catch(err){
+      console.error(err);
     }
   }
 
@@ -81,6 +103,9 @@ export default class Screen5 extends PureComponent {
 
   async addWrappedTokenOnDestinationChain() {
     try {
+      this.setState({
+        btnClicked: true
+      });
       await this.activeToken();
       const bridgeContract = new BridgeContract(this.props.web3Instance, this.props.bridgeContractAddress);
       await bridgeContract.addWrappedTokenOnDestinationChain(
@@ -100,69 +125,69 @@ export default class Screen5 extends PureComponent {
           }
         },
         async (response) => {
-          
+
           // handle response 
           console.log({
             "Contract response:": response
           });
 
           response = {
-              "to": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
-              "from": "0xA03476C7a7bd9eeEAcB0F4Cea7a8093cc2827EdD",
-              "contractAddress": null,
-              "transactionIndex": 3,
-              "gasUsed": {
-                  "type": "BigNumber",
-                  "hex": "0x01e871"
-              },
-              "logsBloom": "0x00000000000000010000008000000000800000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000010003000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-              "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6",
-              "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
-              "logs": [
-                  {
-                      "transactionIndex": 3,
-                      "blockNumber": 22515012,
-                      "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
-                      "address": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
-                      "topics": [
-                          "0xef4ec9b3cfaa22dd32688bf4ac3c820e8b468ffb6452f61717fb9d845f3c5263",
-                          "0x000000000000000000000000000080383847bd75f91c168269aa74004877592f"
-                      ],
-                      "data": "0x00000000000000000000000000000000000000000000000000000000000000610000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000045a6574610000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000045a45544100000000000000000000000000000000000000000000000000000000",
-                      "logIndex": 22,
-                      "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6"
-                  }
-              ],
-              "blockNumber": 22515012,
-              "confirmations": 4,
-              "cumulativeGasUsed": {
-                  "type": "BigNumber",
-                  "hex": "0x0bed71"
-              },
-              "effectiveGasPrice": {
-                  "type": "BigNumber",
-                  "hex": "0x02540be400"
-              },
-              "status": 1,
-              "type": 0,
-              "byzantium": true
-          } 
-
-          if (response.code === "ACTION_REJECTED"){
-            this.setState({
-              btnClicked: false
-            });
-            notificationConfig.error(response.reason);
+            "to": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
+            "from": "0xA03476C7a7bd9eeEAcB0F4Cea7a8093cc2827EdD",
+            "contractAddress": null,
+            "transactionIndex": 3,
+            "gasUsed": {
+              "type": "BigNumber",
+              "hex": "0x01e871"
+            },
+            "logsBloom": "0x00000000000000010000008000000000800000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000010003000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6",
+            "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
+            "logs": [
+              {
+                "transactionIndex": 3,
+                "blockNumber": 22515012,
+                "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
+                "address": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
+                "topics": [
+                  "0xef4ec9b3cfaa22dd32688bf4ac3c820e8b468ffb6452f61717fb9d845f3c5263",
+                  "0x000000000000000000000000000080383847bd75f91c168269aa74004877592f"
+                ],
+                "data": "0x00000000000000000000000000000000000000000000000000000000000000610000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000045a6574610000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000045a45544100000000000000000000000000000000000000000000000000000000",
+                "logIndex": 22,
+                "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6"
+              }
+            ],
+            "blockNumber": 22515012,
+            "confirmations": 4,
+            "cumulativeGasUsed": {
+              "type": "BigNumber",
+              "hex": "0x0bed71"
+            },
+            "effectiveGasPrice": {
+              "type": "BigNumber",
+              "hex": "0x02540be400"
+            },
+            "status": 1,
+            "type": 0,
+            "byzantium": true
           }
-          
-          if (response.code === "UNPREDICTABLE_GAS_LIMIT"){
+
+          if (response.code === "ACTION_REJECTED") {
             this.setState({
               btnClicked: false
             });
             notificationConfig.error(response.reason);
           }
 
-          if (response.code === -32016){
+          if (response.code === "UNPREDICTABLE_GAS_LIMIT") {
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.reason);
+          }
+
+          if (response.code === -32016) {
             this.setState({
               btnClicked: false
             });
@@ -170,32 +195,81 @@ export default class Screen5 extends PureComponent {
           }
 
           if (response.status === 1) {
-            await this.props.onTokenAddedSuccessfully(response.transactionHash)
+            await this.attachWrapToken(
+              this.props.projectId,
+              this.state.addWrappedTokenSignedParams.name,
+              this.state.addWrappedTokenSignedParams.symbol,
+              this.props.chainId,
+              response.transactionHash,
+              response.blockNumber,
+              this.props.accountAddress
+            );
+            notificationConfig.success('Token Wrapped Successfully!');
           }
 
-      });
+        });
     } catch (err) {
       console.error(err.message);
     }
   }
 
-  async attachWrapToken(projectId = null, tokenName = null, chain = null, chainId = null) {
-    try { 
-      if(
+  async attachWrapToken(projectId = null, tokenName = null, tokenSymbol = null, chainId = null, txHash = null, blockNumber = null, creatorAddress = null) {
+    try {
+      if (
         projectId == null
         ||
         tokenName == null
         ||
-        chain == null
+        tokenSymbol == null
         ||
         chainId == null
-      ){
+        ||
+        txHash == null
+        ||
+        blockNumber == null
+        ||
+        creatorAddress == null
+      ) {
         notificationConfig.error('Could not saved wrapped token.');
         return;
       }
+
+      const { response, error, code } = await BridgeApiHelper.attachWrapTokenOnProject(
+        projectId,
+        tokenName,
+        tokenSymbol,
+        chainId,
+        txHash,
+        blockNumber,
+        creatorAddress
+      );
+
+      if(code === 201){
+        await this.getWrappedTokens(this.props.projectId);
+        this.setState({
+          btnClicked: false
+        });
+      }
+
     } catch (err) {
       console.error(err.message);
     }
+  }
+
+  async onFinishButtonClicked(){
+    await this.getWrappedTokens(this.props.projectId, this.props.accountAddress).then(response => {
+      this.props.onFinishButtonClicked();
+    });
+  }
+
+  async onBackButtonClicked(chainId){
+    await this.switchNetwork(Number(chainId)).then(() => {
+      if(this.state.pendingNetworkSwitchRequest === false){
+        this.props.onBackButtonClicked(4);
+      } else {
+        notificationConfig.info('A switch network request is pending. Check metamask.');
+      }
+    });
   }
 
   render() {
@@ -264,10 +338,21 @@ export default class Screen5 extends PureComponent {
                             <label className="Btn02"><i className="fa fa-check" aria-hidden="true"></i> Bridge Created</label>
                           )}
                           {network.wrappedTokenExist === false && Number(network.chainId) === Number(this.props.chainId) && (
-                            <button onClick={e => this.addWrappedTokenOnDestinationChain()} className="Btn01">CREATE A BRIDGE</button>
+                            <button disabled={this.state.btnClicked} onClick={e => this.addWrappedTokenOnDestinationChain()} className="Btn01">
+                              {this.state.btnClicked === true && (
+                                <LoopCircleLoading
+                                    height={'20px'}
+                                    width={'20px'}
+                                    color={'#ffffff'}
+                                />
+                              )}
+                              {this.state.btnClicked === false && (
+                                'CREATE A BRIDGE'                              
+                              )}
+                            </button>
                           )}
                           {network.wrappedTokenExist === false && Number(network.chainId) !== Number(this.props.chainId) && (
-                            <button onClick={e => this.switchNetwork(network.chainId)} className="Btn01">SWITCH NETWORK</button>
+                            <button disabled={this.state.btnClicked} onClick={e => this.switchNetwork(network.chainId)} className="Btn01">SWITCH NETWORK</button>
                           )}
                         </ProColBtn>
                       </ProRowCol1>
@@ -276,8 +361,8 @@ export default class Screen5 extends PureComponent {
                 }.bind(this))}
 
                 <BtnMbox>
-                  <button onClick={() => this.props.onBackButtonClicked(4)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button className="Btn01">FINISH</button>
+                  <button onClick={() => this.onBackButtonClicked(this.props.selectedSourceTokenData.chainId)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                  <button onClick={() => this.onFinishButtonClicked()} className="Btn01">FINISH</button>
                 </BtnMbox>
 
               </CMbx>
