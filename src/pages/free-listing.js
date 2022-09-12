@@ -55,10 +55,16 @@ export default class Projects extends PureComponent {
       networks: [],
       tokens: [],
       wrappedTokens: [],
-      showWrappedToken: false
+      showWrappedToken: false,
+      claimDeployerOwnerShip: false,
+      isEmailAddressExist: false,
+      validatorAdded: false,
+      ownershipTransfered: false
     };
 
+    this.connectWallet = this.connectWallet.bind(this);
     this.walletConnectCallback = this.walletConnectCallback.bind(this);
+    this.startHereButtonClickedCallback = this.startHereButtonClickedCallback.bind(this);
     this.sourceTokenSelectedCallback = this.sourceTokenSelectedCallback.bind(this);
     this.tokenAddedOnSourceChainCallback = this.tokenAddedOnSourceChainCallback.bind(this);
     this.wrappedTokenFetchedCallback = this.wrappedTokenFetchedCallback.bind(this);
@@ -67,11 +73,61 @@ export default class Projects extends PureComponent {
     this.backButtonClickedCallback = this.backButtonClickedCallback.bind(this);
     this.finishButtonClicked = this.finishButtonClicked.bind(this);
     this.addMoreBridgeButtonClicked = this.addMoreBridgeButtonClicked.bind(this)
+    this.emailAddressExistCallback = this.emailAddressExistCallback.bind(this)
   }
 
   async componentDidMount() {
     await this.getNetworkList();
     await this.getTokenList();
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (typeof window.ethereum !== 'undefined') {
+        // detect Network account change
+        window.ethereum.on('chainChanged', networkId => {
+            console.log('chainChanged', networkId);
+            this.connectWallet();
+        });
+
+        window.ethereum.on('accountsChanged', async(accounts) => {          
+            if(accounts.length > 0){
+              await web3Config.connectWallet(0);
+              this.walletConnectCallback(true, web3Config.getWeb3());
+            } else {
+              this.walletConnectCallback(false, null);              
+            }
+        });
+
+        window.ethereum.on('disconnect', (error) => {
+          this.walletConnectCallback(false, null);          
+        });
+    }
+  }
+
+  async connectWallet() {
+    
+    if (typeof window.ethereum == 'undefined') {
+      console.log('MetaMask is not installed!');
+      notificationConfig.error('Metamask not found.');
+      return;
+    }
+
+    await web3Config.connectWallet(0).then(response => {
+      if(window.ethereum.isConnected() === true){
+        if(response === true){
+          this.walletConnectCallback(true, web3Config.getWeb3());
+          notificationConfig.success('Wallet connected');
+        } else {
+          notificationConfig.info('Wallet not connected to metamask');                  
+        }
+      } else {
+        notificationConfig.info('Wallet not connected to metamask');        
+      }
+    }).catch(error => {
+      console.log({
+        error:error
+      });
+    });
   }
 
   walletConnectCallback(walletConnected, web3Instance) {
@@ -81,6 +137,18 @@ export default class Projects extends PureComponent {
       chainId: web3Config.getNetworkId(),
       accountAddress: web3Config.getAddress()
     });
+  }
+
+  startHereButtonClickedCallback(){
+    this.setState({
+      claimDeployerOwnerShip: true
+    })
+  }
+
+  emailAddressExistCallback(){
+    this.setState({
+      isEmailAddressExist: true
+    })
   }
 
   async sourceTokenSelectedCallback(sourceToken, sourceTokenAddress, sourceTokenIcon, sourceChain, sourceChainId, sourceChainIcon, explorerUrl) {
@@ -128,6 +196,19 @@ export default class Projects extends PureComponent {
       this.setState({
         isdestinationNetworksFiltered: false,
         //filteredDestinationNetworks: []
+      });
+    }
+
+    if(onStep === 10){
+      this.setState({
+        validatorAdded: true,
+        //filteredDestinationNetworks: []
+      });
+    }
+
+    if(onStep === 11){
+      this.setState({
+        ownershipTransfered: true
       });
     }
   }
@@ -320,12 +401,20 @@ export default class Projects extends PureComponent {
             <div className="main">  
                 <HeadFreeListing />
 
+                {this.state.walletConnected === false && this.state.claimDeployerOwnerShip === false &&
                 <Screen01
-                  onWalletConnectButtonClick={this.walletConnectCallback} 
+                  onWalletConnectButtonClick={this.connectWallet}
                   walletConnected={this.state.walletConnected}
+                  claimDeployerOwnerShip={this.state.claimDeployerOwnerShip}
+                  onStartHereButtonClick={this.startHereButtonClickedCallback}
                 />
+                }
 
-                {this.state.walletConnected === true && this.state.web3Instance !== null && this.state.isSourceTokenSelected === false &&
+                {
+                  this.state.walletConnected === true && 
+                  this.state.web3Instance !== null && 
+                  this.state.isSourceTokenSelected === false &&
+                  this.state.claimDeployerOwnerShip === false &&
                   <Screen02 
                     chainId={this.state.chainId} 
                     web3Instance={this.state.web3Instance} 
@@ -341,6 +430,7 @@ export default class Projects extends PureComponent {
                   this.state.web3Instance !== null &&
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === false &&
+                  this.state.claimDeployerOwnerShip === false &&
                   <Screen03
                     chainId={this.state.chainId}
                     web3Instance={this.state.web3Instance}
@@ -357,6 +447,7 @@ export default class Projects extends PureComponent {
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === true &&
                   this.state.isdestinationNetworksFiltered === false &&
+                  this.state.claimDeployerOwnerShip === false &&
                   <Screen04
                     chainId={this.state.chainId}
                     web3Instance={this.state.web3Instance}
@@ -375,7 +466,8 @@ export default class Projects extends PureComponent {
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === true &&
                   this.state.isdestinationNetworksFiltered === true &&
-                  this.state.showWrappedToken === false && 
+                  this.state.showWrappedToken === false &&
+                  this.state.claimDeployerOwnerShip === false &&
                   <Screen05
                     chainId={this.state.chainId} 
                     web3Instance={this.state.web3Instance}
@@ -401,7 +493,8 @@ export default class Projects extends PureComponent {
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === true &&
                   this.state.isdestinationNetworksFiltered === true &&
-                  this.state.showWrappedToken === true && 
+                  this.state.showWrappedToken === true &&
+                  this.state.claimDeployerOwnerShip === false &&
                   <Screen06
                     chainId={this.state.chainId} 
                     web3Instance={this.state.web3Instance}
@@ -412,6 +505,63 @@ export default class Projects extends PureComponent {
                     onAddMoreBridgeButtonClicked={this.addMoreBridgeButtonClicked}
                   />
                 }
+
+
+              {
+                this.state.walletConnected === false && 
+                this.state.claimDeployerOwnerShip === true &&
+                <Screen07
+                  onWalletConnectButtonClick={this.connectWallet}
+                  walletConnected={this.state.walletConnected}
+                  claimDeployerOwnerShip={this.state.claimDeployerOwnerShip}
+                />                  
+              }
+
+              {
+                this.state.walletConnected === true && 
+                this.state.claimDeployerOwnerShip === true &&
+                this.state.isEmailAddressExist === false &&
+                <Screen08
+                  claimDeployerOwnerShip={this.state.claimDeployerOwnerShip}
+                  accountAddress={this.state.accountAddress}
+                  onEmailAddressExist={this.emailAddressExistCallback}
+                />                  
+              }
+
+              {
+                this.state.walletConnected === true && 
+                this.state.claimDeployerOwnerShip === true &&
+                this.state.isEmailAddressExist === true &&
+                this.state.validatorAdded === false &&
+                <Screen09
+                  accountAddress={this.state.accountAddress}
+                  onEmailAddressExist={this.emailAddressExistCallback}
+                  onActiveValidatorButtonClick={this.backButtonClickedCallback}
+                />                  
+              }
+
+              {
+                this.state.walletConnected === true && 
+                this.state.claimDeployerOwnerShip === true &&
+                this.state.isEmailAddressExist === true &&
+                this.state.validatorAdded === true &&
+                this.state.ownershipTransfered === false &&
+                <Screen10
+                  networks={this.state.networks}
+                  tokens={this.state.tokens}
+                  accountAddress={this.state.accountAddress}
+                  onOwnershipTransfered={this.backButtonClickedCallback}
+                />
+              }
+
+              {
+                this.state.walletConnected === true && 
+                this.state.claimDeployerOwnerShip === true &&
+                this.state.isEmailAddressExist === true &&
+                this.state.validatorAdded === true &&
+                this.state.ownershipTransfered === true &&
+                <Screen11/>
+              }
 
             </div>
           </main>

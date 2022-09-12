@@ -1,43 +1,47 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
-import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
-import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
-import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
-import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
-import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
-import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
-import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
-import Lineimg from "../assets/freelisting-images/line01.png";
-
-
-
+import BridgeApiHelper from "../helper/bridgeApiHelper";
 
 const $ = window.$;
 export default class Screen8 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
-
-    };
-
-    this.state = {
-      web3: null,
-      web3Check: false,
+      validatorFileInfo: {
+        name: null,
+        url: null,
+        updatedAt: null,
+        instructionUrl: null
+      }
     };
   }
 
+  componentDidMount() {
+    this.getValidatorFileInfo();
+  }
 
+  getValidatorFileInfo = async() => {
+    try {
+      const {response, error, code} = await BridgeApiHelper.getValidatorFileInfo();
+      if(code === 200){
+        this.setState({
+          validatorFileInfo: response
+        });
+      }
+    } catch(err){
+      console.error(err);
+    }
+  }
+
+  goToInstructionUrl(){
+    window.open(this.state.validatorFileInfo.instructionUrl, '_blank');
+  }
+
+  downloadFile(){
+    window.open(this.state.validatorFileInfo.url, '_blank');
+  }
+  
   render() {
     return (
       <>
@@ -55,12 +59,12 @@ export default class Screen8 extends PureComponent {
                     <label><i>1</i> 
                     <ProFileNBtn>
                       <ProFile><p>
-                        <span><em class="fa fa-file-code"></em> SMART validator V.1</span> Latest update 09/08/2022</p>
-                        <ProbxLink>Instructions <em class="fas fa-external-link-alt"></em></ProbxLink>
+                        <span><em className="fa fa-file-code"></em> {this.state.validatorFileInfo.name},</span> Latest update {this.state.validatorFileInfo.updatedAt}</p>
+                        <ProbxLink>Instructions <em onClick={() => this.goToInstructionUrl()} className="fas fa-external-link-alt"></em></ProbxLink>
 
                       </ProFile>
                       <ProBtn>
-                        <button className="Btn01">DOWNLOAD VALIDATOR FILE</button> 
+                        <button onClick={() => this.downloadFile()} className="Btn01">DOWNLOAD VALIDATOR FILE</button> 
                       </ProBtn>
                     </ProFileNBtn>
                     </label>   
@@ -72,7 +76,7 @@ export default class Screen8 extends PureComponent {
             
                 <BtnMbox>
                     <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                    <button className="Btn01"> ACTIVE VALIDATOR</button> 
+                    <button onClick={() => this.props.onActiveValidatorButtonClick(10)} className="Btn01"> ACTIVE VALIDATOR</button> 
                 </BtnMbox> 
               </CMbx>
             </MContainer>

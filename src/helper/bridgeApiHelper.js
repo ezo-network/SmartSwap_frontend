@@ -10,10 +10,48 @@ const apiEndpoints = {
     'networks': 'public/networks',
     'tokens': 'public/tokens',
     'activateToken': 'customer/activate-token',
-    'attachWrappedToken': 'customer/attach-wrap-token'
+    'attachWrappedToken': 'customer/attach-wrap-token',
+    'getEmailStatus': 'customer/get-email-status',
+    'addEmailAddress': 'customer/add-email-address',
+    'getValidatorFileInfo': 'public/validator-file-info',
+    'makeTransferWrapTokenOwnershipRequest': 'customer/transfer-wrap-token-ownership-request',
 }
 
 const BridgeApiHelper = {
+    
+    getValidatorFileInfo: async() => {
+        let response, error, code;
+        try {
+            const result = await axiosRequest.request({
+                path: apiEndpoints.getValidatorFileInfo
+            });
+
+            if(result.status === 200){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }
+    },
+
     isProjectExist: async(chainId = null, sourceTokenAddress = null) => {
         let response, error, code;
         try {
@@ -41,7 +79,7 @@ const BridgeApiHelper = {
                 return {
                     response: undefined,
                     code: result.data.code,
-                    error: undefined
+                    error: result.data.error
                 }
             }
 
@@ -126,8 +164,8 @@ const BridgeApiHelper = {
             } else {
                 return {
                     response: undefined,
-                    code: result.data,
-                    error: undefined
+                    code: result.data.code,
+                    error: result.data.error
                 }
             }
 
@@ -160,8 +198,8 @@ const BridgeApiHelper = {
             } else {
                 return {
                     response: undefined,
-                    code: result.data,
-                    error: undefined
+                    code: result.data.code,
+                    error: result.data.error
                 }
             }
 
@@ -241,28 +279,25 @@ const BridgeApiHelper = {
         }
     },    
 
-    getWrappedTokens: async(projectId = null, creatorAddress = null) => {
+    getWrappedTokens: async(projectId = null, creatorAddress = null, all = false) => {
         let response, error, code;
         try {
 
-            let queryString = `?projectId=${projectId}`;
+            let params = {};
 
-            if(projectId === null){
-                error = 'mandatory parameters are missing';
-                code = 422;
-                return {
-                    response, 
-                    error,
-                    code
-                }
+            if(projectId !== null){
+                params['projectId'] = projectId
             }
 
             if(creatorAddress !== null){
-                queryString = queryString + `&creatorAddress=${creatorAddress}`;
+                params['creatorAddress'] = creatorAddress
             }
 
+            params =  '?' + new URLSearchParams(params);
+            
+
             const result = await axiosRequest.request({
-                path: apiEndpoints.getWappedTokens + queryString,
+                path: apiEndpoints.getWappedTokens + params,
             });
 
             if(result.status === 200){
@@ -274,8 +309,8 @@ const BridgeApiHelper = {
             } else {
                 return {
                     response: undefined,
-                    code: result.data,
-                    error: undefined
+                    code: result.data.code,
+                    error: result.data.error
                 }
             }
 
@@ -308,8 +343,8 @@ const BridgeApiHelper = {
             } else {
                 return {
                     response: undefined,
-                    code: result.data,
-                    error: undefined
+                    code: result.data.code,
+                    error: result.data.error
                 }
             }
 
@@ -342,8 +377,8 @@ const BridgeApiHelper = {
             } else {
                 return {
                     response: undefined,
-                    code: result.data,
-                    error: undefined
+                    code: result.data.code,
+                    error: result.data.error
                 }
             }
 
@@ -467,7 +502,171 @@ const BridgeApiHelper = {
             error,
             code
         }    
-    }
+    },
+
+    getEmailStatus: async(walletAddress = null, emailAddress = null) => {
+        let response, error, code;
+        try {
+
+            let queryString = `?walletAddress=${walletAddress}`;
+
+            if(walletAddress === null){
+                error = 'mandatory parameters are missing';
+                code = 422;
+                return {
+                    response, 
+                    error,
+                    code
+                }
+            }
+
+            if(emailAddress !== null){
+                queryString = queryString + `&emailAddress=${emailAddress}`;
+            }
+
+            const result = await axiosRequest.request({
+                path: apiEndpoints.getEmailStatus + queryString,
+            });
+
+            if(result.status === 200){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }
+    },
+
+    addEmailAddress: async(walletAddress = null, emailAddress = null) => {
+        let response, error, code;
+        try {
+
+            if(
+                walletAddress === null
+                || 
+                emailAddress === null
+            ){
+                error = 'mandatory parameters are missing';
+                code = 422;
+                return {
+                    response, 
+                    error,
+                    code
+                }
+            }
+
+            const result = await axiosRequest.request({
+                path: apiEndpoints.addEmailAddress,
+                method: 'POST',
+                data: {
+                    walletAddress: (walletAddress).toLowerCase(),
+                    emailAddress: (emailAddress).toLowerCase()
+                }
+            });
+
+            if(result.status === 201){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }
+    },    
+
+
+    makeTransferWrapTokenOwnershipRequest: async(tokenSymbol = null, chain = null, chainId = null, requesterAddress = null) => {
+        let response, error, code;
+
+        if(
+            tokenSymbol == null
+            ||
+            chain == null
+            ||
+            chainId == null
+            ||
+            requesterAddress == null
+        ){
+            error = 'mandatory parameters are missing';
+            code = 422;
+            return {
+                response, 
+                error,
+                code
+            }
+        }
+
+        try { 
+            const result = await axiosRequest.request({
+                path: apiEndpoints.makeTransferWrapTokenOwnershipRequest,
+                method: 'POST',
+                data: {
+                    token: tokenSymbol,
+                    chain: chain,
+                    chainId: chainId,
+                    requesterAddress: requesterAddress
+                }
+            });
+
+            if(result.status === 200){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }    
+    },
+
 }
 
 

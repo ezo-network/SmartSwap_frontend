@@ -1,94 +1,160 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
-import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
-import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
-import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
-import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
-import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
-import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
-import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
-import ImgIco07 from "../assets/freelisting-images/s2ICO-07.png";
-import ImgIco08 from "../assets/freelisting-images/s2ICO-08.png";
-import ImgIco09 from "../assets/freelisting-images/s2ICO-09.png";
+import _ from "lodash";
 import Lineimg from "../assets/freelisting-images/line01.png";
-
-
-
-
+import BridgeApiHelper from "../helper/bridgeApiHelper";
 const $ = window.$;
-export default class Screen4 extends PureComponent {
+
+
+export default class Screen10 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
-
-    };
-
-    this.state = {
-      web3: null,
-      web3Check: false,
+      wrappedTokens:[],
+      selectedWrappedToken: [],
+      ownershipTransferRequested: false
     };
   }
 
+  componentDidMount() {
+    this.getWrappedTokens(null, this.props.accountAddress, false);
+  }
+
+  selectToken(id){
+    this.set
+  }
+
+  selectToken = (id) => {
+    if(this.state.selectedWrappedToken.includes(id)){
+      this.setState({selectedWrappedToken: this.state.selectedWrappedToken.filter(function(_id) { 
+        return id !== _id
+      })});
+    } else {
+      this.setState(prevState => ({
+        selectedWrappedToken: [...prevState.selectedWrappedToken, id]
+      }));
+    }
+  }
+
+  async getWrappedTokens(sourceTokenChainId = null, creatorAddress = null, all = false) {
+    try {
+      const {
+        response,
+        error,
+        code
+      } = await BridgeApiHelper.getWrappedTokens(sourceTokenChainId, creatorAddress, all);
+
+      if (code === 200) {
+        this.setState({
+          wrappedTokens: response
+        });
+      } else {
+        console.error(error)
+      }
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async makeTransferWrapTokenOwnershipRequest(){
+    if(this.state.ownershipTransferRequested === false){
+      if(this.state.selectedWrappedToken.length > 0){
+        this.state.selectedWrappedToken.forEach(async(selectedWrappedTokenId) => {
+          const wrappedToken = _.find(this.state.wrappedTokens, {_id: selectedWrappedTokenId});
+          if(wrappedToken !== null){
+            const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.chainId });
+            await BridgeApiHelper.makeTransferWrapTokenOwnershipRequest(
+              wrappedToken.tokenSymbol,
+              networkConfig.name,
+              wrappedToken.chainId,            
+              this.props.accountAddress
+            );
+          }
+        });
+        this.setState({
+          ownershipTransferRequested: true
+        });
+      } else {
+        notificationConfig.error('Select a token');
+      }
+    }
+  }
 
   render() {
+    
+    let usersWrappedTokens = [];
+    this.state.wrappedTokens.forEach(wrappedToken => {
+      const originalToken = _.find(this.props.tokens, {symbol: wrappedToken.tokenSymbol});
+      const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.chainId });
+      if (networkConfig !== undefined) {      
+        wrappedToken['chain'] = networkConfig['name'];
+        wrappedToken['icon'] = originalToken['icon'];
+        usersWrappedTokens.push(wrappedToken);
+      }
+    });
+
     return (
       <>
         <main id="main" className="smartSwap">
-
           <div className="main">
             <MContainer>
               <CMbx>
                 <ProgressBar> <span style={{ width: '100%' }}></span> </ProgressBar>
-
                 <ProGTitle01>Transfer deployer ownership on existing bridges</ProGTitle01>
                 <ProICOMbx01>
                   <ProICOMbx02>
 
-                    <ProICOSbx01 className="selected">
-                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    {
+                      usersWrappedTokens.length > 0 && usersWrappedTokens.map(function (wrappedToken, i) {
+                      return (
+                        <ProICOSbx01 
+                          onClick={() => this.selectToken(wrappedToken._id)} 
+                          key={wrappedToken._id} 
+                          className={this.state.selectedWrappedToken.includes(wrappedToken._id) ? 'selected' : 'pending'}
+                        >
+                          <i className="fa fa-check-circle" aria-hidden="true"></i>
+                          <ProICOSbx02> 
+                            <img src={window.location.href + '/images/free-listing/tokens/' + wrappedToken.icon} /> 
+                            {wrappedToken.tokenSymbol}
+                          </ProICOSbx02>
+                          <ProICOSbx02> {wrappedToken.chain} </ProICOSbx02>
+                        </ProICOSbx01>                         
+                      )
+                     }.bind(this))
+                    }
+
+                    {/* <ProICOSbx01 className="pending">
+                        <i className="fa fa-check-circle" aria-hidden="true"></i>
                         <ProICOSbx02> <img src={ImgIco05} /> SMART </ProICOSbx02>
                         <ProICOSbx02> BSC </ProICOSbx02>
                     </ProICOSbx01>
                     <ProICOSbx01 className="selected">
-                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                        <i className="fa fa-check-circle" aria-hidden="true"></i>
                       <ProICOSbx02> <img src={ImgIco02} /> SMART </ProICOSbx02>
                       <ProICOSbx02> Ethereum </ProICOSbx02>
                     </ProICOSbx01>
                     <ProICOSbx01 className="selected">
-                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                        <i className="fa fa-check-circle" aria-hidden="true"></i>
                       <ProICOSbx02> <img src={ImgIco03} /> SMART </ProICOSbx02>
                       <ProICOSbx02> Polygon </ProICOSbx02>
-                    </ProICOSbx01>
-                    
- 
+                    </ProICOSbx01> */}
 
                   </ProICOMbx02>
                 </ProICOMbx01>
-
                 <BtnMbox>
                   <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button className="Btn01">TRANSFER DEPLOYER OWNERSHIP</button>
+                  {this.state.ownershipTransferRequested === false && 
+                    <button onClick={() => this.makeTransferWrapTokenOwnershipRequest()} className="Btn01">TRANSFER DEPLOYER OWNERSHIP</button>                
+                  }
 
-
+                  {this.state.ownershipTransferRequested === true && 
+                    <button onClick={() => this.props.onOwnershipTransfered(11)} className="Btn01">FINISH</button>                
+                  }
                 </BtnMbox>
-
-
-
-
               </CMbx>
             </MContainer>
-
           </div>
         </main>
       </>
@@ -131,7 +197,10 @@ const ProICOSbx01 = styled.button`
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  
     i { opacity: 1; color: #91dc27; }
-}
+  }
+  &.pending{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  
+    i { opacity: 1; color: #ccc; }        
+  }
   i {
     color: #fff; font-size: 18px; margin-left: 18px; opacity: 0;
   }
