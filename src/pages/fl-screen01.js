@@ -13,8 +13,6 @@ export default class Screen1 extends PureComponent {
     return (
       <>
         { 
-          this.props.walletConnected === false && 
-          this.props.claimDeployerOwnerShip === false &&
           <main id="main" className="smartSwap">           
             <div className="main">   
              <MContainer> 
@@ -25,7 +23,16 @@ export default class Screen1 extends PureComponent {
                         Create a cross-chain bridge token to any EVM blockchain by few seconds
                         <span>It's free and open to any project and their users</span>
                       </CStitle01> 
-                      <button onClick={() => this.props.onWalletConnectButtonClick()} className="Btn01 ani-1">CONNECT YOUR WALLET</button>
+                      { 
+                        this.props.walletConnected === false && 
+                        this.props.claimDeployerOwnerShip === false &&
+                        <button onClick={() => this.props.onWalletConnectButtonClick()} className="Btn01 ani-1">CONNECT YOUR WALLET</button>
+                      }
+                      { 
+                        this.props.walletConnected === true &&
+                        this.props.claimDeployerOwnerShip === false &&
+                        <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(1)} className="Btn01 ani-1">CONTINUE</button>
+                      }
                     </Csubbx01>
                     <Csubbx01 className="v2"> 
                       <CStitle01>

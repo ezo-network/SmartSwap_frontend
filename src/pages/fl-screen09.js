@@ -2,9 +2,10 @@ import React, { PureComponent, lazy, Suspense } from "react";
 import notificationConfig from "../config/notificationConfig";
 import styled from 'styled-components';
 import BridgeApiHelper from "../helper/bridgeApiHelper";
+import Web3 from 'web3';
 
 const $ = window.$;
-export default class Screen8 extends PureComponent {
+export default class Screen9 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
@@ -12,13 +13,16 @@ export default class Screen8 extends PureComponent {
         name: null,
         url: null,
         updatedAt: null,
-        instructionUrl: null
-      }
+        instructionUrl: null,
+      },
+      validatorAddress: "",
+      isAddressSet: false
     };
   }
 
   componentDidMount() {
     this.getValidatorFileInfo();
+    this.getValidator();
   }
 
   getValidatorFileInfo = async() => {
@@ -34,12 +38,60 @@ export default class Screen8 extends PureComponent {
     }
   }
 
+  getValidator = async() => {
+    try {
+      const {response, error, code} = await BridgeApiHelper.getValidator(this.props.accountAddress);
+      if(code === 200){
+        if(Web3.utils.isAddress(response.validatorAddress)){
+          this.setState({
+            validatorAddress: response.validatorAddress,
+            isAddressSet: true
+          });
+          notificationConfig.info('Validator address already set.');
+        } else {
+          this.setState({
+            isAddressSet: false
+          });
+        }
+      }
+    } catch(err){
+      console.error(err);
+    }
+  }
+
+  addValidator = async() => {
+    try {
+      if(Web3.utils.isAddress(this.state.validatorAddress)){
+        const {response, error, code} = await BridgeApiHelper.addValidator(this.props.accountAddress, this.state.validatorAddress);
+        if(code === 200){
+          notificationConfig.info('Validator address added successfully.');
+          await this.getValidator();
+        }
+      } else {
+        this.setState({
+          validatorAddress: ''
+        });
+        notificationConfig.error('Please provide a valid address.');
+      }
+    } catch(err){
+      console.error(err);
+    }
+  }
+
   goToInstructionUrl(){
     window.open(this.state.validatorFileInfo.instructionUrl, '_blank');
   }
 
   downloadFile(){
     window.open(this.state.validatorFileInfo.url, '_blank');
+  }
+
+  setValidatorAddressHandler(event){
+    if(Web3.utils.isAddress(event.target.value)){
+      this.setState({
+        validatorAddress: (event.target.value).toLowerCase()
+      });
+    }
   }
   
   render() {
@@ -70,13 +122,19 @@ export default class Screen8 extends PureComponent {
                     </label>   
                 </ProInputbx>
                 <ProInputbx> 
-                    <label htmlFor="input01"><i>2</i> Type the validator address to activate master validator status</label>   
-                    <input type="text" id="input01" className="v2"  /> 
+                    <label htmlFor="input01"><i>2</i> Type the validator address to activate master validator status</label>
+                    <input onChange={(e) => this.setValidatorAddressHandler(e)} type="text" id="input01" className="v2" value={this.state.validatorAddress}/>
                 </ProInputbx>
             
                 <BtnMbox>
-                    <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                    <button onClick={() => this.props.onActiveValidatorButtonClick(10)} className="Btn01"> ACTIVE VALIDATOR</button> 
+                    <button onClick={() => this.props.onBackButtonClicked(8)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                    {this.state.isAddressSet === false &&
+                      <button onClick={() => this.addValidator()} className="Btn01">ACTIVE VALIDATOR</button>                   
+                    }
+                    
+                    {this.state.isAddressSet === true &&
+                    <button onClick={() => this.props.onActiveValidatorButtonClick(10)} className="Btn01">NEXT STEP</button>                   
+                    }
                 </BtnMbox> 
               </CMbx>
             </MContainer>

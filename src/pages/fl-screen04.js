@@ -118,7 +118,7 @@ export default class Screen4 extends PureComponent {
                           onChange={e => this.selectNetwork(network.chainId)}
                         />
                         <label htmlFor={'list-item-' + i}>
-                          <img src={window.location.href + '/images/free-listing/chains/' + ((network.icon).toString()).toLowerCase()} /> {network.name}
+                          <img src={'/images/free-listing/chains/' + ((network.icon).toString()).toLowerCase()} /> {network.name}
                         </label>
                       </ProICOSbx01>
                     }.bind(this) )}

@@ -15,9 +15,6 @@ export default class Screen7 extends PureComponent {
   render() {
     return (
       <>
-        { 
-        this.props.walletConnected === false && 
-        this.props.claimDeployerOwnerShip === true &&
         <main id="main" className="smartSwap">
           <div className="main">
             <MContainer>
@@ -27,15 +24,31 @@ export default class Screen7 extends PureComponent {
                 <ProPera>Further, SmartBridge allows projects to take ownership of the deployer, leaving them fully in control of project tokens on any chain.</ProPera>
                 <BtnMbox>
                   <BtnRight>
-                    <button onClick={() => this.props.onWalletConnectButtonClick()} className="Btn01">CONNECT YOUR WALLET</button>
-                    <p>Connect with the wallet used to deploy the original token</p>
+                    { 
+                    this.props.walletConnected === false && 
+                    this.props.claimDeployerOwnerShip === true &&
+                      <>
+                        <button onClick={() => this.props.onWalletConnectButtonClick()} className="Btn01">CONNECT YOUR WALLET</button>
+                        <p>Connect with the wallet used to deploy the original token</p>
+                      </>
+                    }
+
+                    { 
+                    this.props.walletConnected === true && 
+                    this.props.claimDeployerOwnerShip === true &&
+                    this.props.wantToBecomeMasterValidator === false &&
+                      <>
+                        <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(2)} className="Btn01">CONTINUE</button>
+                        <p>Connected with the wallet used to deploy the original token</p>
+                      </>
+                    }
+
                   </BtnRight>
                 </BtnMbox>
               </CMbx>
             </MContainer>
           </div>
         </main>
-        }
       </>
     );
   }

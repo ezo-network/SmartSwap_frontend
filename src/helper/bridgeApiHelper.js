@@ -15,6 +15,8 @@ const apiEndpoints = {
     'addEmailAddress': 'customer/add-email-address',
     'getValidatorFileInfo': 'public/validator-file-info',
     'makeTransferWrapTokenOwnershipRequest': 'customer/transfer-wrap-token-ownership-request',
+    'addValidator': 'customer/add-validator',
+    'getValidator': 'customer/get-validator'
 }
 
 const BridgeApiHelper = {
@@ -136,6 +138,97 @@ const BridgeApiHelper = {
             error,
             code
         }
+    },
+
+    getValidator: async(walletAddress = null) => {
+        let response, error, code;
+        try {
+            if(walletAddress === null){
+                error = 'mandatory parameters are missing';
+                code = 422;
+                return {
+                    response, 
+                    error,
+                    code
+                }
+            }
+
+            const result = await axiosRequest.request({
+                path: apiEndpoints.getValidator + `?walletAddress=${walletAddress}`,
+            });
+
+            if(result.status === 200){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
+
+        }  catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }      
+    },
+
+    addValidator: async(walletAddress = null, validatorAddress = null) => {
+        let response, error, code;
+        try {
+            if(walletAddress === null || validatorAddress === null){
+                error = 'mandatory parameters are missing';
+                code = 422;
+                return {
+                    response, 
+                    error,
+                    code
+                }
+            }
+
+            const result = await axiosRequest.request({
+                path: apiEndpoints.addValidator,
+                method: "POST",
+                data: {
+                    walletAddress: walletAddress,
+                    validatorAddress: validatorAddress
+                }                
+            });
+
+            if(result.status === 200){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
+
+        }  catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }      
     },
 
     getBridge: async(chainId = null) => {
@@ -608,7 +701,7 @@ const BridgeApiHelper = {
     },    
 
 
-    makeTransferWrapTokenOwnershipRequest: async(tokenSymbol = null, chain = null, chainId = null, requesterAddress = null) => {
+    makeTransferWrapTokenOwnershipRequest: async(tokenSymbol = null, chain = null, chainId = null, requesterAddress = null, hashMessage = null) => {
         let response, error, code;
 
         if(
@@ -619,6 +712,8 @@ const BridgeApiHelper = {
             chainId == null
             ||
             requesterAddress == null
+            ||
+            hashMessage == null
         ){
             error = 'mandatory parameters are missing';
             code = 422;
@@ -637,7 +732,8 @@ const BridgeApiHelper = {
                     token: tokenSymbol,
                     chain: chain,
                     chainId: chainId,
-                    requesterAddress: requesterAddress
+                    requesterAddress: requesterAddress,
+                    hashMessage: hashMessage
                 }
             });
 

@@ -9384,3 +9384,4 @@ a.dc-file:hover {
 .powertextBX-links {display: flex; font-size: 11px; margin-left: 10px;}
 .powertextBX-links a {color: #91dc27; margin: 0;}
 .powertextBX-links span {color: #595959 !important; margin: 0 11px;}
+.no-effect{pointer-events: none;}

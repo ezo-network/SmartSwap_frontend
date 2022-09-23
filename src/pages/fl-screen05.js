@@ -12,12 +12,13 @@ import BridgeContract from "../helper/bridgeContract";
 
 const $ = window.$;
 export default class Screen5 extends PureComponent {
+  pendingNetworkSwitchRequest = false;
+  canMoveForward = true;
   constructor(props) {
     super();
     this.state = {
       addWrappedTokenSignedParams: [],
-      btnClicked: false,
-      pendingNetworkSwitchRequest: false
+      btnClicked: false
     };
   }
 
@@ -44,30 +45,34 @@ export default class Screen5 extends PureComponent {
     }
   }
 
-  async switchNetwork(chainId) {
+  async switchNetwork(chainId, actionType = null) {
     try {
       if (Number(this.props.chainId) !== Number(chainId)) {
-        this.setState({
-          pendingNetworkSwitchRequest: true
-        });
+        this.pendingNetworkSwitchRequest = true;
+        this.canMoveForward = false;
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: Web3.utils.toHex(chainId) }],
         }).then((response) => {
-          this.setState({
-            pendingNetworkSwitchRequest: false
-          });
+          this.pendingNetworkSwitchRequest = false;
           console.log({response: response});
           this.props.onSwitchNetwork(Number(chainId));
         }).catch(error => {
           console.error(error);
           if(error.code === -32002){
             notificationConfig.info('A switch network request is pending. Check metamask.');
+            this.pendingNetworkSwitchRequest = true;
+            this.canMoveForward = true;
           }
+          
           if(error.code === 4001){
-            this.setState({
-              pendingNetworkSwitchRequest: false
-            });            
+            if(actionType === 'BACK_BUTTON'){
+              this.pendingNetworkSwitchRequest = true;
+              this.canMoveForward = true;
+            } else {
+              this.pendingNetworkSwitchRequest = false;
+              this.canMoveForward = true;
+            }
           }
         });
       } else {
@@ -94,6 +99,7 @@ export default class Screen5 extends PureComponent {
           error: error,
           code: code
         });
+        notificationConfig.error(error);
       }
     } catch (err) {
       console.error(err.message);
@@ -131,47 +137,47 @@ export default class Screen5 extends PureComponent {
             "Contract response:": response
           });
 
-          response = {
-            "to": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
-            "from": "0xA03476C7a7bd9eeEAcB0F4Cea7a8093cc2827EdD",
-            "contractAddress": null,
-            "transactionIndex": 3,
-            "gasUsed": {
-              "type": "BigNumber",
-              "hex": "0x01e871"
-            },
-            "logsBloom": "0x00000000000000010000008000000000800000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000010003000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6",
-            "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
-            "logs": [
-              {
-                "transactionIndex": 3,
-                "blockNumber": 22515012,
-                "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
-                "address": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
-                "topics": [
-                  "0xef4ec9b3cfaa22dd32688bf4ac3c820e8b468ffb6452f61717fb9d845f3c5263",
-                  "0x000000000000000000000000000080383847bd75f91c168269aa74004877592f"
-                ],
-                "data": "0x00000000000000000000000000000000000000000000000000000000000000610000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000045a6574610000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000045a45544100000000000000000000000000000000000000000000000000000000",
-                "logIndex": 22,
-                "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6"
-              }
-            ],
-            "blockNumber": 22515012,
-            "confirmations": 4,
-            "cumulativeGasUsed": {
-              "type": "BigNumber",
-              "hex": "0x0bed71"
-            },
-            "effectiveGasPrice": {
-              "type": "BigNumber",
-              "hex": "0x02540be400"
-            },
-            "status": 1,
-            "type": 0,
-            "byzantium": true
-          }
+          // response = {
+          //   "to": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
+          //   "from": "0xA03476C7a7bd9eeEAcB0F4Cea7a8093cc2827EdD",
+          //   "contractAddress": null,
+          //   "transactionIndex": 3,
+          //   "gasUsed": {
+          //     "type": "BigNumber",
+          //     "hex": "0x01e871"
+          //   },
+          //   "logsBloom": "0x00000000000000010000008000000000800000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000010003000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          //   "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6",
+          //   "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
+          //   "logs": [
+          //     {
+          //       "transactionIndex": 3,
+          //       "blockNumber": 22515012,
+          //       "transactionHash": "0xddef0352b1b39ec2d6c739bbbb9b90c11a644c6932a76adc355f13a04efe057b",
+          //       "address": "0x20451Ef7dfb23520bF08344f516229E30eAa6378",
+          //       "topics": [
+          //         "0xef4ec9b3cfaa22dd32688bf4ac3c820e8b468ffb6452f61717fb9d845f3c5263",
+          //         "0x000000000000000000000000000080383847bd75f91c168269aa74004877592f"
+          //       ],
+          //       "data": "0x00000000000000000000000000000000000000000000000000000000000000610000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000045a6574610000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000045a45544100000000000000000000000000000000000000000000000000000000",
+          //       "logIndex": 22,
+          //       "blockHash": "0x1328b3a19f2998d0fb1bb481871e8f98e9c8e6d8e862462fc1df95a5072bc3f6"
+          //     }
+          //   ],
+          //   "blockNumber": 22515012,
+          //   "confirmations": 4,
+          //   "cumulativeGasUsed": {
+          //     "type": "BigNumber",
+          //     "hex": "0x0bed71"
+          //   },
+          //   "effectiveGasPrice": {
+          //     "type": "BigNumber",
+          //     "hex": "0x02540be400"
+          //   },
+          //   "status": 1,
+          //   "type": 0,
+          //   "byzantium": true
+          // }
 
           if (response.code === "ACTION_REJECTED") {
             this.setState({
@@ -257,19 +263,22 @@ export default class Screen5 extends PureComponent {
   }
 
   async onFinishButtonClicked(){
-    await this.getWrappedTokens(this.props.projectId, this.props.accountAddress).then(response => {
-      this.props.onFinishButtonClicked();
-    });
+    if(this.canMoveForward === true){
+      await this.getWrappedTokens(this.props.projectId, this.props.accountAddress).then(response => {
+        this.props.onFinishButtonClicked();
+      });
+    } else {
+      notificationConfig.info('A switch network request is pending. Check metamask.');            
+    }
   }
 
   async onBackButtonClicked(chainId){
-    await this.switchNetwork(Number(chainId)).then(() => {
-      if(this.state.pendingNetworkSwitchRequest === false){
+      await this.switchNetwork(Number(chainId), 'BACK_BUTTON');
+      if(this.pendingNetworkSwitchRequest === false){
         this.props.onBackButtonClicked(4);
       } else {
         notificationConfig.info('A switch network request is pending. Check metamask.');
       }
-    });
   }
 
   render() {
@@ -311,11 +320,11 @@ export default class Screen5 extends PureComponent {
                         <ProICOTitle>Current chain</ProICOTitle>
                         <ProICOSbx01 className="selected">
                           <ProICOSbx02>
-                            <img src={window.location.href + '/images/free-listing/tokens/' + this.props.selectedSourceTokenData.icon} />
+                            <img src={'/images/free-listing/tokens/' + this.props.selectedSourceTokenData.icon} />
                             {this.props.selectedSourceTokenData.name}
                           </ProICOSbx02>
                           <ProICOSbx02>
-                            <img src={window.location.href + '/images/free-listing/chains/' + this.props.selectedSourceTokenData.chainIcon} />
+                            <img src={'/images/free-listing/chains/' + this.props.selectedSourceTokenData.chainIcon} />
                             {this.props.selectedSourceTokenData.chain}
                           </ProICOSbx02>
                         </ProICOSbx01>
@@ -325,11 +334,11 @@ export default class Screen5 extends PureComponent {
                         <ProICOTitle>Destination chain </ProICOTitle>
                         <ProICOSbx01 className="selected">
                           <ProICOSbx02>
-                            <img src={window.location.href + '/images/free-listing/tokens/' + this.props.selectedSourceTokenData.icon} />
+                            <img src={'/images/free-listing/tokens/' + this.props.selectedSourceTokenData.icon} />
                             sb{this.props.selectedSourceTokenData.name}
                           </ProICOSbx02>
                           <ProICOSbx02>
-                            <img src={window.location.href + '/images/free-listing/chains/' + network.icon} />
+                            <img src={'/images/free-listing/chains/' + network.icon} />
                             {network.name}
                           </ProICOSbx02>
                         </ProICOSbx01>
@@ -348,6 +357,9 @@ export default class Screen5 extends PureComponent {
                               )}
                               {this.state.btnClicked === false && (
                                 'CREATE A BRIDGE'                              
+                              )}
+                              {this.state.btnClicked === true && (
+                                'CREATING A BRIDGE'                              
                               )}
                             </button>
                           )}

@@ -72,30 +72,36 @@ class BridgeContract extends EventEmitter {
         return s;
     }
 
-    async setFeeAmountLimit(amount, txCb, receiptCb) {
-        amount = web3Js.utils.toWei((amount).toString());
-        amount = web3Js.utils.toHex(amount);
-        amount = amount.slice(2);
-        var payload = `0x8c90c121${this.pad32Bytes(amount)}`
-        console.log(payload);
-        console.log(this.contractAddress);
-        this.sendTransaction(payload, 0, "120000", this.contractAddress, txCb, receiptCb)
+    async isContractExist(){
+        try {
+            const response = await this.web3.getCode(this.contractAddress);
+            if(response === '0x'){
+                return false;
+            } else {
+                return true;
+            }
+        } catch(error){
+            return false;
+        }
     }
 
     async addTokenOnSourceChain(address, txCb, receiptCb){
         try {
-            // address will be valid etherium bc address
-            address = web3Js.utils.toHex(address);
-            address = address.slice(2);
-            var payload = `0xd48bfca7${this.pad32Bytes(address)}`;
-            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            const isContractExist = await this.isContractExist(address);
+            if(isContractExist){
+                // address will be valid etherium bc address
+                address = web3Js.utils.toHex(address);
+                address = address.slice(2);
+                var payload = `0xd48bfca7${this.pad32Bytes(address)}`;
+                await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            } else {
+                receiptCb({
+                    code: 'NOT_A_CONTRACT',
+                });
+            }
         } catch (error){
-            return error;   
+            receiptCb(error.message);
         }
-    }
-
-    async getFeeAmountLimit(txCb, receiptCb) {
-        //this.sendTransaction(payload, 0, "120000", this.contractAddress, txCb, receiptCb)
     }
 
     handleActions(action) {

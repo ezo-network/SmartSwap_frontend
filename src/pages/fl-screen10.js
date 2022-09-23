@@ -4,16 +4,19 @@ import styled from 'styled-components';
 import _ from "lodash";
 import Lineimg from "../assets/freelisting-images/line01.png";
 import BridgeApiHelper from "../helper/bridgeApiHelper";
+import { ethers } from "ethers";
 const $ = window.$;
 
 
 export default class Screen10 extends PureComponent {
+  pendingSignMessageRequest = false;  
   constructor(props) {
     super();
     this.state = {
       wrappedTokens:[],
       selectedWrappedToken: [],
-      ownershipTransferRequested: false
+      ownershipTransferRequested: false,
+      btnClicked: false
     };
   }
 
@@ -21,11 +24,7 @@ export default class Screen10 extends PureComponent {
     this.getWrappedTokens(null, this.props.accountAddress, false);
   }
 
-  selectToken(id){
-    this.set
-  }
-
-  selectToken = (id) => {
+  selectToken = (id) => {    
     if(this.state.selectedWrappedToken.includes(id)){
       this.setState({selectedWrappedToken: this.state.selectedWrappedToken.filter(function(_id) { 
         return id !== _id
@@ -59,26 +58,97 @@ export default class Screen10 extends PureComponent {
   }
 
   async makeTransferWrapTokenOwnershipRequest(){
-    if(this.state.ownershipTransferRequested === false){
-      if(this.state.selectedWrappedToken.length > 0){
-        this.state.selectedWrappedToken.forEach(async(selectedWrappedTokenId) => {
-          const wrappedToken = _.find(this.state.wrappedTokens, {_id: selectedWrappedTokenId});
-          if(wrappedToken !== null){
-            const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.chainId });
-            await BridgeApiHelper.makeTransferWrapTokenOwnershipRequest(
-              wrappedToken.tokenSymbol,
-              networkConfig.name,
-              wrappedToken.chainId,            
-              this.props.accountAddress
-            );
+    if(this.pendingSignMessageRequest === false){
+      this.setState({
+        btnClicked: true
+      });
+      if(this.state.ownershipTransferRequested === false){
+        if(this.state.selectedWrappedToken.length > 0){
+          const signedMessage = await this.signData();
+          console.log({
+            signedMessage: signedMessage
+          });
+          if(signedMessage !== false){
+            this.state.selectedWrappedToken.forEach(async(selectedWrappedTokenId) => {
+              const wrappedToken = _.find(this.state.wrappedTokens, {_id: selectedWrappedTokenId});
+              if(wrappedToken !== null){
+                const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.chainId });
+                await BridgeApiHelper.makeTransferWrapTokenOwnershipRequest(
+                  wrappedToken.tokenSymbol,
+                  networkConfig.name,
+                  wrappedToken.chainId,            
+                  this.props.accountAddress,
+                  signedMessage
+                );
+              }
+            });
+            this.setState({
+              ownershipTransferRequested: true,
+              btnClicked: false
+            });
+          } else {
+            notificationConfig.error("Something went wrong when signing message.");
+            this.setState({
+              btnClicked: false
+            });
           }
-        });
-        this.setState({
-          ownershipTransferRequested: true
-        });
+        } else {
+          notificationConfig.error('Select a token');
+          this.setState({
+            btnClicked: false
+          });
+        }
       } else {
-        notificationConfig.error('Select a token');
+        this.setState({
+          btnClicked: false
+        });
       }
+    } else {
+      notificationConfig.info('A sing message request is pending. Check metamask.');
+    }
+  }
+
+  async signData() {
+    try {
+      this.pendingSignMessageRequest = true;
+      const signer = this.props.web3Instance.getSigner();
+
+      console.log({
+        signer: signer
+      });
+  
+      const message = process.env.REACT_APP_SIGN_MESSAGE;
+
+      console.log({
+        message: message
+      })
+
+      const signature = await signer.signMessage(message);
+      const address = ethers.utils.verifyMessage(message, signature);
+  
+      if(address === this.props.accountAddress){
+        console.log('AUTHORIZED USER');
+        this.pendingSignMessageRequest = false;
+        return signature;
+      } else {
+        console.log('UNAUTHORIZED USER'); 
+        this.pendingSignMessageRequest = false;
+        return false;
+      }
+    } catch(error){
+      console.error({
+        signDataError: error.message
+      });
+      this.pendingSignMessageRequest = false;
+      return false;
+    }
+  }
+
+  onBackButtonClicked = () => {
+    if(this.pendingSignMessageRequest === false){
+      this.props.onBackButtonClicked(9);
+    } else {
+      notificationConfig.info('A sing message request is pending. Check metamask and decline request to go back.');
     }
   }
 
@@ -102,7 +172,17 @@ export default class Screen10 extends PureComponent {
             <MContainer>
               <CMbx>
                 <ProgressBar> <span style={{ width: '100%' }}></span> </ProgressBar>
-                <ProGTitle01>Transfer deployer ownership on existing bridges</ProGTitle01>
+                {
+                  usersWrappedTokens.length > 0 && (
+                    <ProGTitle01>Transfer deployer ownership on existing bridges</ProGTitle01>
+                  )
+                }
+
+                {
+                  usersWrappedTokens.length === 0 && (
+                    <ProGTitle01>You've not wrapped any token yet.</ProGTitle01>
+                  )
+                }
                 <ProICOMbx01>
                   <ProICOMbx02>
 
@@ -111,12 +191,13 @@ export default class Screen10 extends PureComponent {
                       return (
                         <ProICOSbx01 
                           onClick={() => this.selectToken(wrappedToken._id)} 
+                          disabled={this.state.btnClicked}
                           key={wrappedToken._id} 
                           className={this.state.selectedWrappedToken.includes(wrappedToken._id) ? 'selected' : 'pending'}
                         >
                           <i className="fa fa-check-circle" aria-hidden="true"></i>
                           <ProICOSbx02> 
-                            <img src={window.location.href + '/images/free-listing/tokens/' + wrappedToken.icon} /> 
+                            <img src={'/images/free-listing/tokens/' + wrappedToken.icon} /> 
                             {wrappedToken.tokenSymbol}
                           </ProICOSbx02>
                           <ProICOSbx02> {wrappedToken.chain} </ProICOSbx02>
@@ -125,26 +206,11 @@ export default class Screen10 extends PureComponent {
                      }.bind(this))
                     }
 
-                    {/* <ProICOSbx01 className="pending">
-                        <i className="fa fa-check-circle" aria-hidden="true"></i>
-                        <ProICOSbx02> <img src={ImgIco05} /> SMART </ProICOSbx02>
-                        <ProICOSbx02> BSC </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProICOSbx01 className="selected">
-                        <i className="fa fa-check-circle" aria-hidden="true"></i>
-                      <ProICOSbx02> <img src={ImgIco02} /> SMART </ProICOSbx02>
-                      <ProICOSbx02> Ethereum </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProICOSbx01 className="selected">
-                        <i className="fa fa-check-circle" aria-hidden="true"></i>
-                      <ProICOSbx02> <img src={ImgIco03} /> SMART </ProICOSbx02>
-                      <ProICOSbx02> Polygon </ProICOSbx02>
-                    </ProICOSbx01> */}
 
                   </ProICOMbx02>
                 </ProICOMbx01>
                 <BtnMbox>
-                  <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                  <button onClick={() => this.onBackButtonClicked()} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
                   {this.state.ownershipTransferRequested === false && 
                     <button onClick={() => this.makeTransferWrapTokenOwnershipRequest()} className="Btn01">TRANSFER DEPLOYER OWNERSHIP</button>                
                   }
@@ -179,14 +245,16 @@ width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:
 `
 
 const ProGTitle01 = styled(FlexDiv)` 
-    font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
+font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
     i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  } 
 `
+
 const ProInputbx = styled(FlexDiv)`
     width:100%;
 
     input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
 `
+
 const ProICOMbx01 = styled.div` width:100%; `
 const ProICOMbx02 = styled(FlexDiv)`
     align-items:flex-start; justify-content: flex-start; margin:0 -18px 0 -18px;
