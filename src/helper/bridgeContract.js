@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import bridgeContractAbi from "../abis/bridgeContract.json";
 import web3Config from "../config/web3Config";
 
+const Logger = new ethers.utils.Logger(ethers.version);
 
 class BridgeContract extends EventEmitter {
     
@@ -13,29 +14,32 @@ class BridgeContract extends EventEmitter {
         super();
         this.web3 = web3;
         this.contractAddress = contractAddress;
-
-        this.contractInstance = new ethers.Contract(
-            this.contractAddress,
-            bridgeContractAbi,
-            this.web3.getSigner(0)
-        );
+        
+        try {
+            this.contractInstance = new ethers.Contract(
+                this.contractAddress,
+                bridgeContractAbi,
+                this.web3.getSigner(0)
+            );
+        } catch(error){
+            console.error({
+                BridgeContractError: error 
+            });
+        }
     }
 
     async sendTransaction(payload, value, to, txCb, receiptCb) {
         try {
             const gasPrice = await this.web3.getGasPrice();
 
-            console.log(gasPrice);
+            console.log((gasPrice).toString());
             
-            const gasLimit = await this.web3.estimateGas({
+            const gasLimit = await this.web3.getSigner(0).estimateGas({
                 // Wrapped ETH address
                 to: to,              
-                // `function deposit() payable`
                 data: payload,
                 value: web3Js.utils.toHex(value)
             });
-
-            console.log(gasLimit);
 
             console.log({
                 gasPrice: (gasPrice).toString(),
@@ -54,14 +58,38 @@ class BridgeContract extends EventEmitter {
                 txCb(result.hash)
                 result.wait().then(async(receipt) => {
                     receiptCb(receipt);
-                })
+                }).catch(error => {
+                    console.error(error);
+                    receiptCb(error);
+                });
             }).catch(error => {
-                console.log(error);
+                console.error(error);
                 receiptCb(error);
             });
 
+            // try {
+            //     // Wait for the transaction to be mined
+            //     const receipt = await txResponse.wait();
+            //     // The transactions was mined without issue
+            //     //myProcessMinedTransaction(tx, receipt);
+            //     receiptCb({tx, receipt});
+            //   } catch (error) {
+            //     if (error.code === Logger.errors.TRANSACTION_REPLACED) {
+            //       if (error.cancelled) {
+            //         // The transaction was replaced  :'(
+            //         //myProcessCancelledTransaction(tx, error.replacement);
+            //         receiptCb({tx, error: error.replacement});
+            //     } else {
+            //         // The user used "speed up" or something similar
+            //         // in their client, but we now have the updated info
+            //         //myProcessMinedTransaction(error.replacement, error.receipt);
+            //         receiptCb({tx, error: error.receipt});
+            //       }
+            //     }
+            // }
+
         } catch(error){
-            console.log(error);
+            console.error(error);
             receiptCb(error);
         }
     }
@@ -120,23 +148,7 @@ class BridgeContract extends EventEmitter {
                 sig: sig
             });
 
-            // address will be valid etherium bc address
-            tokenAddress = web3Js.utils.toHex(tokenAddress);
-            tokenAddress = tokenAddress.slice(2);
-
-            chainId = web3Js.utils.toHex(chainId);
-
-            decimals = web3Js.utils.toHex(decimals);
-
-            name = web3Js.utils.toHex(name);
-
-            symbol = web3Js.utils.toHex(symbol);
-
-            sig = sig.slice(2);
-            sig = web3Js.utils.toHex([sig]);
-
-
-            const payload = ethers.utils.defaultAbiCoder.encode([ 
+            let payload = ethers.utils.defaultAbiCoder.encode([ 
                 "address", 
                 "uint256", 
                 "uint256", 
@@ -145,12 +157,15 @@ class BridgeContract extends EventEmitter {
                 "bytes[]" 
             ], [ 
                 tokenAddress,
-                chainId,
-                decimals,
+                Number(chainId),
+                Number(decimals),
                 name,
                 symbol,
                 [sig]
             ]);
+
+            payload = payload.slice(2);
+            payload = `0xa85c33cd${this.pad32Bytes(payload)}`;
 
             await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
         } catch (error){

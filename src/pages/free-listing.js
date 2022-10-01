@@ -42,7 +42,8 @@ export default class Projects extends PureComponent {
         chainId: null,
         chain: null,
         explorerUrl: null,
-        txHash: null
+        txHash: null,
+        decimals: null
       },
       filteredDestinationNetworks: [],
       isdestinationNetworksFiltered: false,
@@ -174,7 +175,7 @@ export default class Projects extends PureComponent {
     });
   }
 
-  async sourceTokenSelectedCallback(sourceToken, sourceTokenAddress, sourceTokenIcon, sourceChain, sourceChainId, sourceChainIcon, explorerUrl) {
+  async sourceTokenSelectedCallback(sourceToken, sourceTokenAddress, sourceTokenIcon, sourceChain, sourceChainId, sourceChainIcon, explorerUrl, decimals) {
     await this.getBridge(sourceChainId).then(async () => {
       if (this.state.bridgeAddress !== null) {
         await this.isProjectExist(sourceChainId, sourceTokenAddress).then(async () => {
@@ -188,6 +189,7 @@ export default class Projects extends PureComponent {
             sourceTokenData['chainId'] = sourceChainId;
             sourceTokenData['chainIcon'] = sourceChainIcon;
             sourceTokenData['explorerUrl'] = explorerUrl;
+            sourceTokenData['decimals'] = decimals;            
             return {
               isSourceTokenSelected: true,
               sourceTokenData,
@@ -293,6 +295,7 @@ export default class Projects extends PureComponent {
         this.state.sourceTokenData.address,
         this.state.sourceTokenData.chain,
         this.state.sourceTokenData.chainId,
+        this.state.sourceTokenData.decimals,
         txHash
       );
 
@@ -572,6 +575,7 @@ export default class Projects extends PureComponent {
                     networks={this.state.networks}
                     wrappedTokens={this.state.wrappedTokens}
                     onAddMoreBridgeButtonClicked={this.addMoreBridgeButtonClicked}
+                    onStartHereButtonClick={this.startHereButtonClickedCallback}
                   />
                 }
 

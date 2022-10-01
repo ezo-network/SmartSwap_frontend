@@ -20,7 +20,8 @@ export default class AddCustomToken extends PureComponent {
         chain: null,
         chainId: props.chainId,
         chainIcon: null,
-        explorerUrl: null
+        explorerUrl: null,
+        decimals: null
       },
       isTokenExist: false
     }
@@ -39,10 +40,11 @@ export default class AddCustomToken extends PureComponent {
         name: 'CUSTOM',
         address: "",
         icon: 'default.png',
-        chain: networkConfig.name,
+        chain: networkConfig.chain,
         chainId: networkConfig.chainId,
         chainIcon: networkConfig.icon,
-        explorerUrl: networkConfig.explorerUrl
+        explorerUrl: networkConfig.explorerUrl,
+        decimals: null
       }
     });
   }
@@ -93,6 +95,7 @@ export default class AddCustomToken extends PureComponent {
             this.setState(prevState => {
               const selectedSourceTokenData = prevState.selectedSourceTokenData;
               selectedSourceTokenData['name'] = response.symbol;
+              selectedSourceTokenData['decimals'] = response.decimals;
               return {
                 btnClicked: false,
                 selectedSourceTokenData,
@@ -140,6 +143,8 @@ export default class AddCustomToken extends PureComponent {
         this.state.selectedSourceTokenData.chainIcon == null
         ||
         this.state.selectedSourceTokenData.explorerUrl == null
+        ||
+        this.state.selectedSourceTokenData.decimals == null
       ){
         notificationConfig.error('Please select a token first.');
         return;
@@ -152,7 +157,8 @@ export default class AddCustomToken extends PureComponent {
         this.state.selectedSourceTokenData.chain,
         this.state.selectedSourceTokenData.chainId,
         this.state.selectedSourceTokenData.chainIcon,
-        this.state.selectedSourceTokenData.explorerUrl
+        this.state.selectedSourceTokenData.explorerUrl,
+        this.state.selectedSourceTokenData.decimals
       );
   }  
 

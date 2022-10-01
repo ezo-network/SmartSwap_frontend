@@ -200,11 +200,58 @@ export default class Screen5 extends PureComponent {
             notificationConfig.error(response.message);
           }
 
-          if (response.status === 1) {
+          if (response.code === -32000 || response.code === -32603){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error("Intrinsic gas too low");
+          }
+
+          if(response.code === 'NOT_A_CONTRACT'){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error('Bridge address is not a contract.');
+          }
+          
+
+          if(
+            response.code === 'CALL_EXCEPTION' 
+            || response.code === 'INSUFFICIENT_FUNDS' 
+            || response.code === 'NETWORK_ERROR' 
+            || response.code === 'NONCE_EXPIRED' 
+            || response.code === 'REPLACEMENT_UNDERPRICED'
+            || response.code === 'UNPREDICTABLE_GAS_LIMIT'
+          ){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.reason);            
+          }
+
+          if(response.code === 'TRANSACTION_REPLACED'){
+            if(response.cancelled === false && response.receipt?.transactionHash){
+              await this.attachWrapToken(
+                this.props.projectId,
+                this.state.addWrappedTokenSignedParams.name,
+                this.state.addWrappedTokenSignedParams.symbol,
+                this.props.selectedSourceTokenData.chainId,
+                this.props.chainId,
+                response.receipt.transactionHash,
+                response.receipt.blockNumber,
+                this.props.accountAddress
+              );
+              notificationConfig.success('Token Wrapped Successfully!');
+            }
+          }
+          
+
+          if(response.status === 1) {
             await this.attachWrapToken(
               this.props.projectId,
               this.state.addWrappedTokenSignedParams.name,
               this.state.addWrappedTokenSignedParams.symbol,
+              this.props.selectedSourceTokenData.chainId,
               this.props.chainId,
               response.transactionHash,
               response.blockNumber,
@@ -219,7 +266,7 @@ export default class Screen5 extends PureComponent {
     }
   }
 
-  async attachWrapToken(projectId = null, tokenName = null, tokenSymbol = null, chainId = null, txHash = null, blockNumber = null, creatorAddress = null) {
+  async attachWrapToken(projectId = null, tokenName = null, tokenSymbol = null, fromChainId = null, toChainId = null, txHash = null, blockNumber = null, creatorAddress = null) {
     try {
       if (
         projectId == null
@@ -228,8 +275,10 @@ export default class Screen5 extends PureComponent {
         ||
         tokenSymbol == null
         ||
-        chainId == null
+        fromChainId == null
         ||
+        toChainId == null
+        ||        
         txHash == null
         ||
         blockNumber == null
@@ -244,7 +293,8 @@ export default class Screen5 extends PureComponent {
         projectId,
         tokenName,
         tokenSymbol,
-        chainId,
+        fromChainId,
+        toChainId,
         txHash,
         blockNumber,
         creatorAddress
@@ -286,7 +336,10 @@ export default class Screen5 extends PureComponent {
     let networksData = [];
     const selectedDestinationNetworks = this.props.selectedDestinationNetworks;
     selectedDestinationNetworks.forEach(networkId => {
-      const wrappedToken = _.find(this.props.wrappedTokens, { chainId: networkId });
+      const wrappedToken = _.find(this.props.wrappedTokens, { 
+        toChainId: Number(networkId), 
+        fromChainId: Number(this.props.selectedSourceTokenData.chainId)
+      });
       const networkConfig = _.find(this.props.networks, { chainId: networkId });
       let networkData = networkConfig;
       if (wrappedToken !== undefined) {
@@ -320,26 +373,42 @@ export default class Screen5 extends PureComponent {
                         <ProICOTitle>Current chain</ProICOTitle>
                         <ProICOSbx01 className="selected">
                           <ProICOSbx02>
-                            <img src={'/images/free-listing/tokens/' + this.props.selectedSourceTokenData.icon} />
+                            <img 
+                              alt={this.props.selectedSourceTokenData.name}
+                              src={'/images/free-listing/tokens/' + ((this.props.selectedSourceTokenData.name).toString() + '.png').toLowerCase()} 
+                              onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')}                          
+                            />
                             {this.props.selectedSourceTokenData.name}
                           </ProICOSbx02>
                           <ProICOSbx02>
-                            <img src={'/images/free-listing/chains/' + this.props.selectedSourceTokenData.chainIcon} />
+                            <img
+                              alt={this.props.selectedSourceTokenData.chainIcon}
+                              src={'/images/free-listing/chains/' + this.props.selectedSourceTokenData.chainIcon}
+                              onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
+                            />
                             {this.props.selectedSourceTokenData.chain}
                           </ProICOSbx02>
                         </ProICOSbx01>
-                        <ProColImg><img src={addImg}></img></ProColImg>
+                        <ProColImg><img alt="add image" src={addImg}></img></ProColImg>
                       </ProRowCol1>
                       <ProRowCol1>
                         <ProICOTitle>Destination chain </ProICOTitle>
                         <ProICOSbx01 className="selected">
                           <ProICOSbx02>
-                            <img src={'/images/free-listing/tokens/' + this.props.selectedSourceTokenData.icon} />
+                            <img 
+                              alt={this.props.selectedSourceTokenData.name}
+                              src={'/images/free-listing/tokens/' + ((this.props.selectedSourceTokenData.name).toString() + '.png').toLowerCase()} 
+                              onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')}                           
+                            />
                             sb{this.props.selectedSourceTokenData.name}
                           </ProICOSbx02>
                           <ProICOSbx02>
-                            <img src={'/images/free-listing/chains/' + network.icon} />
-                            {network.name}
+                            <img
+                              alt={network.icon}
+                              src={'/images/free-listing/chains/' + network.icon} 
+                              onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
+                            />
+                            {network.chain}
                           </ProICOSbx02>
                         </ProICOSbx01>
                         <ProColBtn>
@@ -421,7 +490,7 @@ const ProICOSbx01 = styled.button`
 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px;}
+  img{ margin-right:15px; width: 30px; height: 30px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
 `
 const BtnMbox = styled(FlexDiv)`

@@ -308,7 +308,7 @@ const BridgeApiHelper = {
         }
     },    
 
-    createNewProject: async(creatorAddress = null, sourceToken = null, sourceTokenAddress = null, sourceChain = null, sourceChainId = null, txHash = null) => {
+    createNewProject: async(creatorAddress = null, sourceToken = null, sourceTokenAddress = null, sourceChain = null, sourceChainId = null, decimals = null, txHash = null) => {
         let response, error, code;
         try {
             if(
@@ -321,6 +321,8 @@ const BridgeApiHelper = {
                 sourceChain === null
                 || 
                 sourceChainId === null
+                ||
+                decimals === null
                 ||
                 txHash === null
             ){
@@ -342,6 +344,7 @@ const BridgeApiHelper = {
                     sourceTokenAddress: sourceTokenAddress,
                     sourceChain: sourceChain,
                     sourceChainId: sourceChainId,
+                    decimals: decimals,
                     txHash: txHash
                 }
             });
@@ -529,7 +532,7 @@ const BridgeApiHelper = {
         }
     },
 
-    attachWrapTokenOnProject: async(projectId = null, tokenName = null, tokenSymbol = null, chainId = null, txHash = null, blockNumber = null, creatorAddress = null) => {
+    attachWrapTokenOnProject: async(projectId = null, tokenName = null, tokenSymbol = null, fromChainId = null, toChainId = null, txHash = null, blockNumber = null, creatorAddress = null) => {
         let response, error, code;
 
         if(
@@ -539,7 +542,9 @@ const BridgeApiHelper = {
             ||
             tokenSymbol == null
             ||
-            chainId == null
+            fromChainId == null
+            ||
+            toChainId == null
             ||
             txHash == null
             ||
@@ -564,7 +569,8 @@ const BridgeApiHelper = {
                     projectId: projectId,
                     tokenName: tokenName,
                     tokenSymbol: tokenSymbol,
-                    chainId: chainId,
+                    fromChainId: fromChainId,
+                    toChainId: toChainId,
                     txHash: txHash,
                     blockNumber: blockNumber,
                     creatorAddress: creatorAddress

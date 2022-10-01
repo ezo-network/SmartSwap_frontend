@@ -26,7 +26,7 @@ const rpcUrl = {
   42: 'https://kovan.infura.io/v3/bf51999b809848e8811c620334a5e041',
   137: 'https://polygon-mainnet.infura.io/v3/9e6392781fcc48af8e29b195fdf0ee77',
   80001: 'https://matic-mumbai.chainstacklabs.com',
-  56: 'https://cold-white-glitter.bsc.quiknode.pro/f9c8b2b4bac83d7154566b17b7b054d61b0468ee',
+  56: 'https://nd-391-673-039.p2pify.com/568ce20e78b9e5e3f184667368f84784',
   97: 'https://data-seed-prebsc-1-s1.binance.org:8545'  
 }
 
@@ -46,7 +46,8 @@ export default class Screen2 extends PureComponent {
         chain: null,
         chainId: null,
         chainIcon: null,
-        explorerUrl: null
+        explorerUrl: null,
+        decimals: null
       },
       addCustomToken: false
     };
@@ -83,14 +84,14 @@ export default class Screen2 extends PureComponent {
         config
       );
       
-      Object.keys(response.results.transformed).forEach(token => {
-        console.log(`${token} - ${response.results.transformed[token]}`)
+      Object.keys(response.results.transformed).forEach((token, index) => {
         const tokenAddress = (token.substring(11)).toLowerCase();
         const isTokenExist = _.find(this.props.tokens, {
           address: tokenAddress,
           chainId: Number(chainId)
         });
         if(isTokenExist){
+          console.log(`${index} ${isTokenExist.symbol}  ${isTokenExist.chainId} - ${token} - ${response.results.transformed[token]}`)
           if(response.results.transformed[token] > 0){
             this.setState(prevState => ({
               tokens: [...prevState.tokens, isTokenExist]
@@ -119,7 +120,7 @@ export default class Screen2 extends PureComponent {
     }
   }
 
-  async switchNetwork(token, tokenAddress, tokenIcon, chain, chainId, chainIcon, explorerUrl) {
+  async switchNetwork(token, tokenAddress, tokenIcon, chain, chainId, chainIcon, explorerUrl, decimals) {
     if(this.pendingNetworkSwitchRequest === false){
       const sourceObject = {
         selectedSource: {
@@ -129,7 +130,8 @@ export default class Screen2 extends PureComponent {
           chain: chain,
           chainId: chainId,
           chainIcon: chainIcon,
-          explorerUrl: explorerUrl
+          explorerUrl: explorerUrl,
+          decimals: decimals
         }      
       }
       if(Number(this.props.chainId) !== Number(chainId)){
@@ -173,6 +175,8 @@ export default class Screen2 extends PureComponent {
           this.state.selectedSource.chainIcon == null
           ||
           this.state.selectedSource.explorerUrl == null
+          ||
+          this.state.selectedSource.decimals == null
         ){
           notificationConfig.error('Please select a token first.');
           return;
@@ -185,7 +189,8 @@ export default class Screen2 extends PureComponent {
           this.state.selectedSource.chain,
           this.state.selectedSource.chainId,
           this.state.selectedSource.chainIcon,
-          this.state.selectedSource.explorerUrl
+          this.state.selectedSource.explorerUrl,
+          this.state.selectedSource.decimals
         );
       } else {
         this.props.onAddCustomTokenClicked();      
@@ -202,7 +207,7 @@ export default class Screen2 extends PureComponent {
   getNetworkName = (chainId) => {
     const networkConfig = _.find(this.props.networks, {chainId: chainId});
     if(networkConfig !== undefined){
-      return networkConfig.name
+      return networkConfig.chain
     } else {
       return 'CUSTOM'
     }
@@ -255,7 +260,7 @@ export default class Screen2 extends PureComponent {
                     {filteredTokens.map((token, i) => {
                       const network = _.find(this.props.networks, { chainId: token.chainId });
                       if(network !== undefined){
-                        token['chain'] = network.name;
+                        token['chain'] = network.chain;
                         token['chainIcon'] = network.icon;
                         token['explorerUrl'] = network.explorerUrl;
                       }
@@ -279,14 +284,25 @@ export default class Screen2 extends PureComponent {
                           token.chain, 
                           token.chainId,
                           token.chainIcon,
-                          token.explorerUrl
+                          token.explorerUrl,
+                          token.decimals
                         )}
                       >
                         <ProICOSbx02> 
-                          <img src={'/images/free-listing/tokens/' + ((token.icon).toString()).toLowerCase()} />{token.symbol}
+                          <img
+                            alt={token.symbol} 
+                            className="token-icon" 
+                            src={'/images/free-listing/tokens/' + ((token.symbol).toString() + '.png').toLowerCase()}
+                            onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                          />{token.symbol}
                         </ProICOSbx02>
                         <ProICOSbx02> 
-                            <img src={'/images/free-listing/chains/' + ((token.chainIcon).toString()).toLowerCase()} />{token.chain}
+                            <img
+                              alt={token.chain}
+                              className="chain-icon"
+                              src={'/images/free-listing/chains/' + ((token.chainIcon).toString()).toLowerCase()} 
+                              onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
+                            />{token.chain}
                         </ProICOSbx02>
                       </ProICOSbx01>
                       )
@@ -301,7 +317,10 @@ export default class Screen2 extends PureComponent {
                           <img src={'/images/free-listing/tokens/' + (('default.png').toString()).toLowerCase()} />CUSTOM
                         </ProICOSbx02>
                         <ProICOSbx02> 
-                            <img src={'/images/free-listing/chains/' + ((this.getNetworkIcon(this.props.chainId)).toString()).toLowerCase()} />{this.getNetworkName(this.props.chainId)}
+                            <img 
+                              src={'/images/free-listing/chains/' + ((this.getNetworkIcon(this.props.chainId)).toString()).toLowerCase()} 
+                              onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
+                            />{this.getNetworkName(this.props.chainId)}
                         </ProICOSbx02>
                       </ProICOSbx01>
                   </ProICOMbx02>
@@ -363,7 +382,7 @@ const ProICOSbx01 = styled.button`
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px;}
+  img{ margin-right:15px; width: 30px; height: 30px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
 `
 const BtnMbox = styled(FlexDiv)`
@@ -374,7 +393,6 @@ const BtnMbox = styled(FlexDiv)`
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
 
 `
-
 
 
 

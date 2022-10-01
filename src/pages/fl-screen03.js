@@ -102,12 +102,39 @@ export default class Screen3 extends PureComponent {
             });
             notificationConfig.error(response.message);
           }
-          
+
+          if (response.code === -32000 || response.code === -32603){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error("Intrinsic gas too low");
+          }
+
           if(response.code === 'NOT_A_CONTRACT'){
             this.setState({
               btnClicked: false
             });
             notificationConfig.error('Bridge address is not a contract.');
+          }
+
+          if(
+            response.code === 'CALL_EXCEPTION' 
+            || response.code === 'INSUFFICIENT_FUNDS' 
+            || response.code === 'NETWORK_ERROR' 
+            || response.code === 'NONCE_EXPIRED' 
+            || response.code === 'REPLACEMENT_UNDERPRICED'
+            || response.code === 'UNPREDICTABLE_GAS_LIMIT'
+          ){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.reason);            
+          }
+
+          if(response.code === 'TRANSACTION_REPLACED'){
+            if(response.cancelled === false && response.receipt?.transactionHash){
+              await this.props.onTokenAddedSuccessfully(response.receipt.transactionHash)
+            }
           }
 
           if (response.status === 1) {
@@ -117,6 +144,7 @@ export default class Screen3 extends PureComponent {
         });
 
     } catch (error) {
+      console.log({addTokenError: error});
       console.log(error);
     }
   }

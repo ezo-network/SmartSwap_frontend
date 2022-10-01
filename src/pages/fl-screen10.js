@@ -36,13 +36,13 @@ export default class Screen10 extends PureComponent {
     }
   }
 
-  async getWrappedTokens(sourceTokenChainId = null, creatorAddress = null, all = false) {
+  async getWrappedTokens(projectId = null, creatorAddress = null, all = false) {
     try {
       const {
         response,
         error,
         code
-      } = await BridgeApiHelper.getWrappedTokens(sourceTokenChainId, creatorAddress, all);
+      } = await BridgeApiHelper.getWrappedTokens(projectId, creatorAddress, all);
 
       if (code === 200) {
         this.setState({
@@ -72,11 +72,11 @@ export default class Screen10 extends PureComponent {
             this.state.selectedWrappedToken.forEach(async(selectedWrappedTokenId) => {
               const wrappedToken = _.find(this.state.wrappedTokens, {_id: selectedWrappedTokenId});
               if(wrappedToken !== null){
-                const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.chainId });
+                const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.toChainId });
                 await BridgeApiHelper.makeTransferWrapTokenOwnershipRequest(
                   wrappedToken.tokenSymbol,
-                  networkConfig.name,
-                  wrappedToken.chainId,            
+                  networkConfig.chain,
+                  wrappedToken.toChainId,
                   this.props.accountAddress,
                   signedMessage
                 );
@@ -156,10 +156,10 @@ export default class Screen10 extends PureComponent {
     
     let usersWrappedTokens = [];
     this.state.wrappedTokens.forEach(wrappedToken => {
-      const originalToken = _.find(this.props.tokens, {symbol: wrappedToken.tokenSymbol});
-      const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.chainId });
-      if (networkConfig !== undefined) {      
-        wrappedToken['chain'] = networkConfig['name'];
+      const originalToken = _.find(this.props.tokens, {symbol: wrappedToken.tokenSymbol.slice(2)});
+      const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.toChainId });
+      if (networkConfig !== undefined) {
+        wrappedToken['chain'] = networkConfig['chain'];
         wrappedToken['icon'] = originalToken['icon'];
         usersWrappedTokens.push(wrappedToken);
       }
@@ -198,7 +198,8 @@ export default class Screen10 extends PureComponent {
                           <i className="fa fa-check-circle" aria-hidden="true"></i>
                           <ProICOSbx02> 
                             <img src={'/images/free-listing/tokens/' + wrappedToken.icon} /> 
-                            {wrappedToken.tokenSymbol}
+                            {(wrappedToken.tokenSymbol.substring(-2, 2)).toLowerCase()}
+                            {(wrappedToken.tokenSymbol.substring(2)).toUpperCase()}
                           </ProICOSbx02>
                           <ProICOSbx02> {wrappedToken.chain} </ProICOSbx02>
                         </ProICOSbx01>                         
@@ -275,7 +276,7 @@ const ProICOSbx01 = styled.button`
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px;}
+  img{ margin-right:15px; width: 30px; height: 30px; }
   &:nth-of-type(1){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
 `
 const BtnMbox = styled(FlexDiv)`

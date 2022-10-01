@@ -82,8 +82,8 @@ export default class Screen6 extends PureComponent {
 
 		let wrappedTokens = [];
 		this.state.wrappedTokens.forEach(token => {
-			const networkConfig = _.find(this.props.networks, { chainId: token.chainId });
-			token['chain'] = networkConfig['name'];
+			const networkConfig = _.find(this.props.networks, { chainId: token.toChainId });
+			token['chain'] = networkConfig['chain'];
 			wrappedTokens.push(token);
 		});
 
@@ -118,14 +118,17 @@ export default class Screen6 extends PureComponent {
 									{wrappedTokens.length > 0 && wrappedTokens.map(function (wrappedToken, i) {
 										return (
 											<List key={i}>
-												<ListTxt><span>sb{wrappedToken.tokenSymbol}</span><span>{wrappedToken.chain}</span></ListTxt>
+												<ListTxt><span>
+													{(wrappedToken.tokenSymbol.substring(-2, 2)).toLowerCase()}
+					    	                        {(wrappedToken.tokenSymbol.substring(2)).toUpperCase()}
+												</span><span>{wrappedToken.chain}</span></ListTxt>
 												<ListTxt><ListLink>{wrappedToken.address === null ? 'FETHING...' : wrappedToken.address}</ListLink></ListTxt>
 											</List>
 										)
 									})}
 									<ListFooter>
 										<LinkGreen onClick={e => this.props.onAddMoreBridgeButtonClicked()}>+ Add more bridges </LinkGreen>
-										<LinkFt>Projects, claim the bridge deployer to become the master validator   <i className="fas fa-external-link-alt"></i></LinkFt>
+										<LinkFt onClick={() => this.props.onStartHereButtonClick()}>Projects, claim the bridge deployer to become the master validator   <i className="fas fa-external-link-alt"></i></LinkFt>
 									</ListFooter>
 								</Ulist>
 							</CMbx>
@@ -240,12 +243,14 @@ const LinkGreen = styled.a`
 	list-style: none;
 	color: #91dc27;
 	font-weight: bold;
+	cursor: pointer;
 `
 const LinkFt = styled.a`
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	color: #aaaaaa;
+	cursor: pointer;
 	i {
 		margin-left: 5px;
 	}
