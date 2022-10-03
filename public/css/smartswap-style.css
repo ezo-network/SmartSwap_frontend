@@ -30,7 +30,7 @@ body {
 
 .smartSwap .mainBlock {
   /* background: url(../images/header-bg.jpg) 50% 0 no-repeat; */
-  padding-top: 27px;
+  padding-top: 160px;
   min-height: 100vh;
 }
 
@@ -1432,7 +1432,7 @@ body {
 }
 
 .smartSwap .swap-textBox {
-  padding: 130px 0px 0px 0px;
+  padding: 100px 0px 0px 0px;
 }
 
 .smartSwap .swap-textBox .container-Grid {
@@ -8097,7 +8097,7 @@ p.withdrawOnContractAlert {
 .tab-main-wrapper {
   display: flex;
   align-items: stretch;
-  box-shadow: 0px 0px 30px 0 rgb(255 255 255 / 25%);
+  box-shadow: 0px 0px 30px 8px rgb(145 220 39 / 25%);
 }
 
 ul.tabs-n {
@@ -8110,12 +8110,12 @@ ul.tabs-n {
 ul.tabs-n li {
   background: #0d0e13;
   color: #a6a2b0;
-  padding: 0px 20px;
+  padding: 0px 35px;
   cursor: pointer;
   text-align: left;
   position: relative;
   width: 198px;
-  height: calc(20.1% - 2px);
+  height: calc(25.1% - 2px);
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -8679,7 +8679,7 @@ a.color-light-n:hover {
 .swap-Textlink {
   width: 100%;
   max-width: 874px;
-  margin: 17px auto 0;
+  margin: 20px auto;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -9338,50 +9338,3 @@ a.dc-file:hover {
   -o-transform: rotate(90deg);
   transform: rotate(90deg);
 }
-
-/* Subham */
-.tabRow {display: flex; margin: 0 -26px 10px;}
-.tabRow .tabCol {width: 50%; padding: 0 26px;}
-.tabRow img {vertical-align: top;}
-.tabRow .tabDivider {border-left: 1px solid #1b1d21; border-right: 1px solid #373c47; display: inline-block; vertical-align: top; width: 0; margin: 0 0; position: relative;}
-.tabRow .tabDivider .swap {position: absolute; width: 4px; bottom: 66px; left: -2px; padding: 6px 0; backdrop-filter: opacity(1) blur(5px); border-radius: 18px; /* background: linear-gradient(#292e33, #272c31); */}
-.tabRow .tabDivider .swap img {width: 30px; position: relative; left: -13px;}
-.tabRow .tabCol label {color: #aaaaaa; font-size: 12px; margin-bottom: 11px; display: block;}
-.inputIcon {position: relative; }
-.inputIcon i {position: absolute; top: 2px; left: 2px; bottom: 2px; width: 50px; background: #ededed; display: flex; align-items: center; justify-content:center;}
-.inputIcon i img {height: 25px;}
-.inputIcon input {border: 0; color: #130929; width:100%; height: 50px; border-radius: 0; padding: 0 0 0 60px; font-weight: bold; font-size: 16px;}
-.inputIcon.black input {background: #0d0e13; color: #656565;}
-.inputIcon.black i {background: #21232b;}
-.d-none {display: none !important;}
-
-.tabCol figure {text-align: center; padding: 30px 0 0;}
-.figIcon {background: #fff; border-radius: 100px; width: 110px; height: 110px; display: inline-flex; align-items: center; justify-content: center;}
-.figIcon img {height: 65px; margin-right: -10px;}
-.tabCol figure figcaption {margin-top: 17px;}
-.tabCol figure figcaption span {color: #aaa;}
-.tabCol figure figcaption span:first-child::after {content:""; border-left: 1px solid #000;
-  border-right: 1px solid #373c47; display: inline-block; vertical-align: top;
-  width: 0;
-  margin: 0 10px;
-  height: 20px;}
-.btn { color: #FFF; font-weight: 700; padding: 25px 24px; font-size: 24px; display: inline-block;  cursor: pointer; text-align: center; border-radius: 0 !important; width:100%; margin-top: 16px;}
-.btn.btn-primary {background-color: inherit; border: 2px solid #91dc27; box-shadow: 0px 0px 10px #91dc27;}
-.btn.btn-primary:hover {background: #91dc27;}
-.btn.btn-secondary {background-color: inherit; border: 2px solid #9d9d9d; box-shadow: 0px 0px 10px #9d9d9d;}
-.btn.btn-secondary:hover {background: #9d9d9d;}
-.btn b {width: 40px; height: 40px; background: #9d9d9d; display: inline-block; vertical-align: top; border-radius: 100%; padding: 6px 0 0 0; margin: -7px 16px -7px 0;}
-.btn b img {height: 27px;}
-.hasBtn {padding: 0 26px; flex-flow: column;}
-.hasBtn p {text-align: center; color: #aaaaaa; margin: 15px 0 0; font-size: 11px;}
-.color-green {color: #91dc27}
-.btn-grp {display: flex; margin: 0 -17px; padding: 0 43px;}
-.btn-grp .btn {margin: 0 17px;}
-
-.dropdown {padding: 70px 43px 95px;}
-.dropdown-title {font-size: 24px; font-weight: bold; margin: 0;}
-.dropdown-title:after {content: ""; display: inline-block; vertical-align: top; margin: 12px 0 0 50px; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 9px solid #91dc27}
-.powertextBX-links {display: flex; font-size: 11px; margin-left: 10px;}
-.powertextBX-links a {color: #91dc27; margin: 0;}
-.powertextBX-links span {color: #595959 !important; margin: 0 11px;}
-.no-effect{pointer-events: none;}

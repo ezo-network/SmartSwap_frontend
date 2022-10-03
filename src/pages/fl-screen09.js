@@ -1,99 +1,43 @@
 import React, { PureComponent, lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
+import web3Config from "../config/web3Config";
+import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
+import SwapFactoryContract from "../helper/swapFactoryContract";
+import CONSTANT from "../constants";
+import Header from "../components/Header";
+import RightSideMenu from "../components/RightSideMenu";
+import axios from "axios";
+import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import BridgeApiHelper from "../helper/bridgeApiHelper";
-import Web3 from 'web3';
+import HeadFreeListing from "../components/Header02";
+
+import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
+import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
+import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
+import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
+import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
+import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
+import Lineimg from "../assets/freelisting-images/line01.png";
+
+
+
 
 const $ = window.$;
-export default class Screen9 extends PureComponent {
+export default class Screen8 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
-      validatorFileInfo: {
-        name: null,
-        url: null,
-        updatedAt: null,
-        instructionUrl: null,
-      },
-      validatorAddress: "",
-      isAddressSet: false
+
+    };
+
+    this.state = {
+      web3: null,
+      web3Check: false,
     };
   }
 
-  componentDidMount() {
-    this.getValidatorFileInfo();
-    this.getValidator();
-  }
 
-  getValidatorFileInfo = async() => {
-    try {
-      const {response, error, code} = await BridgeApiHelper.getValidatorFileInfo();
-      if(code === 200){
-        this.setState({
-          validatorFileInfo: response
-        });
-      }
-    } catch(err){
-      console.error(err);
-    }
-  }
-
-  getValidator = async() => {
-    try {
-      const {response, error, code} = await BridgeApiHelper.getValidator(this.props.accountAddress);
-      if(code === 200){
-        if(Web3.utils.isAddress(response.validatorAddress)){
-          this.setState({
-            validatorAddress: response.validatorAddress,
-            isAddressSet: true
-          });
-          notificationConfig.info('Validator address already set.');
-        } else {
-          this.setState({
-            isAddressSet: false
-          });
-        }
-      }
-    } catch(err){
-      console.error(err);
-    }
-  }
-
-  addValidator = async() => {
-    try {
-      if(Web3.utils.isAddress(this.state.validatorAddress)){
-        const {response, error, code} = await BridgeApiHelper.addValidator(this.props.accountAddress, this.state.validatorAddress);
-        if(code === 200){
-          notificationConfig.info('Validator address added successfully.');
-          await this.getValidator();
-        }
-      } else {
-        this.setState({
-          validatorAddress: ''
-        });
-        notificationConfig.error('Please provide a valid address.');
-      }
-    } catch(err){
-      console.error(err);
-    }
-  }
-
-  goToInstructionUrl(){
-    window.open(this.state.validatorFileInfo.instructionUrl, '_blank');
-  }
-
-  downloadFile(){
-    window.open(this.state.validatorFileInfo.url, '_blank');
-  }
-
-  setValidatorAddressHandler(event){
-    if(Web3.utils.isAddress(event.target.value)){
-      this.setState({
-        validatorAddress: (event.target.value).toLowerCase()
-      });
-    }
-  }
-  
   render() {
     return (
       <>
@@ -111,30 +55,24 @@ export default class Screen9 extends PureComponent {
                     <label><i>1</i> 
                     <ProFileNBtn>
                       <ProFile><p>
-                        <span><em className="fa fa-file-code"></em> {this.state.validatorFileInfo.name},</span> Latest update {this.state.validatorFileInfo.updatedAt}</p>
-                        <ProbxLink>Instructions <em onClick={() => this.goToInstructionUrl()} className="fas fa-external-link-alt"></em></ProbxLink>
+                        <span><em class="fa fa-file-code"></em> SMART validator V.1</span> Latest update 09/08/2022</p>
+                        <ProbxLink>Instructions <em class="fas fa-external-link-alt"></em></ProbxLink>
 
                       </ProFile>
                       <ProBtn>
-                        <button onClick={() => this.downloadFile()} className="Btn01">DOWNLOAD VALIDATOR FILE</button> 
+                        <button className="Btn01">DOWNLOAD VALIDATOR FILE</button> 
                       </ProBtn>
                     </ProFileNBtn>
                     </label>   
                 </ProInputbx>
                 <ProInputbx> 
-                    <label htmlFor="input01"><i>2</i> Type the validator address to activate master validator status</label>
-                    <input onChange={(e) => this.setValidatorAddressHandler(e)} type="text" id="input01" className="v2" value={this.state.validatorAddress}/>
+                    <label htmlFor="input01"><i>2</i> Type the validator address to activate master validator status</label>   
+                    <input type="text" id="input01" className="v2"  /> 
                 </ProInputbx>
             
                 <BtnMbox>
-                    <button onClick={() => this.props.onBackButtonClicked(8)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                    {this.state.isAddressSet === false &&
-                      <button onClick={() => this.addValidator()} className="Btn01">ACTIVE VALIDATOR</button>                   
-                    }
-                    
-                    {this.state.isAddressSet === true &&
-                    <button onClick={() => this.props.onActiveValidatorButtonClick(10)} className="Btn01">NEXT STEP</button>                   
-                    }
+                    <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                    <button className="Btn01"> ACTIVE VALIDATOR</button> 
                 </BtnMbox> 
               </CMbx>
             </MContainer>

@@ -13,7 +13,6 @@ import ownLicence from './pages/ownLicence';
 import ownLicence02 from './pages/ownLicence02';
 import SmartSwapLicence from './pages/smartSwapLicence';
 import FreeListing from './pages/free-listing';
-import Welcome from './pages/welcome';
 
 const DefaultRouter = () => (
   <Router>
@@ -37,9 +36,6 @@ const DefaultRouter = () => (
     </Switch>
     <Switch>
       <Route path="/freelisting" component={FreeListing} />
-    </Switch>
-    <Switch>
-      <Route path="/welcome" component={Welcome} />
     </Switch>
   </Router>
 )

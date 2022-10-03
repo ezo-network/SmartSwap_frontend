@@ -14,7 +14,6 @@ import { LoopCircleLoading } from "react-loadingg";
 import CONSTANT from "../constants";
 import data from "../config/constantConfig";
 import Header from "../components/Header";
-import HeadFreeListing from "../components/Header02";
 import RightSideMenu from "../components/RightSideMenu";
 import WalletPopup from "../components/WalletPopup";
 import CoinPopup from "../components/CoinPopup";
@@ -29,9 +28,6 @@ import CefiToDefi from "../components/CefiToDefi";
 import axios from "axios";
 import LedgerHistory from "../components/LedgerHistory";
 import NoDomain from "../components/NoDomain";
-import PopupToken01 from "../components/PopupToken01";
-import PopupToken02 from "../components/PopupToken02";
-import PopupToken03 from "../components/PopupToken03";
 import Carousel from "react-multi-carousel";
 import AnimatedNumber from "react-animated-numbers";
 import AnimatedNumbers from "react-animated-number";
@@ -40,11 +36,6 @@ import "react-multi-carousel/lib/styles.css";
 import { isValidAddress } from 'ethereumjs-util';
 import reimbursementAbi from "../abis/reimbursementAbi.json";
 import SelectToken from "./select_token"
-
-import tabicon1 from "../assets/images/tabicon1.png";
-import tabicon12 from "../assets/images/tabicon1-2.png";
-import swapImg from "../assets/images/reverticon.png";
-
 
 import SBLogo01 from "../assets/images/sb-ICO-01.png";
 import SBLogo02 from "../assets/images/sb-ICO-02.png";
@@ -57,7 +48,6 @@ import SBLogo08 from "../assets/images/sb-ICO-08.png";
 import SBLogo09 from "../assets/images/sb-ICO-09.png";
 import SBLogo010 from "../assets/images/sb-ICO-010.png";
 import SBLogo011 from "../assets/images/sb-ICO-011.png";
-import SmartExchange from "../assets/images/smart-exchange.png";
 import BigNumber from "big-number/big-number";
 import Select from 'react-select';
 import Switch from "react-switch";
@@ -134,9 +124,7 @@ export default class Home extends PureComponent {
       txLinkSend: "",
       txLinkReturn: "",
       receiveFundAmount: "",
-      receiveAmountUsd: null,
       sendFundAmount: "",
-      sentAmountUsd: null,
       actualSendFundAmount: 0,
       approxReceiveFundAmount: 0,
       allTxHistoryUI: null,
@@ -189,12 +177,20 @@ export default class Home extends PureComponent {
       selectedOptionSend: getTokenByName("BNB"),
       selectedOptionReceive: getTokenByName("ETH"),
       selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs("BNB", "ETH"),
-      sendCurrencyList: getTokenList(),
+      sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+        return value.label !== "ETH" && value.label !== "BNB";
+      }),
       selectedNetworkOptionSend: getTokenByNetwork("BSC"),
       selectedNetworkOptionReceive: getTokenByNetwork("ETHEREUM"),
-      sendNetworkList: getNetworkList(),
-      recieveNetworkList: getNetworkList(),
-      recieveCurrencyList: getTokenList(),
+      sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+        return value.label !== "ETHEREUM" && value.label !== "BSC";
+      }),
+      recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+        return value.label !== "BSC" && value.label !== "ETHEREUM";
+      }),
+      recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+        return value.label !== "BNB" && value.label !== "ETH";
+      }),
       web3Provider: {
         [process.env.REACT_APP_ETH_CHAIN_ID]: null,
         [process.env.REACT_APP_BSC_CHAIN_ID]: null,
@@ -682,7 +678,7 @@ export default class Home extends PureComponent {
           // console.log(res.data)
           let result = res.data;
           console.log(result);
-          if (result.data.status === "FULFILLED" && result.data.relationship.claim.approveHash !== null && result.data.approveTime !== null) {
+          if (result.data.status === "FULFILLED" && result.data.relationship.claim.approveHash !== null) {
             console.log(result.data);
 
             if (result.data.txHash === this.state.txIdSent) {
@@ -696,21 +692,16 @@ export default class Home extends PureComponent {
                   result.data.relationship.claim.approveHash;
 
 
-                result.data["hash"] = result.data.relationship.claim.approveHash;
-                result.data["txLinkReturn"] = txLinkReturn
-                result.data["returnAmount"] = web3Js.utils.fromWei(result.data.estimatedForeignAmount);
-                result.data["sentTxTime"] = new Date(Number(result.data.srTime + "000")).toUTCString();
-                result.data["txReceiveTime"] = new Date(Number(result.data.approveTime + "000")).toUTCString();
-                result.data["sentAmountUsd"] = (Number(web3Js.utils.fromWei(result.data.processAmount)) * Number(result.data.tokenAPrices.prices[0])).toFixed(2);
-                result.data["receiveAmountUsd"] = (Number(web3Js.utils.fromWei(result.data.estimatedForeignAmount)) * Number(result.data.tokenBPrices.prices[0])).toFixed(2);
-                // sentTxTime = new Date(Number(element.srTime + "000")).toUTCString()
+                result.data["recivedAmount"] = web3Js.utils.fromWei(result.data.estimatedForeignAmount);
                 // result.data.counterParties.map(async (elementCounterParties, key) => {
                 //   let rcAmount = web3Js.utils.fromWei(elementCounterParties.crossAmountA) * (elementCounterParties.tokenAPrice / elementCounterParties.tokenBPrice)
                 //   result.data["recivedAmount"] = Number(result.data["recivedAmount"]) + Number(rcAmount);
                 // })
 
                 this.updateLedgerAfterResponse(
-                  result.data
+                  result.data.relationship.claim.approveHash,
+                  txLinkReturn,
+                  result.data.recivedAmount
                 );
                 clearInterval(txCheckInterval);
               }
@@ -728,7 +719,6 @@ export default class Home extends PureComponent {
               this.setState({
                 allowCurrentTxExpedite: (allowCurrentTxExpedite === 0) ? 1 : allowCurrentTxExpedite,
                 currentTxExpediteData: curTxExData,
-                txSentTime: new Date(Number(result.data.srTime + "000")).toUTCString()
               })
             }
           }
@@ -1722,6 +1712,18 @@ export default class Home extends PureComponent {
         selectedNetworkOptionSend: selectedNetworkOptionReceive,
         selectedNetworkOptionReceive: selectedNetworkOptionSend,
         selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedReceiveCurrency, selectedSendCurrency),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOptionSend.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOptionReceive.value && selectedOptionSend.value !== value.value;
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOptionSend.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOptionReceive.value && selectedOptionSend.value !== value.value;
+        }),
         sendFundAmount: "",
         estimatedGasFee: "0"
       },
@@ -1736,50 +1738,82 @@ export default class Home extends PureComponent {
 
   handleChange = (name, selectedOption) => {
     const { selectedOptionSend, selectedOptionReceive, selectedNetworkOptionSend, selectedNetworkOptionReceive } = this.state;
-    if (name === "send" || name === "sendNetwork") {
-      if (selectedOption.value === selectedOptionReceive.value) {
-        let selectedReceiveOptionNew = getTokenList().filter(function (value, index, arr) {
+    if (name === "send") {
+      this.setState({
+        selectedSendCurrency: selectedOption.value,
+        selectedOptionSend: selectedOption,
+        selectedNetworkOptionSend: getTokenByNetwork(selectedOption.networkName),
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedOptionReceive.value),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
           return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
-        })[0];
-        this.setState({
-          selectedSendCurrency: selectedOption.value,
-          selectedOptionSend: getTokenByName(selectedOption.value),
-          selectedNetworkOptionSend: getTokenByNetwork(selectedOption.networkName),
-          selectedReceiveCurrency: selectedReceiveOptionNew.value,
-          selectedOptionReceive: selectedReceiveOptionNew,
-          selectedNetworkOptionReceive: getTokenByNetwork(selectedReceiveOptionNew.networkName),
-          selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedReceiveOptionNew.value),
-        })
-      } else {
-        this.setState({
-          selectedSendCurrency: selectedOption.value,
-          selectedOptionSend: getTokenByName(selectedOption.value),
-          selectedNetworkOptionSend: getTokenByNetwork(selectedOption.networkName),
-          selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedOptionReceive.value),
-        })
-      }
-    } else if (name === "receive" || name === "receiveNetwork") {
-      if (selectedOption.value === selectedOptionSend.value) {
-        let selectedSendOptionNew = getTokenList().filter(function (value, index, arr) {
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+      })
+    } else if (name === "receive") {
+      this.setState({
+        selectedReceiveCurrency: selectedOption.value,
+        selectedOptionReceive: selectedOption,
+        selectedNetworkOptionReceive: getTokenByNetwork(selectedOption.networkName),
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.value, selectedOption.value),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
           return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
-        })[0];
-        this.setState({
-          selectedReceiveCurrency: selectedOption.value,
-          selectedOptionReceive: getTokenByName(selectedOption.value),
-          selectedNetworkOptionReceive: getTokenByNetwork(selectedOption.networkName),
-          selectedSendCurrency: selectedSendOptionNew.value,
-          selectedOptionSend: selectedSendOptionNew,
-          selectedNetworkOptionSend: getTokenByNetwork(selectedSendOptionNew.networkName),
-          selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedSendOptionNew.value),
-        })
-      } else {
-        this.setState({
-          selectedReceiveCurrency: selectedOption.value,
-          selectedOptionReceive: getTokenByName(selectedOption.value),
-          selectedNetworkOptionReceive: getTokenByNetwork(selectedOption.networkName),
-          selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.value, selectedOption.value),
-        })
-      }
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
+        }),
+      })
+    } else if (name === "sendNetwork") {
+      this.setState({
+        selectedNetworkOptionSend: selectedOption,
+        selectedSendCurrency: getTokenByName(selectedOption.value).value,
+        selectedOptionSend: getTokenByName(selectedOption.value),
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOption.value, selectedOptionReceive.value),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionReceive.value !== value.value;
+        }),
+      })
+    } else if (name === "receiveNetwork") {
+      this.setState({
+        selectedNetworkOptionReceive: selectedOption,
+        selectedReceiveCurrency: getTokenByName(selectedOption.value).value,
+        selectedOptionReceive: getTokenByName(selectedOption.value),
+        selectedPairAddress: constantConfig.getSmartswapContractAddressByPairs(selectedOptionSend.value, selectedOption.value),
+        sendCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
+        }),
+        recieveCurrencyList: getTokenList().filter(function (value, index, arr) {
+          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
+        }),
+        sendNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return value.value !== selectedOption.value && selectedOptionSend.value !== value.value;
+        }),
+        recieveNetworkList: getNetworkList().filter(function (value, index, arr) {
+          return (value.value !== selectedOption.value && selectedOptionSend.value !== value.value);
+        }),
+      })
     }
   };
 
@@ -1805,14 +1839,12 @@ export default class Home extends PureComponent {
       txIdSent: null,
       txSentStatus: "pending",
       txSentTime: null,
-      sentAmountUsd: null,
       tokenReceive: "0",
       txReceiveTime: null,
       txIdReceive: null,
       txLinkSend: "",
       txLinkReturn: "",
       receiveFundAmount: "",
-      receiveAmountUsd: null,
       sendFundAmount: "",
       actualSendFundAmount: 0,
       approxReceiveFundAmount: 0,
@@ -1910,20 +1942,18 @@ export default class Home extends PureComponent {
       }, 10000);
     }
   }
-  updateLedgerAfterResponse(ledgerData) {
+  updateLedgerAfterResponse(hash, txLinkReturn, returnAmount) {
     this.setState(
       {
         isSendingOrder: false,
         txSentStatus: "Success",
-        txSentTime: ledgerData.sentTxTime,
-        sentAmountUsd: ledgerData.sentAmountUsd,
+        // txSentTime: new Date().toUTCString(),
         tokenReceive: "2",
-        txReceiveTime: ledgerData.txReceiveTime,
-        txIdReceive: ledgerData.hash,
+        // txReceiveTime: new Date().toUTCString(),
+        txIdReceive: hash,
         whichButton: "4",
-        txLinkReturn: ledgerData.txLinkReturn,
-        receiveFundAmount: ledgerData.returnAmount,
-        receiveAmountUsd: ledgerData.receiveAmountUsd,
+        txLinkReturn: txLinkReturn,
+        receiveFundAmount: returnAmount,
       },
       async () => {
         //   await this.enableInputs();
@@ -2207,19 +2237,14 @@ export default class Home extends PureComponent {
               ></RightSideMenu>
               {/* <!--======================= RIGHT SIDE MENU END  =====================-->
                     <!--======================= HEADER START =====================--> */}
-              {/* <Header
+              <Header
                 web3={this.state.web3}
                 web3Config={web3Config}
                 cloneData={this.state.cloneData}
                 isSubdomain={this.state.isSubdomain}
                 clearPreview={this.clearPreview}
-              ></Header> */}
-              <HeadFreeListing />
+              ></Header>
               {/* <!--======================= HEADER END =====================--> */}
-
-              {/* <PopupToken01></PopupToken01> */}
-               {/* <PopupToken02></PopupToken02> */}
-              {/* <PopupToken03></PopupToken03> */}
               <div className="backgroundBlock" onClick={this.handleClick} >
                 <div
                   className={
@@ -2258,27 +2283,21 @@ export default class Home extends PureComponent {
                       //     this.openPopup('About');
                       // }}
                       >
-                        <span>One click</span> DECENTRALIZED CROSS-CHAIN SWAP
+                        <span>One click</span> DECENTRALIZED MULTICHAIN SMART SWAP
                       </div>
                       <div className="smvTitle02 wow fadeInUp" data-wow-delay="0.2s">
                         {/* Unlimited Liquidity CeFi to Defi Decentralized Bridge <span style={{ color: '#525252' }}>|</span> AMM Alternative */}
                         {/* Best multichain rates available with slippage free transactions or with a DeFi aggregator */}
-                        Best cross-chain rates available with slippage or zero slippage transactions with p2p and CeDeFi
+                        Best multichain rates available from slippage or slippage free transactions with P2P and CeDeFi
                       </div>
                       {this.state.wrapBox === "swap" ? (
                         <>
                           <div className="tab-container">
                             <div className="tab-main-wrapper">
                               <ul className="tabs-n">
-                                <li className="tab-link" data-tab="tab-1">
-                                  <div>
-                                    NATIVE TOKENS
-                                    <span className="text-sm-n">LIVE BETA</span>
-                                  </div>
-                                </li>
                                 <li className="tab-link current-n" data-tab="tab-1">
                                   <div>
-                                    BRIDGE TOKENS
+                                    CRYPTO
                                     <span className="text-sm-n">LIVE BETA</span>
                                   </div>
                                 </li>
@@ -2290,13 +2309,13 @@ export default class Home extends PureComponent {
                                 </li>
                                 <li className="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>
                                   <div>
-                                  dFX
+                                    FOREX
                                     <span className="text-sm-n">COMING SOON</span>
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none' }}>
                                   <div>
-                                  dSTOCKS
+                                    STOCKS
                                     <span className="text-sm-n">COMING SOON</span>
                                   </div>
                                 </li>
@@ -2365,53 +2384,13 @@ export default class Home extends PureComponent {
                               <div className="tab-content-n-main">
                                 <div id="tab-1" className="tab-content-n current-n">
                                   <div className="">
-                                    <div className="tabRow">
-                                      <div className="tabCol">
-                                        <div className="d-flex balance-row">
-                                          <div className="b-text">
-                                            Balance: {Number(this.state.userBalance).toFixed(4)} &nbsp;<span>MAX</span>
-                                          </div>
+                                    <div className="form-group-n  items-center-n">
+                                      <div className="d-flex balance-row">
+                                        <div className="b-text">
+                                          Balance: {Number(this.state.userBalance).toFixed(4)} &nbsp;<span>MAX</span>
                                         </div>
+                                        {/* <img src="images/slider-icon.png" alt="" /> */}
                                       </div>
-                                      <div className="tabCol">
-                                        <span className="color-green">Check authenticity </span>
-                                      </div>
-                                    </div>
-                                    <div className="tabRow">
-                                      <div className="tabCol">
-                                        <label>SEND</label>
-                                        <div className="inputIcon white"><i><img src={tabicon1}></img></i><input type="text" value="100"></input></div>
-                                        <figure>
-                                          <div className="figIcon">
-                                            <img src={tabicon1}></img>
-                                          </div>
-                                          <figcaption>
-                                            <span>JNTR</span>
-                                            <span>ETHEREUM</span>
-                                          </figcaption>
-                                        </figure>
-                                      </div>
-                                      <div className="tabDivider"><a className="swap" href=""><img src={swapImg}></img></a></div>
-                                      <div className="tabCol">
-                                        <label>RECEIVE</label>
-                                        <div className="inputIcon black"><i><img src={tabicon12}></img></i><input type="text" value="100"></input></div>
-                                        <figure>
-                                          <div className="figIcon">
-                                            <img src={tabicon12}></img>
-                                          </div>
-                                          <figcaption>
-                                            <span>JNTR</span>
-                                            <span>BSC</span>
-                                          </figcaption>
-                                        </figure>
-                                      </div>
-                                    </div>
-                                    <div className="tabRow hasBtn">
-                                      <button className="btn btn-primary"><b><img src={SBLogo01}></img></b>BRIDGE FOR FREE</button>
-                                      <p>Bridge to any EVM chain for free with 1:1 wrap value</p>
-                                    </div>
-                                    <div className="d-none form-group-n  items-center-n">
-                                      
                                       <div className="flex-1 w-100-sm flex-auto-sm">
                                         <div className="inputs-wrap light-controls-n">
 
@@ -2692,7 +2671,7 @@ export default class Home extends PureComponent {
                                         </div>
                                       </div>
                                     </div>
-                                    <div className="text-center d-none">
+                                    <div className="text-center">
                                       {this.state.web3 === null ||
                                         constantConfig.tokenDetails[
                                           this.state.selectedSendCurrency
@@ -2944,20 +2923,14 @@ export default class Home extends PureComponent {
                                 <div className="d-flex">
                                   <p>
                                     Powered by
-                                    <img src={SmartExchange} />
-
-                                    <div className="powertextBX-links">
-                                      <a href="">Free listing</a>
-                                      <span>|</span>
-                                      <a href="">Free license</a>
-                                    </div>
+                                    <img src="images/smLOGO.png" />
                                     {/* <a href="#">Start new swap</a> */}
                                   </p>
                                   {/* <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p> */}
                                 </div>
                               </div>
                             )}
-                            {/* <label className="slippage-outer">
+                            <label className="slippage-outer">
                               <p className="active" style={{ paddingRight: "10px" }}>Slippage free </p>
                               <Switch
                                 checked={this.state.checked1}
@@ -2978,7 +2951,7 @@ export default class Home extends PureComponent {
                                 disabled={true}
                               />
                               <p style={{ paddingLeft: "10px" }}>Slippage</p>
-                            </label> */}
+                            </label>
                             {/* <div className="swap-Link03">
                                                 <a href="javascript:void();">P2C</a> | <a href="javascript:void();">P2G</a> | <a
                                                     href="javascript:void();">P2P</a>
@@ -3001,17 +2974,6 @@ export default class Home extends PureComponent {
                                                         SmartSwap reimburses users with ZERO/1 at 100%.</p>
                                                 </div>
                                             </div> */}
-                          </div>
-
-                          <div>
-                            <div className="dropdown">
-                              <h4 className="dropdown-title">Ledger</h4>
-                            </div>
-                            <div className="btn-grp">
-                              <a className="btn btn-primary" href="#">FREE SMARTSWAP LICENSE</a>
-                              <a className="btn btn-secondary" href="#">BECOME A SWAP PROVIDER</a>
-                              <a className="btn btn-secondary" href="#">FREE LISTING</a>
-                            </div>
                           </div>
                         </>
                       ) : this.state.wrapBox === "success" ? (
@@ -3139,9 +3101,9 @@ export default class Home extends PureComponent {
                                     Send
                                   </div>
                                   <div className="trasaction-Amt">
-                                    {Number(this.state.actualSendFundAmount).toFixed(6)}{" "}
+                                    {this.state.actualSendFundAmount}{" "}
                                     {this.state.selectedSendCurrency}
-                                    <span>{this.state.sentAmountUsd ? "($" + this.state.sentAmountUsd + ")" : null}</span>
+                                    {/* <span>({this.state.sendFundAmount})</span> */}
                                   </div>
                                   <div className="trasaction-Date">
                                     {this.state.txSentTime}
@@ -3173,9 +3135,9 @@ export default class Home extends PureComponent {
                                         Received <span></span>
                                       </div>
                                       <div className="trasaction-Amt">
-                                        {Number(this.state.receiveFundAmount).toFixed(6)}{" "}
+                                        {this.state.receiveFundAmount}{" "}
                                         {this.state.selectedReceiveCurrency}
-                                        <span>{this.state.receiveAmountUsd ? "($" + this.state.receiveAmountUsd + ")" : null}</span>
+                                        {/* <span>(${this.state.sendFundAmount})</span>  */}
                                       </div>
                                       <div className="trasaction-Date">
                                         {this.state.txReceiveTime}
@@ -3233,15 +3195,7 @@ export default class Home extends PureComponent {
                                               style={{ color: "white" }}
                                               onClick={() => this.expedite(this.state.currentTxExpediteData)}
                                             >
-                                              Expedite to skip pending
-                                              <i className="help-circle">
-                                                <i
-                                                  className="fas fa-question-circle protip"
-                                                  data-pt-position="top"
-                                                  data-pt-title="It seems like there is no p2p swap available yet. If you don't want to wait, please pay expedite fee to for instant swaps using a swap provider"
-                                                  aria-hidden="true"
-                                                ></i>
-                                              </i>
+                                              Expedite
                                             </a>
                                           </>) : this.state.allowCurrentTxExpedite === 2 ? (
                                             "Expediting...."

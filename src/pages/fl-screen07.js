@@ -1,52 +1,76 @@
 import React, { PureComponent, lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
+import web3Config from "../config/web3Config";
+import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
+import notificationConfig from "../config/notificationConfig";
+import SwapFactoryContract from "../helper/swapFactoryContract";
+import CONSTANT from "../constants";
+import Header from "../components/Header";
+import RightSideMenu from "../components/RightSideMenu";
+import axios from "axios";
+import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import Lineimg from "../assets/freelisting-images/line01.png";
-import Badge from "../assets/freelisting-images/imgIco02.png";
-const $ = window.$;
+import HeadFreeListing from "../components/Header02";
 
-export default class Screen7 extends PureComponent {
+import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
+import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
+import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
+import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
+import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
+import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
+import Lineimg from "../assets/freelisting-images/line01.png";
+import addImg from "../assets/images/add-chain.png";
+import Badge from "../assets/freelisting-images/imgIco02.png";
+
+
+
+
+
+const $ = window.$;
+export default class Screen5 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
 
     };
+
+    this.state = {
+      web3: null,
+      web3Check: false,
+    };
   }
+
 
   render() {
     return (
       <>
         <main id="main" className="smartSwap">
+
           <div className="main">
             <MContainer>
               <CMbx>
+
                 <ProGTitle01> <i className="hasImg"><img alt="badge" src={Badge}></img></i> Project, claim the deployer ownership and become a master validator for your own token</ProGTitle01>
+
                 <ProPera>No need for projects to trust cross-chain solutions for bridging needs. SmartBridge allows projects to become a must validators meaning no transaction takes place without other validators consensus to the project.</ProPera>
                 <ProPera>Further, SmartBridge allows projects to take ownership of the deployer, leaving them fully in control of project tokens on any chain.</ProPera>
+                
+
                 <BtnMbox>
-                  <BtnRight>
-                    { 
-                    this.props.walletConnected === false && 
-                    this.props.claimDeployerOwnerShip === true &&
-                      <>
-                        <button onClick={() => this.props.onWalletConnectButtonClick()} className="Btn01">CONNECT YOUR WALLET</button>
+                    <BtnRight>
+                        <button className="Btn01">CONNECT YOUR WALLET</button>
                         <p>Connect with the wallet used to deploy the original token</p>
-                      </>
-                    }
+                    </BtnRight>
 
-                    { 
-                    this.props.walletConnected === true && 
-                    this.props.claimDeployerOwnerShip === true &&
-                    this.props.wantToBecomeMasterValidator === false &&
-                      <>
-                        <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(2)} className="Btn01">CONTINUE</button>
-                        <p>Connected with the wallet used to deploy the original token</p>
-                      </>
-                    }
 
-                  </BtnRight>
                 </BtnMbox>
+
+
+
+
               </CMbx>
             </MContainer>
+
           </div>
         </main>
       </>
@@ -82,7 +106,7 @@ const ProGTitle01 = styled(FlexDiv)`
         }
     }
 `
-
+ 
 const ProICOMbx01 = styled.div` width:100%; `
 const ProICOMbx02 = styled(FlexDiv)`
     align-items:flex-start; justify-content: flex-start; margin:30px -18px 0 -18px;
@@ -92,7 +116,7 @@ const ProICOSbx01 = styled.button`
   display: flex; align-items: center; justify-content: flex-start;
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
-`
+` 
 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
@@ -108,7 +132,7 @@ const BtnMbox = styled(FlexDiv)`
 
 `
 
-const ProRow = styled.div`
+const ProRow = styled.div `
   display: flex;
   width: 100%;
   align-items: center;
@@ -126,7 +150,7 @@ const ProRow = styled.div`
     margin-right: 25px;
   }
   `
-const ProRowCol1 = styled.div`
+const ProRowCol1 = styled.div `
   display: flex;
   width: 50%;
   align-items: center;
@@ -137,12 +161,12 @@ const ProRowCol1 = styled.div`
     flex-grow: 1;
   }
 `
-const ProColImg = styled.div`
+const ProColImg = styled.div `
   flex-grow: 1;
   text-align: center;
   width: calc(50% - 36px);
   `
-const ProColBtn = styled.div`
+const ProColBtn = styled.div `
   flex-grow: 1;
   width: calc(50% - 36px);
   padding-left: 30px;
@@ -170,7 +194,7 @@ const ProICOTitle = styled.span`
   font-weight: bold;
 `
 
-const ProPera = styled.p`
+const ProPera = styled.p `
     width: 100%;
     color: #aaaaaa;
     font-size: 18px;
@@ -178,7 +202,7 @@ const ProPera = styled.p`
     margin: 0 0 30px;
     `
 
-const BtnRight = styled.div`
+    const BtnRight = styled.div `
         margin-left: auto;
         min-width: 430px;
         text-align: center;

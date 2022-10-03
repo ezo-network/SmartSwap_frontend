@@ -1,14 +1,47 @@
 import React, { PureComponent, lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
+import web3Config from "../config/web3Config";
+import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
+import notificationConfig from "../config/notificationConfig";
+import SwapFactoryContract from "../helper/swapFactoryContract";
+import CONSTANT from "../constants";
+import Header from "../components/Header";
+import RightSideMenu from "../components/RightSideMenu";
+import axios from "axios";
+import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
+import HeadFreeListing from "../components/Header02";
+
+import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
+import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
+import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
+import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
+import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
+import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
+import Lineimg from "../assets/freelisting-images/line01.png";
+import addImg from "../assets/images/add-chain.png";
+
 import logoImg01 from "../assets/images/smart-bridge.png";
 import logoImg02 from "../assets/images/derex.png";
 import logoImg03 from "../assets/images/pdo.png";
+
+
+
 
 const $ = window.$;
 export default class Screen5 extends PureComponent {
   constructor(props) {
     super();
+    this.state = {
+
+    };
+
+    this.state = {
+      web3: null,
+      web3Check: false,
+    };
   }
+
 
   render() {
     return (
@@ -20,7 +53,7 @@ export default class Screen5 extends PureComponent {
               <CMbx>
 				
 				<SuccessBox>
-					<i className="fa fa-check" aria-hidden="true"></i>
+					<i class="fa fa-check" aria-hidden="true"></i>
 					<SuccessTitle><span>Successfully transferred ownership and now the master validator</span></SuccessTitle>
 				</SuccessBox>
                 
@@ -30,21 +63,21 @@ export default class Screen5 extends PureComponent {
                         <p>Create more bridges on <br></br>
                         any EVM chain</p>
                         <DetailsLink>
-                            <a href="#">Create a Bridge</a> | <a href="#">Learn more <i className="fas fa-external-link-alt"></i></a>
+                            <a href="#">Create a Bridge</a> | <a href="#">Learn more <i class="fas fa-external-link-alt"></i></a>
                         </DetailsLink>
                     </DetailsBox>
                     <DetailsBox>
                         <DetailsLogo><img src={logoImg02}></img></DetailsLogo>
                         <p>Claim a $10,000 credit for launching an initial bond offering on DEREX exchange</p>
                         <DetailsLink>
-                            <a href="#">Claim Now</a> | <a href="#">Learn more <i className="fas fa-external-link-alt"></i></a>
+                            <a href="#">Claim Now</a> | <a href="#">Learn more <i class="fas fa-external-link-alt"></i></a>
                         </DetailsLink>
                     </DetailsBox>
                     <DetailsBox>
                         <DetailsLogo><img src={logoImg03}></img></DetailsLogo>
                         <p>Claim a $10,000 credit for launching a post-DEX offering on PDO Finance</p>
                         <DetailsLink>
-                            <a href="#">Claim Now</a> | <a href="#">Learn more <i className="fas fa-external-link-alt"></i></a>
+                            <a href="#">Claim Now</a> | <a href="#">Learn more <i class="fas fa-external-link-alt"></i></a>
                         </DetailsLink>
                     </DetailsBox>
                 </DetailsRow>

@@ -1,139 +1,96 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import _ from "lodash";
+import { Link } from "react-router-dom";
+import web3Config from "../config/web3Config";
+import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
+import SwapFactoryContract from "../helper/swapFactoryContract";
+import CONSTANT from "../constants";
+import Header from "../components/Header";
+import RightSideMenu from "../components/RightSideMenu";
+import axios from "axios";
+import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import Lineimg from "../assets/freelisting-images/line01.png";
-import BridgeApiHelper from "../helper/bridgeApiHelper";
-const $ = window.$;
+import HeadFreeListing from "../components/Header02";
 
+import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
+import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
+import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
+import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
+import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
+import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
+import ImgIco07 from "../assets/freelisting-images/s2ICO-07.png";
+import ImgIco08 from "../assets/freelisting-images/s2ICO-08.png";
+import ImgIco09 from "../assets/freelisting-images/s2ICO-09.png";
+
+
+
+import Lineimg from "../assets/freelisting-images/line01.png";
+
+
+
+
+const $ = window.$;
 export default class Screen4 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
-      selectedNetworks: [],
-      filteredNetwork: "",
-      bridges: []
+
+    };
+
+    this.state = {
+      web3: null,
+      web3Check: false,
     };
   }
 
-  async componentDidMount() {
-    await this.getBridges();
-  }
-  
-  filterNetworks = (network) => {
-    this.setState({ filteredNetwork: network });
-  };
-
-  selectNetwork = (networkId) => {
-    if(this.state.selectedNetworks.includes(networkId)){
-      this.setState({selectedNetworks: this.state.selectedNetworks.filter(function(network) { 
-        return network !== networkId
-      })});
-    } else {
-      this.setState(prevState => ({
-        selectedNetworks: [...prevState.selectedNetworks, Number(networkId)]
-      }));
-    }
-  }
-
-
-  setDestinationNetworks(){
-    if(this.state.selectedNetworks.length === 0){
-      notificationConfig.error('Please select a network.');
-      return;
-    }
-    this.props.onDestinationNetworksSelected(this.state.selectedNetworks);
-  }
-
-  async getBridges(){
-    try {
-      const {
-        response, 
-        error,
-        code
-      } = await BridgeApiHelper.getBridges();
-  
-      if(code === 200){
-        this.setState({
-          bridges: response
-        });
-      } else {
-        console.error(error)
-      }
-    } catch (error){
-      console.error(error)
-    }
-  }
 
   render() {
-    let finalFilteredNetworks = [];
-    const filteredNetworks = this.props.networks.filter(network => {
-      if(network.name.match(new RegExp(this.state.filteredNetwork, "i"))){
-        return network;
-      }
-    });
-
-    filteredNetworks.forEach(network => {
-      if(Number(network.chainId) !== Number(this.props.selectedSourceTokenChainId)){
-        const bridge = _.find(this.state.bridges, { chainId: network.chainId });
-        if(bridge !== undefined){
-          if(this.state.selectedNetworks.includes(network.chainId)){
-            network['selectedNetwork'] = true;
-          } else {
-            network['selectedNetwork'] = false;
-          }
-          finalFilteredNetworks.push(network);
-        }
-      }
-    });
-
     return (
       <>
         <main id="main" className="smartSwap">
+
           <div className="main">
             <MContainer>
               <CMbx>
+                <ProgressBar> <span style={{ width: '75%' }}></span> </ProgressBar>
 
-                <ProgressBar> 
-                  <span style={{ width: '75%' }}></span> 
-                </ProgressBar>
-                
-                <ProGTitle01> 
-                  <i>3</i> Select the EVM destination chains
-                </ProGTitle01>
-                
-                <ProInputbx> 
-                  <input onChange={e => this.filterNetworks(e.target.value)} type="text" placeholder="Search chain" value={this.state.filteredNetwork}/>
-                </ProInputbx>
-
+                <ProGTitle01> <i>3</i> Select the EVM destination chains</ProGTitle01>
+                <ProInputbx> <input type="text" placeholder="Search chain" /> </ProInputbx>
                 <ProICOMbx01>
                   <ProICOMbx02>
-                    {finalFilteredNetworks.length > 0 && finalFilteredNetworks.map(function(network, i){
-                      return <ProICOSbx01 className={"md-checkbox"} key={i}>
-                        <input
-                          type="checkbox"
-                          id={'list-item-' + i}
-                          name={network.name}
-                          checked={network.selectedNetwork}
-                          onChange={e => this.selectNetwork(network.chainId)}
-                        />
-                        <label htmlFor={'list-item-' + i}>
-                          <img src={'/images/free-listing/chains/' + ((network.icon).toString()).toLowerCase()} /> {network.chain}
-                        </label>
-                      </ProICOSbx01>
-                    }.bind(this) )}
+
+                  <ProICOSbx01  className="md-checkbox">
+                        <input type="checkbox" defaultChecked id="arr01" name="bsc" /><label for="arr01"> <img src={ImgIco01} /> BSC </label>  
+                    </ProICOSbx01>
+                    <ProICOSbx01  className="md-checkbox">
+                        <input type="checkbox" defaultChecked id="arr02" name="bsc" /><label for="arr02"> <img src={ImgIco02} /> Ethereum </label>  
+                    </ProICOSbx01>
+                    <ProICOSbx01  className="md-checkbox">
+                        <input type="checkbox" defaultChecked id="arr03" name="bsc" /><label for="arr03"> <img src={ImgIco03} /> Polygon </label>  
+                    </ProICOSbx01>
+                    <ProICOSbx01  className="md-checkbox">
+                        <input type="checkbox" id="arr04" name="bsc" /><label for="arr04"> <img src={ImgIco07} /> Fantom </label>  
+                    </ProICOSbx01>
+                    <ProICOSbx01  className="md-checkbox">
+                        <input type="checkbox" id="arr05" name="bsc" /><label for="arr05"> <img src={ImgIco08} /> Avalanche </label>  
+                    </ProICOSbx01>
+                    <ProICOSbx01  className="md-checkbox">
+                        <input type="checkbox" id="arr06" name="bsc" /><label for="arr06"> <img src={ImgIco09} /> Moonriver </label>  
+                    </ProICOSbx01>
+ 
+
                   </ProICOMbx02>
-
-                  { finalFilteredNetworks.length == 0 && (
-                    <p>NO BRIDGE FOUND ON ANY DESTINATION CHAIN</p>
-                  )}
-
                 </ProICOMbx01>
-                
+
                 <BtnMbox>
-                  <button onClick={() => this.props.onBackButtonClicked(2)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button onClick={() => this.setDestinationNetworks()} className="Btn01"> NEXT STEP</button>
+                  <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                  <button className="Btn01"> NEXT STEP</button>
+
+
                 </BtnMbox>
+
+
+
 
               </CMbx>
             </MContainer>
@@ -192,7 +149,7 @@ const ProICOSbx01 = styled.div`
 
 
 
-`
+` 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
   img{ margin-right:15px;}

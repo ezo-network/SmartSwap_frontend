@@ -1,19 +1,40 @@
-import React, { PureComponent} from "react";
+import React, { PureComponent, lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
+import web3Config from "../config/web3Config";
+import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
+import notificationConfig from "../config/notificationConfig";
+import SwapFactoryContract from "../helper/swapFactoryContract";
+import CONSTANT from "../constants";
+import Header from "../components/Header";
+import RightSideMenu from "../components/RightSideMenu";
+import axios from "axios";
+import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
+import HeadFreeListing from "../components/Header02";
+
 import ImgIco01 from "../assets/freelisting-images/imgIco01.png";
 import ImgIco02 from "../assets/freelisting-images/imgIco02.png";
-const $ = window.$;
 
+const $ = window.$;
 export default class Screen1 extends PureComponent {
   constructor(props) {
     super();
+    this.state = { 
+        
+    };
+    
+    this.state = {
+      web3: null,
+      web3Check: false, 
+    };
   }
+      
 
   render() {
     return (
       <>
-        { 
-          <main id="main" className="smartSwap">           
+          <main id="main" className="smartSwap">
+           
             <div className="main">   
              <MContainer> 
                   <CMbx>
@@ -23,24 +44,13 @@ export default class Screen1 extends PureComponent {
                         Create a cross-chain bridge token to any EVM blockchain by few seconds
                         <span>It's free and open to any project and their users</span>
                       </CStitle01> 
-                      { 
-                        this.props.walletConnected === false && 
-                        this.props.claimDeployerOwnerShip === false &&
-                        <button onClick={() => this.props.onWalletConnectButtonClick()} className="Btn01 ani-1">CONNECT YOUR WALLET</button>
-                      }
-                      { 
-                        this.props.walletConnected === true &&
-                        this.props.claimDeployerOwnerShip === false &&
-                        <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(1)} className="Btn01 ani-1">CONTINUE</button>
-                      }
+                      <button className="Btn01 ani-1">CONNECT YOUR WALLET</button> 
                     </Csubbx01>
                     <Csubbx01 className="v2"> 
                       <CStitle01>
                         <i className="imgIco"><img src={ImgIco02} alt="Ico" /></i>
                         Projects, claim the bridge deployer to become the master validator
-                        <span>
-                          <button onClick={() => this.props.onStartHereButtonClick()} className="Btn02 ani-1">START HERE</button>
-                        </span>
+                        <span><button className="Btn02 ani-1">START HERE</button></span>
                       </CStitle01> 
                     </Csubbx01> 
                   </CMbx> 
@@ -48,7 +58,6 @@ export default class Screen1 extends PureComponent {
                 
             </div>
           </main>
-        }
       </>
     );
   }
