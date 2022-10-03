@@ -35,6 +35,7 @@ export default class HeadFreeListing extends PureComponent {
                 <Link to=''>SmartExtension</Link> <span>|</span>
                 <Link to=''>SmartBridge</Link><span>|</span>
                 <Link to=''>SmartPayment</Link><span>|</span>
+                <Link to=''>SmartWallet</Link><span>|</span>
                 <Link to=''>SmartSwap</Link><span>|</span>
                 <Link to='' className="active">FREE Listing</Link> 
             </Nav>

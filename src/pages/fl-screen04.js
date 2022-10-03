@@ -7,6 +7,7 @@ import SwapFactoryContract from "../helper/swapFactoryContract";
 import CONSTANT from "../constants";
 import Header from "../components/Header";
 import RightSideMenu from "../components/RightSideMenu";
+import Collapse from "@kunukn/react-collapse";
 import axios from "axios";
 import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
@@ -35,14 +36,22 @@ export default class Screen4 extends PureComponent {
     super();
     this.state = {
 
+
     };
 
     this.state = {
       web3: null,
       web3Check: false,
+      isOpen1: true,
     };
   }
 
+  toggle = index => {
+    let collapse = "isOpen" + index;
+    this.setState(prevState => ({
+        [collapse]: !prevState[collapse]
+    })); 
+};
 
   render() {
     return (
@@ -56,6 +65,7 @@ export default class Screen4 extends PureComponent {
 
                 <ProGTitle01> <i>3</i> Select the EVM destination chains</ProGTitle01>
                 <ProInputbx> <input type="text" placeholder="Search chain" /> </ProInputbx>
+                <ProGTitle02>Choose a new chain to bridge to</ProGTitle02>
                 <ProICOMbx01>
                   <ProICOMbx02>
 
@@ -82,10 +92,27 @@ export default class Screen4 extends PureComponent {
                   </ProICOMbx02>
                 </ProICOMbx01>
 
+                <ProGTitle02 className='v2'>Existing bridges  <button className="Opbtn01" onClick={() => this.toggle(1)}><i class="fas fa-sort-down"></i></button> </ProGTitle02>
+                <Collapse isOpen={this.state.isOpen1} className={"collapse-css-transition colpsmBX"} > 
+                <ProICOMbx01>
+                  <ProICOMbx02> 
+                    
+                  <ProICOSbx01  className="md-checkbox">
+                        <input type="checkbox" id="arr07" name="bsc" /><label for="arr07"> <img src={ImgIco09} className='disable' /> Moonriver </label>  
+                    </ProICOSbx01>
+
+                    <ProICOSbx01  className="md-checkbox">
+                        <input type="checkbox" id="arr08" name="bsc" /><label for="arr08"> <img src={ImgIco07} className='disable' /> Fantom </label>  
+                    </ProICOSbx01>
+                  </ProICOMbx02>
+                </ProICOMbx01>
+                </Collapse>
+
                 <BtnMbox>
                   <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
                   <button className="Btn01"> NEXT STEP</button>
-
+                  
+                <SmallInfo>Total chains to bridge to: <span>3</span></SmallInfo>
 
                 </BtnMbox>
 
@@ -104,6 +131,8 @@ export default class Screen4 extends PureComponent {
 
 const FlexDiv = styled.div`
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+
+  .colpsmBX{ width: 100%; overflow:visible !important;}
 `;
 
 const MContainer = styled(FlexDiv)` 
@@ -122,6 +151,19 @@ const ProGTitle01 = styled(FlexDiv)`
     font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
     i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  } 
 `
+const ProGTitle02 = styled(FlexDiv)` 
+    font-size:18px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin:25px 0 0px 0;  
+    &.v2{ border-top:1px solid #303030; margin: 0; padding-top: 20px; position:relative;  }
+    .Opbtn01{ display:flex; width:22px; height:22px; position:absolute; right:0; top:15px; border:none; outline:none; background-color:transparent; color:#ffffff; align-items:center; justify-content:center; }
+`
+
+const SmallInfo = styled(FlexDiv)`
+font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%; margin-bottom:10px;
+
+span{ color:#fff; padding:0 0 0 3px;}
+
+`
+
 const ProInputbx = styled(FlexDiv)`
     width:100%;
 
@@ -137,15 +179,17 @@ const ProICOSbx01 = styled.div`
   /* :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  } 
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  } */
 
+  .disable{filter: grayscale(100%); }
+
   input[type="checkbox"]:checked+label{ -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   label{ width:100%; display:block; line-height:60px; margin-left:0px; padding-left:52px; display: flex;  align-items: center;  justify-content: flex-start; font-size:14px; color:#ffffff;   img{margin:-3px 12px 0 0; }
 
 
 }
 
-  label:before{ background: transparent;  border: 2px solid #aaaaaa; left: 13px;  top: 18px;}
-  input[type="checkbox"]:checked+label:after{  top: 18px; width: 18px; height: 10px; left: 19px;}
-  input[type="checkbox"]:checked+label:before{ border:2px solid #aaaaaa}
+  label:before{ background: #464646; border-radius:25px;  border:none; left: 13px;  top: 18px;}
+  input[type="checkbox"]:checked+label:after{ top: 23px; width: 10px; height: 7px; left: 18px; border-color: #21232b;}
+  input[type="checkbox"]:checked+label:before{ border:none; background-color:#91dc26;}
 
 
 

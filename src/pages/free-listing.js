@@ -57,8 +57,9 @@ export default class Projects extends PureComponent {
                 <Screen08/>
                 <Screen09/>
                 <Screen10/>
-                */}
                 <Screen11/>
+                */}
+                <Screen02/>
                 
             </div>
           </main>

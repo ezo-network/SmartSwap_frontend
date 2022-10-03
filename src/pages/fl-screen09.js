@@ -50,9 +50,12 @@ export default class Screen8 extends PureComponent {
 
                 <ProGTitle01>To become a validator, download the validator file and place it in AWS Lambda</ProGTitle01>
 
-                 
                 <ProInputbx className="FirstChild"> 
-                    <label><i>1</i> 
+                    <label htmlFor="input01"><i>1</i> Type the validator address to activate master validator status</label>   
+                    <input type="text" id="input01" className="v2"  /> 
+                </ProInputbx>
+                <ProInputbx> 
+                    <label><i>2</i> 
                     <ProFileNBtn>
                       <ProFile><p>
                         <span><em class="fa fa-file-code"></em> SMART validator V.1</span> Latest update 09/08/2022</p>
@@ -60,15 +63,12 @@ export default class Screen8 extends PureComponent {
 
                       </ProFile>
                       <ProBtn>
-                        <button className="Btn01">DOWNLOAD VALIDATOR FILE</button> 
+                        <button className="Btn02"><span class="fas fa-download"></span> DOWNLOAD VALIDATOR FILE</button> 
                       </ProBtn>
                     </ProFileNBtn>
                     </label>   
                 </ProInputbx>
-                <ProInputbx> 
-                    <label htmlFor="input01"><i>2</i> Type the validator address to activate master validator status</label>   
-                    <input type="text" id="input01" className="v2"  /> 
-                </ProInputbx>
+                
             
                 <BtnMbox>
                     <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
@@ -157,6 +157,11 @@ const ProBtn = styled.div `
     display: flex; align-items: center;
     margin-left: auto;
     .Btn01{ color:#fff; background-color:#0d0e13; width:430px; max-width:100%; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700;  -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
+
+    .Btn02{ background-color:transparent; color:#91dc27; border:0; font-size:18px; font-weight:700; :hover{ color:#fff;}
+      span{ margin-right:5px;}
+    
+    }
 `
 
 

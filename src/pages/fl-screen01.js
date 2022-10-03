@@ -44,7 +44,10 @@ export default class Screen1 extends PureComponent {
                         Create a cross-chain bridge token to any EVM blockchain by few seconds
                         <span>It's free and open to any project and their users</span>
                       </CStitle01> 
-                      <button className="Btn01 ani-1">CONNECT YOUR WALLET</button> 
+                      {/* <button className="Btn01 ani-1">CONNECT YOUR WALLET</button>  */}
+
+                      <> <button className="Btn01 ani-1"><i class="fas fa-check-circle"></i> WALLET CONNECTED</button>
+                        <SmallInfo>0x123n...2109</SmallInfo></>
                     </Csubbx01>
                     <Csubbx01 className="v2"> 
                       <CStitle01>
@@ -88,4 +91,8 @@ const CStitle01 = styled(FlexDiv)`
   .imgIco{ margin-bottom:30px;}
   span{ font-size:21px; font-weight:300;  text-align:left; display:block; width:100%; margin:40px 0 55px 0;  ;}
   
+`
+const SmallInfo = styled(FlexDiv)`
+font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%;
+
 `

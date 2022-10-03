@@ -49,7 +49,7 @@ export default class Screen1 extends PureComponent {
                 <ProgressBar> <span style={{ width: '25%' }}></span> </ProgressBar>
 
                 <ProGTitle01> <i>1</i> Select the token to bridge</ProGTitle01>
-                <ProInputbx> <input type="text" placeholder="Search tokens" /> </ProInputbx>
+                <ProInputbx> <input type="text" placeholder="Search token by name or smart contract" /> </ProInputbx>
                 <ProICOMbx01>
                   <ProICOMbx02>
 

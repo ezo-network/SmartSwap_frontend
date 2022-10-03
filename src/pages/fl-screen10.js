@@ -65,9 +65,38 @@ export default class Screen4 extends PureComponent {
                       <ProICOSbx02> <img src={ImgIco02} /> SMART </ProICOSbx02>
                       <ProICOSbx02> Ethereum </ProICOSbx02>
                     </ProICOSbx01>
+                    <ProICOSbx01 >
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                      <ProICOSbx02> <img src={ImgIco03}  className='disable'/> SMART </ProICOSbx02>
+                      <ProICOSbx02> Polygon </ProICOSbx02>
+                    </ProICOSbx01>
+                    
+ 
+
+                  </ProICOMbx02>
+                </ProICOMbx01>
+
+                <ProICOMbx01 className='v2'>
+                  <ProICOMbx02>
+
                     <ProICOSbx01 className="selected">
                         <i class="fa fa-check-circle" aria-hidden="true"></i>
-                      <ProICOSbx02> <img src={ImgIco03} /> SMART </ProICOSbx02>
+                        <ProICOSbx02> <img src={ImgIco05} /> DEGEN </ProICOSbx02>
+                        <ProICOSbx02> BSC </ProICOSbx02>
+                    </ProICOSbx01>
+                    <ProICOSbx01 className="selected">
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                      <ProICOSbx02> <img src={ImgIco02} /> DEGEN </ProICOSbx02>
+                      <ProICOSbx02> Ethereum </ProICOSbx02>
+                    </ProICOSbx01>
+                    <ProICOSbx01 >
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                      <ProICOSbx02> <img src={ImgIco03} className='disable'/> DEGEN </ProICOSbx02>
+                      <ProICOSbx02> Polygon </ProICOSbx02>
+                    </ProICOSbx01>
+                    <ProICOSbx01 >
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                      <ProICOSbx02> <img src={ImgIco07} className='disable'/> DEGEN </ProICOSbx02>
                       <ProICOSbx02> Polygon </ProICOSbx02>
                     </ProICOSbx01>
                     
@@ -79,6 +108,9 @@ export default class Screen4 extends PureComponent {
                 <BtnMbox>
                   <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
                   <button className="Btn01">TRANSFER DEPLOYER OWNERSHIP</button>
+                  <SmallInfo>
+                   <p> Total bridges to transfer: <span>4</span></p>
+                    </SmallInfo>
 
 
                 </BtnMbox>
@@ -121,13 +153,20 @@ const ProInputbx = styled(FlexDiv)`
 
     input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
 `
-const ProICOMbx01 = styled.div` width:100%; `
+const ProICOMbx01 = styled.div` 
+  width:100%; 
+
+  &.v2{ border-top: 2px solid #303030; padding-top:36px;}
+
+
+`
 const ProICOMbx02 = styled(FlexDiv)`
     align-items:flex-start; justify-content: flex-start; margin:0 -18px 0 -18px;
 `
 const ProICOSbx01 = styled.button`
   width:calc(25% - 36px); margin:0 18px 30px 18px; background-color:#21232b; height:60px; border:0px; outline:none; padding:0; position: relative;
   display: flex; align-items: center; justify-content: flex-start;
+  .disable{filter: grayscale(100%); }
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  
     i { opacity: 1; color: #91dc27; }
@@ -150,7 +189,12 @@ const BtnMbox = styled(FlexDiv)`
 
 `
 
+const SmallInfo = styled(FlexDiv)`
+font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%; margin-bottom:10px;
+p{ margin:0; padding:0; text-align:left; width:100%; max-width:430px;}
+span{ color:#fff; padding:0 0 0 3px;}
 
+`
 
 
 
