@@ -6,29 +6,6 @@ import styled from 'styled-components';
 import Lineimg from "../assets/freelisting-images/line01.png";
 import { createWatcher, aggregate } from '@makerdao/multicall';
 
-const multicallContractAddress = {
-  1: '0xeefba1e63905ef1d7acba5a8513c70307c1ce441',
-  3: '0x53c43764255c17bd724f74c4ef150724ac50a3ed',
-  4: '0x42ad527de7d4e9d9d011ac45b31d8551f8fe9821',
-  5: '0x77dca2c955b15e9de4dbbcf1246b4b85b651e50e',  
-  42: '0x2cc8688c5f75e365aaeeb4ea8d6a480405a48d2a',
-  137: '0x11ce4B23bD875D7F5C6a31084f55fDe1e9A87507',
-  80001: '0x08411ADd0b5AA8ee47563b146743C13b3556c9Cc',
-  56: '0x41263cba59eb80dc200f3e2544eda4ed6a90e76c',
-  97: '0xae11C5B5f29A6a25e955F0CB8ddCc416f522AF5C'
-}
-
-const rpcUrl = {
-  1: 'https://mainnet.infura.io/v3/bf51999b809848e8811c620334a5e041',
-  3: 'https://ropsten.infura.io/v3/bf51999b809848e8811c620334a5e041',
-  4: 'https://rinkeby.infura.io/v3/bf51999b809848e8811c620334a5e041',
-  5: 'https://goerli.infura.io/v3/bf51999b809848e8811c620334a5e041',
-  42: 'https://kovan.infura.io/v3/bf51999b809848e8811c620334a5e041',
-  137: 'https://polygon-mainnet.infura.io/v3/9e6392781fcc48af8e29b195fdf0ee77',
-  80001: 'https://matic-mumbai.chainstacklabs.com',
-  56: 'https://nd-391-673-039.p2pify.com/568ce20e78b9e5e3f184667368f84784',
-  97: 'https://data-seed-prebsc-1-s1.binance.org:8545'  
-}
 
 const $ = window.$;
 export default class Screen2 extends PureComponent {
@@ -61,9 +38,14 @@ export default class Screen2 extends PureComponent {
   aggregateBalanceOfMultiCall = async(chainId, tokenAddresses = [], accountAddress) => {
     try {
       //accountAddress = '0x084374b068Eb3db504178b4909eDC26D01226a80';
+
+      
+      const networkConfig = _.find(this.props.networks, {chainId: Number(chainId)});
+      console.log(networkConfig);
+
       const config = {
-        rpcUrl: rpcUrl[chainId],
-        multicallAddress: multicallContractAddress[chainId]
+        rpcUrl: networkConfig.rpc,
+        multicallAddress: networkConfig.multicallContractAddress
       };
   
       const multicallTokensConfig = [];
@@ -120,6 +102,47 @@ export default class Screen2 extends PureComponent {
     }
   }
 
+  async addNetworkToWallet(chainId) {
+    try {
+
+      const networkConfig = _.find(this.props.networks, {chainId: Number(chainId)});
+
+      if(networkConfig !== undefined){
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: Web3.utils.toHex(networkConfig.chainId),
+            chainName: networkConfig.name,
+            nativeCurrency: {
+              name: networkConfig.nativeCurrencyName,
+              symbol: networkConfig.nativeCurrencySymbol,
+              decimals: networkConfig.nativeCurrencyDecimals
+            },
+            rpcUrls: [networkConfig.rpc],
+            blockExplorerUrls: [networkConfig.explorerUrl]
+          }]
+        }).then((response) => {
+          console.log({
+            addNetworkToWalletResponse: response
+          })
+        }).catch((error) => {
+          console.error({
+            addNetworkToWalletError: error
+          });
+        });
+      } else {
+        console.error({
+          addNetworkToWalletError: 'networkConfig undefined'
+        });        
+      }
+      
+    } catch (error) {
+      console.error({
+        addNetworkToWalletCatch: error
+      });
+    }
+  }
+
   async switchNetwork(token, tokenAddress, tokenIcon, chain, chainId, chainIcon, explorerUrl, decimals) {
     if(this.pendingNetworkSwitchRequest === false){
       const sourceObject = {
@@ -142,12 +165,20 @@ export default class Screen2 extends PureComponent {
         }).then(response => {
           this.setState(sourceObject);
           this.pendingNetworkSwitchRequest = false;
-        }).catch(error => {
+        }).catch(async(error) => {
           console.error(error);
           if(error.code === -32002){
             notificationConfig.info('A switch network request is pending. Check metamask.');
             this.pendingNetworkSwitchRequest = true;
           }
+
+          if(error.code === 4902){
+            notificationConfig.error('Unrecognized network. Adding network to metamask');
+            //await this.addNetworkToWallet(chainId, chain, token, token, decimals, explorerUrl, explorerUrl);
+            //https://matic-mumbai.chainstacklabs.com
+            await this.addNetworkToWallet(chainId);
+          }
+
           this.pendingNetworkSwitchRequest = false;
         });
       } else {
@@ -155,6 +186,14 @@ export default class Screen2 extends PureComponent {
       }
     } else {
       notificationConfig.info('A switch network request is pending. Check metamask.');      
+    }
+  }
+
+  onBackButtonClicked(){
+    if(this.pendingNetworkSwitchRequest === false){
+      this.props.onBackButtonClicked(1)
+    } else {
+      notificationConfig.info('A switch network request is pending. Check metamask.');            
     }
   }
 
@@ -227,11 +266,16 @@ export default class Screen2 extends PureComponent {
       addCustomToken: !this.state.addCustomToken
     })     
   }
+  
 
   render() {
 
     const filteredTokens = this.state.tokens.filter(token => {
-      if(token.symbol.match(new RegExp(this.state.filteredToken, "i"))){
+      if(
+        token.symbol.match(new RegExp(this.state.filteredToken, "i")) 
+        ||
+        token.address.match(new RegExp(this.state.filteredToken, "i"))
+      ){
         return token;
       }
     });
@@ -250,7 +294,7 @@ export default class Screen2 extends PureComponent {
                   <input 
                     onChange={e => this.filterTokens(e.target.value)}
                     type="text"
-                    placeholder="Search tokens"
+                    placeholder="Search tokens by symbol or smart contract"
                     value={this.state.filteredToken}
                   />
                 </ProInputbx>
@@ -328,7 +372,7 @@ export default class Screen2 extends PureComponent {
                 </ProICOMbx01>
 
                 <BtnMbox>
-                  <button onClick={() => this.props.onBackButtonClicked(1)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                  <button onClick={() => this.onBackButtonClicked()} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
                   <button onClick={() => this.setSourceToken()} className="Btn01"> NEXT STEP</button>
                 </BtnMbox>
 

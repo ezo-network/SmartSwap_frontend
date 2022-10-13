@@ -9,6 +9,10 @@ export default class Screen1 extends PureComponent {
     super();
   }
 
+  textMasking = (text, maskingChar = '.', noOfMaskingChar = 4, startingLettersLength = 5, endingLettersLength = 4) => {
+    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
+  }
+
   render() {
     return (
       <>
@@ -31,7 +35,12 @@ export default class Screen1 extends PureComponent {
                       { 
                         this.props.walletConnected === true &&
                         this.props.claimDeployerOwnerShip === false &&
-                        <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(1)} className="Btn01 ani-1">CONTINUE</button>
+                        <>
+                          <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(1)} className="Btn01 ani-1">
+                            <i className="fas fa-check-circle"></i> WALLET CONNECTED
+                          </button>
+                          <SmallInfo>{this.props.accountAddress.length > 0 ? this.textMasking(this.props.accountAddress) : ''}</SmallInfo>
+                        </>
                       }
                     </Csubbx01>
                     <Csubbx01 className="v2"> 
@@ -77,6 +86,9 @@ const CStitle01 = styled(FlexDiv)`
   align-items:flex-start; font-size:30px; font-weight:700; color:#fff; flex-direction:column;  text-align:left;
 
   .imgIco{ margin-bottom:30px;}
-  span{ font-size:21px; font-weight:300;  text-align:left; display:block; width:100%; margin:40px 0 55px 0;  ;}
-  
+  span{ font-size:21px; font-weight:300;  text-align:left; display:block; width:100%; margin:40px 0 55px 0;  ;} 
+`
+
+const SmallInfo = styled(FlexDiv)`
+font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%;
 `

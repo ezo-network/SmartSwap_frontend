@@ -67,7 +67,7 @@ export default class Projects extends PureComponent {
     this.startHereButtonClickedCallback = this.startHereButtonClickedCallback.bind(this);
     this.sourceTokenSelectedCallback = this.sourceTokenSelectedCallback.bind(this);
     this.tokenAddedOnSourceChainCallback = this.tokenAddedOnSourceChainCallback.bind(this);
-    this.wrappedTokenFetchedCallback = this.wrappedTokenFetchedCallback.bind(this);
+    this.fetchWrappedTokens = this.fetchWrappedTokens.bind(this);
     this.destinationNetworksSelectedCallback = this.destinationNetworksSelectedCallback.bind(this)
     this.switchNetworkCallback = this.switchNetworkCallback.bind(this)
     this.backButtonClickedCallback = this.backButtonClickedCallback.bind(this);
@@ -277,10 +277,12 @@ export default class Projects extends PureComponent {
     });
   }
 
-  async wrappedTokenFetchedCallback(wrappedTokens){
-    this.setState({
-      wrappedTokens: wrappedTokens
-    });
+  async fetchWrappedTokens(ofAccountAddress = false){
+    if(ofAccountAddress){
+      await this.getWrappedTokens(this.state.projectId, this.state.accountAddress);
+    } else {
+      await this.getWrappedTokens(this.state.projectId);
+    }
   }
   
   async tokenAddedOnSourceChainCallback(txHash) {
@@ -306,10 +308,11 @@ export default class Projects extends PureComponent {
         this.setState({
           projectId: response
         });
-        await this.isProjectExist(this.state.sourceTokenData.chainId, this.state.sourceTokenData.address);
-      } else {
+      } else {        
         console.error(error)
       }
+      
+      await this.isProjectExist(this.state.sourceTokenData.chainId, this.state.sourceTokenData.address);
 
     } catch (error){
       console.error(error)
@@ -442,6 +445,27 @@ export default class Projects extends PureComponent {
     }
   }
 
+  async getWrappedTokens(sourceTokenChainId, creatorAddress = null) {
+    try {
+      const {
+        response,
+        error,
+        code
+      } = await BridgeApiHelper.getWrappedTokens(sourceTokenChainId, creatorAddress);
+
+      if (code === 200) {
+        this.setState({
+          wrappedTokens: response
+        });
+      } else {
+        console.error(error)
+      }
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   render() {
     return (
       <>
@@ -457,12 +481,13 @@ export default class Projects extends PureComponent {
                   claimDeployerOwnerShip={this.state.claimDeployerOwnerShip}
                   onStartHereButtonClick={this.startHereButtonClickedCallback}
                   onWalletAlreadyConnectButtonClick={this.walletAlreadyConnectedCallback}
+                  accountAddress={this.state.accountAddress}
                 />
                 }
 
                 {
-                  this.state.walletConnected === true && 
-                  this.state.web3Instance !== null && 
+                  //this.state.walletConnected === true && 
+                  //this.state.web3Instance !== null && 
                   this.state.isSourceTokenSelected === false &&
                   this.state.claimDeployerOwnerShip === false &&
                   this.state.addCustomToken ===  false &&
@@ -480,8 +505,8 @@ export default class Projects extends PureComponent {
                 }
 
                 {
-                  this.state.walletConnected === true &&
-                  this.state.web3Instance !== null &&
+                  //this.state.walletConnected === true &&
+                  //this.state.web3Instance !== null &&
                   this.state.isSourceTokenSelected === false &&
                   this.state.claimDeployerOwnerShip === false &&
                   this.state.addCustomToken ===  true &&
@@ -498,8 +523,8 @@ export default class Projects extends PureComponent {
                 }
 
                 {
-                  this.state.walletConnected === true &&
-                  this.state.web3Instance !== null &&
+                  //this.state.walletConnected === true &&
+                  //this.state.web3Instance !== null &&
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === false &&
                   this.state.claimDeployerOwnerShip === false &&
@@ -514,27 +539,29 @@ export default class Projects extends PureComponent {
                 }
 
                 {
-                  this.state.walletConnected === true &&
-                  this.state.web3Instance !== null &&
+                  //this.state.walletConnected === true &&
+                  //this.state.web3Instance !== null &&
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === true &&
                   this.state.isdestinationNetworksFiltered === false &&
                   this.state.claimDeployerOwnerShip === false &&
                   <Screen04
                     chainId={this.state.chainId}
-                    web3Instance={this.state.web3Instance}
+                    //web3Instance={this.state.web3Instance}
                     projectId={this.state.projectId}
                     networks={this.state.networks}
                     selectedSourceTokenChainId={this.state.sourceTokenData.chainId}
                     onBackButtonClicked={this.backButtonClickedCallback}
                     onDestinationNetworksSelected={this.destinationNetworksSelectedCallback}
+                    onFetchWrappedTokens={this.fetchWrappedTokens}
+                    wrappedTokens={this.state.wrappedTokens}
                   />
                 }
 
 
                 {
-                  this.state.walletConnected === true &&
-                  this.state.web3Instance !== null &&
+                  //this.state.walletConnected === true &&
+                  //this.state.web3Instance !== null &&
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === true &&
                   this.state.isdestinationNetworksFiltered === true &&
@@ -550,18 +577,18 @@ export default class Projects extends PureComponent {
                     tokens={this.state.tokens}
                     selectedSourceTokenData={this.state.sourceTokenData}
                     selectedDestinationNetworks={this.state.filteredDestinationNetworks}
-                    onWrappedTokensFetched={this.wrappedTokenFetchedCallback}
                     wrappedTokens={this.state.wrappedTokens}
                     onBackButtonClicked={this.backButtonClickedCallback}
                     onSwitchNetwork={this.switchNetworkCallback}
                     onFinishButtonClicked={this.finishButtonClicked}
+                    onFetchWrappedTokens={this.fetchWrappedTokens}
                   />
                 }
 
 
                 {
-                  this.state.walletConnected === true &&
-                  this.state.web3Instance !== null &&
+                  //this.state.walletConnected === true &&
+                  //this.state.web3Instance !== null &&
                   this.state.isSourceTokenSelected === true &&
                   this.state.isProjectExist === true &&
                   this.state.isdestinationNetworksFiltered === true &&

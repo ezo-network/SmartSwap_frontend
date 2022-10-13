@@ -16,7 +16,8 @@ const apiEndpoints = {
     'getValidatorFileInfo': 'public/validator-file-info',
     'makeTransferWrapTokenOwnershipRequest': 'customer/transfer-wrap-token-ownership-request',
     'addValidator': 'customer/add-validator',
-    'getValidator': 'customer/get-validator'
+    'getValidator': 'customer/get-validator',
+    'getOwnershipRequests': 'public/ownership-requests'
 }
 
 const BridgeApiHelper = {
@@ -768,6 +769,60 @@ const BridgeApiHelper = {
             code
         }    
     },
+
+    getOwnershipRequests: async(requesterAddress = null, status = null, token = null, chainId = null) => {
+        let response, error, code;
+        try {
+
+            let params = {};
+
+            if(requesterAddress !== null){
+                params['requesterAddress'] = requesterAddress
+            }
+
+            if(status !== null){
+                params['status'] = status
+            }
+
+            if(token !== null){
+                params['token'] = token
+            }
+
+            if(chainId !== null){
+                params['chainId'] = chainId
+            }
+
+            params =  '?' + new URLSearchParams(params);
+            
+            const result = await axiosRequest.request({
+                path: apiEndpoints.getOwnershipRequests + params,
+            });
+
+            if(result.status === 200){
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }
+    },    
 
 }
 

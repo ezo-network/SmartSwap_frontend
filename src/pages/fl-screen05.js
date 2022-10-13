@@ -22,26 +22,44 @@ export default class Screen5 extends PureComponent {
     };
   }
 
-  async componentDidMount() {
-    await this.getWrappedTokens(this.props.projectId);
-  }
-
-  async getWrappedTokens(sourceTokenChainId, creatorAddress = null) {
+  async addNetworkToWallet(chainId) {
     try {
-      const {
-        response,
-        error,
-        code
-      } = await BridgeApiHelper.getWrappedTokens(sourceTokenChainId, creatorAddress);
 
-      if (code === 200) {
-        this.props.onWrappedTokensFetched(response);
+      const networkConfig = _.find(this.props.networks, {chainId: Number(chainId)});
+
+      if(networkConfig !== undefined){
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: Web3.utils.toHex(networkConfig.chainId),
+            chainName: networkConfig.name,
+            nativeCurrency: {
+              name: networkConfig.nativeCurrencyName,
+              symbol: networkConfig.nativeCurrencySymbol,
+              decimals: networkConfig.nativeCurrencyDecimals
+            },
+            rpcUrls: [networkConfig.rpc],
+            blockExplorerUrls: [networkConfig.explorerUrl]
+          }]
+        }).then((response) => {
+          console.log({
+            addNetworkToWalletResponse: response
+          })
+        }).catch((error) => {
+          console.error({
+            addNetworkToWalletError: error
+          });
+        });
       } else {
-        console.error(error)
+        console.error({
+          addNetworkToWalletError: 'networkConfig undefined'
+        });        
       }
-
+      
     } catch (error) {
-      console.error(error)
+      console.error({
+        addNetworkToWalletCatch: error
+      });
     }
   }
 
@@ -55,14 +73,20 @@ export default class Screen5 extends PureComponent {
           params: [{ chainId: Web3.utils.toHex(chainId) }],
         }).then((response) => {
           this.pendingNetworkSwitchRequest = false;
+          this.canMoveForward = true;
           console.log({response: response});
           this.props.onSwitchNetwork(Number(chainId));
-        }).catch(error => {
+        }).catch(async(error) => {
           console.error(error);
           if(error.code === -32002){
             notificationConfig.info('A switch network request is pending. Check metamask.');
             this.pendingNetworkSwitchRequest = true;
             this.canMoveForward = true;
+          }
+
+          if(error.code === 4902){
+            notificationConfig.error('Unrecognized network. Adding network to metamask');
+            await this.addNetworkToWallet(chainId);
           }
           
           if(error.code === 4001){
@@ -74,6 +98,7 @@ export default class Screen5 extends PureComponent {
               this.canMoveForward = true;
             }
           }
+          
         });
       } else {
         this.props.onSwitchNetwork(Number(chainId));
@@ -301,7 +326,7 @@ export default class Screen5 extends PureComponent {
       );
 
       if(code === 201){
-        await this.getWrappedTokens(this.props.projectId);
+        await this.props.onFetchWrappedTokens();
         this.setState({
           btnClicked: false
         });
@@ -314,7 +339,7 @@ export default class Screen5 extends PureComponent {
 
   async onFinishButtonClicked(){
     if(this.canMoveForward === true){
-      await this.getWrappedTokens(this.props.projectId, this.props.accountAddress).then(response => {
+      await this.props.onFetchWrappedTokens(true).then(response => {
         this.props.onFinishButtonClicked();
       });
     } else {
