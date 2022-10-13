@@ -1,70 +1,103 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
-import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
-import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
-import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
-import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
-import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
-import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
-import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
-import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
-import Lineimg from "../assets/freelisting-images/line01.png";
-
-
-
-
+import BridgeApiHelper from "../helper/bridgeApiHelper";
+import notificationConfig from "../config/notificationConfig";
 const $ = window.$;
+
 export default class Screen8 extends PureComponent {
   constructor(props) {
     super();
     this.state = {
-
-    };
-
-    this.state = {
-      web3: null,
-      web3Check: false,
+      emailAddress: null,
+      emailAdded: false
     };
   }
 
+  componentDidMount() {
+    this.getEmailStatus(true);
+  }
+
+  setEmailAddressHandler(event){
+    this.setState({
+      emailAddress: event.target.value
+    })
+  }
+
+  isValidEmail(email) {
+    return /\S+@\S+\.\S+/.test(email);
+  }
+
+  getEmailStatus = async(init = false) => {
+    try {
+      const {response, error, code} = await BridgeApiHelper.getEmailStatus(this.props.accountAddress);
+
+      if(code === 200){
+        this.setState({
+          emailAdded: true,
+          emailAddress: response.emailAddress
+        });
+
+        if(init === false){
+
+          if(response.instructionSent === true){
+            notificationConfig.info(`Instructions sent on ${response.emailAddress} email address`);
+          } else {
+            notificationConfig.info(`Instructions will be send on ${response.emailAddress} email address shortly`);
+          }
+          
+          this.props.onEmailAddressExist();
+        }
+
+
+      } else if(code === 404){
+        if(init === false){
+          if(this.state.emailAddress !== null){
+            if(this.isValidEmail(this.state.emailAddress)){
+              await this.addEmailAddress();
+              await this.getEmailStatus();
+            } else {
+              notificationConfig.error(`Invalid email address provided.`);
+            }
+          } else {
+            notificationConfig.error(`Please provide an email address.`);          
+          }
+        }
+      } else {
+        notificationConfig.error(error);        
+      }
+
+    } catch(err){
+      console.error(err)
+    }
+  }
+
+  addEmailAddress = async() => {
+    try {
+      await BridgeApiHelper.addEmailAddress(this.props.accountAddress, this.state.emailAddress);
+    } catch(err){
+      console.error(err)
+    }
+  }
 
   render() {
     return (
       <>
         <main id="main" className="smartSwap">
-
           <div className="main">
             <MContainer>
               <CMbx>
                 <ProgressBar> <span style={{ width: '33.33%' }}></span> </ProgressBar>
-
                 <ProGTitle01>Gain access to serve-side code and instructions</ProGTitle01>
-                <ProInputbx> 
-                    <label htmlFor="input01">Email</label>   
-                    <input type="text" id="input01"  /> 
+                <ProInputbx>
+                  <label htmlFor="input01">Email</label>
+                  <input readOnly={this.state.emailAdded} onChange={e => this.setEmailAddressHandler(e)} defaultValue={this.state.emailAddress} type="text" id="input01" />
                 </ProInputbx>
-            
                 <BtnMbox>
                   <span></span>
-                  <button className="Btn01"> NEXT STEP</button> 
+                  <button onClick={() => this.getEmailStatus()} className="Btn01"> NEXT STEP</button>
                 </BtnMbox>
-
-
-
-
               </CMbx>
             </MContainer>
-
           </div>
         </main>
       </>
@@ -96,7 +129,7 @@ const ProInputbx = styled(FlexDiv)`
     width:100%;
     label{width:100%; font-size:18px; font-weight:700; margin-bottom:18px;}
     input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
-` 
+`
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
 

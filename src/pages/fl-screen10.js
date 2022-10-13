@@ -1,94 +1,279 @@
 import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
-import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
-import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
-import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
-import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
-import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
-import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
-import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
-import ImgIco07 from "../assets/freelisting-images/s2ICO-07.png";
-import ImgIco08 from "../assets/freelisting-images/s2ICO-08.png";
-import ImgIco09 from "../assets/freelisting-images/s2ICO-09.png";
+import _ from "lodash";
 import Lineimg from "../assets/freelisting-images/line01.png";
-
-
-
-
+import BridgeApiHelper from "../helper/bridgeApiHelper";
+import { ethers } from "ethers";
 const $ = window.$;
-export default class Screen4 extends PureComponent {
+
+
+export default class Screen10 extends PureComponent {
+  pendingDeploymentRequestCount = 0;
+  pendingSignMessageRequest = false;  
   constructor(props) {
     super();
     this.state = {
-
-    };
-
-    this.state = {
-      web3: null,
-      web3Check: false,
+      wrappedTokens:[],
+      selectedWrappedToken: [],
+      ownershipTransferRequested: false,
+      btnClicked: false,
+      ownershipRequests: []
     };
   }
 
+  componentDidMount() {
+    this.getWrappedTokens(null, this.props.accountAddress, false);
+    this.getOwnershipRequests(this.props.accountAddress);
+  }
+
+  selectToken = (id) => {    
+    if(this.state.selectedWrappedToken.includes(id)){
+      this.setState({selectedWrappedToken: this.state.selectedWrappedToken.filter(function(_id) { 
+        return id !== _id
+      })});
+    } else {
+      this.setState(prevState => ({
+        selectedWrappedToken: [...prevState.selectedWrappedToken, id]
+      }));
+    }
+  }
+
+  async getWrappedTokens(projectId = null, creatorAddress = null, all = false) {
+    try {
+      const {
+        response,
+        error,
+        code
+      } = await BridgeApiHelper.getWrappedTokens(projectId, creatorAddress, all);
+
+      if (code === 200) {
+        this.setState({
+          wrappedTokens: response
+        });
+      } else {
+        console.error(error)
+      }
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async getOwnershipRequests() {
+    try {
+      const {
+        response,
+        error,
+        code
+      } = await BridgeApiHelper.getOwnershipRequests(this.props.accountAddress);
+
+      if (code === 200) {
+        this.setState({
+          ownershipRequests: response
+        });
+      } else {
+        console.error(error)
+      }
+
+    } catch (error) {
+      console.error(error)
+    }    
+  }
+
+  async makeTransferWrapTokenOwnershipRequest(){
+    if(this.pendingSignMessageRequest === false){
+      this.setState({
+        btnClicked: true
+      });
+      if(this.state.selectedWrappedToken.length > 0){
+        const signedMessage = await this.signData();
+        console.log({
+          signedMessage: signedMessage
+        });
+        if(signedMessage !== false){
+          for await (const selectedWrappedTokenId of this.state.selectedWrappedToken) {
+            const wrappedToken = _.find(this.state.wrappedTokens, {_id: selectedWrappedTokenId});
+            if(wrappedToken !== null){
+              const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.toChainId });
+              await BridgeApiHelper.makeTransferWrapTokenOwnershipRequest(
+                wrappedToken.tokenSymbol,
+                networkConfig.chain,
+                wrappedToken.toChainId,
+                this.props.accountAddress,
+                signedMessage
+              );
+            }
+          }
+          this.setState({
+            ownershipTransferRequested: true,
+            btnClicked: false,
+            selectedWrappedToken: []
+          });
+          await this.getOwnershipRequests(this.props.accountAddress);
+          this.pendingDeploymentRequestCount = 0;
+        } else {
+          notificationConfig.error("Something went wrong when signing message.");
+          this.setState({
+            btnClicked: false
+          });
+        }
+      } else {
+        notificationConfig.error('Select a token');
+        this.setState({
+          btnClicked: false
+        });
+      }
+    } else {
+      notificationConfig.info('A sing message request is pending. Check metamask.');
+    }
+  }
+
+  async signData() {
+    try {
+      this.pendingSignMessageRequest = true;
+      const signer = this.props.web3Instance.getSigner();
+
+      console.log({
+        signer: signer
+      });
+  
+      const message = process.env.REACT_APP_SIGN_MESSAGE;
+
+      console.log({
+        message: message
+      })
+
+      const signature = await signer.signMessage(message);
+      const address = ethers.utils.verifyMessage(message, signature);
+  
+      if(address === this.props.accountAddress){
+        console.log('AUTHORIZED USER');
+        this.pendingSignMessageRequest = false;
+        return signature;
+      } else {
+        console.log('UNAUTHORIZED USER'); 
+        this.pendingSignMessageRequest = false;
+        return false;
+      }
+    } catch(error){
+      console.error({
+        signDataError: error.message
+      });
+      this.pendingSignMessageRequest = false;
+      return false;
+    }
+  }
+
+  onBackButtonClicked = () => {
+    if(this.pendingSignMessageRequest === false){
+      this.props.onBackButtonClicked(9);
+    } else {
+      notificationConfig.info('A sing message request is pending. Check metamask and decline request to go back.');
+    }
+  }
 
   render() {
+
+    this.pendingDeploymentRequestCount = 0;
+    let usersWrappedTokens = [];
+    this.state.wrappedTokens.forEach(wrappedToken => {
+      //const originalToken = _.find(this.props.tokens, {symbol: wrappedToken.tokenSymbol.slice(2)});
+      const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.toChainId });
+      if (networkConfig !== undefined) {
+        wrappedToken['chain'] = networkConfig['chain'];
+        usersWrappedTokens.push(wrappedToken);
+      }
+    });
+
+    const wrapTokenGroupBySymbol = _.mapValues(_.groupBy(usersWrappedTokens, 'tokenSymbol'));
+
+
     return (
       <>
         <main id="main" className="smartSwap">
-
           <div className="main">
             <MContainer>
               <CMbx>
                 <ProgressBar> <span style={{ width: '100%' }}></span> </ProgressBar>
+                {
+                  usersWrappedTokens.length > 0 && (
+                    <ProGTitle01>Transfer deployer ownership on existing bridges</ProGTitle01>
+                  )
+                }
 
-                <ProGTitle01>Transfer deployer ownership on existing bridges</ProGTitle01>
-                <ProICOMbx01>
-                  <ProICOMbx02>
+                {
+                  usersWrappedTokens.length === 0 && (
+                    <ProGTitle01>You've not wrapped any token yet.</ProGTitle01>
+                  )
+                }                                    
 
-                    <ProICOSbx01 className="selected">
-                        <i class="fa fa-check-circle" aria-hidden="true"></i>
-                        <ProICOSbx02> <img src={ImgIco05} /> SMART </ProICOSbx02>
-                        <ProICOSbx02> BSC </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProICOSbx01 className="selected">
-                        <i class="fa fa-check-circle" aria-hidden="true"></i>
-                      <ProICOSbx02> <img src={ImgIco02} /> SMART </ProICOSbx02>
-                      <ProICOSbx02> Ethereum </ProICOSbx02>
-                    </ProICOSbx01>
-                    <ProICOSbx01 className="selected">
-                        <i class="fa fa-check-circle" aria-hidden="true"></i>
-                      <ProICOSbx02> <img src={ImgIco03} /> SMART </ProICOSbx02>
-                      <ProICOSbx02> Polygon </ProICOSbx02>
-                    </ProICOSbx01>
-                    
- 
+                {
+                  Object.keys(wrapTokenGroupBySymbol).map(function(wrapTokenListKey, i){
+                    return <ProICOMbx01 key={wrapTokenListKey + '_' + i} className='v2'>
+                      <ProICOMbx02 key={wrapTokenListKey + '_' + i}>
+                      {
+                        Object.keys(wrapTokenGroupBySymbol[wrapTokenListKey]).map(function(wrappedTokenKey, i){
+                          
+                          let wrappedToken = wrapTokenGroupBySymbol[wrapTokenListKey][wrappedTokenKey];
+                          
+                          let ownershipRequestExist = _.find(this.state.ownershipRequests, {
+                            token: (wrappedToken.tokenSymbol).toUpperCase(),
+                            chainId: Number(wrappedToken.toChainId)
+                          });
 
-                  </ProICOMbx02>
-                </ProICOMbx01>
+                          ownershipRequestExist = ownershipRequestExist !== undefined ? true : false;
+
+                          const isSelected = this.state.selectedWrappedToken.includes(wrappedToken._id) ? 'selected' : 'pending';
+                          const isDisabled = ownershipRequestExist ? 'disabled' : '';
+
+                          if(ownershipRequestExist === false){
+                            this.pendingDeploymentRequestCount = this.pendingDeploymentRequestCount + 1;
+                          }
+
+                          return (
+                            <ProICOSbx01 
+                              onClick={(e) => ownershipRequestExist ? e.preventDefault : this.selectToken(wrappedToken._id)}
+                              key={wrappedToken._id}
+                              className={`${isSelected} ${isDisabled}`}
+                              disabled={ownershipRequestExist}
+                            >
+                              {ownershipRequestExist ? false : true && <i className="fa fa-check-circle" aria-hidden="true"></i>}
+                              <ProICOSbx02>
+                                <img 
+                                  src={'/images/free-listing/tokens/' + (wrappedToken.tokenSymbol.substring(2) + '.png').toLowerCase()}
+                                  onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                                />
+                                {(wrappedToken.tokenSymbol.substring(-2, 2)).toLowerCase()}
+                                {(wrappedToken.tokenSymbol.substring(2)).toUpperCase()}                                
+                              </ProICOSbx02>
+                              <ProICOSbx02>{wrappedToken.chain}</ProICOSbx02>
+                            </ProICOSbx01>
+                          )
+                        }.bind(this))
+                      }
+                      </ProICOMbx02>
+                    </ProICOMbx01>
+                  }.bind(this))
+                }
 
                 <BtnMbox>
-                  <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button className="Btn01">TRANSFER DEPLOYER OWNERSHIP</button>
+                  <button onClick={() => this.onBackButtonClicked()} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                  {this.pendingDeploymentRequestCount > 0 && 
+                    <button onClick={() => this.makeTransferWrapTokenOwnershipRequest()} className="Btn01">TRANSFER DEPLOYER OWNERSHIP</button>                
+                  }
 
+                  {this.pendingDeploymentRequestCount === 0 &&
+                    <button onClick={() => this.props.onOwnershipTransfered(11)} className="Btn01">FINISH</button>                
+                  }
+
+                  <SmallInfo>
+                    <p>Total bridges to transfer: <span>{this.state.selectedWrappedToken.length}</span></p>
+                  </SmallInfo>
 
                 </BtnMbox>
-
-
-
-
               </CMbx>
             </MContainer>
-
           </div>
         </main>
       </>
@@ -113,15 +298,21 @@ width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:
 `
 
 const ProGTitle01 = styled(FlexDiv)` 
-    font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
+font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
     i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  } 
 `
+
 const ProInputbx = styled(FlexDiv)`
     width:100%;
 
     input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
 `
-const ProICOMbx01 = styled.div` width:100%; `
+
+const ProICOMbx01 = styled.div` 
+  width:100%; 
+  &.v2{ border-top: 2px solid #303030; padding-top:36px;}
+`
+
 const ProICOMbx02 = styled(FlexDiv)`
     align-items:flex-start; justify-content: flex-start; margin:0 -18px 0 -18px;
 `
@@ -129,16 +320,20 @@ const ProICOSbx01 = styled.button`
   width:calc(25% - 36px); margin:0 18px 30px 18px; background-color:#21232b; height:60px; border:0px; outline:none; padding:0; position: relative;
   display: flex; align-items: center; justify-content: flex-start;
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
+  &.disabled{ filter: grayscale(100%); }
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  
     i { opacity: 1; color: #91dc27; }
-}
+  }
+  &.pending{  
+    i { opacity: 1; color: #ccc; }        
+  }
   i {
     color: #fff; font-size: 18px; margin-left: 18px; opacity: 0;
   }
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px;}
+  img{ margin-right:15px; width: 30px; height: 30px; }
   &:nth-of-type(1){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
 `
 const BtnMbox = styled(FlexDiv)`
@@ -149,6 +344,11 @@ const BtnMbox = styled(FlexDiv)`
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
 
 `
+
+const SmallInfo = styled(FlexDiv)`
+font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%; margin-bottom:10px;
+p{ margin:0; padding:0; text-align:left; width:100%; max-width:430px;}
+span{ color:#fff; padding:0 0 0 3px;}`
 
 
 

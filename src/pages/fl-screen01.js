@@ -1,75 +1,22 @@
-import React, { PureComponent, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
-import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
-import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
+import React, { PureComponent} from "react";
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
 import ImgIco01 from "../assets/freelisting-images/imgIco01.png";
 import ImgIco02 from "../assets/freelisting-images/imgIco02.png";
-
 const $ = window.$;
+
 export default class Screen1 extends PureComponent {
   constructor(props) {
     super();
   }
 
-  componentWillReceiveProps(newProps) {
-    if (typeof window.ethereum !== 'undefined') {
-        // detect Network account change
-        window.ethereum.on('chainChanged', networkId => {
-            console.log('chainChanged', networkId);
-            this.connectWallet();
-        });
-
-        window.ethereum.on('accountsChanged', async(accounts) => {          
-            if(accounts.length > 0){
-              await web3Config.connectWallet(0);
-              this.props.onWalletConnectButtonClick(true, web3Config.getWeb3());
-            } else {
-              this.props.onWalletConnectButtonClick(false, null);              
-            }
-        });
-
-        window.ethereum.on('disconnect', (error) => {
-          this.props.onWalletConnectButtonClick(false, null);          
-        });
-    }
+  textMasking = (text, maskingChar = '.', noOfMaskingChar = 4, startingLettersLength = 5, endingLettersLength = 4) => {
+    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
   }
-
-  async connectWallet() {
-    
-    if (typeof window.ethereum == 'undefined') {
-      console.log('MetaMask is not installed!');
-      notificationConfig.error('Metamask not found.');
-      return;
-    }
-
-    await web3Config.connectWallet(0).then(response => {
-      console.log(response);
-      if(window.ethereum.isConnected() === true){
-        this.props.onWalletConnectButtonClick(true, web3Config.getWeb3());
-        //notificationConfig.info('Wallet connected');
-      } else {
-        notificationConfig.info('Wallet not connected to metamask');        
-      }
-    }).catch(error => {
-      console.log(error);
-    });
-  }
-      
 
   render() {
     return (
       <>
-        { this.props.walletConnected === false &&
+        { 
           <main id="main" className="smartSwap">           
             <div className="main">   
              <MContainer> 
@@ -80,13 +27,29 @@ export default class Screen1 extends PureComponent {
                         Create a cross-chain bridge token to any EVM blockchain by few seconds
                         <span>It's free and open to any project and their users</span>
                       </CStitle01> 
-                      <button onClick={() => this.connectWallet()} className="Btn01 ani-1">CONNECT YOUR WALLET</button>
+                      { 
+                        this.props.walletConnected === false && 
+                        this.props.claimDeployerOwnerShip === false &&
+                        <button onClick={() => this.props.onWalletConnectButtonClick()} className="Btn01 ani-1">CONNECT YOUR WALLET</button>
+                      }
+                      { 
+                        this.props.walletConnected === true &&
+                        this.props.claimDeployerOwnerShip === false &&
+                        <>
+                          <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(1)} className="Btn01 ani-1">
+                            <i className="fas fa-check-circle"></i> WALLET CONNECTED
+                          </button>
+                          <SmallInfo>{this.props.accountAddress.length > 0 ? this.textMasking(this.props.accountAddress) : ''}</SmallInfo>
+                        </>
+                      }
                     </Csubbx01>
                     <Csubbx01 className="v2"> 
                       <CStitle01>
                         <i className="imgIco"><img src={ImgIco02} alt="Ico" /></i>
                         Projects, claim the bridge deployer to become the master validator
-                        <span><button className="Btn02 ani-1">START HERE</button></span>
+                        <span>
+                          <button onClick={() => this.props.onStartHereButtonClick()} className="Btn02 ani-1">START HERE</button>
+                        </span>
                       </CStitle01> 
                     </Csubbx01> 
                   </CMbx> 
@@ -123,6 +86,9 @@ const CStitle01 = styled(FlexDiv)`
   align-items:flex-start; font-size:30px; font-weight:700; color:#fff; flex-direction:column;  text-align:left;
 
   .imgIco{ margin-bottom:30px;}
-  span{ font-size:21px; font-weight:300;  text-align:left; display:block; width:100%; margin:40px 0 55px 0;  ;}
-  
+  span{ font-size:21px; font-weight:300;  text-align:left; display:block; width:100%; margin:40px 0 55px 0;  ;} 
+`
+
+const SmallInfo = styled(FlexDiv)`
+font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%;
 `

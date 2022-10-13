@@ -1,34 +1,21 @@
 import React, { PureComponent, lazy, Suspense } from "react";
 import Web3 from 'web3';
 import _ from "lodash";
-import { Link } from "react-router-dom";
-import web3Config from "../config/web3Config";
-import constantConfig, { getTokenList, tokenDetails } from "../config/constantConfig";
 import notificationConfig from "../config/notificationConfig";
-import SwapFactoryContract from "../helper/swapFactoryContract";
-import CONSTANT from "../constants";
-import Header from "../components/Header";
-import RightSideMenu from "../components/RightSideMenu";
-import axios from "axios";
-import { isValidAddress } from 'ethereumjs-util';
 import styled from 'styled-components';
-import HeadFreeListing from "../components/Header02";
-
-import ImgIco01 from "../assets/freelisting-images/s2ICO-01.png";
-import ImgIco02 from "../assets/freelisting-images/s2ICO-02.png";
-import ImgIco03 from "../assets/freelisting-images/s2ICO-03.png";
-import ImgIco04 from "../assets/freelisting-images/s2ICO-04.png";
-import ImgIco05 from "../assets/freelisting-images/s2ICO-05.png";
-import ImgIco06 from "../assets/freelisting-images/s2ICO-06.png";
 import Lineimg from "../assets/freelisting-images/line01.png";
+import { createWatcher, aggregate } from '@makerdao/multicall';
+
 
 const $ = window.$;
 export default class Screen2 extends PureComponent {
+  pendingNetworkSwitchRequest = false;
   constructor(props) {
     super();
 
     this.state = {
-      filteredToken: "",   
+      tokens: [],
+      filteredToken: "",
       selectedSource: {
         token: null,
         tokenAddress: null,
@@ -36,93 +23,261 @@ export default class Screen2 extends PureComponent {
         chain: null,
         chainId: null,
         chainIcon: null,
-        explorerUrl: null
-      }
+        explorerUrl: null,
+        decimals: null
+      },
+      addCustomToken: false
     };
 
   }
 
-  async switchNetwork(token, tokenAddress, tokenIcon, chain, chainId, chainIcon, explorerUrl) {
-    const sourceObject = {
-      selectedSource: {
-        token: token,
-        tokenAddress: tokenAddress,
-        tokenIcon: tokenIcon,
-        chain: chain,
-        chainId: chainId,
-        chainIcon: chainIcon,
-        explorerUrl: explorerUrl
-      }      
-    }
-    if(Number(this.props.chainId) !== Number(chainId)){
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: Web3.utils.toHex(chainId)}],
-      }).then(response => {
-        this.setState(sourceObject);
-      }).catch(error => {
-        console.error(error);
+  componentDidMount(){
+    this.filterTokenByWalletBalance();
+  }
+
+  aggregateBalanceOfMultiCall = async(chainId, tokenAddresses = [], accountAddress) => {
+    try {
+      //accountAddress = '0x084374b068Eb3db504178b4909eDC26D01226a80';
+
+      
+      const networkConfig = _.find(this.props.networks, {chainId: Number(chainId)});
+      console.log(networkConfig);
+
+      const config = {
+        rpcUrl: networkConfig.rpc,
+        multicallAddress: networkConfig.multicallContractAddress
+      };
+  
+      const multicallTokensConfig = [];
+      tokenAddresses.forEach(tokenAddress => {
+          // will only work with erc20 token addresses
+          var obj = {
+            target: tokenAddress,
+            call: ['balanceOf(address)(uint256)', accountAddress],
+            returns: [['BALANCE_OF_' + tokenAddress, val => val / 10 ** 18]]
+          }
+          multicallTokensConfig.push(obj);
       });
+  
+      console.log(multicallTokensConfig);
+      
+      const response = await aggregate(
+        multicallTokensConfig,
+        config
+      );
+      
+      Object.keys(response.results.transformed).forEach((token, index) => {
+        const tokenAddress = (token.substring(11)).toLowerCase();
+        const isTokenExist = _.find(this.props.tokens, {
+          address: tokenAddress,
+          chainId: Number(chainId)
+        });
+        if(isTokenExist){
+          console.log(`${index} ${isTokenExist.symbol}  ${isTokenExist.chainId} - ${token} - ${response.results.transformed[token]}`)
+          if(response.results.transformed[token] > 0){
+            this.setState(prevState => ({
+              tokens: [...prevState.tokens, isTokenExist]
+            }))
+          }
+        }
+      });  
+    } catch(error){
+      console.error(error.message);
+    }
+  }
+
+  async filterTokenByWalletBalance(){
+    try {
+      const groupedTokenByNetwork = this.props.tokens.reduce(function (r, token) {
+          r[token.chainId] = r[token.chainId] || [];
+          r[token.chainId].push(token.address);
+          return r;
+      }, Object.create(null));
+
+      Object.keys(groupedTokenByNetwork).forEach(async(network) => {
+        await this.aggregateBalanceOfMultiCall(network, groupedTokenByNetwork[network], this.props.accountAddress);
+      });
+    } catch(error) {
+      console.error(error.message);
+    }
+  }
+
+  async addNetworkToWallet(chainId) {
+    try {
+
+      const networkConfig = _.find(this.props.networks, {chainId: Number(chainId)});
+
+      if(networkConfig !== undefined){
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: Web3.utils.toHex(networkConfig.chainId),
+            chainName: networkConfig.name,
+            nativeCurrency: {
+              name: networkConfig.nativeCurrencyName,
+              symbol: networkConfig.nativeCurrencySymbol,
+              decimals: networkConfig.nativeCurrencyDecimals
+            },
+            rpcUrls: [networkConfig.rpc],
+            blockExplorerUrls: [networkConfig.explorerUrl]
+          }]
+        }).then((response) => {
+          console.log({
+            addNetworkToWalletResponse: response
+          })
+        }).catch((error) => {
+          console.error({
+            addNetworkToWalletError: error
+          });
+        });
+      } else {
+        console.error({
+          addNetworkToWalletError: 'networkConfig undefined'
+        });        
+      }
+      
+    } catch (error) {
+      console.error({
+        addNetworkToWalletCatch: error
+      });
+    }
+  }
+
+  async switchNetwork(token, tokenAddress, tokenIcon, chain, chainId, chainIcon, explorerUrl, decimals) {
+    if(this.pendingNetworkSwitchRequest === false){
+      const sourceObject = {
+        selectedSource: {
+          token: token,
+          tokenAddress: tokenAddress,
+          tokenIcon: tokenIcon,
+          chain: chain,
+          chainId: chainId,
+          chainIcon: chainIcon,
+          explorerUrl: explorerUrl,
+          decimals: decimals
+        }      
+      }
+      if(Number(this.props.chainId) !== Number(chainId)){
+        this.pendingNetworkSwitchRequest = true;
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: Web3.utils.toHex(chainId)}],
+        }).then(response => {
+          this.setState(sourceObject);
+          this.pendingNetworkSwitchRequest = false;
+        }).catch(async(error) => {
+          console.error(error);
+          if(error.code === -32002){
+            notificationConfig.info('A switch network request is pending. Check metamask.');
+            this.pendingNetworkSwitchRequest = true;
+          }
+
+          if(error.code === 4902){
+            notificationConfig.error('Unrecognized network. Adding network to metamask');
+            //await this.addNetworkToWallet(chainId, chain, token, token, decimals, explorerUrl, explorerUrl);
+            //https://matic-mumbai.chainstacklabs.com
+            await this.addNetworkToWallet(chainId);
+          }
+
+          this.pendingNetworkSwitchRequest = false;
+        });
+      } else {
+        this.setState(sourceObject);
+      }
     } else {
-      this.setState(sourceObject);
+      notificationConfig.info('A switch network request is pending. Check metamask.');      
+    }
+  }
+
+  onBackButtonClicked(){
+    if(this.pendingNetworkSwitchRequest === false){
+      this.props.onBackButtonClicked(1)
+    } else {
+      notificationConfig.info('A switch network request is pending. Check metamask.');            
     }
   }
 
   setSourceToken(){
-
-    if(
-      this.state.selectedSource.token == null
-      ||
-      this.state.selectedSource.tokenAddress == null
-      ||
-      this.state.selectedSource.tokenIcon == null
-      ||
-      this.state.selectedSource.chain == null
-      ||
-      this.state.selectedSource.chainId == null
-      ||
-      this.state.selectedSource.chainIcon == null
-      ||
-      this.state.selectedSource.explorerUrl == null
-    ){
-      notificationConfig.error('Please select a token first.');
-      return;
+    if(this.pendingNetworkSwitchRequest === false){
+      if(this.state.addCustomToken === false){
+        if(
+          this.state.selectedSource.token == null
+          ||
+          this.state.selectedSource.tokenAddress == null
+          ||
+          this.state.selectedSource.tokenIcon == null
+          ||
+          this.state.selectedSource.chain == null
+          ||
+          this.state.selectedSource.chainId == null
+          ||
+          this.state.selectedSource.chainIcon == null
+          ||
+          this.state.selectedSource.explorerUrl == null
+          ||
+          this.state.selectedSource.decimals == null
+        ){
+          notificationConfig.error('Please select a token first.');
+          return;
+        }
+    
+        this.props.onSourceTokenSelected(
+          this.state.selectedSource.token,
+          this.state.selectedSource.tokenAddress, 
+          this.state.selectedSource.tokenIcon, 
+          this.state.selectedSource.chain,
+          this.state.selectedSource.chainId,
+          this.state.selectedSource.chainIcon,
+          this.state.selectedSource.explorerUrl,
+          this.state.selectedSource.decimals
+        );
+      } else {
+        this.props.onAddCustomTokenClicked();      
+      }
+    } else {
+      notificationConfig.info('A switch network request is pending. Check metamask.');            
     }
-
-    this.props.onSourceTokenSelected(
-      this.state.selectedSource.token,
-      this.state.selectedSource.tokenAddress, 
-      this.state.selectedSource.tokenIcon, 
-      this.state.selectedSource.chain,
-      this.state.selectedSource.chainId,
-      this.state.selectedSource.chainIcon,
-      this.state.selectedSource.explorerUrl
-    );
-
   }
 
   filterTokens = (token) => {
-    this.setState({ filteredToken: token });
+    this.setState({ filteredToken: (token).toUpperCase() });
   };
+
+  getNetworkName = (chainId) => {
+    const networkConfig = _.find(this.props.networks, {chainId: chainId});
+    if(networkConfig !== undefined){
+      return networkConfig.chain
+    } else {
+      return 'CUSTOM'
+    }
+  }
+
+  getNetworkIcon = (chainId) => {
+    const networkConfig = _.find(this.props.networks, {chainId: chainId});
+    if(networkConfig !== undefined){
+      return networkConfig.icon
+    } else {
+      return 'default.png'
+    }
+  }
+
+  addCustomTokenButtonClickedHandler = () => {
+    this.setState({
+      addCustomToken: !this.state.addCustomToken
+    })     
+  }
+  
 
   render() {
 
-    let finalFilteredTokens = [];
-    const filteredTokens = this.props.tokens.filter(token => {
-      if(token.name.match(new RegExp(this.state.filteredToken, "i"))){
+    const filteredTokens = this.state.tokens.filter(token => {
+      if(
+        token.symbol.match(new RegExp(this.state.filteredToken, "i")) 
+        ||
+        token.address.match(new RegExp(this.state.filteredToken, "i"))
+      ){
         return token;
       }
-    });
-
-
-    filteredTokens.forEach(token => {
-      const network = _.find(this.props.networks, { chainId: token.chainId });
-      if(network !== undefined){
-        token['chain'] = network.name;
-        token['chainIcon'] = network.icon;
-        token['explorerUrl'] = network.explorerUrl;
-      }
-      finalFilteredTokens.push(token);        
     });
 
     return (
@@ -139,19 +294,33 @@ export default class Screen2 extends PureComponent {
                   <input 
                     onChange={e => this.filterTokens(e.target.value)}
                     type="text"
-                    placeholder="Search tokens"
+                    placeholder="Search tokens by symbol or smart contract"
                     value={this.state.filteredToken}
                   />
                 </ProInputbx>
                 <ProICOMbx01>
                   <ProICOMbx02>
                   
-                    {finalFilteredTokens.length > 0 && finalFilteredTokens.map((token, i) => {
+                    {filteredTokens.map((token, i) => {
+                      const network = _.find(this.props.networks, { chainId: token.chainId });
+                      if(network !== undefined){
+                        token['chain'] = network.chain;
+                        token['chainIcon'] = network.icon;
+                        token['explorerUrl'] = network.explorerUrl;
+                      }
+                      var isSelectedToken = this.state.selectedSource.tokenAddress === null ? '' : ( 
+                        (this.state.selectedSource.tokenAddress).toLowerCase() === (token.address).toLowerCase()
+                        && 
+                        Number(this.state.selectedSource.chainId) === Number(token.chainId)
+                      ) ? 'selected' : '';
+                      var isFeaturedToken = token.featured === true ? 'featured': 'not-featured';
+                      var isFilteredToken = token.symbol.includes(this.state.filteredToken.length > 0 ? this.state.filteredToken : undefined) ? 'filtered-token' : '';
                       return (
                       <ProICOSbx01 
                         key={i} 
                         chainId={token.chainId} 
-                        className={(this.state.selectedSource.tokenAddress === null ? '' : this.state.selectedSource.tokenAddress).toLowerCase() === (token.address).toLowerCase() ? 'selected' : ''}
+                        //className={`${isSelectedToken} ${isFeaturedToken} ${isFilteredToken}`}
+                        className={`${isSelectedToken}`}
                         onClick={() => this.switchNetwork(
                           token.symbol, 
                           token.address, 
@@ -159,24 +328,51 @@ export default class Screen2 extends PureComponent {
                           token.chain, 
                           token.chainId,
                           token.chainIcon,
-                          token.explorerUrl
+                          token.explorerUrl,
+                          token.decimals
                         )}
                       >
                         <ProICOSbx02> 
-                          <img src={window.location.href + '/images/free-listing/tokens/' + ((token.icon).toString()).toLowerCase()} />{token.symbol}
+                          <img
+                            alt={token.symbol} 
+                            className="token-icon" 
+                            src={'/images/free-listing/tokens/' + ((token.symbol).toString() + '.png').toLowerCase()}
+                            onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                          />{token.symbol}
                         </ProICOSbx02>
                         <ProICOSbx02> 
-                            <img src={window.location.href + '/images/free-listing/chains/' + ((token.chainIcon).toString()).toLowerCase()} />{token.chain}
+                            <img
+                              alt={token.chain}
+                              className="chain-icon"
+                              src={'/images/free-listing/chains/' + ((token.chainIcon).toString()).toLowerCase()} 
+                              onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
+                            />{token.chain}
                         </ProICOSbx02>
                       </ProICOSbx01>
                       )
                     })}
 
+                      <ProICOSbx01
+                        key={this.state.tokens.length}
+                        onClick={() => this.addCustomTokenButtonClickedHandler()}
+                        className={this.state.addCustomToken === true ? 'selected' : ''}
+                      >
+                        <ProICOSbx02>
+                          <img src={'/images/free-listing/tokens/' + (('default.png').toString()).toLowerCase()} />CUSTOM
+                        </ProICOSbx02>
+                        <ProICOSbx02> 
+                            <img 
+                              src={'/images/free-listing/chains/' + ((this.getNetworkIcon(this.props.chainId)).toString()).toLowerCase()} 
+                              onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
+                            />{this.getNetworkName(this.props.chainId)}
+                        </ProICOSbx02>
+                      </ProICOSbx01>
                   </ProICOMbx02>
+
                 </ProICOMbx01>
 
                 <BtnMbox>
-                  <button className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
+                  <button onClick={() => this.onBackButtonClicked()} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
                   <button onClick={() => this.setSourceToken()} className="Btn01"> NEXT STEP</button>
                 </BtnMbox>
 
@@ -223,11 +419,14 @@ const ProICOSbx01 = styled.button`
   width:calc(25% - 36px); margin:0 18px 30px 18px; background-color:#21232b; height:60px; border:0px; outline:none; padding:0;
   display: flex; align-items: center; justify-content: flex-start;
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
-  &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
+  &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }, 
+  &.featured{ display: flex;}
+  &.not-featured{ display: none;}
+  &.filtered-token{ display: flex;}
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px;}
+  img{ margin-right:15px; width: 30px; height: 30px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
 `
 const BtnMbox = styled(FlexDiv)`
@@ -238,7 +437,6 @@ const BtnMbox = styled(FlexDiv)`
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
 
 `
-
 
 
 

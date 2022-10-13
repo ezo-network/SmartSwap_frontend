@@ -103,6 +103,40 @@ export default class Screen3 extends PureComponent {
             notificationConfig.error(response.message);
           }
 
+          if (response.code === -32000 || response.code === -32603){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error("Intrinsic gas too low");
+          }
+
+          if(response.code === 'NOT_A_CONTRACT'){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error('Bridge address is not a contract.');
+          }
+
+          if(
+            response.code === 'CALL_EXCEPTION' 
+            || response.code === 'INSUFFICIENT_FUNDS' 
+            || response.code === 'NETWORK_ERROR' 
+            || response.code === 'NONCE_EXPIRED' 
+            || response.code === 'REPLACEMENT_UNDERPRICED'
+            || response.code === 'UNPREDICTABLE_GAS_LIMIT'
+          ){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.reason);            
+          }
+
+          if(response.code === 'TRANSACTION_REPLACED'){
+            if(response.cancelled === false && response.receipt?.transactionHash){
+              await this.props.onTokenAddedSuccessfully(response.receipt.transactionHash)
+            }
+          }
+
           if (response.status === 1) {
             await this.props.onTokenAddedSuccessfully(response.transactionHash)
           }
@@ -110,6 +144,7 @@ export default class Screen3 extends PureComponent {
         });
 
     } catch (error) {
+      console.log({addTokenError: error});
       console.log(error);
     }
   }
@@ -133,11 +168,11 @@ export default class Screen3 extends PureComponent {
                   <i>2</i> Verify the smart contract address 
                 </ProGTitle01>
                 <ProInputbx> 
-                  <input type="text" placeholder={this.props.selectedSourceTokenData.address} /> 
+                  <input type="text" value={this.props.selectedSourceTokenData.address} readOnly={true}/>
                 </ProInputbx>
                 <BtnMbox02>
                   <div>
-                    <button className="Btn03">{this.props.selectedSourceTokenData.name} </button> | <button className="Btn03">{this.props.selectedSourceTokenData.chain}</button>
+                    <button disabled={true} className="Btn03 no-effect">{this.props.selectedSourceTokenData.name} </button> | <button disabled={true} className="Btn03 no-effect">{this.props.selectedSourceTokenData.chain}</button>
                   </div>
                   <button onClick={() => this.goToContractOnExplorer(this.props.selectedSourceTokenData.explorerUrl, this.props.selectedSourceTokenData.address)} className="Btn04">Check the contract  <i className="fas fa-external-link-alt"></i></button>
                 </BtnMbox02>

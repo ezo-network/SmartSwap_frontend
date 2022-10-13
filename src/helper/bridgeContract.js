@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import bridgeContractAbi from "../abis/bridgeContract.json";
 import web3Config from "../config/web3Config";
 
+const Logger = new ethers.utils.Logger(ethers.version);
 
 class BridgeContract extends EventEmitter {
     
@@ -13,29 +14,32 @@ class BridgeContract extends EventEmitter {
         super();
         this.web3 = web3;
         this.contractAddress = contractAddress;
-
-        this.contractInstance = new ethers.Contract(
-            this.contractAddress,
-            bridgeContractAbi,
-            this.web3.getSigner(0)
-        );
+        
+        try {
+            this.contractInstance = new ethers.Contract(
+                this.contractAddress,
+                bridgeContractAbi,
+                this.web3.getSigner(0)
+            );
+        } catch(error){
+            console.error({
+                BridgeContractError: error 
+            });
+        }
     }
 
     async sendTransaction(payload, value, to, txCb, receiptCb) {
         try {
             const gasPrice = await this.web3.getGasPrice();
 
-            console.log(gasPrice);
+            console.log((gasPrice).toString());
             
-            const gasLimit = await this.web3.estimateGas({
+            const gasLimit = await this.web3.getSigner(0).estimateGas({
                 // Wrapped ETH address
                 to: to,              
-                // `function deposit() payable`
                 data: payload,
                 value: web3Js.utils.toHex(value)
             });
-
-            console.log(gasLimit);
 
             console.log({
                 gasPrice: (gasPrice).toString(),
@@ -54,14 +58,38 @@ class BridgeContract extends EventEmitter {
                 txCb(result.hash)
                 result.wait().then(async(receipt) => {
                     receiptCb(receipt);
-                })
+                }).catch(error => {
+                    console.error(error);
+                    receiptCb(error);
+                });
             }).catch(error => {
-                console.log(error);
+                console.error(error);
                 receiptCb(error);
             });
 
+            // try {
+            //     // Wait for the transaction to be mined
+            //     const receipt = await txResponse.wait();
+            //     // The transactions was mined without issue
+            //     //myProcessMinedTransaction(tx, receipt);
+            //     receiptCb({tx, receipt});
+            //   } catch (error) {
+            //     if (error.code === Logger.errors.TRANSACTION_REPLACED) {
+            //       if (error.cancelled) {
+            //         // The transaction was replaced  :'(
+            //         //myProcessCancelledTransaction(tx, error.replacement);
+            //         receiptCb({tx, error: error.replacement});
+            //     } else {
+            //         // The user used "speed up" or something similar
+            //         // in their client, but we now have the updated info
+            //         //myProcessMinedTransaction(error.replacement, error.receipt);
+            //         receiptCb({tx, error: error.receipt});
+            //       }
+            //     }
+            // }
+
         } catch(error){
-            console.log(error);
+            console.error(error);
             receiptCb(error);
         }
     }
@@ -72,36 +100,79 @@ class BridgeContract extends EventEmitter {
         return s;
     }
 
-    async setFeeAmountLimit(amount, txCb, receiptCb) {
-        amount = web3Js.utils.toWei((amount).toString());
-        amount = web3Js.utils.toHex(amount);
-        amount = amount.slice(2);
-        var payload = `0x8c90c121${this.pad32Bytes(amount)}`
-        console.log(payload);
-        console.log(this.contractAddress);
-        this.sendTransaction(payload, 0, "120000", this.contractAddress, txCb, receiptCb)
+    async isContractExist(){
+        try {
+            const response = await this.web3.getCode(this.contractAddress);
+            if(response === '0x'){
+                return false;
+            } else {
+                return true;
+            }
+        } catch(error){
+            return false;
+        }
     }
 
     async addTokenOnSourceChain(address, txCb, receiptCb){
         try {
-            // address will be valid etherium bc address
-            address = web3Js.utils.toHex(address);
-            address = address.slice(2);
-            var payload = `0xd48bfca7${this.pad32Bytes(address)}`;
-            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            const isContractExist = await this.isContractExist(address);
+            if(isContractExist){
+                // address will be valid etherium bc address
+                address = web3Js.utils.toHex(address);
+                address = address.slice(2);
+                var payload = `0xd48bfca7${this.pad32Bytes(address)}`;
+                await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            } else {
+                receiptCb({
+                    code: 'NOT_A_CONTRACT',
+                });
+            }
         } catch (error){
-            return error;   
+            receiptCb(error.message);
         }
-    }
-
-    async getFeeAmountLimit(txCb, receiptCb) {
-        //this.sendTransaction(payload, 0, "120000", this.contractAddress, txCb, receiptCb)
     }
 
     handleActions(action) {
         switch (action.type) {}
     }
 
+    async addWrappedTokenOnDestinationChain(tokenAddress, chainId, decimals, name, symbol, sig, txCb, receiptCb){
+        try {
+
+            console.log({
+                tokenAddress: tokenAddress,
+                chainId: chainId,
+                decimals: decimals,
+                name: name,
+                symbol: symbol,
+                sig: sig
+            });
+
+            let payload = ethers.utils.defaultAbiCoder.encode([ 
+                "address", 
+                "uint256", 
+                "uint256", 
+                "string", 
+                "string", 
+                "bytes[]" 
+            ], [ 
+                tokenAddress,
+                Number(chainId),
+                Number(decimals),
+                name,
+                symbol,
+                [sig]
+            ]);
+
+            payload = payload.slice(2);
+            payload = `0xa85c33cd${this.pad32Bytes(payload)}`;
+
+            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+        } catch (error){
+            console.log(error);
+            return error;   
+        }
+    }
 }
 
 
