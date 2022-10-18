@@ -445,13 +445,13 @@ export default class Projects extends PureComponent {
     }
   }
 
-  async getWrappedTokens(sourceTokenChainId, creatorAddress = null) {
+  async getWrappedTokens(projectId, creatorAddress = null) {
     try {
       const {
         response,
         error,
         code
-      } = await BridgeApiHelper.getWrappedTokens(sourceTokenChainId, creatorAddress);
+      } = await BridgeApiHelper.getWrappedTokens(projectId, creatorAddress);
 
       if (code === 200) {
         this.setState({

@@ -168,11 +168,49 @@ class BridgeContract extends EventEmitter {
             payload = `0xa85c33cd${this.pad32Bytes(payload)}`;
 
             await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
-        } catch (error){
-            console.log(error);
-            return error;   
+        } catch (err){
+            console.error({
+                addWrappedTokenOnDestinationChain: err.message
+            });
+            return err;   
         }
     }
+
+    async depositTokens(originalTokenAddress, amountToDepositInWei, toChainId, txCb, receiptCb){
+        try {
+
+            const args = {
+                receiver: web3Config.getAddress(),
+                token: originalTokenAddress,
+                value: (amountToDepositInWei).toString(),
+                toChainId: Number(toChainId)
+            };
+
+            console.log(args);
+
+            let payload = ethers.utils.defaultAbiCoder.encode([
+                "address",
+                "address",
+                "uint256",
+                "uint256"
+            ], [
+                web3Config.getAddress(),
+                originalTokenAddress,
+                (amountToDepositInWei).toString(),
+                Number(toChainId)
+            ]);
+
+            payload = payload.slice(2);
+            payload = `0x487cda0d${this.pad32Bytes(payload)}`;
+
+            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+        } catch (err){
+            console.error({
+               depositTokens: err.message
+            });
+            return err;   
+        }
+    }    
 }
 
 

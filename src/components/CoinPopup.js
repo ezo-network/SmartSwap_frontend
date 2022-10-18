@@ -29,7 +29,7 @@ export default class CoinPopup extends PureComponent {
     render() {
 
         return (
-            <div className="main-Popup wallet-Popup" id={this.props.popId}>
+            <div className="main-Popup wallet-Popup" id={this.props.popId} key={this.props.popId}>
                 <div className="container-Grid">
                     {/* <div className="tab-Nav">
                         <a href="javascript:void(0)" className={"tab-Link ani-1 active" + this.props.popId} data-id="tab-01">Tokens</a>
@@ -56,7 +56,7 @@ export default class CoinPopup extends PureComponent {
                                             return null
                                         } else {
                                             return (
-                                                <div className="wallet-Bx ani-1">
+                                                <div key={key} className="wallet-Bx ani-1">
                                                     <div className="img-Box">
                                                         <span className="round-Bg">
                                                             <span className="icon-Box icon16">
