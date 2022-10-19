@@ -81,11 +81,11 @@ export default class Screen6 extends PureComponent {
 	render() {
 
 		let wrappedTokens = [];
-		this.state.wrappedTokens.forEach(token => {
+		/* this.state.wrappedTokens.forEach(token => {
 			const networkConfig = _.find(this.props.networks, { chainId: token.toChainId });
 			token['chain'] = networkConfig['chain'];
 			wrappedTokens.push(token);
-		});
+		}); */
 
 		return (
 			<>
@@ -142,17 +142,21 @@ export default class Screen6 extends PureComponent {
 }
 
 const FlexDiv = styled.div`
-  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+	display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
 `;
 
 const MContainer = styled(FlexDiv)` 
-  width:100%; max-width:1360px; margin:0 auto;
+	width: calc(100% - 40px); max-width:1360px; margin:0 auto;
 `
 const CMbx = styled(FlexDiv)`
-  width:100%;  margin-top:90px;
+	width:100%;  margin-top:90px; margin-bottom: 30px;
+	@media (max-width: 991px){
+		margin-top: 60px;
+		
+	}
 `
 
-const SuccessBox = styled.div`
+const SuccessBox = styled.div `
 	text-align: center;
 	width:100%;
 	margin-bottom: 56px;
@@ -172,7 +176,7 @@ const SuccessBox = styled.div`
 		}
 	}
 	`
-const SuccessTitle = styled.div`
+const SuccessTitle = styled.div `
 	font-size: 24px;
 	color: #fff;
 	font-weight: bold;
@@ -182,14 +186,14 @@ const SuccessTitle = styled.div`
 		
 	}
 `
-const Ulist = styled.ul`
+const Ulist = styled.ul `
 	padding: 0;
 	margin: 0;
 	display: table;
 	width: 900px;
 	border-top: 2px solid #3b3e4b;
 `
-const List = styled.li`
+const List = styled.li `
 	padding: 0;
 	margin: 0;
 	list-style: none;
@@ -203,11 +207,15 @@ const List = styled.li`
 		
 	}
 	`
-const ListTxt = styled.div`
+const ListTxt = styled.div `
 	padding: 17px 22px;
 	margin: 0;
 	list-style: none;
 	width: 50%;
+	@media screen and (max-width: 575px) {
+		padding: 17px 10px;
+		max-width: 50%;
+	}
 	&:last-child {
 		border-left: 1px solid #3b3e4b;
 	}
@@ -223,34 +231,41 @@ const ListTxt = styled.div`
 	}
 	
 `
-const ListLink = styled.a`
+const ListLink = styled.a `
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	color: #2d52f3;
+	@media screen and (max-width: 575px) {
+		word-wrap: break-word;
+	}
 `
-const ListFooter = styled.li`
+const ListFooter = styled.li `
 	list-style: none;
 	padding: 0;
 	margin: 0;
 	display: flex;
 	justify-content: space-between;
 	padding: 17px 0;
+	@media screen and (max-width: 575px) {
+		flex-flow: column; justify-content: center; align-items: center; text-align: center;
+	}
 `
-const LinkGreen = styled.a`
+const LinkGreen = styled.a `
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	color: #91dc27;
 	font-weight: bold;
-	cursor: pointer;
+	@media screen and (max-width: 575px) {
+		margin-bottom: 8px;
+	}
 `
-const LinkFt = styled.a`
+const LinkFt = styled.a `
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	color: #aaaaaa;
-	cursor: pointer;
 	i {
 		margin-left: 5px;
 	}

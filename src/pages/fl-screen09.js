@@ -120,7 +120,7 @@ export default class Screen9 extends PureComponent {
 
                       </ProFile>
                       <ProBtn>
-                        <button onClick={() => this.downloadFile()} className="Btn01">DOWNLOAD VALIDATOR FILE</button> 
+                        <button onClick={() => this.downloadFile()} className="Btn02"><span className="fas fa-download"></span> DOWNLOAD VALIDATOR FILE</button> 
                       </ProBtn>
                     </ProFileNBtn>
                     </label>   
@@ -151,15 +151,20 @@ const FlexDiv = styled.div`
 `;
 
 const MContainer = styled(FlexDiv)` 
-  width:100%; max-width:1360px; margin:0 auto;
+  width: calc(100% - 40px); max-width:1360px; margin:0 auto;
 `
 const CMbx = styled(FlexDiv)`
-  width:100%;  margin-top:90px;
+  width:100%;  margin-top:90px; margin-bottom: 40px;
+  @media (max-width: 991px){
+		margin-top: 60px;
+	}
 `
 const ProgressBar = styled.div`
-width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:55px;
-
-    span{ display:inline-block; height:4px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5);  background-color:#91dc27; border-radius:0 2px 2px 0;}
+  width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:55px;
+  span{ display:inline-block; height:4px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5);  background-color:#91dc27; border-radius:0 2px 2px 0;}
+  @media screen and (max-width: 640px) {
+    margin-bottom: 40px;
+  }
 `
 
 
@@ -175,14 +180,16 @@ const ProInputbx = styled(FlexDiv)`
       padding-bottom: 30px; margin-bottom: 40px;
     }
     label{width:100%; font-size:18px; font-weight:700; margin-bottom:18px;
-    
-        i{ width:30px; height:30px; background-color:#fff; color:#0d0e13; display:inline-flex; align-items:center; justify-content:center; font-style:normal; margin-right:16px;}
-
-        
+      i{ width:30px; height:30px; background-color:#fff; color:#0d0e13; display:inline-flex; align-items:center; justify-content:center; font-style:normal; margin-right:16px;}
     }
     input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400;
-    
         &.v2{ margin-left:50px;}
+    }
+    @media screen and (max-width: 575px) {
+      label {
+        display: flex;
+        i {flex-shrink: 0;}
+      }
     }
 ` 
 const BtnMbox = styled(FlexDiv)`
@@ -194,7 +201,13 @@ const BtnMbox = styled(FlexDiv)`
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700;  -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
 
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
-
+  @media screen and (max-width: 640px) {
+    .Btn01{max-width: 50%}
+  }
+  @media screen and (max-width: 480px) {
+    flex-flow: column-reverse; padding-bottom: 30px; padding-top: 30px;
+    .Btn01{max-width: 100%; margin-bottom: 25px;}
+  }
 `
 const ProFileNBtn = styled.div `
     display: inline-flex; padding-left: 4px;
@@ -205,6 +218,14 @@ const ProFileNBtn = styled.div `
         margin-right: 10px;
       }
     }
+    @media screen and (max-width: 768px) {
+      flex-flow: column; align-items: flex-start;
+    }
+    @media screen and (max-width: 575px) {
+      p {padding-left: 28px; margin: 4px 0 10px;
+        span {display: block; margin: 0 0 0 -28px;}
+      }
+    }
 `
 const ProbxLink = styled.a `
   display: table; margin: -6px 0 0 30px; font-weight: normal;
@@ -213,17 +234,19 @@ const ProbxLink = styled.a `
 `
 
 const ProFile = styled.div `
-
+  
 `
 const ProBtn = styled.div `
     display: flex; align-items: center;
     margin-left: auto;
     .Btn01{ color:#fff; background-color:#0d0e13; width:430px; max-width:100%; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700;  -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
-    .Btn02{ background-color:transparent; color:#91dc27; border:0; font-size:18px; font-weight:700; :hover{ color:#fff;}
-    span{ margin-right:5px;}
+
+    .Btn02{ background-color:transparent; color:#91dc27; border:0; font-size:18px;  font-weight:700; :hover{ color:#fff;}
+      span{ margin-right:5px;}
+    
+    }
+    @media screen and (max-width: 768px) {
+      margin-left: 0;
+      .Btn02{padding-left: 0; margin-top: 10px;}
+    }
 `
-
-
-
-
-

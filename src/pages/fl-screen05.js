@@ -359,21 +359,21 @@ export default class Screen5 extends PureComponent {
   render() {
 
     let networksData = [];
-    const selectedDestinationNetworks = this.props.selectedDestinationNetworks;
-    selectedDestinationNetworks.forEach(networkId => {
-      const wrappedToken = _.find(this.props.wrappedTokens, { 
-        toChainId: Number(networkId), 
-        fromChainId: Number(this.props.selectedSourceTokenData.chainId)
-      });
-      const networkConfig = _.find(this.props.networks, { chainId: networkId });
-      let networkData = networkConfig;
-      if (wrappedToken !== undefined) {
-        networkData['wrappedTokenExist'] = true;
-      } else {
-        networkData['wrappedTokenExist'] = false;
-      }
-      networksData.push(networkData);
-    });
+    // const selectedDestinationNetworks = this.props.selectedDestinationNetworks;
+    // selectedDestinationNetworks.forEach(networkId => {
+    //   const wrappedToken = _.find(this.props.wrappedTokens, { 
+    //     toChainId: Number(networkId), 
+    //     fromChainId: Number(this.props.selectedSourceTokenData.chainId)
+    //   });
+    //   const networkConfig = _.find(this.props.networks, { chainId: networkId });
+    //   let networkData = networkConfig;
+    //   if (wrappedToken !== undefined) {
+    //     networkData['wrappedTokenExist'] = true;
+    //   } else {
+    //     networkData['wrappedTokenExist'] = false;
+    //   }
+    //   networksData.push(networkData);
+    // });
 
     return (
       <>
@@ -486,22 +486,26 @@ const FlexDiv = styled.div`
 `;
 
 const MContainer = styled(FlexDiv)` 
-  width:100%; max-width:1360px; margin:0 auto;
+  width: calc(100% - 40px); max-width:1360px; margin:0 auto;
 `
 const CMbx = styled(FlexDiv)`
   width:100%;  margin-top:90px;
+  @media (max-width: 991px){
+		margin-top: 60px;
+	}
 `
 const ProgressBar = styled.div`
 width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:55px;
-
     span{ display:inline-block; height:4px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5);  background-color:#91dc27; border-radius:0 2px 2px 0;}
+    @media screen and (max-width: 640px) {
+      margin-bottom: 40px;
+    }
 `
 
 const ProGTitle01 = styled(FlexDiv)` 
     font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
     i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  } 
 `
-
 const ProICOMbx01 = styled.div` width:100%; `
 const ProICOMbx02 = styled(FlexDiv)`
     align-items:flex-start; justify-content: flex-start; margin:30px -18px 0 -18px;
@@ -511,12 +515,20 @@ const ProICOSbx01 = styled.button`
   display: flex; align-items: center; justify-content: flex-start;
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
-`
+` 
 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px; width: 30px; height: 30px;}
+  img{ margin-right:15px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
+  @media screen and (max-width: 1200px) {
+    /* flex-flow: column; align-items: center; justify-content: center; */ padding:0 10px;
+    img {margin:0 6px 0 0;}
+  }
+  @media screen and (max-width: 640px) {
+    flex-flow: row; justify-content: flex-start;  padding:0 15px;
+    img {margin:0 15px 0 0;}
+  }
 `
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
@@ -524,15 +536,27 @@ const BtnMbox = styled(FlexDiv)`
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
 
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
-
+  @media screen and (max-width: 640px) {
+		.Btn01{max-width: 50%}
+	}
+	@media screen and (max-width: 480px) {
+		flex-flow: column-reverse; padding-bottom: 30px; padding-top: 30px; margin-top: 0;
+		.Btn01{max-width: 100%; margin-bottom: 25px;}
+	}
 `
 
-const ProRow = styled.div`
+const ProRow = styled.div `
   display: flex;
   width: 100%;
   align-items: center;
   padding: 40px 0 0 0;
   margin: 0 0 50px;
+  @media (max-width: 1100px){
+    display: grid; grid-template-columns: 30px 1fr; column-gap: 40px;
+  }
+  @media (max-width: 640px){
+    display: grid; grid-template-columns: 1fr; column-gap: 0;
+  }
   .labelNo {
     width:30px;
     height:30px;
@@ -543,30 +567,48 @@ const ProRow = styled.div`
     color: #000;
     font-weight: bold;
     margin-right: 25px;
+    @media (max-width: 1100px){
+      grid-row-start: 1; grid-row-end: 3; align-self: flex-start;
+    }
   }
   `
-const ProRowCol1 = styled.div`
+const ProRowCol1 = styled.div `
   display: flex;
   width: 50%;
   align-items: center;
   position: relative;
+  @media (max-width: 1100px){
+    width: auto; margin: 0 0 70px; 
+  }
+  @media (max-width: 640px){
+    margin: 70px 0 0; flex-flow: column;
+  }
   button {
     width: calc(50% - 36px);
     margin: 0;
     flex-grow: 1;
+    @media (max-width: 640px){
+      width: 100%;
+    }
   }
 `
-const ProColImg = styled.div`
+const ProColImg = styled.div `
   flex-grow: 1;
   text-align: center;
-  width: calc(50% - 36px);
+  width: calc(50% - 36px); 
+  padding: 0 15px;
+  img {max-width: 100%;}
+  @media screen and (max-width: 640px) {
+    margin-top: 40px;
+    width: 100%; 
+  }
   `
-const ProColBtn = styled.div`
+const ProColBtn = styled.div `
   flex-grow: 1;
   width: calc(50% - 36px);
   padding-left: 30px;
   button {
-    color:#fff; background-color:#0d0e13; width: 100%;  text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); 
+    color:#fff; background-color:#0d0e13; width: 100%;  text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5);
     &:hover{ background-color:#91dc27;}
   }
   .Btn02 {
@@ -579,6 +621,15 @@ const ProColBtn = styled.div`
       margin-right: 10px;
     }
   }
+  @media screen and (max-width: 640px) {
+    width: 100%; padding-left: 0;
+    button {
+      margin-top: 40px; width: 100%;
+    }
+    .Btn02 {
+      padding: 10px 0; margin-top: 40px;
+    }
+  }
 `
 const ProICOTitle = styled.span`
   position: absolute;
@@ -587,6 +638,9 @@ const ProICOTitle = styled.span`
   bottom: 100%;
   margin-bottom: 15px;
   font-weight: bold;
+  @media screen and (max-width: 640px) {
+    width: 100%;
+  }
 `
 
 
