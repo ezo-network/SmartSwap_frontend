@@ -201,34 +201,36 @@ export default class SourceTokenPopup extends PureComponent {
                                     return <tr 
                                             key={token._id}
                                         >
-                                            <Tcell
-                                                // onClick={(e) => this.setSourceToken(
-                                                //     token.symbol,
-                                                //     Number(token.chainId),
-                                                //     networkConfig.chain,
-                                                //     token.address,
-                                                //     token.decimals
-                                                // )}
-                                                onClick={(e) => this.addToPinnedToken(token.address)}
-                                            >
+                                            <Tcell>
                                                 <Token>
                                                     <img 
                                                         src={'/images/free-listing/tokens/' + (token.symbol).toLowerCase() + '.png'}
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                         alt="to-token-input-icon"
-                                                    ></img> {token.symbol}
+                                                        onClick={(e) => this.setSourceToken(
+                                                            token.symbol,
+                                                            Number(token.chainId),
+                                                            networkConfig.chain,
+                                                            token.address,
+                                                            token.decimals
+                                                        )}                                                        
+                                                    ></img> 
+                                                    <span
+                                                        onClick={(e) => this.setSourceToken(
+                                                            token.symbol,
+                                                            Number(token.chainId),
+                                                            networkConfig.chain,
+                                                            token.address,
+                                                            token.decimals
+                                                        )}
+                                                    >{token.symbol}</span>
                                                 </Token>
-                                                <Pin className={this.state.pinnedTokens.includes((token.address).toUpperCase()) ? 'selected' : ''}></Pin>
+                                                <Pin 
+                                                    onClick={(e) => this.addToPinnedToken(token.address)}
+                                                    className={this.state.pinnedTokens.includes((token.address).toUpperCase()) ? 'selected' : ''}
+                                                ></Pin>
                                             </Tcell>
-                                            <Tcell
-                                                onClick={(e) => this.setSourceToken(
-                                                    token.symbol,
-                                                    Number(token.chainId),
-                                                    networkConfig.chain,
-                                                    token.address,
-                                                    token.decimals
-                                                )}
-                                            >
+                                            <Tcell>
                                                 <Token>
                                                     <img 
                                                         src={'/images/free-listing/chains/' + (networkConfig.chain).toLowerCase() + '.png'}
@@ -244,13 +246,7 @@ export default class SourceTokenPopup extends PureComponent {
                                             >
                                                 <TDLink>{textMasking(token.address)}</TDLink>
                                             </Tcell>
-                                            <Tcell onClick={(e) => this.setSourceToken(
-                                                token.symbol,
-                                                Number(token.chainId),
-                                                networkConfig.chain,
-                                                token.address,
-                                                token.decimals
-                                            )}>
+                                            <Tcell>
                                                 <BridgeGrp>
                                                     <b>
                                                         {

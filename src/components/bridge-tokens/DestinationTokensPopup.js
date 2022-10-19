@@ -224,23 +224,34 @@ export default class DestinationTokensPopup extends PureComponent {
                                         networks !== undefined && networks.length > 0 && networks.map(function (network, i) {
                                             return (
                                                 <tr key={network._id}>
-                                                    <Tcell
-                                                        // onClick={(e) => network['isBridgeExistOnChain'] === true ? this.setDestinationToken(
-                                                        //     network['wrappedTokenSymbol'],
-                                                        //     network.chainId,
-                                                        //     network.chain,
-                                                        //     network['wrappedTokenAddress']
-                                                        // ) : e.preventDefault()}
-                                                        onClick={(e) => this.addToPinnedNetwork(network.chainId)}
-                                                    >
+                                                    <Tcell>
                                                         <Token>
                                                             <img
                                                                 src={'/images/free-listing/chains/' + (network.chain).toLowerCase() + '.png'}
                                                                 onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                                 alt="destination-chain-icon"
-                                                            ></img> {network.chain}
+                                                                onClick={(e) => network['isBridgeExistOnChain'] === true ? this.setDestinationToken(
+                                                                    network['wrappedTokenSymbol'],
+                                                                    network.chainId,
+                                                                    network.chain,
+                                                                    network['wrappedTokenAddress']
+                                                                ) : e.preventDefault()}
+                                                            ></img>
+                                                            <span
+                                                                onClick={(e) => network['isBridgeExistOnChain'] === true ? this.setDestinationToken(
+                                                                    network['wrappedTokenSymbol'],
+                                                                    network.chainId,
+                                                                    network.chain,
+                                                                    network['wrappedTokenAddress']
+                                                                ) : e.preventDefault()}                                                            
+                                                            >
+                                                            {network.chain}
+                                                            </span>
                                                         </Token>
-                                                        <Pin className={this.state.pinnedNetworks.includes(Number(network.chainId)) ? 'selected' : ''}></Pin>
+                                                        <Pin
+                                                            onClick={(e) => this.addToPinnedNetwork(network.chainId)}
+                                                            className={this.state.pinnedNetworks.includes(Number(network.chainId)) ? 'selected' : ''}
+                                                        ></Pin>
                                                     </Tcell>
                                                     <Tcell onClick={
                                                         (e) => network['wrappedTokenAddress'] !== undefined 
@@ -249,14 +260,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                     }>
                                                         {network['wrappedTokenAddress'] === undefined ? '-' : <TDLink>{textMasking(network['wrappedTokenAddress'])}</TDLink>}
                                                     </Tcell>
-                                                    <Tcell
-                                                        onClick={(e) => network['isBridgeExistOnChain'] === true ? this.setDestinationToken(
-                                                            network['wrappedTokenSymbol'],
-                                                            network.chainId,
-                                                            network.chain,
-                                                            network['wrappedTokenAddress']
-                                                        ) : e.preventDefault()}
-                                                    >
+                                                    <Tcell>
                                                         {network['isBridgeExistOnChain'] === true &&
                                                             <ButtonDark>
                                                                 <i className="fa fa-check" aria-hidden="true"></i> Bridge Exists
@@ -269,15 +273,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                             </Link>
                                                         }
                                                     </Tcell>
-                                                    <Tcell 
-                                                        onClick={(e) => network['isBridgeExistOnChain'] === true ? this.setDestinationToken(
-                                                            network['wrappedTokenSymbol'],
-                                                            network.chainId,
-                                                            network.chain,
-                                                            network['wrappedTokenAddress']
-                                                        ) : e.preventDefault()}                                                    
-                                                        className="text-center"
-                                                    >
+                                                    <Tcell>
                                                         -
                                                     </Tcell>
                                                 </tr>
