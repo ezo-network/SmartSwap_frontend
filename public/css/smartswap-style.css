@@ -9344,7 +9344,7 @@ a.dc-file:hover {
 .tabRow .tabCol {width: 50%; padding: 0 26px;}
 .tabRow img {vertical-align: top;}
 .tabRow .tabDivider {border-left: 1px solid #1b1d21; border-right: 1px solid #373c47; display: inline-block; vertical-align: top; width: 0; margin: 0 0; position: relative;}
-.tabRow .tabDivider .swap {position: absolute; width: 4px; bottom: 66px; left: -2px; padding: 6px 0; backdrop-filter: opacity(1) blur(5px); border-radius: 18px; /* background: linear-gradient(#292e33, #272c31); */}
+.tabRow .tabDivider .swap {position: absolute; width: 4px; bottom: 66px; left: -2px; padding: 6px 0; backdrop-filter: opacity(1) blur(5px); border-radius: 18px; background-color: transparent; border: none; /* background: linear-gradient(#292e33, #272c31); */}
 .tabRow .tabDivider .swap img {width: 30px; position: relative; left: -13px;}
 .tabRow .tabCol label {color: #aaaaaa; font-size: 12px; margin-bottom: 11px; display: block;}
 .inputIcon {position: relative; }
@@ -9385,3 +9385,8 @@ a.dc-file:hover {
 .powertextBX-links a {color: #91dc27; margin: 0;}
 .powertextBX-links span {color: #595959 !important; margin: 0 11px;}
 .no-effect{pointer-events: none;}
+.from-token-selector img , .to-token-selector img {height: 65px; margin-right: 0px;}
+.button-link {background-color: transparent; border: none;}
+#bridge-tokens .figIcon:hover { background: #91dc27;}
+.btn.btn-switch {background-color: inherit; color: #91dc27; border: 2px solid #91dc27; box-shadow: 0px 0px 10px #91dc27;}
+.btn.btn-switch:hover {background: #91dc27; color: #fff;}

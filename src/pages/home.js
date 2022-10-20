@@ -19,7 +19,7 @@ import RightSideMenu from "../components/RightSideMenu";
 import WalletPopup from "../components/WalletPopup";
 import CoinPopup from "../components/CoinPopup";
 import SidePopup from "../components/SidePopup";
-import LiquidityProvider from "../components/LiquidityProvider/LiquidityProvider";
+//import LiquidityProvider from "../components/LiquidityProvider/LiquidityProvider";
 import LiquidityFountainSP from "../components/liquidity_fountain_for_SPs";
 import About from "../components/About";
 import PeerPopup from "../components/PeerPopup";
@@ -64,6 +64,8 @@ import Switch from "react-switch";
 import Collapse from "@kunukn/react-collapse";
 import Dropdown from "../components/DropDown";
 import Counter from "../components/Counter";
+import BridgeSwap from "../components/bridge-tokens/BridgeSwap";
+
 
 const responsive = {
   desktop: {
@@ -239,80 +241,80 @@ export default class Home extends PureComponent {
     });
   };
   componentWillMount = async () => {
-    await this.fetchPrice();
-    setInterval(async () => {
-      await this.fetchPrice();
-    }, 60000)
+    // await this.fetchPrice();
+    // setInterval(async () => {
+    //   await this.fetchPrice();
+    // }, 60000)
 
   };
   componentDidMount = async () => {
-    let web3Provider = {};
-    web3Provider[process.env.REACT_APP_ETH_CHAIN_ID] = new Web3(
-      new Web3.providers.WebsocketProvider(CONSTANT.RPC_PROVIDER_ETHEREUM)
-    );
-    web3Provider[process.env.REACT_APP_BSC_CHAIN_ID] = new Web3(
-      new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_BINANCE)
-    );
-    web3Provider[process.env.REACT_APP_POLYGON_CHAIN_ID] = new Web3(
-      new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_POLYGON)
-    );
-    this.setState({
-      web3Ethereum: new Web3(
-        new Web3.providers.WebsocketProvider(CONSTANT.RPC_PROVIDER_ETHEREUM)
-      ),
-      web3Binance: new Web3(
-        new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_BINANCE)
-      ),
-      web3Polygon: new Web3(
-        new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_POLYGON)
-      ),
-      web3Provider
-    });
+    // let web3Provider = {};
+    // web3Provider[process.env.REACT_APP_ETH_CHAIN_ID] = new Web3(
+    //   new Web3.providers.WebsocketProvider(CONSTANT.RPC_PROVIDER_ETHEREUM)
+    // );
+    // web3Provider[process.env.REACT_APP_BSC_CHAIN_ID] = new Web3(
+    //   new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_BINANCE)
+    // );
+    // web3Provider[process.env.REACT_APP_POLYGON_CHAIN_ID] = new Web3(
+    //   new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_POLYGON)
+    // );
+    // this.setState({
+    //   web3Ethereum: new Web3(
+    //     new Web3.providers.WebsocketProvider(CONSTANT.RPC_PROVIDER_ETHEREUM)
+    //   ),
+    //   web3Binance: new Web3(
+    //     new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_BINANCE)
+    //   ),
+    //   web3Polygon: new Web3(
+    //     new Web3.providers.HttpProvider(CONSTANT.RPC_PROVIDER_POLYGON)
+    //   ),
+    //   web3Provider
+    // });
 
-    {
-      //  this.openPopup('DepositToken');
-      //  this.showWithId("DepositToken", "tab-A1");
-    } // temporary popup on
+    // {
+    //   //  this.openPopup('DepositToken');
+    //   //  this.showWithId("DepositToken", "tab-A1");
+    // } // temporary popup on
 
-    this.setState(
-      {
-        loading: true,
-      },
-      async () => {
-        await this.initInstance();
-      }
-    );
+    // this.setState(
+    //   {
+    //     loading: true,
+    //   },
+    //   async () => {
+    //     await this.initInstance();
+    //   }
+    // );
 
-    const href = window.location.href;
-    const domaindata = href
-      .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
-      .split("/")[0];
-    const domain = domaindata.split(".");
+    // const href = window.location.href;
+    // const domaindata = href
+    //   .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+    //   .split("/")[0];
+    // const domain = domaindata.split(".");
 
-    console.log(domaindata);
-    this.setState({
-      subDomainName: domain[0],
-    });
+    // console.log(domaindata);
+    // this.setState({
+    //   subDomainName: domain[0],
+    // });
 
-    const localhost = domaindata.indexOf("localhost");
-    console.log(domain.length);
-    if (domain.length === (localhost === -1 ? 3 : 2)) {
-      this.setState({
-        isSubdomain: true,
-      });
-      this.getData(domain);
-    } else {
-      this.setState({
-        isSubdomain: false,
-        isloading: false,
-      });
-      // setTimeout(() => {
-      //   !this.state.cloneData.isPreview && this.openPopup("About");
-      // }, 100);
-    }
+    // const localhost = domaindata.indexOf("localhost");
+    // console.log(domain.length);
+    // if (domain.length === (localhost === -1 ? 3 : 2)) {
+    //   this.setState({
+    //     isSubdomain: true,
+    //   });
+    //   this.getData(domain);
+    // } else {
+    //   this.setState({
+    //     isSubdomain: false,
+    //     isloading: false,
+    //   });
+    //   // setTimeout(() => {
+    //   //   !this.state.cloneData.isPreview && this.openPopup("About");
+    //   // }, 100);
+    // }
 
-    // this.fetchTransactionStatus()
-    // await this.fetchTransactionStatus("0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339");
+    // // this.fetchTransactionStatus()
+    // // await this.fetchTransactionStatus("0xb41a1f771244992427ff250d2981381305c5d0bf81e5107a3b5e442b903fd339");
   };
 
   async updateTotalAmounts() {
@@ -552,12 +554,12 @@ export default class Home extends PureComponent {
     let networkId = web3Config.getNetworkId();
     let selectedCurId = constantConfig.tokenDetails[this.state.selectedSendCurrency].networkId;
     if (!constantConfig.allowedNetwork.includes(networkId)) {
-      notificationConfig.error("Please Select Ethereum or BSC or Polygon Main Network");
+      //notificationConfig.error("Please Select Ethereum or BSC or Polygon Main Network"); // Notice - Please move native token swap UI to seperate component because it creates conflicts as we're working on common UI. ex - BridgeSwap
       this.setState({ btnClick: false });
       return;
     }
     if (selectedCurId !== networkId) {
-      notificationConfig.warning("Change metamask network to " + CONSTANT.NETWORK_ID[selectedCurId] + "!");
+      //notificationConfig.warning("Change metamask network to " + CONSTANT.NETWORK_ID[selectedCurId] + "!"); // Notice - Please move native token swap UI to seperate component because it creates conflicts as we're working on common UI. ex - BridgeSwap
       return;
     }
     // if (
@@ -2270,34 +2272,34 @@ export default class Home extends PureComponent {
                           <div className="tab-container">
                             <div className="tab-main-wrapper">
                               <ul className="tabs-n">
-                                <li className="tab-link" data-tab="tab-1">
+                                <li className="tab-link" data-tab="bridge-tokens">
                                   <div>
                                     NATIVE TOKENS
-                                    <span className="text-sm-n">LIVE BETA</span>
+                                    {/* <span className="text-sm-n">LIVE BETA</span> */}
                                   </div>
                                 </li>
-                                <li className="tab-link current-n" data-tab="tab-1">
+                                <li className="tab-link current-n" data-tab="bridge-tokens">
                                   <div>
                                     BRIDGE TOKENS
-                                    <span className="text-sm-n">LIVE BETA</span>
+                                    {/* <span className="text-sm-n">LIVE BETA</span> */}
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-2" style={{ pointerEvents: 'none' }}>
                                   <div>
                                     W3B
-                                    <span className="text-sm-n">COMING SOON</span>
+                                    {/* <span className="text-sm-n">COMING SOON</span> */}
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>
                                   <div>
                                   dFX
-                                    <span className="text-sm-n">COMING SOON</span>
+                                    {/* <span className="text-sm-n">COMING SOON</span> */}
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none' }}>
                                   <div>
                                   dSTOCKS
-                                    <span className="text-sm-n">COMING SOON</span>
+                                    {/* <span className="text-sm-n">COMING SOON</span> */}
                                   </div>
                                 </li>
                               </ul>
@@ -2363,53 +2365,12 @@ export default class Home extends PureComponent {
                                 </div>
                               </div> */}
                               <div className="tab-content-n-main">
-                                <div id="tab-1" className="tab-content-n current-n">
+                                <div id="bridge-tokens" className="tab-content-n current-n">
                                   <div className="">
-                                    <div className="tabRow">
-                                      <div className="tabCol">
-                                        <div className="d-flex balance-row">
-                                          <div className="b-text">
-                                            Balance: {Number(this.state.userBalance).toFixed(4)} &nbsp;<span>MAX</span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="tabCol">
-                                        <span className="color-green">Check authenticity </span>
-                                      </div>
-                                    </div>
-                                    <div className="tabRow">
-                                      <div className="tabCol">
-                                        <label>SEND</label>
-                                        <div className="inputIcon white"><i><img src={tabicon1}></img></i><input type="text" value="100"></input></div>
-                                        <figure>
-                                          <div className="figIcon">
-                                            <img src={tabicon1}></img>
-                                          </div>
-                                          <figcaption>
-                                            <span>JNTR</span>
-                                            <span>ETHEREUM</span>
-                                          </figcaption>
-                                        </figure>
-                                      </div>
-                                      <div className="tabDivider"><a className="swap" href=""><img src={swapImg}></img></a></div>
-                                      <div className="tabCol">
-                                        <label>RECEIVE</label>
-                                        <div className="inputIcon black"><i><img src={tabicon12}></img></i><input type="text" value="100"></input></div>
-                                        <figure>
-                                          <div className="figIcon">
-                                            <img src={tabicon12}></img>
-                                          </div>
-                                          <figcaption>
-                                            <span>JNTR</span>
-                                            <span>BSC</span>
-                                          </figcaption>
-                                        </figure>
-                                      </div>
-                                    </div>
-                                    <div className="tabRow hasBtn">
-                                      <button className="btn btn-primary"><b><img src={SBLogo01}></img></b>BRIDGE FOR FREE</button>
-                                      <p>Bridge to any EVM chain for free with 1:1 wrap value</p>
-                                    </div>
+                                    {/** bridge-swap-ui */}
+                                    <BridgeSwap 
+                                      //userBalance={this.state.userBalance}
+                                    ></BridgeSwap>
                                     <div className="d-none form-group-n  items-center-n">
                                       
                                       <div className="flex-1 w-100-sm flex-auto-sm">
@@ -2941,20 +2902,19 @@ export default class Home extends PureComponent {
                               </div>
                             ) : (
                               <div className="powertextBX">
-                                <div className="d-flex">
-                                  <p>
-                                    Powered by
-                                    <img src={SmartExchange} />
-
-                                    <div className="powertextBX-links">
-                                      <a href="">Free listing</a>
-                                      <span>|</span>
-                                      <a href="">Free license</a>
-                                    </div>
-                                    {/* <a href="#">Start new swap</a> */}
-                                  </p>
-                                  {/* <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p> */}
-                                </div>
+                                <p>
+                                  Powered by
+                                  <img src={SmartExchange} />
+                                  {/* <a href="#">Start new swap</a> */}
+                                </p>
+                                <div className="powertextBX-links">
+                                    <Link to='/freelisting'>Free listing</Link> 
+                                    <span>|</span>
+                                    <a href="">Free license</a>
+                                </div>       
+                                {/* <div className="d-flex">
+                                  <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p>
+                                </div> */}
                               </div>
                             )}
                             {/* <label className="slippage-outer">
@@ -3010,7 +2970,7 @@ export default class Home extends PureComponent {
                             <div className="btn-grp">
                               <a className="btn btn-primary" href="#">FREE SMARTSWAP LICENSE</a>
                               <a className="btn btn-secondary" href="#">BECOME A SWAP PROVIDER</a>
-                              <a className="btn btn-secondary" href="#">FREE LISTING</a>
+                              <Link className="btn btn-secondary" to='/freelisting'>Free listing</Link>
                             </div>
                           </div>
                         </>
@@ -3740,7 +3700,7 @@ export default class Home extends PureComponent {
                             to="/"
                             className="ssBtn02 ani-1"
                             onClick={() => {
-                              this.openPopup("LiquidityProvider");
+                              //this.openPopup("LiquidityProvider");
                             }}
 
                           >
@@ -3966,7 +3926,7 @@ export default class Home extends PureComponent {
                             to="/"
                             className="ssBtn02"
                             onClick={() => {
-                              this.openPopup("LiquidityProvider");
+                              //this.openPopup("LiquidityProvider");
                             }}
                           >
                             <span>BECOME A SWAP PROVIDER</span>{" "}
@@ -4515,10 +4475,10 @@ export default class Home extends PureComponent {
                 selectedCurrrency={this.state.selectedReceiveCurrency}
               ></CoinPopup>
 
-              <LiquidityProvider
+              {/* <LiquidityProvider
                 closePopup={this.closePopup}
                 openPopup={this.openPopup}
-              ></LiquidityProvider>
+              ></LiquidityProvider> */}
 
               <LiquidityFountainSP
                 closePopup={this.closePopup}
