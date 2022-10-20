@@ -188,64 +188,93 @@ export default class Screen4 extends PureComponent {
 
 const FlexDiv = styled.div`
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+
   .colpsmBX{ width: 100%; overflow:visible !important;}
 `;
 
 const MContainer = styled(FlexDiv)` 
-  width:100%; max-width:1360px; margin:0 auto;
-`
+	width: calc(100% - 40px); max-width:1360px; margin:0 auto;
+`;
 const CMbx = styled(FlexDiv)`
-  width:100%;  margin-top:90px;
-`
+	width:100%;  margin-top:90px; margin-bottom: 40px;
+  @media (max-width: 991px){
+		margin-top: 60px;
+	}
+`;
 const ProgressBar = styled.div`
-width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:55px;
-    span{ display:inline-block; height:4px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5);  background-color:#91dc27; border-radius:0 2px 2px 0;}
+  width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:55px;
+  span{ display:inline-block; height:4px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5);  background-color:#91dc27; border-radius:0 2px 2px 0;}
+  @media screen and (max-width: 640px) {
+    margin-bottom: 40px;
+  }
 `
 
 const ProGTitle01 = styled(FlexDiv)` 
-    font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
-    i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  } 
+  font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; flex-flow : row;
+  i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px; flex-shrink: 0; } 
+  @media only screen and (max-width: 640px) {
+    i{margin-right: 20px;}
+  }
 `
 const ProGTitle02 = styled(FlexDiv)` 
-    font-size:18px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin:25px 0 0px 0;  
-    &.v2{ border-top:1px solid #303030; margin: 0; padding-top: 20px; position:relative;  }
-    .Opbtn01{ display:flex; width:22px; height:22px; position:absolute; right:0; top:15px; border:none; outline:none; background-color:transparent; color:#ffffff; align-items:center; justify-content:center; }
+  font-size:18px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin:25px 0 30px 0;  
+  &.v2{ border-top:1px solid #303030; margin: 0 0 30px; padding-top: 20px; position:relative;  }
+  .Opbtn01{ display:flex; width:22px; height:22px; position:absolute; right:0; top:15px; border:none; outline:none; background-color:transparent; color:#ffffff; align-items:center; justify-content:center; }
 `
 
 const SmallInfo = styled(FlexDiv)`
-font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%; margin-bottom:10px;
-span{ color:#fff; padding:0 0 0 3px;}
+  font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%; margin-bottom:10px;
+  span{ color:#fff; padding:0 0 0 3px;}
 `
 
 const ProInputbx = styled(FlexDiv)`
-    width:100%;
-    input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
+  width:100%;
+  input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
 `
 const ProICOMbx01 = styled.div` width:100%; `
 const ProICOMbx02 = styled(FlexDiv)`
-    align-items:flex-start; justify-content: flex-start; margin:30px -18px 0 -18px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); column-gap: 36px; row-gap: 30px; margin:0 0 30px; 
+  
 `
 const ProICOSbx01 = styled.div`
-  width:calc(25% - 36px); margin:0 18px 30px 18px; background-color:#21232b; height:60px; border:0px; outline:none; padding:0;
-  display: flex; align-items: center; justify-content: flex-start;
+  background-color:#21232b; height:60px; border:0px; outline:none; padding:0;
+  display: flex; align-items: center; justify-content: flex-start; margin: 0;
   /* :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  } 
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  } */
   .disable{filter: grayscale(100%); }
   input[type="checkbox"]:checked+label{ -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   label{ width:100%; display:block; line-height:60px; margin-left:0px; padding-left:52px; display: flex;  align-items: center;  justify-content: flex-start; font-size:14px; color:#ffffff;   img{margin:-3px 12px 0 0; }
-}
+  }
+
   label:before{ background: #464646; border-radius:25px;  border:none; left: 13px;  top: 18px;}
   input[type="checkbox"]:checked+label:after{ top: 23px; width: 10px; height: 7px; left: 18px; border-color: #21232b;}
   input[type="checkbox"]:checked+label:before{ border:none; background-color:#91dc26;}
+  @media screen and (max-width: 991px) {
+	}
+	@media screen and (max-width: 575px) {
+		label {padding-left: 45px;}
+	}
+	@media screen and (max-width: 480px) {
+	}
+
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
-  width:calc(25% - 36px); height:60px; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff; background-color:#21232b; margin:0 18px 30px 18px;
-  img{ margin-right:15px; height: 30px; width: 30px;}
-  .disable{filter: grayscale(100%); }
+  width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
+  img{ margin-right:15px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
 `
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
+
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
+
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
+	@media screen and (max-width: 640px) {
+		.Btn01{max-width: 50%}
+	}
+	@media screen and (max-width: 480px) {
+		flex-flow: column-reverse; padding-bottom: 30px; padding-top: 30px; margin-top: 0;
+		.Btn01{max-width: 100%; margin-bottom: 25px;}
+	}
 `
+

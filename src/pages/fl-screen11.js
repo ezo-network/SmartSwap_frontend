@@ -63,11 +63,14 @@ const FlexDiv = styled.div`
 `;
 
 const MContainer = styled(FlexDiv)` 
-  width:100%; max-width:1360px; margin:0 auto;
-`
+	width: calc(100% - 40px) ; max-width:1360px; margin:0 auto;
+`;
 const CMbx = styled(FlexDiv)`
-  width:100%;  margin-top:90px;
-`
+	width:100%;  margin-top:90px;
+	@media (max-width: 991px){
+		margin-top: 60px;
+	}
+`;
 
 const SuccessBox = styled.div `
 	text-align: center;
@@ -171,6 +174,9 @@ const DetailsRow = styled.div `
     width: 1365px;
     border-top: 1px solid #303030;
     padding-top: 40px;
+	@media screen and (max-width: 991px) {
+		flex-flow: wrap;
+	}
 `
 const DetailsBox = styled.div `
     width: 33.33%; padding-right: 36px; padding-bottom: 40px;
@@ -178,17 +184,31 @@ const DetailsBox = styled.div `
         font-size: 18px; font-weight: bold;
         line-height: 30px; margin: 20px 0;
     }
+	@media screen and (max-width: 991px) {
+		width: 50%;
+	}
+	@media screen and (max-width: 640px) {
+		width: 100%;
+		text-align: center; align-items: center;  padding-right: 0; padding-bottom: 60px;
+		p {margin: 10px 0 20px}
+	}
 `
 const DetailsLogo = styled.div `
     min-height: 60px;
     display: flex; align-items: center; 
+	@media screen and (max-width: 640px) {
+		display: inline-flex;
+	}
 `
 const DetailsLink = styled.div `
-    display: flex; align-items: center;  color: #303030;
+    display: flex; align-items: center;  color: #303030; white-space: nowrap;
     a { color: #91dc27; margin-right: 14px; font-weight: bold; font-size: 18px;
         i { font-size: 12px; display: inline-block; vertical-align: top;}
         &:last-child { margin-left: 14px; }
         &:hover {color: #fff;}
     }
+	@media screen and (max-width: 640px) {
+		display: inline-flex; padding-left: 14px;
+	}
 `
 

@@ -470,10 +470,9 @@ export default class Projects extends PureComponent {
     return (
       <>
           <main id="main" className="smartSwap">
-           
             <div className="main">  
                 <HeadFreeListing />
-
+                <Screen11/>
                 {this.state.addNewBridge === false && this.state.claimDeployerOwnerShip === false &&
                 <Screen01
                   onWalletConnectButtonClick={this.connectWallet}
@@ -680,4 +679,3 @@ export default class Projects extends PureComponent {
 const FlexDiv = styled.div`
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
 `;
- 
