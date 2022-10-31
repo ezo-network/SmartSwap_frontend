@@ -81,9 +81,48 @@ export default class Projects extends PureComponent {
     await this.getNetworkList();
     await this.getTokenList();
     await this.connectWallet();
+
+    // screen pass with route
+    console.log(this.props.location.state);
+    if(this.props.location.state?.sourceTokenData && this.props.location.state?.destinationNetworkData){
+      const sourceTokenDataFromProps = this.props.location.state?.sourceTokenData;
+      const destinationNetworkDataFromProps = this.props.location.state?.destinationNetworkData;
+      const networkConfig = _.find(this.state.networks, {chainId: Number(sourceTokenDataFromProps.chainId)});
+      const token = _.find(this.state.tokens, {address: (sourceTokenDataFromProps.address).toLowerCase()});
+
+      if(token !== undefined){
+        // set source token data, bridge data, project data
+        await this.sourceTokenSelectedCallback(
+          token.symbol,
+          token.address,
+          token.icon,
+          networkConfig.chain,
+          networkConfig.chainId,
+          networkConfig.icon,
+          networkConfig.explorerUrl,
+          token.decimals
+        ).then(() => {
+          // clear
+          window.history.replaceState({}, document.title)
+          this.setState({
+            addNewBridge: true
+          })
+        });
+
+        // project exist ? 
+        if(this.state.isProjectExist){
+          // set destination data and prompt to switch network
+          this.setState({
+            isdestinationNetworksFiltered: true,
+            filteredDestinationNetworks: [destinationNetworkDataFromProps.chainId]
+          })
+        }
+
+      }
+    }
   }
 
-  componentDidUpdate(newProps) {
+  componentDidUpdate(newProps) {    
     if (typeof window.ethereum !== 'undefined') {
         // detect Network account change
         window.ethereum.on('chainChanged', networkId => {
@@ -106,6 +145,12 @@ export default class Projects extends PureComponent {
         });
     }
   }
+
+  // componentWillReceiveProps(nextProps) {
+  //   // if (nextProps.location !== this.props.location) {
+  //   //   // navigated!
+  //   // }
+  // }
 
   async connectWallet() {
     
@@ -470,9 +515,10 @@ export default class Projects extends PureComponent {
     return (
       <>
           <main id="main" className="smartSwap">
+           
             <div className="main">  
                 <HeadFreeListing />
-                <Screen11/>
+
                 {this.state.addNewBridge === false && this.state.claimDeployerOwnerShip === false &&
                 <Screen01
                   onWalletConnectButtonClick={this.connectWallet}
@@ -679,3 +725,4 @@ export default class Projects extends PureComponent {
 const FlexDiv = styled.div`
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
 `;
+ 

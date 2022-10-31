@@ -19,7 +19,7 @@ export default class Screen1 extends PureComponent {
         { 
           <main id="main" className="smartSwap">           
             <div className="main">   
-              <MContainer> 
+             <MContainer> 
                   <CMbx>
                     <Csubbx01> 
                       <CStitle01>
@@ -79,7 +79,6 @@ const CMbx = styled(FlexDiv)`
 `
 const Csubbx01 = styled(FlexDiv)`
   width:50%; position:relative; padding-right:70px; border-right:1px solid #303030; align-items:flex-start; justify-content: flex-start;
-
   &.v2{ padding-right:0; padding-left:70px; border-right:none;
     .imgIco{ margin-bottom:19px;}
   } 

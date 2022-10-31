@@ -24,19 +24,19 @@ export default class Screen7 extends PureComponent {
                 <ProPera>Further, SmartBridge allows projects to take ownership of the deployer, leaving them fully in control of project tokens on any chain.</ProPera>
                 <BtnMbox>
                   <BtnRight>
-                    { 
-                    this.props.walletConnected === false && 
-                    this.props.claimDeployerOwnerShip === true &&
+                    {
+                      this.props.walletConnected === false &&
+                      this.props.claimDeployerOwnerShip === true &&
                       <>
                         <button onClick={() => this.props.onWalletConnectButtonClick()} className="Btn01">CONNECT YOUR WALLET</button>
                         <p>Connect with the wallet used to deploy the original token</p>
                       </>
                     }
 
-                    { 
-                    this.props.walletConnected === true && 
-                    this.props.claimDeployerOwnerShip === true &&
-                    this.props.wantToBecomeMasterValidator === false &&
+                    {
+                      this.props.walletConnected === true &&
+                      this.props.claimDeployerOwnerShip === true &&
+                      this.props.wantToBecomeMasterValidator === false &&
                       <>
                         <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(2)} className="Btn01">CONTINUE</button>
                         <p>Connected with the wallet used to deploy the original token</p>
@@ -69,7 +69,6 @@ const CMbx = styled(FlexDiv)`
 `
 const ProgressBar = styled.div`
 width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:55px;
-
     span{ display:inline-block; height:4px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5);  background-color:#91dc27; border-radius:0 2px 2px 0;}
     @media screen and (max-width: 640px) {
       margin-bottom: 40px;
@@ -102,7 +101,7 @@ const ProICOSbx01 = styled.button`
   display: flex; align-items: center; justify-content: flex-start;
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
-` 
+`
 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
@@ -111,13 +110,11 @@ const ProICOSbx02 = styled(FlexDiv)`
 `
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
-
   .Btn01{ color:#fff; background-color:#0d0e13; width: 430px; max-width:100%; text-align:center; padding:18px 30px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
-
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
 `
 
-const ProRow = styled.div `
+const ProRow = styled.div`
   display: flex;
   width: 100%;
   align-items: center;
@@ -135,7 +132,7 @@ const ProRow = styled.div `
     margin-right: 25px;
   }
   `
-const ProRowCol1 = styled.div `
+const ProRowCol1 = styled.div`
   display: flex;
   width: 50%;
   align-items: center;
@@ -146,12 +143,12 @@ const ProRowCol1 = styled.div `
     flex-grow: 1;
   }
 `
-const ProColImg = styled.div `
+const ProColImg = styled.div`
   flex-grow: 1;
   text-align: center;
   width: calc(50% - 36px);
   `
-const ProColBtn = styled.div `
+const ProColBtn = styled.div`
   flex-grow: 1;
   width: calc(50% - 36px);
   padding-left: 30px;
@@ -179,28 +176,25 @@ const ProICOTitle = styled.span`
   font-weight: bold;
 `
 
-const ProPera = styled.p `
+const ProPera = styled.p`
     width: 100%;
     color: #aaaaaa;
     font-size: 18px;
     line-height: 30px;
     margin: 0 0 30px;
-    `
+`
 
-    const BtnRight = styled.div `
-        margin-left: auto;
-        min-width: 430px;
-        text-align: center;
-        p {
-            font-size: 12px;
-            margin: -5px 0 0 0;
-            color: #aaa;
-        }
-        @media only screen and (max-width: 640px) {
-          width: 100%; min-width: inherit;
-          .Btn01 {width: 100%;}
-        }
-    `
-
-
-
+const BtnRight = styled.div`
+    margin-left: auto;
+    min-width: 430px;
+    text-align: center;
+    p {
+        font-size: 12px;
+        margin: -5px 0 0 0;
+        color: #aaa;
+    }
+    @media only screen and (max-width: 640px) {
+      width: 100%; min-width: inherit;
+      .Btn01 {width: 100%;}
+    }
+`

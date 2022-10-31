@@ -10,6 +10,7 @@ import CheckAuthenticityPopup from "../../components/bridge-tokens/CheckAuthenti
 import web3Config from "../../config/web3Config";
 import BridgeApiHelper from "../../helper/bridgeApiHelper";
 import BridgeContract from "../../helper/bridgeContract";
+import styled from 'styled-components';
 
 
 export default class BridgeSwap extends PureComponent {
@@ -51,6 +52,7 @@ export default class BridgeSwap extends PureComponent {
             accountAddress: null,
             networks: [],
             tokens: [],
+            tokensWithBalance: [],
             wrappedTokens: []
         };
 
@@ -78,34 +80,44 @@ export default class BridgeSwap extends PureComponent {
                 //console.log('accountChanged', accounts);
                 if(accounts.length > 0){
                     await web3Config.connectWallet(0);
-                    this.walletConnectCallback(true, web3Config.getWeb3());
+                    await this.walletConnectCallback(true, web3Config.getWeb3());
                 } else {
-                    this.walletConnectCallback(false, null);              
+                    await this.walletConnectCallback(false, null);              
                 }
             });
 
-            window.ethereum.on('disconnect', (error) => {
-                this.walletConnectCallback(false, null);          
+            window.ethereum.on('disconnect', async (error) => {
+                await this.walletConnectCallback(false, null);          
             });
         }
     }    
 
-    toggleSourceTokenPopup = () => {
+    toggleSourceTokenPopup = async() => {
         if(this.pendingNetworkSwitchRequest === false){
-            this.setState({
-                toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
-            });
+            if(this.state.walletConnected){
+                await this.filterTokenByWalletBalance().then(() => {
+                    this.setState({
+                        toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
+                    });
+                });
+            } else {
+                notificationConfig.info('Connect your wallet first.');
+            }
         } else {
-            notificationConfig.info('A switch network request is pending. Check metamask.');            
+            notificationConfig.info('A switch network request is pending. Check metamask.');
         }
     }
 
     toggleDestinationTokensPopup = () => {
         if(this.state.isSourceTokenSelected){
             if(this.pendingNetworkSwitchRequest === false){
-                this.setState({
-                    toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
-                });
+                if(this.state.walletConnected === true && (Number(web3Config.getNetworkId()) === Number(this.state.sourceTokenData.chainId))){
+                    this.setState({
+                        toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
+                    });
+                } else {
+                    notificationConfig.info('Please switch network');                    
+                }
             } else {
                 notificationConfig.info('A switch network request is pending. Check metamask.');
             } 
@@ -146,7 +158,7 @@ export default class BridgeSwap extends PureComponent {
         await web3Config.connectWallet(0).then(async(response) => {
           if(window.ethereum.isConnected() === true){
             if(response === true){
-              this.walletConnectCallback(true, web3Config.getWeb3());
+              await this.walletConnectCallback(true, web3Config.getWeb3());
               //notificationConfig.success('Wallet connected');
             } else {
               notificationConfig.info('Wallet not connected to metamask');                  
@@ -161,7 +173,7 @@ export default class BridgeSwap extends PureComponent {
         });
     }
 
-    walletConnectCallback(walletConnected, web3Instance) {
+    async walletConnectCallback(walletConnected, web3Instance) {
         this.setState({
           walletConnected: walletConnected,
           web3Instance: web3Instance,
@@ -198,7 +210,6 @@ export default class BridgeSwap extends PureComponent {
               destinationTokenData
             };
         });
-
     }
 
     getNetworkList = async() => {
@@ -472,6 +483,58 @@ export default class BridgeSwap extends PureComponent {
         }
     }    
 
+    aggregateTokenBalanceWithMultiCall = async (chainId, tokenAddresses = [], accountAddress) => {
+        try {
+            //accountAddress = '0x084374b068Eb3db504178b4909eDC26D01226a80';
+
+
+            const networkConfig = _.find(this.state.networks, { chainId: Number(chainId) });
+            console.log(networkConfig);
+            
+            const config = {
+                rpcUrl: networkConfig.rpc,
+                multicallAddress: networkConfig.multicallContractAddress
+            };
+            
+            const multicallTokensConfig = [];
+            tokenAddresses.forEach(tokenAddress => {
+                const token = _.find(this.state.tokens, { address: (tokenAddress).toLowerCase() });
+                // will only work with erc20 token addresses
+                var obj = {
+                    target: tokenAddress,
+                    call: ['balanceOf(address)(uint256)', accountAddress],
+                    returns: [['BALANCE_OF_' + tokenAddress, val => val / 10 ** Number(token.decimals)]]
+                }
+                multicallTokensConfig.push(obj);
+            });
+
+            console.log(multicallTokensConfig);
+
+            const response = await aggregate(
+                multicallTokensConfig,
+                config
+            );
+
+            Object.keys(response.results.transformed).forEach((token, index) => {
+                const tokenAddress = (token.substring(11)).toLowerCase();
+                const isTokenExist = _.find(this.state.tokens, {
+                    address: tokenAddress,
+                    chainId: Number(chainId)
+                });
+                if (isTokenExist) {
+                    console.log(`${index} ${isTokenExist.symbol}  ${isTokenExist.chainId} - ${token} - ${response.results.transformed[token]}`)
+                    if (response.results.transformed[token] > 0) {
+                        this.setState(prevState => ({
+                            tokensWithBalance: [...prevState.tokensWithBalance, isTokenExist]
+                        }))
+                    }
+                }
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
+    }    
+
     updateSourceTokenBalance = async() => {
         await this.aggregateBalanceOfMultiCall(
             this.state.sourceTokenData.chainId,
@@ -610,6 +673,25 @@ export default class BridgeSwap extends PureComponent {
         }
     }
 
+    filterTokenByWalletBalance = async () => {
+        try {
+            this.setState({
+                tokensWithBalance: []
+            });
+            const groupedTokenByNetwork = this.state.tokens.reduce(function (r, token) {
+                r[token.chainId] = r[token.chainId] || [];
+                r[token.chainId].push(token.address);
+                return r;
+            }, Object.create(null));
+
+            Object.keys(groupedTokenByNetwork).forEach(async (network) => {
+                await this.aggregateTokenBalanceWithMultiCall(network, groupedTokenByNetwork[network], this.state.accountAddress);
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
     render() {
 
         let sideAIcon = this.state.sourceTokenData.isWrappedToken === true
@@ -646,7 +728,7 @@ export default class BridgeSwap extends PureComponent {
                 </div>
                 <div className="tabRow">
                     <div className="tabCol">
-                        <label>SEND</label>
+                        <label>DEPOSIT</label>
                         <div className="from-token inputIcon white">
                             <i>
                                 <img
@@ -706,29 +788,48 @@ export default class BridgeSwap extends PureComponent {
                         </figure>
                     </div>
                 </div>
-                <div className="tabRow hasBtn">
+                <div className="tabRow hasBtn action-btn">
                     {
                         this.state.walletConnected === false && 
                         <button onClick={() => this.connectWallet()} className="btn btn-primary">CONNECT YOUR WALLET</button>                        
                     }
                     {
                         this.state.walletConnected === true && (Number(web3Config.getNetworkId()) !== Number(this.state.sourceTokenData.chainId)) && 
-                        <button onClick={() => this.switchNetwork(Number(this.state.sourceTokenData.chainId))} className="btn btn-switch">SWITCH NETWORK</button>                        
+                        <button onClick={() => this.switchNetwork(Number(this.state.sourceTokenData.chainId))} className="btn btn-switch">
+                            <div className="btn-container">
+                                <img 
+                                    src={'/images/free-listing/chains/' + (this.state.sourceTokenData.chain + '.png').toLowerCase()}
+                                    onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
+                                    alt={this.state.sourceTokenData.chain}
+                                ></img>
+                                SWITCH NETWORK
+                            </div>
+                        </button>                        
                     }
                     {
                         this.state.walletConnected === true && 
                         (Number(web3Config.getNetworkId()) === Number(this.state.sourceTokenData.chainId)) && 
-                        <button 
-                            disabled={
-                                this.state.btnClicked 
-                                || !this.state.isDestinationTokenSelected 
-                                || !this.state.isSourceTokenSelected
-                            }
-                            onClick={
-                                () => this.depositTokens()
-                            }
-                            className="btn btn-primary">{this.state.btnAction}
-                        </button>
+                        <>
+                            <button 
+                                disabled={
+                                    this.state.btnClicked 
+                                    || !this.state.isDestinationTokenSelected 
+                                    || !this.state.isSourceTokenSelected
+                                }
+                                onClick={
+                                    () => this.depositTokens()
+                                }
+                                className="btn btn-primary">
+                                    <div className="btn-container">
+                                        <img 
+                                            src={'/images/free-listing/chains/' + (this.state.sourceTokenData.chain + '.png').toLowerCase()}
+                                            onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
+                                            alt={this.state.sourceTokenData.chain}
+                                        ></img>
+                                        {this.state.btnAction}                                    
+                                    </div>
+                            </button>
+                        </>
                     }
                     {
                         this.state.walletConnected === true && 
@@ -744,10 +845,12 @@ export default class BridgeSwap extends PureComponent {
                 <SourceTokenPopup 
                     show={this.state.toggleSourceTokenPopup} 
                     closePopupCallback={this.toggleSourceTokenPopup}
-                    tokens={this.state.tokens}
+                    tokens={this.state.tokensWithBalance}
                     networks={this.state.networks}
                     wrappedTokens={this.state.wrappedTokens}
                     sourceTokenSelectedCallback={this.setSourceToken}
+                    accountAddress={this.state.accountAddress}
+                    walletConnected={this.state.walletConnected}
                 ></SourceTokenPopup>
                 
                 <DestinationTokensPopup 

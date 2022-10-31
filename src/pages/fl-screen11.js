@@ -211,4 +211,3 @@ const DetailsLink = styled.div `
 		display: inline-flex; padding-left: 14px;
 	}
 `
-

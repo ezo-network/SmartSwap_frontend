@@ -88,6 +88,13 @@ export default class Screen3 extends PureComponent {
             });
             notificationConfig.error(response.reason);
           }
+
+          if (response.code === 4001){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.message);
+          }
           
           if (response.code === "UNPREDICTABLE_GAS_LIMIT"){
             this.setState({
@@ -215,7 +222,6 @@ const CMbx = styled(FlexDiv)`
 `
 const ProgressBar = styled.div`
 width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:55px;
-
     span{ display:inline-block; height:4px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5);  background-color:#91dc27; border-radius:0 2px 2px 0;}
     @media screen and (max-width: 640px) {
       margin-bottom: 40px;
@@ -231,14 +237,11 @@ const ProGTitle01 = styled(FlexDiv)`
 `
 const ProInputbx = styled(FlexDiv)`
     width:100%;
-
     input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
 ` 
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
-
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
-
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
   @media screen and (max-width: 640px) {
     .Btn01{max-width: 50%}
@@ -256,4 +259,3 @@ const BtnMbox02 = styled(BtnMbox)`
     flex-flow: row; padding-bottom: 30px; padding-top: 30px;
   }
 `  
-
