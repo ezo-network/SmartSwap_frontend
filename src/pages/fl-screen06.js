@@ -81,11 +81,11 @@ export default class Screen6 extends PureComponent {
 	render() {
 
 		let wrappedTokens = [];
-		/* this.state.wrappedTokens.forEach(token => {
+		this.state.wrappedTokens.forEach(token => {
 			const networkConfig = _.find(this.props.networks, { chainId: token.toChainId });
 			token['chain'] = networkConfig['chain'];
 			wrappedTokens.push(token);
-		}); */
+		});
 
 		return (
 			<>
@@ -270,6 +270,3 @@ const LinkFt = styled.a `
 		margin-left: 5px;
 	}
 `
-
-
-

@@ -268,7 +268,14 @@ export default class DestinationTokensPopup extends PureComponent {
                                                         }
 
                                                         {network['isBridgeExistOnChain'] === false &&
-                                                            <Link to='/freelisting'>
+
+                                                            <Link to={{ 
+                                                                pathname: "/freelisting", 
+                                                                state: {
+                                                                    sourceTokenData: this.props.selectedSourceToken,
+                                                                    destinationNetworkData: network
+                                                                }
+                                                            }}>
                                                                 <ButtonPrimary>CREATE NEW BRIDGE</ButtonPrimary>
                                                             </Link>
                                                         }

@@ -188,7 +188,6 @@ export default class Screen4 extends PureComponent {
 
 const FlexDiv = styled.div`
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
-
   .colpsmBX{ width: 100%; overflow:visible !important;}
 `;
 
@@ -245,7 +244,6 @@ const ProICOSbx01 = styled.div`
   input[type="checkbox"]:checked+label{ -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   label{ width:100%; display:block; line-height:60px; margin-left:0px; padding-left:52px; display: flex;  align-items: center;  justify-content: flex-start; font-size:14px; color:#ffffff;   img{margin:-3px 12px 0 0; }
   }
-
   label:before{ background: #464646; border-radius:25px;  border:none; left: 13px;  top: 18px;}
   input[type="checkbox"]:checked+label:after{ top: 23px; width: 10px; height: 7px; left: 18px; border-color: #21232b;}
   input[type="checkbox"]:checked+label:before{ border:none; background-color:#91dc26;}
@@ -256,7 +254,6 @@ const ProICOSbx01 = styled.div`
 	}
 	@media screen and (max-width: 480px) {
 	}
-
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
@@ -265,9 +262,7 @@ const ProICOSbx02 = styled(FlexDiv)`
 `
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
-
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
-
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
 	@media screen and (max-width: 640px) {
 		.Btn01{max-width: 50%}
@@ -277,4 +272,3 @@ const BtnMbox = styled(FlexDiv)`
 		.Btn01{max-width: 100%; margin-bottom: 25px;}
 	}
 `
-

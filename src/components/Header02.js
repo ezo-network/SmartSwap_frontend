@@ -1,8 +1,10 @@
 import React, { PureComponent } from "react";
 import styled from 'styled-components';
 import { Link } from "react-router-dom";
+
 import LogoM from '../assets/freelisting-images/logo.png'
 import JPico from '../assets/freelisting-images/jackpot.png'
+
 
 export class CounterBox extends PureComponent {
     render() {
@@ -36,10 +38,14 @@ export default class HeadFreeListing extends PureComponent {
 
 
     render() {
+
         return (
             <>
+
                 <LHead>
+
                     <Logo> <img src={LogoM} alt="logo" /></Logo>
+
                     <Nav className="deskNav">
                         <Link to=''>SmartExtension</Link> <span>|</span>
                         <Link to=''>SmartBridge</Link><span>|</span>
@@ -49,14 +55,16 @@ export default class HeadFreeListing extends PureComponent {
                         <Link to='/freelisting' className="active">FREE Listing</Link>
                     </Nav>
                     <Nav className="mobNav"> 
-                        <Link to='' className="active">FREE Listing<i className="fas fa-caret-down"></i></Link> 
+                        <Link to='/freelisting' className="active">FREE Listing<i className="fas fa-caret-down"></i></Link> 
                     </Nav>
                     <RMbox>
                         <CounterBox/>
-                        {/* <a href="#" className="link01" >Rewards program</a> */}
                         <a href="#" className="rmDotLink02"></a>
                     </RMbox>
                 </LHead>
+
+
+
             </>
         );
     }
@@ -148,7 +156,6 @@ const RMbox = styled(FlexDiv)`
 `
 const Rtimer = styled(FlexDiv)`
     font-size:14px; font-weight:700; color: #fff; line-height:24px;
-
     span{ display: inline-block; background-color: #222222; border:1px solid #da9732; width:18px; text-align:center; margin:0 2px}
     @media screen and (max-width: 450px) {
         font-size: 9px; margin: 0 -5px 0 0; line-height: 17px;

@@ -533,25 +533,15 @@ const BridgeApiHelper = {
         }
     },
 
-    attachWrapTokenOnProject: async(projectId = null, tokenName = null, tokenSymbol = null, fromChainId = null, toChainId = null, txHash = null, blockNumber = null, creatorAddress = null) => {
+    attachWrapTokenOnProject: async(toChainId = null, txHash = null, blockNumber = null) => {
         let response, error, code;
 
         if(
-            projectId == null
-            ||
-            tokenName == null
-            ||
-            tokenSymbol == null
-            ||
-            fromChainId == null
-            ||
             toChainId == null
             ||
             txHash == null
             ||
             blockNumber == null
-            ||
-            creatorAddress == null
         ){
             error = 'mandatory parameters are missing';
             code = 422;
@@ -567,14 +557,9 @@ const BridgeApiHelper = {
                 path: apiEndpoints.attachWrappedToken,
                 method: 'POST',
                 data: {
-                    projectId: projectId,
-                    tokenName: tokenName,
-                    tokenSymbol: tokenSymbol,
-                    fromChainId: fromChainId,
                     toChainId: toChainId,
                     txHash: txHash,
-                    blockNumber: blockNumber,
-                    creatorAddress: creatorAddress
+                    blockNumber: blockNumber
                 }
             });
 

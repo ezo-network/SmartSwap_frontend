@@ -2274,32 +2274,34 @@ export default class Home extends PureComponent {
                               <ul className="tabs-n">
                                 <li className="tab-link" data-tab="bridge-tokens">
                                   <div>
-                                    NATIVE TOKENS
-                                    {/* <span className="text-sm-n">LIVE BETA</span> */}
+                                    Native Tokens
+                                    <span className="text-sm-n">BETA</span>
                                   </div>
                                 </li>
                                 <li className="tab-link current-n" data-tab="bridge-tokens">
                                   <div>
-                                    BRIDGE TOKENS
-                                    {/* <span className="text-sm-n">LIVE BETA</span> */}
+                                    Bridge Tokens
+                                    <span className="text-sm-n">BETA</span>
+                                  </div>
+                                </li>
+                                <li className="tab-link" data-tab="tab-2" style={{ pointerEvents: 'none' }}>
+                                  <div>
+                                    SoulBounds
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-2" style={{ pointerEvents: 'none' }}>
                                   <div>
                                     W3B
-                                    {/* <span className="text-sm-n">COMING SOON</span> */}
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>
                                   <div>
-                                  dFX
-                                    {/* <span className="text-sm-n">COMING SOON</span> */}
+                                  CBDC
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none' }}>
                                   <div>
                                   dSTOCKS
-                                    {/* <span className="text-sm-n">COMING SOON</span> */}
                                   </div>
                                 </li>
                               </ul>
@@ -2910,7 +2912,7 @@ export default class Home extends PureComponent {
                                 <div className="powertextBX-links">
                                     <Link to='/freelisting'>Free listing</Link> 
                                     <span>|</span>
-                                    <a href="">Free license</a>
+                                    <a href="">Apply for licensing</a>
                                 </div>       
                                 {/* <div className="d-flex">
                                   <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p>
@@ -2968,9 +2970,9 @@ export default class Home extends PureComponent {
                               <h4 className="dropdown-title">Ledger</h4>
                             </div>
                             <div className="btn-grp">
-                              <a className="btn btn-primary" href="#">FREE SMARTSWAP LICENSE</a>
+                              <a className="btn btn-primary" href="#">APPLY FOR LICENSING</a>
                               <a className="btn btn-secondary" href="#">BECOME A SWAP PROVIDER</a>
-                              <Link className="btn btn-secondary" to='/freelisting'>Free listing</Link>
+                              <Link className="btn btn-secondary" to='/freelisting'>FREE LISTING</Link>
                             </div>
                           </div>
                         </>

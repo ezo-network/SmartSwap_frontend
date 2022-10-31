@@ -257,14 +257,9 @@ export default class Screen5 extends PureComponent {
           if(response.code === 'TRANSACTION_REPLACED'){
             if(response.cancelled === false && response.receipt?.transactionHash){
               await this.attachWrapToken(
-                this.props.projectId,
-                this.state.addWrappedTokenSignedParams.name,
-                this.state.addWrappedTokenSignedParams.symbol,
-                this.props.selectedSourceTokenData.chainId,
                 this.props.chainId,
                 response.receipt.transactionHash,
-                response.receipt.blockNumber,
-                this.props.accountAddress
+                response.receipt.blockNumber
               );
               notificationConfig.success('Token Wrapped Successfully!');
             }
@@ -273,14 +268,9 @@ export default class Screen5 extends PureComponent {
 
           if(response.status === 1) {
             await this.attachWrapToken(
-              this.props.projectId,
-              this.state.addWrappedTokenSignedParams.name,
-              this.state.addWrappedTokenSignedParams.symbol,
-              this.props.selectedSourceTokenData.chainId,
               this.props.chainId,
               response.transactionHash,
-              response.blockNumber,
-              this.props.accountAddress
+              response.blockNumber
             );
             notificationConfig.success('Token Wrapped Successfully!');
           }
@@ -291,41 +281,26 @@ export default class Screen5 extends PureComponent {
     }
   }
 
-  async attachWrapToken(projectId = null, tokenName = null, tokenSymbol = null, fromChainId = null, toChainId = null, txHash = null, blockNumber = null, creatorAddress = null) {
+  async attachWrapToken(toChainId = null, txHash = null, blockNumber = null) {
     try {
       if (
-        projectId == null
-        ||
-        tokenName == null
-        ||
-        tokenSymbol == null
-        ||
-        fromChainId == null
-        ||
         toChainId == null
         ||        
         txHash == null
         ||
         blockNumber == null
-        ||
-        creatorAddress == null
       ) {
         notificationConfig.error('Could not saved wrapped token.');
         return;
       }
 
       const { response, error, code } = await BridgeApiHelper.attachWrapTokenOnProject(
-        projectId,
-        tokenName,
-        tokenSymbol,
-        fromChainId,
         toChainId,
         txHash,
-        blockNumber,
-        creatorAddress
+        blockNumber
       );
 
-      if(code === 201){
+      if(code === 201 || code === 200){
         await this.props.onFetchWrappedTokens();
         this.setState({
           btnClicked: false
@@ -359,21 +334,21 @@ export default class Screen5 extends PureComponent {
   render() {
 
     let networksData = [];
-    // const selectedDestinationNetworks = this.props.selectedDestinationNetworks;
-    // selectedDestinationNetworks.forEach(networkId => {
-    //   const wrappedToken = _.find(this.props.wrappedTokens, { 
-    //     toChainId: Number(networkId), 
-    //     fromChainId: Number(this.props.selectedSourceTokenData.chainId)
-    //   });
-    //   const networkConfig = _.find(this.props.networks, { chainId: networkId });
-    //   let networkData = networkConfig;
-    //   if (wrappedToken !== undefined) {
-    //     networkData['wrappedTokenExist'] = true;
-    //   } else {
-    //     networkData['wrappedTokenExist'] = false;
-    //   }
-    //   networksData.push(networkData);
-    // });
+    const selectedDestinationNetworks = this.props.selectedDestinationNetworks;
+    selectedDestinationNetworks.forEach(networkId => {
+      const wrappedToken = _.find(this.props.wrappedTokens, { 
+        toChainId: Number(networkId), 
+        fromChainId: Number(this.props.selectedSourceTokenData.chainId)
+      });
+      const networkConfig = _.find(this.props.networks, { chainId: networkId });
+      let networkData = networkConfig;
+      if (wrappedToken !== undefined) {
+        networkData['wrappedTokenExist'] = true;
+      } else {
+        networkData['wrappedTokenExist'] = false;
+      }
+      networksData.push(networkData);
+    });
 
     return (
       <>
@@ -519,7 +494,7 @@ const ProICOSbx01 = styled.button`
 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px;}
+  img{ margin-right:15px; width: 25px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
   @media screen and (max-width: 1200px) {
     /* flex-flow: column; align-items: center; justify-content: center; */ padding:0 10px;
@@ -532,9 +507,7 @@ const ProICOSbx02 = styled(FlexDiv)`
 `
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
-
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
-
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
   @media screen and (max-width: 640px) {
 		.Btn01{max-width: 50%}
@@ -642,9 +615,3 @@ const ProICOTitle = styled.span`
     width: 100%;
   }
 `
-
-
-
-
-
-

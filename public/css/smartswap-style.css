@@ -6180,6 +6180,7 @@ select:focus {
   justify-content: space-between;
   font-size: 11px;
   color: #aaaaaa;
+  width: 100%;
 }
 
 .powertextBX p,
@@ -8114,8 +8115,8 @@ ul.tabs-n li {
   cursor: pointer;
   text-align: left;
   position: relative;
-  width: 198px;
-  height: calc(20.1% - 2px);
+  width: 220px;
+  height: calc(16.1666%);
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -8126,7 +8127,7 @@ ul.tabs-n li {
 }
 
 ul.tabs-n li:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0px;
 }
 
 ul.tabs-n li.current-n {
@@ -8148,14 +8149,13 @@ ul.tabs-n li.current-n {
 /* tabs-n inner content css  */
 
 .text-sm-n {
-  color: #595959;
+  color: #91dc27;
   font-size: 10px;
   width: 100%;
   text-align: left;
   display: inline-block;
-  /* position: absolute;
-  bottom: 6px; */
-  font-weight: normal;
+  position: absolute;
+  margin-left: 5px;
 }
 
 /* Go from zero to full opacity */
@@ -9382,7 +9382,7 @@ a.dc-file:hover {
 .dropdown-title {font-size: 24px; font-weight: bold; margin: 0;}
 .dropdown-title:after {content: ""; display: inline-block; vertical-align: top; margin: 12px 0 0 50px; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 9px solid #91dc27}
 .powertextBX-links {display: flex; font-size: 11px; margin-left: 10px;}
-.powertextBX-links a {color: #91dc27; margin: 0;}
+.powertextBX-links a {color: #91dc27; margin: 0; font-weight: bold;}
 .powertextBX-links span {color: #595959 !important; margin: 0 11px;}
 .no-effect{pointer-events: none;}
 .from-token-selector img , .to-token-selector img {height: 65px; margin-right: 0px;}
@@ -9390,3 +9390,14 @@ a.dc-file:hover {
 #bridge-tokens .figIcon:hover { background: #91dc27;}
 .btn.btn-switch {background-color: inherit; color: #91dc27; border: 2px solid #91dc27; box-shadow: 0px 0px 10px #91dc27;}
 .btn.btn-switch:hover {background: #91dc27; color: #fff;}
+#bridge-tokens .action-btn img {
+  width: 40px;
+  display: inline;
+  margin-right: 10px;
+}
+#bridge-tokens .btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
