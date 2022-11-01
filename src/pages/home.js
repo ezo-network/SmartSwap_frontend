@@ -58,6 +58,12 @@ import SBLogo09 from "../assets/images/sb-ICO-09.png";
 import SBLogo010 from "../assets/images/sb-ICO-010.png";
 import SBLogo011 from "../assets/images/sb-ICO-011.png";
 import SmartExchange from "../assets/images/smart-exchange.png";
+import SSIco from "../assets/images/ss.png";
+import SUSIco from "../assets/images/sus.png";
+import MUCIco from "../assets/images/muc.png";
+import Filter from "../assets/images/filter.png";
+import Doller from "../assets/images/doller.png";
+import Swap from "../assets/images/swap-arrow.png";
 import BigNumber from "big-number/big-number";
 import Select from 'react-select';
 import Switch from "react-switch";
@@ -2260,7 +2266,7 @@ export default class Home extends PureComponent {
                       //     this.openPopup('About');
                       // }}
                       >
-                        <span>One click</span> DECENTRALIZED CROSS-CHAIN SWAP
+                        <span>One click</span> decentralized layer zero solutions
                       </div>
                       <div className="smvTitle02 wow fadeInUp" data-wow-delay="0.2s">
                         {/* Unlimited Liquidity CeFi to Defi Decentralized Bridge <span style={{ color: '#525252' }}>|</span> AMM Alternative */}
@@ -2269,24 +2275,24 @@ export default class Home extends PureComponent {
                       </div>
                       {this.state.wrapBox === "swap" ? (
                         <>
-                          <div className="tab-container">
+                          <div className="tab-container hasSidebar">
                             <div className="tab-main-wrapper">
                               <ul className="tabs-n">
-                                <li className="tab-link" data-tab="bridge-tokens">
+                                <li className="tab-link current-n" data-tab="native-tokens">
                                   <div>
-                                    NATIVE TOKENS
-                                    {/* <span className="text-sm-n">LIVE BETA</span> */}
+                                    Native Tokens
+                                    <span className="text-sm-n color-green">BETA</span>
                                   </div>
                                 </li>
-                                <li className="tab-link current-n" data-tab="bridge-tokens">
+                                <li className="tab-link " data-tab="bridge-tokens">
                                   <div>
-                                    BRIDGE TOKENS
-                                    {/* <span className="text-sm-n">LIVE BETA</span> */}
+                                    Bridge Tokens
+                                    <span className="text-sm-n color-green">BETA</span>
                                   </div>
                                 </li>
                                 <li className="tab-link" data-tab="tab-2" style={{ pointerEvents: 'none' }}>
                                   <div>
-                                    W3B
+                                    SoulBounds
                                     {/* <span className="text-sm-n">COMING SOON</span> */}
                                   </div>
                                 </li>
@@ -2365,7 +2371,361 @@ export default class Home extends PureComponent {
                                 </div>
                               </div> */}
                               <div className="tab-content-n-main">
-                                <div id="bridge-tokens" className="tab-content-n current-n">
+                                <div id="native-tokens" className="tab-content-n current-n">
+                                  <div className="native-icons"><a href="#"><img height="13" src={Filter} /></a><a href="#"><img height="14" src={Doller} /></a></div>
+                                  <div className=" form-group-n  items-center-n">
+                                    <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <div className="inputs-wrap light-controls-n">
+
+                                            <div className="inputs-wrap-control">
+                                            <div className="input-box1">
+                                                <label htmlFor="" className="form-label">from</label>
+                                                <div className="i-outer">
+                                                <input
+                                                    type="text"
+                                                    className="form-control-n"
+                                                    placeholder="0"
+                                                    id="input04"
+                                                    value={this.state.sendFundAmount}
+                                                    onKeyDown={(e) => Validation.floatOnly(e)}
+                                                    onChange={this.recivedToken.bind(this)}
+                                                    autoComplete="off"
+                                                />
+                                                <span className="currency-ic-n">
+                                                    $
+                                                </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="input-box2">
+                                                <label htmlFor="" className="form-label">BLOCKCHAIN</label>
+                                                {/* <button className="ani-1"><img src="images/bnb.png" alt="" /> BSC</button> */}
+                                                <button><img src="../images/coin-icon03.png"></img>BSC</button>
+                                                {/* <Select
+                                                value={this.state.selectedNetworkOptionSend}
+                                                onChange={this.handleChange.bind(this, "sendNetwork")}
+                                                options={this.state.sendNetworkList}
+                                                styles={{
+                                                    control: (styles) => ({ ...styles, backgroundColor: '#EDECEF', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #ffffff", borderRight: "0px", fontSize: "16px" }),
+                                                    singleValue: (provided, state) => ({
+                                                    ...provided,
+                                                    color: "black",
+                                                    // fontSize: state.selectProps.myFontSize
+                                                    }),
+                                                    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                                    // const color = chroma(data.color);
+                                                    console.log({ data, isDisabled, isFocused, isSelected });
+                                                    return {
+                                                        ...styles,
+                                                        backgroundColor: isFocused ? "#999999" : null,
+                                                        color: "black",
+                                                        fontWeight: "bold"
+                                                    };
+                                                    },
+                                                    indicatorSeparator: (styles) => ({ display: 'none' })
+                                                }}
+                                                /> */}
+                                            </div>
+                                            {/* <div className='custom-dropdown'>
+                                                <button onClick={() => { setIsOpen(state => !state); onToggleClick(); }} className={showActive ? 'active' : ''}>BNB <i className="fa fa-caret-down"></i></button>
+                                                <Collapse onInit={onInit} isOpen={isOpen}>
+                                                <div className='nn-list'>
+                                                    <p>ETH</p>
+                                                </div>
+                                                </Collapse>
+                                            </div> */}
+                                            <div className="input-box2">
+                                                <label htmlFor="" className="form-label">TOKEN</label>
+                                                {/* <button className="border-left-0 ani-1"><img src="images/bnb.png" alt="" /> BNB</button> */}
+                                                <button><img src="../images/coin-icon03.png"></img>BNB</button>
+                                                {/* <Select
+                                                value={this.state.selectedOptionSend}
+                                                onChange={this.handleChange.bind(this, "send")}
+                                                options={this.state.sendCurrencyList}
+                                                styles={{
+                                                    control: (styles) => ({ ...styles, backgroundColor: '#EDECEF', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #ffffff", fontSize: "16px" }),
+                                                    singleValue: (provided, state) => ({
+                                                    ...provided,
+                                                    color: "black",
+                                                    // fontSize: state.selectProps.myFontSize
+                                                    }),
+                                                    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                                    // const color = chroma(data.color);
+                                                    console.log({ data, isDisabled, isFocused, isSelected });
+                                                    return {
+                                                        ...styles,
+                                                        backgroundColor: isFocused ? "#999999" : null,
+                                                        color: "black",
+                                                        fontWeight: "bold"
+                                                    };
+                                                    },
+                                                    indicatorSeparator: (styles) => ({ display: 'none' })
+                                                }}
+                                                /> */}
+                                            </div>
+                                            {/* <div className="relative select-item-wrap curICPL"> */}
+                                            {/* <img src={
+                                                "images/currencies/" +
+                                                data.tokenDetails[
+                                                    this.state.selectedSendCurrency
+                                                ].iconName +
+                                                ".png"
+                                                } />{this.state.selectedSendCurrency} */}
+                                            {/* <Select
+                                                value={this.state.selectedOptionSend}
+                                                onChange={this.handleChange.bind(this, "send")}
+                                                options={this.state.sendCurrencyList}
+                                                /> */}
+                                            {/* <select> */}
+                                            {/* <option
+                                                    value={this.state.selectedSendCurrency}
+                                                    data-icon={
+                                                    "images/currencies/" +
+                                                    this.state.selectedSendCurrency +
+                                                    ".png"
+                                                    }
+                                                > {this.state.selectedSendCurrency}</option>
+                                                {
+
+                                                    getTokenList().map((ele) => {
+                                                    if (ele.symbol !== this.state.selectedSendCurrency && ele.symbol !== this.state.selectedReceiveCurrency) {
+                                                        return <option
+                                                        value={ele.symbol}
+                                                        data-icon={
+                                                            "images/currencies/" +
+                                                            ele.iconName +
+                                                            ".png"
+                                                        }
+                                                        > {ele.symbol}</option>
+                                                    }
+                                                    })
+                                                } */}
+                                            {/* <option value="btc" data-icon="images/bnb.png"> BNB</option>
+                                                <option value="eth" data-icon="images/eth.png"> ETH</option>
+                                                <option
+                                                    value={this.state.selectedSendCurrency}
+                                                    data-icon={
+                                                    "images/currencies/" +
+                                                    data.tokenDetails[
+                                                        this.state.selectedSendCurrency
+                                                    ].iconName +
+                                                    ".png"
+                                                    }
+                                                > {this.state.selectedSendCurrency}</option> */}
+                                            {/* </select> */}
+                                            {/* </div> */}
+                                            </div>
+                                        </div>
+                                        <div className="d-flex jc-sb">
+                                            <p className="form-label font-normal mb-0">≈ {this.state.actualSendFundAmount.toFixed(5)} | 1 {this.state.selectedSendCurrency} : ${this.state.currencyPrices[this.state.selectedSendCurrency]}</p>
+                                            {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
+                                            <p className="form-label font-normal mb-0">
+                                              Balance: BNB&nbsp;<span className="color-green">MAX</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="form-ic">
+                                        <a className="grey-arrow"
+                                            href="javascript:void(0);"
+                                            onClick={() => {
+                                            this.changeCurrency(true);
+                                            }}
+                                        >
+                                            <img width="22" src={Swap} alt="" />
+                                        </a>
+                                        <a className="green-arrow"
+                                            href="javascript:void(0);"
+                                            onClick={() => {
+                                            this.changeCurrency(true);
+                                            }}
+                                        >
+                                            <img width="22" src={Swap} alt="" />
+                                        </a>
+                                    </div>
+                                    <div className="flex-1 w-100-sm flex-auto-sm">
+                                        <div className="inputs-wrap dark-controls-n">
+                                            <div className="inputs-wrap-control">
+                                            <div className="input-box1 ver2">
+                                                <label htmlFor="" className="form-label">to</label>
+                                                <div className="i-outer">
+                                                <input
+                                                    type="text"
+                                                    className="form-control-n"
+                                                    placeholder="0"
+                                                    readOnly=""
+                                                    disabled
+                                                    value={this.state.sendFundAmount}
+                                                />
+                                                <span className="currency-ic-n ver2">
+                                                    $
+                                                </span>
+                                                </div>
+                                            </div>
+                                            <div className="input-box2 ver2">
+                                                <label htmlFor="" className="form-label">BLOCKCHAIN</label>
+                                                {/* <button className="ani-1"><img src="images/eth-icon.png" alt="" /> Ethereum</button> */}
+                                                <button><img src="../images/coin-icon13.png"></img>Ethereum</button>
+                                                {/* <Select
+                                                value={this.state.selectedNetworkOptionReceive}
+                                                onChange={this.handleChange.bind(this, "receiveNetwork")}
+                                                options={this.state.recieveNetworkList}
+                                                styles={{
+                                                    control: (styles) => ({ ...styles, backgroundColor: '#20232A', color: 'white', height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #0D0E13", borderRight: "0px", fontSize: "16px" }),
+                                                    singleValue: (provided, state) => ({
+                                                    ...provided,
+                                                    color: "white",
+                                                    // fontSize: state.selectProps.myFontSize
+                                                    }),
+                                                    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                                    // const color = chroma(data.color);
+                                                    console.log({ data, isDisabled, isFocused, isSelected });
+                                                    return {
+                                                        ...styles,
+                                                        backgroundColor: isFocused ? "#999999" : null,
+                                                        color: "black",
+                                                        fontWeight: "bold"
+                                                    };
+                                                    },
+                                                    indicatorSeparator: (styles) => ({ display: 'none' })
+                                                }}
+                                                /> */}
+
+                                            </div>
+                                            <div className="input-box2 ver2">
+                                                <label htmlFor="" className="form-label">TOKEN</label>
+                                                {/* <button className="border-left-0 ani-1"><img src="images/eth-icon.png" alt="" /> ETH</button> */}
+                                                <button><img src="../images/coin-icon13.png"></img>ETH</button>
+                                                {/* <Select
+                                                value={this.state.selectedOptionReceive}
+                                                onChange={this.handleChange.bind(this, "receive")}
+                                                options={this.state.recieveCurrencyList}
+                                                styles={{
+                                                    control: (styles) => ({ ...styles, backgroundColor: '#20232A', color: "white", height: '50px', borderRadius: '0', fontWeight: "bold", border: "2px solid #0D0E13", fontSize: "16px" }),
+                                                    singleValue: (provided, state) => ({
+                                                    ...provided,
+                                                    color: "white",
+                                                    // fontSize: state.selectProps.myFontSize
+                                                    }),
+                                                    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                                    // const color = chroma(data.color);
+                                                    console.log({ data, isDisabled, isFocused, isSelected });
+                                                    return {
+                                                        ...styles,
+                                                        backgroundColor: isFocused ? "#999999" : null,
+                                                        color: "black",
+                                                        fontWeight: "bold",
+                                                        borderRadius: "0"
+                                                    };
+                                                    },
+                                                    indicatorSeparator: (styles) => ({ display: 'none' }),
+                                                }}
+                                                /> */}
+                                            </div>
+                                            {/* <div className="relative select-item-wrap curICPL02"> */}
+                                            {/* <Select
+                                                value={this.state.selectedOptionReceive}
+                                                onChange={this.handleChange.bind(this, "receive")}
+                                                options={this.state.recieveCurrencyList}
+                                                /> */}
+                                            {/* <select>
+                                                <option
+                                                    value={this.state.selectedReceiveCurrency}
+                                                    data-icon={
+                                                    "images/currencies/" +
+                                                    this.state.selectedReceiveCurrency +
+                                                    ".png"
+                                                    }
+                                                > {this.state.selectedReceiveCurrency}</option>
+                                                {
+                                                    getTokenList().map((ele) => {
+                                                    if (ele.symbol !== this.state.selectedSendCurrency && ele.symbol !== this.state.selectedReceiveCurrency) {
+                                                        return <option
+                                                        value={ele.symbol}
+                                                        data-icon={
+                                                            "images/currencies/" +
+                                                            ele.iconName +
+                                                            ".png"
+                                                        }
+                                                        > {ele.symbol}</option>
+                                                    }
+                                                    })
+                                                }
+                                                </select> */}
+                                            {/* </div> */}
+                                            </div>
+                                        </div>
+                                        <div className="d-flex jc-sb">
+                                            <p className="form-label font-normal mb-0">≈ {this.state.approxReceiveFundAmount.toFixed(5)} | 1 {this.state.selectedReceiveCurrency} : ${this.state.currencyPrices[this.state.selectedReceiveCurrency]}</p>
+                                            {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <div className="text-center ">
+                                      {this.state.web3 === null ||
+                                      constantConfig.tokenDetails[
+                                          this.state.selectedSendCurrency
+                                      ].networkId !== web3Config.getNetworkId() ? (
+                                      <button className="native-btn ani-1 connect"  onClick={this.connectWallet.bind(this)}><span>
+                                          <i
+                                          className={
+                                              data.tokenDetails[
+                                              this.state.selectedSendCurrency
+                                              ].networkId ===
+                                              CONSTANT.NETWORK_ID.ETHEREUM
+                                              ? "ETH"
+                                              : "BNB"
+                                          }
+                                          ></i>
+                                      </span>
+                                          <span className="currency"><img src={"images/receiveCurrencies/" + this.state.selectedSendCurrency + ".png"} alt="" /></span> CONNECT YOUR WALLET</button>
+
+                                      ) : constantConfig.tokenDetails[
+                                      this.state.selectedSendCurrency
+                                      ].approveRequire &&
+                                      this.state.tokenBalances[
+                                      this.state.selectedSendCurrency + "_APPROVED"
+                                      ] <= this.state.actualSendFundAmount ? (
+                                      this.state.approveLoading ? (
+                                          <button className="btn-primary-n ani-1 connect swap"><LoopCircleLoading
+                                          height={"20px"}
+                                          width={"20px"}
+                                          color={"#ffffff"}
+                                          /></button>
+                                      ) : (
+                                          <button className="btn-primary-n ani-1 connect swap" onClick={() => {
+                                          this.approve();
+                                          }}>Approve</button>
+                                      )
+                                      ) : this.state.swapLoading ? (
+                                      <button className="btn-primary-n ani-1 connect swap"><LoopCircleLoading
+                                          height={"20px"}
+                                          width={"20px"}
+                                          color={"#ffffff"}
+                                      /></button>
+                                      ) : (
+                                      <button className="btn-primary-n ani-1 connect swap swapBtn" onClick={() => {
+                                          this.swap();
+                                      }}>SWAP</button>
+                                      )}
+                                      <div className="swap-outer">
+                                      {this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ?
+                                          <p className="font-11 color-light-n">You are swapping ${this.state.sendFundAmount} of {this.state.selectedSendCurrency} to ${this.state.sendFundAmount} of {this.state.selectedReceiveCurrency}
+                                          <> |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></></p>
+                                          : null}
+                                      {/* New Updated Design */}
+                                      {/* <p className="font-11 color-light-n">You are swapping <span className="color-white">$100</span> of BNB to <span className="color-white">$100</span> of ETH  |  Estimated swap time: <span className="color-red">1-15 minutes</span> <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i></p> */}
+                                      {/* <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p> */}
+                                      {/* <p className="font-11 color-light-n">26.31% still pending <i className="help-circle"><i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i></i> | &nbsp;&nbsp;<a href="#" className="color-light-n">Start new swap</a></p> */}
+                                      </div>
+
+                                  </div>
+                                  {/* <div className="success-msg">
+                                    <i className="fas fa-check"></i>
+                                    <h4>Swap sent successfully</h4>
+                                    <p>Check the ledger below</p>
+                                  </div> */}
+                                </div>
+                                <div id="bridge-tokens" className="tab-content-n">
                                   <div className="">
                                     {/** bridge-swap-ui */}
                                     <BridgeSwap 
@@ -2518,6 +2878,7 @@ export default class Home extends PureComponent {
                                           <p className="form-label font-normal mb-0">≈ {this.state.actualSendFundAmount.toFixed(5)} | 1 {this.state.selectedSendCurrency} : ${this.state.currencyPrices[this.state.selectedSendCurrency]}</p>
                                           {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
                                         </div>
+                                        
                                       </div>
                                       <div className="form-ic">
                                         <a className="grey-arrow"
@@ -2584,7 +2945,7 @@ export default class Home extends PureComponent {
                                                 }}
                                               />
 
-                                            </div>
+                                            </div>  
                                             <div className="input-box2 ver2">
                                               <label htmlFor="" className="form-label">TOKEN</label>
                                               {/* <button className="border-left-0 ani-1"><img src="images/eth-icon.png" alt="" /> ETH</button> */}
@@ -2873,9 +3234,26 @@ export default class Home extends PureComponent {
                                 </div>
                               </div>
                             </div>
-
+                            <div className="side-pannel">
+                              <h4>Best cross chain prices</h4>
+                              <div className="">
+                                <h5><span>1. <img src={SSIco} /></span>SmartSwap
+                                  <b><strong>0.06015 ETH</strong> [$1662.44]</b>
+                                  <p>Estimated fees: $0 <i class="help-circle"><i class="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options" aria-hidden="true"></i></i></p>
+                                  <p className="color-green mt-1">Super bonus 145.37% <i class="help-circle"><i class="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options" aria-hidden="true"></i></i></p>
+                                </h5>
+                                <h5><span>2. <img src={SUSIco} /></span>Sushiswap
+                                  <b><strong>0.05892 ETH</strong> [$1599.78]</b>
+                                  <p>Estimated fees: <span className="color-red">-$5.37</span></p>
+                                </h5>
+                                <h5><span>3. <img src={MUCIco} /></span>Multichain
+                                  <b><strong>0.05882 ETH</strong> [$1593.78]</b>
+                                  <p>Estimated fees: <span className="color-red">-$5.37</span></p>
+                                </h5>
+                              </div>
+                            </div>
                           </div>
-                          <div className="swap-Textlink">
+                          <div className="swap-Textlink hasSidebar">
                             {this.state.web3 !== null ? (
                               <div className="swap-Link01">
                                 <a
@@ -2910,14 +3288,37 @@ export default class Home extends PureComponent {
                                 <div className="powertextBX-links">
                                     <Link to='/freelisting'>Free listing</Link> 
                                     <span>|</span>
-                                    <a href="">Free license</a>
-                                </div>       
+                                    {/* <a href="">Free license</a> */}
+                                    <a href="">Apply for licensing</a>
+                                </div>
                                 {/* <div className="d-flex">
                                   <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p>
                                 </div> */}
                               </div>
                             )}
-                            {/* <label className="slippage-outer">
+                            <label className="slippage-outer">
+                              <p className="active" style={{ paddingRight: "10px" }}>Dollar amount </p>
+                              <Switch
+                                checked={this.state.checked2}
+                                onChange={this.handleChange2}
+                                handleDiameter={14}
+                                offColor="#2e303a"
+                                onColor="#2e303a"
+                                offHandleColor="#91dc27"
+                                onHandleColor="#91dc27"
+                                height={18}
+                                width={32}
+                                borderRadius={0}
+                                activeBoxShadow="0px 0px 0px 0px #fffc35"
+                                uncheckedIcon={false}
+                                checkedIcon={false}
+                                className="react-switch"
+                                id="small-radius-switch"
+                                disabled={true}
+                              />
+                              <p style={{ paddingLeft: "10px" }}>Token amount</p>
+                            </label>
+                            <label className="slippage-outer">
                               <p className="active" style={{ paddingRight: "10px" }}>Slippage free </p>
                               <Switch
                                 checked={this.state.checked1}
@@ -2937,8 +3338,9 @@ export default class Home extends PureComponent {
                                 id="small-radius-switch"
                                 disabled={true}
                               />
-                              <p style={{ paddingLeft: "10px" }}>Slippage</p>
-                            </label> */}
+                              <p style={{ paddingLeft: "10px" }}>Best slippage</p>
+                            </label>
+                            
                             {/* <div className="swap-Link03">
                                                 <a href="javascript:void();">P2C</a> | <a href="javascript:void();">P2G</a> | <a
                                                     href="javascript:void();">P2P</a>
@@ -2965,14 +3367,142 @@ export default class Home extends PureComponent {
 
                           <div>
                             <div className="dropdown">
-                              <h4 className="dropdown-title">Ledger</h4>
+                              <h4 className="dropdown-title" data-toggle="n-collapse"
+                                data-target="#ledgerDetailBoxMain"
+                                aria-expanded="false"
+                                aria-controls="ledgerDetailBoxMain">Ledger</h4>
+                            </div>
+                            <div id="ledgerDetailBoxMain" className="n-collapse">
+                              <nav className="tab-nav">
+                                <a className="active" href="">All</a>
+                                <a href="">Completed</a>
+                                <a href="">Pending</a>
+                              </nav>
+                              <div className="ledger-tab">
+                                <div className="ledger-half">
+                                  <h3><b>Sent</b> <i class="fas fa-chevron-right"></i></h3>
+                                  <h4>50 ETH <span>($10,000)</span></h4>
+                                  <p>Feb 2. 2019, 9:21am PST</p>
+                                  <div className="ledger-box">
+                                    <h5><i><img src="../images/tick.png" width="18px"></img></i> Transaction Submitted</h5>
+                                    <p>X0456c19d5A61AeA886E6D657EsEF8849565</p>
+                                    <a href="#">View transaction</a>
+                                  </div>
+                                </div>
+                                <div className="ledger-half">
+                                  <h3><b>Received <span>(73.69%)</span></b></h3>
+                                  <h4>0.25 BTC <span>($2,500)</span></h4>
+                                  <p>Feb 2. 2019, 9:21am PST</p>
+                                  <div className="ledger-box">
+                                    <h5><i><img src="../images/tick.png" width="18px"></img></i>Funds wired to your wallet </h5>
+                                    <p>X0456c19d5A61AeA886E6D657EsEF8849565</p>
+                                    <div className="flex">
+                                      <a href="#">View transaction</a>
+                                      <a className="color-green" href="#">Fees breakdown <i class="fas fa-caret-down ml-2"></i></a>
+                                    </div>
+                                    <table className="ledger-table">
+                                      <tr>
+                                        <td>Network gas: <i className="help-circle">
+                                            <i
+                                              className="fas fa-question-circle protip"
+                                              data-pt-position="top"
+                                              data-pt-title="Gas fees are paid to the corresponding blockchain network"
+                                              aria-hidden="true"
+                                            ></i>
+                                          </i></td>
+                                        <td>0.00910955 Ether ($3.43)</td>
+                                        <td><a href="">View transaction</a></td>
+                                      </tr>
+                                      <tr>
+                                        <td>3<sup>rd</sup> party validators fees: <i className="help-circle">
+                                                <i
+                                                  className="fas fa-question-circle protip"
+                                                  data-pt-position="top"
+                                                  data-pt-title="Validators include Chainlink and other similar oracles"
+                                                  aria-hidden="true"
+                                                ></i></i></td>
+                                        <td>0.01978784 Ether ($7.46)</td>
+                                        <td><a href="">View transaction</a></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Transfer tokens: <i className="help-circle">
+                                                <i
+                                                  className="fas fa-question-circle protip"
+                                                  data-pt-position="top"
+                                                  data-pt-title="Info"
+                                                  aria-hidden="true"
+                                                ></i></i></td>
+                                        <td>0.01978784 Ether ($7.46)</td>
+                                        <td><a href="">View transaction</a></td>
+                                      </tr>
+                                      <tr>
+                                        <td>SmartSwap fee: <i className="help-circle">
+                                                <i
+                                                  className="fas fa-question-circle protip"
+                                                  data-pt-position="top"
+                                                  data-pt-title="80% of the SmartSwap fee goes to buy SMART for the market"
+                                                  aria-hidden="true"  
+                                                ></i></i></td>
+                                        <td>0.3% ($0.005457)</td>
+                                        <td><a href="">View transaction</a></td>
+                                      </tr>
+                                      <tfoot>
+                                        <tr>
+                                          <td>SMART Rebate: <i className="help-circle">
+                                                <i
+                                                  className="fas fa-question-circle protip"
+                                                  data-pt-position="top"
+                                                  data-pt-title="Gas fees are paid to the corresponding blockchain network"
+                                                  aria-hidden="true"
+                                                ></i></i></td> 
+                                          <td>0.1819 SMART ($0.1819) </td>
+                                          <td><a href="">View transaction</a></td>
+                                        </tr>
+                                      </tfoot>
+                                    </table>
+                                  </div>
+
+                                  <h4>0.25 BTC <span>($2,500)</span></h4>
+                                  <p>Feb 2. 2019, 9:21am PST</p>
+                                  <div className="ledger-box">
+                                    <h5><i><img src="../images/tick.png" width="18px"></img></i>Funds wired to your wallet </h5>
+                                    <p>X0456c19d5A61AeA886E6D657EsEF8849565</p>
+                                    <div className="flex">
+                                      <a href="#">View transaction</a>
+                                      <a className="color-green" href="#">Fees breakdown <i class="fas fa-caret-down ml-2"></i></a>
+                                    </div>
+                                    
+                                  </div>
+
+                                  <h4>0.25 BTC <span>($2,500)</span></h4>
+                                  <p>Feb 2. 2019, 9:21am PST</p>
+                                  <div className="ledger-box">
+                                    <h5><i><img src="../images/tick.png" width="18px"></img></i>Funds wired to your wallet </h5>
+                                    <p>X0456c19d5A61AeA886E6D657EsEF8849565</p>
+                                    <div className="flex">
+                                      <a href="#">View transaction</a>
+                                      <a className="color-green" href="#">Fees breakdown <i class="fas fa-caret-down ml-2"></i></a>
+                                    </div>
+                                  </div>
+
+                                  <h3><b>Pending <span>(73.69%)</span></b></h3>
+                                  <h4>10 ETH <span>($2,500)</span></h4>
+                                  <div className="ledger-box">
+                                    <div className="pending-text">Pending <div class="loader">Loading...</div></div>
+                                  </div>
+                                  <div className="pending-bottom">
+                                    <i class="fas fa-cog color-green"></i> 
+                                    <span>Wait until a match is found or cancel the transaction to redeem the 10 ETH pending to your wallet</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                             <div className="btn-grp">
                               <a className="btn btn-primary" href="#">FREE SMARTSWAP LICENSE</a>
                               <a className="btn btn-secondary" href="#">BECOME A SWAP PROVIDER</a>
                               <Link className="btn btn-secondary" to='/freelisting'>Free listing</Link>
                             </div>
-                          </div>
+                          </div> 
                         </>
                       ) : this.state.wrapBox === "success" ? (
                         <div className="wrap-Box">
@@ -2989,7 +3519,7 @@ export default class Home extends PureComponent {
                                       type="text"
                                       id="input04"
                                       value={this.state.sendFundAmount}
-                                    />
+                                      />
                                     <i className="recCurIcon">
                                       <img
                                         src={
@@ -3158,6 +3688,7 @@ export default class Home extends PureComponent {
                                           >
                                             View transaction
                                           </a>
+                                         
                                           {/* <a href="javascript:void(0);" className="view-Trans02 ani-1" data-toggle="n-collapse" data-target="#trsBox01" aria-expanded="false" aria-controls="trsBox01">Break down fees <i className="fas fa-sort-down"></i></a> */}
                                         </div>
                                       </div>

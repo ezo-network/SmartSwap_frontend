@@ -5,7 +5,8 @@ import constantConfig, { getTokenList, tokenDetails } from "../config/constantCo
 import notificationConfig from "../config/notificationConfig";
 import SwapFactoryContract from "../helper/swapFactoryContract";
 import CONSTANT from "../constants";
-import Header from "../components/Header";
+// import Header from "../components/Header";
+import Header from "../components/Header02";
 import RightSideMenu from "../components/RightSideMenu";
 import axios from "axios";
 import { isValidAddress } from 'ethereumjs-util';
@@ -365,8 +366,8 @@ export default class Projects extends PureComponent {
                     <div className="boost-outer">
                       <div className="boost-left">
                         <h2>Boost your web3 dApp sales by giving your customers the best payment experience</h2>
-                        <p>Super easy one-click multichain solution allowing customers to pay with any token or blockchain while you get the token on the blockchain you need.</p>
-                        <p className="green">Instead of Deploying Your Project on Multiple Blockchains, Deploy One SmartBridge to Welcome All Type of Users</p>
+                        <p>Super easy one-click cross-chain solution allowing customers to pay with any token or blockchain while you get the token on the blockchain you need.</p>
+                        <p className="green">Instead of Deploying Your Project on Multiple Blockchains, integrate one smartpayment to Welcome All Type of Users</p>
                         <div className="down-block">
                           <img src="images/down-arrow.png" alt="" />
                         </div>
@@ -378,8 +379,8 @@ export default class Projects extends PureComponent {
                     <div className="o-outer">
                       <div className="o-left">
                         {/* <p className="option">OPTION 1</p> */}
-                        <h3>ONE-CLICK SmartBridge</h3>
-                        <p>This code will allow users to push by ONE click any token from any network, and receive the final assets that the project is offering. The One-Click SmartBridge allows users one-click access from any token on any network to the final asset the project offers.</p>
+                        <h3>ONE-CLICK SMARTPAYMENT</h3>
+                        <p>This code will allow users to push by ONE click any token from any network, and receive the final assets that the project is offering. The One-Click SmartPayment allows users one-click access from any token on any network to the final asset the project offers.</p>
                         
                         <div className="Box-bottom">
                           <p className="need-text">You need to call this function in SmartBridge contract</p>
@@ -405,7 +406,7 @@ export default class Projects extends PureComponent {
                         </div>
                         <div className="Box-bottom ver2">
                           <Link to='#' className="dc-file">Download ABI of smart contract file</Link>
-                          <Link to='#'>See example for live SmartBridge button for UniSwap V2 DEXs clone</Link>
+                          <Link to='#'>See example for live SmartPayment button for UniSwap V2 DEXs clone</Link>
                         </div>
                         
                       </div>
