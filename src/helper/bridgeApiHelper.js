@@ -17,7 +17,8 @@ const apiEndpoints = {
     'makeTransferWrapTokenOwnershipRequest': 'customer/transfer-wrap-token-ownership-request',
     'addValidator': 'customer/add-validator',
     'getValidator': 'customer/get-validator',
-    'getOwnershipRequests': 'public/ownership-requests'
+    'getOwnershipRequests': 'public/ownership-requests',
+    'addErc20Token': 'customer/add-erc20-token'
 }
 
 const BridgeApiHelper = {
@@ -55,7 +56,7 @@ const BridgeApiHelper = {
         }
     },
 
-    isProjectExist: async(chainId = null, sourceTokenAddress = null) => {
+    isProjectExist: async(chainId = null, sourceTokenAddress = null, cancelToken) => {
         let response, error, code;
         try {
             if(chainId === null || sourceTokenAddress === null){
@@ -70,6 +71,7 @@ const BridgeApiHelper = {
 
             const result = await axiosRequest.request({
                 path: apiEndpoints.isProjectExist + `?chainId=${chainId}&sourceTokenAddress=${sourceTokenAddress}`,
+                cancelToken: cancelToken
             });
 
             if(result.status === 200){
@@ -98,7 +100,7 @@ const BridgeApiHelper = {
         }
     },
 
-    getProject: async(chainId = null, sourceTokenAddress = null) => {
+    getProject: async(chainId = null, sourceTokenAddress = null, cancelToken) => {
         let response, error, code;
         try {
             if(chainId === null || sourceTokenAddress === null){
@@ -113,6 +115,7 @@ const BridgeApiHelper = {
 
             const result = await axiosRequest.request({
                 path: apiEndpoints.project + `?chainId=${chainId}&tokenAddress=${sourceTokenAddress}`,
+                cancelToken: cancelToken
             });
 
             if(result.status === 200){
@@ -232,7 +235,7 @@ const BridgeApiHelper = {
         }      
     },
 
-    getBridge: async(chainId = null) => {
+    getBridge: async(chainId = null, cancelToken) => {
         let response, error, code;
         try {
             if(chainId === null){
@@ -247,6 +250,7 @@ const BridgeApiHelper = {
 
             const result = await axiosRequest.request({
                 path: apiEndpoints.bridge + `?chainId=${chainId}`,
+                cancelToken: cancelToken
             });
 
             if(result.status === 200){
@@ -376,7 +380,7 @@ const BridgeApiHelper = {
         }
     },    
 
-    getWrappedTokens: async(projectId = null, creatorAddress = null, all = false) => {
+    getWrappedTokens: async(projectId = null, creatorAddress = null, all = false, cancelToken) => {
         let response, error, code;
         try {
 
@@ -395,19 +399,22 @@ const BridgeApiHelper = {
 
             const result = await axiosRequest.request({
                 path: apiEndpoints.getWappedTokens + params,
+                cancelToken: cancelToken
             });
-
-            if(result.status === 200){
-                return {
-                    response: result.data.data,
-                    code: result.data.code,
-                    error: undefined
-                }
-            } else {
-                return {
-                    response: undefined,
-                    code: result.data.code,
-                    error: result.data.error
+            
+            if(result !== undefined){
+                if(result.status === 200){
+                    return {
+                        response: result.data.data,
+                        code: result.data.code,
+                        error: undefined
+                    }
+                } else {
+                    return {
+                        response: undefined,
+                        code: result.data.code,
+                        error: result.data.error
+                    }
                 }
             }
 
@@ -423,27 +430,31 @@ const BridgeApiHelper = {
         }
     },
 
-    getNetworkList: async() => {
+    getNetworkList: async(cancelToken) => {
         let response, error, code;
         try {
 
             const result = await axiosRequest.request({
                 path: apiEndpoints.networks,
+                cancelToken: cancelToken
             });
 
-            if(result.status === 200){
-                return {
-                    response: result.data.data,
-                    code: result.data.code,
-                    error: undefined
-                }
-            } else {
-                return {
-                    response: undefined,
-                    code: result.data.code,
-                    error: result.data.error
+            if(result !== undefined){
+                if(result.status === 200){
+                    return {
+                        response: result.data.data,
+                        code: result.data.code,
+                        error: undefined
+                    }
+                } else {
+                    return {
+                        response: undefined,
+                        code: result.data.code,
+                        error: result.data.error
+                    }
                 }
             }
+
 
         } catch(err){
             error = err;
@@ -457,25 +468,28 @@ const BridgeApiHelper = {
         }
     },
 
-    getTokenList: async() => {
+    getTokenList: async(cancelToken) => {
         let response, error, code;
         try {
 
             const result = await axiosRequest.request({
                 path: apiEndpoints.tokens,
+                cancelToken: cancelToken
             });
-            
-            if(result.status === 200){
-                return {
-                    response: result.data.data,
-                    code: result.data.code,
-                    error: undefined
-                }
-            } else {
-                return {
-                    response: undefined,
-                    code: result.data.code,
-                    error: result.data.error
+
+            if(result !== undefined){
+                if(result.status === 200){
+                    return {
+                        response: result.data.data,
+                        code: result.data.code,
+                        error: undefined
+                    }
+                } else {
+                    return {
+                        response: undefined,
+                        code: result.data.code,
+                        error: result.data.error
+                    }
                 }
             }
 
@@ -808,6 +822,59 @@ const BridgeApiHelper = {
             code
         }
     },    
+
+    addErc20Token: async(chainId = null, tokenAddress = null) => {
+        let response, error, code;
+
+        if(
+            chainId == null
+            ||
+            tokenAddress == null
+        ){
+            error = 'mandatory parameters are missing';
+            code = 422;
+            return {
+                response, 
+                error,
+                code
+            }
+        }
+
+        try { 
+            const result = await axiosRequest.request({
+                path: apiEndpoints.addErc20Token,
+                method: 'POST',
+                data: {
+                    chainId: chainId,
+                    address: tokenAddress
+                }
+            });
+
+            if(result.status === 201){
+                return {
+                    response: result.data.data,
+                    code: result.status,
+                    error: undefined
+                }
+            } else {
+                return {
+                    response: undefined,
+                    code: result.status,
+                    error: result.data.error
+                }
+            }
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }            
+    }
 
 }
 

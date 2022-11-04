@@ -14,6 +14,9 @@ import ownLicence02 from './pages/ownLicence02';
 import SmartSwapLicence from './pages/smartSwapLicence';
 import FreeListing from './pages/free-listing';
 import Welcome from './pages/welcome';
+import SmartExtension from './pages/smartExtension';
+import SmartBridge from './pages/smartBridge';
+// import SmartPayment from './pages/smartPayment';
 
 const DefaultRouter = () => (
   <Router>
@@ -41,6 +44,15 @@ const DefaultRouter = () => (
     <Switch>
       <Route path="/welcome" component={Welcome} />
     </Switch>
+    <Switch>
+      <Route path="/smart-extension" component={SmartExtension} />
+    </Switch>
+    <Switch>
+      <Route path="/smart-bridge" component={SmartBridge} />
+    </Switch>
+    {/* <Switch>
+      <Route path="/smart-payment" component={SmartPayment} />
+    </Switch> */}
   </Router>
 )
 

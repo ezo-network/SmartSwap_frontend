@@ -5,6 +5,12 @@ import _ from "lodash";
 import pinAct from "../../assets/images/pin.png";
 import pin from "../../assets/images/pin-u.png";
 import close from "../../assets/images/close.png";
+import Web3 from 'web3';
+import BridgeApiHelper from "../../helper/bridgeApiHelper";
+import notificationConfig from "../../config/notificationConfig";
+
+const visibleBridgesNumber = process.env.REACT_APP_VISIBLE_BRIDGES_NUMBER;
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 
 const textMasking = (text, maskingChar = '.', noOfMaskingChar = 3, startingLettersLength = 5, endingLettersLength = 5) => {
     return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
@@ -75,6 +81,30 @@ export default class SourceTokenPopup extends PureComponent {
         }
     }
 
+    searchAndAddToken = async() => {
+        // check balance first
+        const {response, code, error} = await BridgeApiHelper.addErc20Token(this.props.chainId, this.state.filteredToken);
+        console.log(response, code, error);
+        if(code === 201){
+            await this.props.onTokenAddedCallback().then(async() => {
+                notificationConfig.success('Token imported');
+                await this.props.onCustomTokenBalanceCheck(this.state.filteredToken).then(async() => {
+                    if(this.props.customTokenBalance == 0 || this.props.customTokenBalance === null){
+                        notificationConfig.error("Token not listed here due to insufficient token balance");
+                    }
+                });        
+            })
+        } 
+        
+        if(error === 'A TOKEN ALREADY EXIST'){
+            await this.props.onCustomTokenBalanceCheck(this.state.filteredToken).then(async() => {
+                if(this.props.customTokenBalance == 0 || this.props.customTokenBalance === null){
+                    notificationConfig.error("Token not listed here due to insufficient token balance");
+                }
+            });                    
+        }
+    }
+
     render() {
         const pageSize = 10;
         let currentPageNumber = this.state.currentPageNumber;
@@ -83,6 +113,8 @@ export default class SourceTokenPopup extends PureComponent {
         let filteredTokens = this.props.tokens.filter(token => {
             if(
               token.symbol.match(new RegExp(this.state.filteredToken, "i"))
+              ||
+              token.address.match(new RegExp(this.state.filteredToken, "i"))
             ){
               return token;
             }
@@ -96,14 +128,6 @@ export default class SourceTokenPopup extends PureComponent {
         const totalTokens = filteredTokens.length;
         const tokensGroupList = _.chunk(filteredTokens, pageSize);
         let tokens = tokensGroupList[pageIndex <= 0 ? 0 : pageIndex];
-
-
-        // let data = [0, 1, 2, 3, 4, 5];
-        // let index = 3;
-
-        // this.state.pinnedTokens.forEach(pinnedToken => {
-        //     tokens.unshift(tokens.splice(pinnedToken, 1)[0]);
-        // });
 
         return (
             <>
@@ -144,12 +168,28 @@ export default class SourceTokenPopup extends PureComponent {
                                 <Search>
                                     <input 
                                         onChange={e => this.filterTokens(e.target.value)}
-                                        placeholder="Search tokens" 
+                                        placeholder="Search token or paste address" 
                                         type="search"
                                         value={this.state.filteredToken}>
                                     </input>
-                                    <i className="fa fa-search" aria-hidden="true"></i>
+                                    {this.state.filteredToken.length === 0 && 
+                                        <i className="fa fa-search" aria-hidden="true"></i>                                
+                                    }
+                                    {this.state.filteredToken.length > 0 && 
+                                        <i className="fa fa-remove" aria-hidden="true"></i>                                
+                                    }                                    
                                 </Search>
+                                {totalTokens === 0 && Web3.utils.isAddress(this.state.filteredToken) && 
+                                <SelectList>
+                                        <Selected>
+                                            <Token
+                                                onClick={(e) => this.searchAndAddToken()}
+                                            >
+                                                Import Token
+                                            </Token>
+                                        </Selected>
+                                </SelectList>                                                            
+                                }
                                 <SelectList>
                                     {this.state.pinnedTokens.map(function(pinnedToken, i) {
                                     const token = _.find(this.props.tokens, {address: (pinnedToken).toLowerCase() })
@@ -174,12 +214,12 @@ export default class SourceTokenPopup extends PureComponent {
                             <thead>
                                 <tr>
                                     <Thd onClick={() => this.sortTokenBySymbol(this.state.symbolSortOrder)}>
-                                        Token &nbsp;
+                                        Tokens &nbsp;
                                         <i className={`fa fa-caret-${this.state.symbolSortOrder === 'asc' ? 'down' : 'up'}`} aria-hidden="true"></i>
                                     </Thd>
-                                    <Thd>Selected chain</Thd>
                                     <Thd>Smart contract</Thd>
-                                    <Thd>Bridge status</Thd>
+                                    <Thd>Original chain</Thd>
+                                    <Thd>Existing bridges</Thd>
                                 </tr>
                             </thead>
 
@@ -192,11 +232,10 @@ export default class SourceTokenPopup extends PureComponent {
 
                                     const wrappedTokens = _.filter(this.props.wrappedTokens, {
                                         fromChainId: Number(token.chainId),
-                                        tokenSymbol: 'SB' + (token.symbol).toUpperCase()
+                                        tokenSymbol: wrapTokenSymbolPrefix + (token.symbol).toUpperCase()
                                     });
 
                                     const totalWrappedTokens = wrappedTokens.length;
-                                    const visibleBridesNumber = 1;
 
                                     return <tr 
                                             key={token._id}
@@ -230,6 +269,11 @@ export default class SourceTokenPopup extends PureComponent {
                                                     className={this.state.pinnedTokens.includes((token.address).toUpperCase()) ? 'selected' : ''}
                                                 ></Pin>
                                             </Tcell>
+                                            <Tcell 
+                                                onClick={(e) => goToContractOnExplorer(networkConfig.explorerUrl, token.address)}
+                                            >
+                                                <TDLink>{textMasking(token.address)}</TDLink>
+                                            </Tcell>
                                             <Tcell>
                                                 <Token>
                                                     <img 
@@ -240,18 +284,13 @@ export default class SourceTokenPopup extends PureComponent {
                                                     </img> {networkConfig.chain}
                                                 </Token>
                                                 {/* <Pin className="selected"></Pin> */}
-                                            </Tcell>
-                                            <Tcell 
-                                                onClick={(e) => goToContractOnExplorer(networkConfig.explorerUrl, token.address)}
-                                            >
-                                                <TDLink>{textMasking(token.address)}</TDLink>
-                                            </Tcell>
+                                            </Tcell>                                            
                                             <Tcell>
                                                 <BridgeGrp>
                                                     <b>
                                                         {
                                                             wrappedTokens !== undefined && wrappedTokens.map(function(wrappedToken, i){
-                                                                if(visibleBridesNumber > (i++)){
+                                                                if(visibleBridgesNumber > (i++)){
                                                                     const destinationNetworkConfig = _.find(this.props.networks, {
                                                                         chainId: Number(wrappedToken.toChainId)
                                                                     });
@@ -266,7 +305,7 @@ export default class SourceTokenPopup extends PureComponent {
                                                             }.bind(this))
                                                         }
                                                     </b>
-                                                    <span>{totalWrappedTokens > visibleBridesNumber ? '+ ' + (totalWrappedTokens - visibleBridesNumber) : ''}</span>
+                                                    <span>{totalWrappedTokens > visibleBridgesNumber ? '+ ' + (totalWrappedTokens - visibleBridgesNumber) : ''}</span>
                                                 </BridgeGrp>
                                             </Tcell>
                                     </tr>

@@ -319,8 +319,11 @@ const ProICOMbx02 = styled.div`
   input[type=checkbox] {opacity: 0; position: absolute;}
 `
 const ProICOSbx01 = styled.label`
-  background-color:#21232b; height:60px; border:0px; outline:none; padding:0 0 0 35px; position: relative; display: flex; align-items: center; justify-content: flex-start; margin: 0;
-  .disable{filter: grayscale(100%); }
+  background-color:#21232b; height:60px; border:0px; outline:none; padding:0 17px; position: relative; display: flex; align-items: center; justify-content: flex-start; margin: 0;
+  &.disabled{filter: grayscale(100%); }
+  &.pending{  
+    i { opacity: 1; color: #ccc; }        
+  }
   :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
     &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  
       i { opacity: 1; color: #91dc27; }
@@ -338,7 +341,7 @@ const ProICOSbx01 = styled.label`
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff; flex-flow: row;
   
-  img{ margin-right:15px;}
+  img{ margin-right:15px; width: 30px;}
   &:nth-of-type(1){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
   @media screen and (max-width: 1200px) {
     img {margin:0 10px 0 0;}

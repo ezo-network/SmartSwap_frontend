@@ -8,7 +8,7 @@ import Lineimg from "../assets/freelisting-images/line01.png";
 import addImg from "../assets/images/add-chain.png";
 import BridgeApiHelper from "../helper/bridgeApiHelper";
 import BridgeContract from "../helper/bridgeContract";
-
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 
 const $ = window.$;
 export default class Screen5 extends PureComponent {
@@ -225,6 +225,21 @@ export default class Screen5 extends PureComponent {
             notificationConfig.error(response.message);
           }
 
+          if(response.code === 4001) {
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response.message);
+          }
+
+          if (response?.data?.code === 3) {
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(response?.data?.message);
+          }
+          
+
           if (response.code === -32000 || response.code === -32603){
             this.setState({
               btnClicked: false
@@ -400,7 +415,7 @@ export default class Screen5 extends PureComponent {
                               src={'/images/free-listing/tokens/' + ((this.props.selectedSourceTokenData.name).toString() + '.png').toLowerCase()} 
                               onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')}                           
                             />
-                            sb{this.props.selectedSourceTokenData.name}
+                            {(wrapTokenSymbolPrefix).toLowerCase()}{this.props.selectedSourceTokenData.name}
                           </ProICOSbx02>
                           <ProICOSbx02>
                             <img
@@ -494,7 +509,7 @@ const ProICOSbx01 = styled.button`
 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px; width: 25px;}
+  img{ margin-right:15px; width: 25px; border-radius: 25px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
   @media screen and (max-width: 1200px) {
     /* flex-flow: column; align-items: center; justify-content: center; */ padding:0 10px;

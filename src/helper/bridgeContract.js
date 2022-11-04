@@ -210,7 +210,7 @@ class BridgeContract extends EventEmitter {
             });
             return err;   
         }
-    }    
+    }
 }
 
 

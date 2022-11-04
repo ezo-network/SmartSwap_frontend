@@ -440,7 +440,7 @@ const ProICOSbx01 = styled.button`
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff; flex-flow: row;
-  img{ margin-right:15px; max-width: 30px;}
+  img{ margin-right:15px; max-width: 30px; border-radius: 30px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
   @media screen and (max-width: 1200px) {
     /* flex-flow: column; align-items: center; justify-content: center; */
