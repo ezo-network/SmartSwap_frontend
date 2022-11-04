@@ -14,7 +14,8 @@ export default class axiosRequest {
                 headers: {
                     'Accept': 'application/json'
                 },
-                data: null
+                data: null,
+                cancelToken: args.cancelToken
             };
             for (let k in args.headers) {
                 options.headers[k] = args.headers[k];
@@ -26,7 +27,12 @@ export default class axiosRequest {
             return await axios.request(options).then(response => {
                 return response;
             }).catch(ex => {
-                return ex.response;
+                if (axios.isCancel(ex)) {
+                    console.log('Request canceled', ex.message, url);
+                } else {
+                    // handle error
+                    return ex.response;
+                }
             });
 
         } catch (error) {

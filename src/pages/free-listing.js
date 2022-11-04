@@ -20,8 +20,13 @@ import AddCustomToken from "./addCustomToken"
 
 import BridgeApiHelper from "../helper/bridgeApiHelper";
 
+import axios from "axios";
+let source;
+
+
 const $ = window.$;
 export default class Projects extends PureComponent {
+  _isMounted = false;
   constructor(props) {
     super();
 
@@ -61,6 +66,8 @@ export default class Projects extends PureComponent {
       wantToBecomeMasterValidator: false
     };
 
+    source = axios.CancelToken.source();
+
     this.connectWallet = this.connectWallet.bind(this);
     this.walletConnectCallback = this.walletConnectCallback.bind(this);
     this.walletAlreadyConnectedCallback = this.walletAlreadyConnectedCallback.bind(this);
@@ -78,6 +85,9 @@ export default class Projects extends PureComponent {
   }
 
   async componentDidMount() {
+    this._isMounted = true;
+
+
     await this.getNetworkList();
     await this.getTokenList();
     await this.connectWallet();
@@ -92,30 +102,36 @@ export default class Projects extends PureComponent {
 
       if(token !== undefined){
         // set source token data, bridge data, project data
-        await this.sourceTokenSelectedCallback(
-          token.symbol,
-          token.address,
-          token.icon,
-          networkConfig.chain,
-          networkConfig.chainId,
-          networkConfig.icon,
-          networkConfig.explorerUrl,
-          token.decimals
-        ).then(() => {
-          // clear
-          window.history.replaceState({}, document.title)
-          this.setState({
-            addNewBridge: true
-          })
-        });
+        if(this._isMounted === true){
+          await this.sourceTokenSelectedCallback(
+            token.symbol,
+            token.address,
+            token.icon,
+            networkConfig.chain,
+            networkConfig.chainId,
+            networkConfig.icon,
+            networkConfig.explorerUrl,
+            token.decimals
+          ).then(() => {
+            if (this._isMounted) {
+              // clear
+              window.history.replaceState({}, document.title)
+              this.setState({
+                addNewBridge: true
+              })
+            }
+          });
+        }
 
         // project exist ? 
         if(this.state.isProjectExist){
           // set destination data and prompt to switch network
-          this.setState({
-            isdestinationNetworksFiltered: true,
-            filteredDestinationNetworks: [destinationNetworkDataFromProps.chainId]
-          })
+          if (this._isMounted) {
+            this.setState({
+              isdestinationNetworksFiltered: true,
+              filteredDestinationNetworks: [destinationNetworkDataFromProps.chainId]
+            })
+          }
         }
 
       }
@@ -145,6 +161,13 @@ export default class Projects extends PureComponent {
         });
     }
   }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+    if (source) {
+      source.cancel("Projects (free-listing) Component got unmounted");
+    }
+  }  
 
   // componentWillReceiveProps(nextProps) {
   //   // if (nextProps.location !== this.props.location) {
@@ -179,68 +202,77 @@ export default class Projects extends PureComponent {
   }
 
   walletConnectCallback(walletConnected, web3Instance) {
-    this.setState({
-      walletConnected: walletConnected,
-      web3Instance: web3Instance,
-      chainId: web3Config.getNetworkId(),
-      accountAddress: web3Config.getAddress()
-    });
+    if(this._isMounted === true){
+      this.setState({
+        walletConnected: walletConnected,
+        web3Instance: web3Instance,
+        chainId: web3Config.getNetworkId(),
+        accountAddress: web3Config.getAddress()
+      });
+    }
   }
 
   walletAlreadyConnectedCallback(type){
-    if(type === 1){
-      this.setState({
-        addNewBridge: true
-      })    
-    }    
-
-    if(type === 2){
-      this.setState({
-        wantToBecomeMasterValidator: true
-      })    
-    }    
-
+    if(this._isMounted === true){
+      if(type === 1){
+        this.setState({
+          addNewBridge: true
+        })    
+      }    
+  
+      if(type === 2){
+        this.setState({
+          wantToBecomeMasterValidator: true
+        })    
+      }    
+    }
   }
 
   startHereButtonClickedCallback(){
-    this.setState({
-      claimDeployerOwnerShip: true
-    })
+    if(this._isMounted === true){
+      this.setState({
+        claimDeployerOwnerShip: true
+      })
+    }
   }
 
   emailAddressExistCallback(){
-    this.setState({
-      isEmailAddressExist: true
-    });
+    if(this._isMounted === true){
+      this.setState({
+        isEmailAddressExist: true
+      });
+    }
   }
 
   addCustomTokenCallback(){
-    this.setState({
-      addCustomToken: true
-    });
+    if(this._isMounted === true){
+      this.setState({
+        addCustomToken: true
+      });
+    }
   }
 
   async sourceTokenSelectedCallback(sourceToken, sourceTokenAddress, sourceTokenIcon, sourceChain, sourceChainId, sourceChainIcon, explorerUrl, decimals) {
     await this.getBridge(sourceChainId).then(async () => {
       if (this.state.bridgeAddress !== null) {
         await this.isProjectExist(sourceChainId, sourceTokenAddress).then(async () => {
-
-          this.setState(prevState => {
-            const sourceTokenData = prevState.sourceTokenData;
-            sourceTokenData['name'] = sourceToken;
-            sourceTokenData['address'] = sourceTokenAddress;
-            sourceTokenData['icon'] = sourceTokenIcon;
-            sourceTokenData['chain'] = sourceChain;
-            sourceTokenData['chainId'] = sourceChainId;
-            sourceTokenData['chainIcon'] = sourceChainIcon;
-            sourceTokenData['explorerUrl'] = explorerUrl;
-            sourceTokenData['decimals'] = decimals;            
-            return {
-              isSourceTokenSelected: true,
-              sourceTokenData,
-            };
-          });
-
+          if(this._isMounted === true){
+            this.setState(prevState => {
+              const sourceTokenData = prevState.sourceTokenData;
+              sourceTokenData['name'] = sourceToken;
+              sourceTokenData['address'] = sourceTokenAddress;
+              sourceTokenData['icon'] = sourceTokenIcon;
+              sourceTokenData['chain'] = sourceChain;
+              sourceTokenData['chainId'] = sourceChainId;
+              sourceTokenData['chainIcon'] = sourceChainIcon;
+              sourceTokenData['explorerUrl'] = explorerUrl;
+              sourceTokenData['decimals'] = decimals;            
+              return {
+                isSourceTokenSelected: true,
+                sourceTokenData,
+              };
+            });
+          }
         });
       } else {
         notificationConfig.error('Bridge not found for selected network.');
@@ -346,18 +378,20 @@ export default class Projects extends PureComponent {
         txHash
       );
 
-      if(code === 201){
-        console.log({
-          createNewProject: response
-        });
-        this.setState({
-          projectId: response
-        });
-      } else {        
-        console.error(error)
+      if(this._isMounted === true){
+        if(code === 201){
+          console.log({
+            createNewProject: response
+          });
+          this.setState({
+            projectId: response
+          });
+        } else {        
+          console.error(error)
+        }
+        
+        await this.isProjectExist(this.state.sourceTokenData.chainId, this.state.sourceTokenData.address);
       }
-      
-      await this.isProjectExist(this.state.sourceTokenData.chainId, this.state.sourceTokenData.address);
 
     } catch (error){
       console.error(error)
@@ -381,14 +415,15 @@ export default class Projects extends PureComponent {
         response, 
         error,
         code
-      } = await BridgeApiHelper.getNetworkList();
-  
-      if(code === 200){
-        this.setState({
-          networks: response
-        });
-      } else {
-        console.error(error)
+      } = await BridgeApiHelper.getNetworkList(source.token);
+      if(this._isMounted === true){
+        if(code === 200){
+          this.setState({
+            networks: response
+          });
+        } else {
+          console.error(error)
+        }
       }
     } catch (error){
       console.error(error)
@@ -401,14 +436,16 @@ export default class Projects extends PureComponent {
         response, 
         error,
         code
-      } = await BridgeApiHelper.getTokenList();
+      } = await BridgeApiHelper.getTokenList(source.token);
       
-      if(code === 200){
-        this.setState({
-          tokens: response
-        });
-      } else {
-        console.error(error)
+      if(this._isMounted === true){
+        if(code === 200){
+          this.setState({
+            tokens: response
+          });
+        } else {
+          console.error(error)
+        }
       }
 
     } catch (error){
@@ -422,14 +459,15 @@ export default class Projects extends PureComponent {
         response, 
         error,
         code
-      } = await BridgeApiHelper.getBridge(sourceTokenChainId);
-  
-      if(code === 200){
-        this.setState({
-          bridgeAddress: response.address
-        });
-      } else {
-        console.error(error)
+      } = await BridgeApiHelper.getBridge(sourceTokenChainId, source.token);
+      if(this._isMounted === true){
+        if(code === 200){
+          this.setState({
+            bridgeAddress: response.address
+          });
+        } else {
+          console.error(error)
+        }
       }
     } catch (error){
       console.error(error)
@@ -442,20 +480,23 @@ export default class Projects extends PureComponent {
         response, 
         error,
         code
-      } = await BridgeApiHelper.isProjectExist(sourceTokenChainId, sourceTokenAddress);
+      } = await BridgeApiHelper.isProjectExist(sourceTokenChainId, sourceTokenAddress, source.token);
       
-      if(code === 200){
-        this.setState({
-          isProjectExist: response
-        });
-
-        if(response === true){
-          await this.getProject(sourceTokenChainId, sourceTokenAddress);
+      if(this._isMounted === true){
+        if(code === 200){
+          
+          this.setState({
+            isProjectExist: response
+          });
+  
+          if(response === true){
+            await this.getProject(sourceTokenChainId, sourceTokenAddress);
+          }
+        } else {
+          console.error(error)
         }
-      } else {
-        console.error(error)
       }
-
+    
     } catch (error){
       console.error(error)
     }
@@ -467,22 +508,23 @@ export default class Projects extends PureComponent {
         response, 
         error,
         code
-      } = await BridgeApiHelper.getProject(sourceTokenChainId, sourceTokenAddress);
-      
-      if(code === 200){
-        this.setState({
-          projectId: response._id
-        });
-
-        this.setState(prevState => {
-          const sourceTokenData = prevState.sourceTokenData;
-          sourceTokenData['txHash'] = response.txHash;
-          return {
-            sourceTokenData,
-          };
-        });
-      } else {
-        console.error(error)
+      } = await BridgeApiHelper.getProject(sourceTokenChainId, sourceTokenAddress, source.token);
+      if(this._isMounted === true){
+        if(code === 200){
+          this.setState({
+            projectId: response._id
+          });
+  
+          this.setState(prevState => {
+            const sourceTokenData = prevState.sourceTokenData;
+            sourceTokenData['txHash'] = response.txHash;
+            return {
+              sourceTokenData,
+            };
+          });
+        } else {
+          console.error(error)
+        }
       }
 
     } catch (error){
@@ -496,16 +538,16 @@ export default class Projects extends PureComponent {
         response,
         error,
         code
-      } = await BridgeApiHelper.getWrappedTokens(projectId, creatorAddress);
-
-      if (code === 200) {
-        this.setState({
-          wrappedTokens: response
-        });
-      } else {
-        console.error(error)
+      } = await BridgeApiHelper.getWrappedTokens(projectId, creatorAddress, source.token);
+      if(this._isMounted === true){
+        if (code === 200) {
+          this.setState({
+            wrappedTokens: response
+          });
+        } else {
+          console.error(error)
+        }
       }
-
     } catch (error) {
       console.error(error)
     }
