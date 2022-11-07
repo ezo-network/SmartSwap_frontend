@@ -6,6 +6,11 @@ import _ from "lodash";
 import BridgeApiHelper from "../helper/bridgeApiHelper";
 const $ = window.$;
 
+const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
+    if(explorerUrl !== undefined){
+        window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
+    }
+}
 
 export default class Screen6 extends PureComponent {
 	
@@ -81,11 +86,12 @@ export default class Screen6 extends PureComponent {
 	render() {
 
 		let wrappedTokens = [];
-		/* this.state.wrappedTokens.forEach(token => {
+		this.state.wrappedTokens.forEach(token => {
 			const networkConfig = _.find(this.props.networks, { chainId: token.toChainId });
 			token['chain'] = networkConfig['chain'];
+			token['explorerUrl'] = networkConfig['explorerUrl'];
 			wrappedTokens.push(token);
-		}); */
+		});
 
 		return (
 			<>
@@ -122,7 +128,7 @@ export default class Screen6 extends PureComponent {
 													{(wrappedToken.tokenSymbol.substring(-2, 2)).toLowerCase()}
 					    	                        {(wrappedToken.tokenSymbol.substring(2)).toUpperCase()}
 												</span><span>{wrappedToken.chain}</span></ListTxt>
-												<ListTxt><ListLink>{wrappedToken.address === null ? 'FETHING...' : wrappedToken.address}</ListLink></ListTxt>
+												<ListTxt><ListLink onClick={(e) => goToContractOnExplorer(wrappedToken.explorerUrl, wrappedToken.address)}>{wrappedToken.address === null ? 'FETHING...' : wrappedToken.address}</ListLink></ListTxt>
 											</List>
 										)
 									})}
@@ -270,6 +276,3 @@ const LinkFt = styled.a `
 		margin-left: 5px;
 	}
 `
-
-
-

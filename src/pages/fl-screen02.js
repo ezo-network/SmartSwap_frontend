@@ -416,7 +416,6 @@ const ProGTitle01 = styled(FlexDiv)`
 `
 const ProInputbx = styled(FlexDiv)`
     width:100%;
-
     input{ width:100%; display:block; border:2px solid #000; border-radius:0; background-color:#21232b; padding:20px; font-size:16px; color:#ffffff; font-weight:400; }
 `
 const ProICOMbx01 = styled.div` width:100%; `
@@ -441,7 +440,7 @@ const ProICOSbx01 = styled.button`
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
   width:50%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff; flex-flow: row;
-  img{ margin-right:15px; max-width: 30px;}
+  img{ margin-right:15px; max-width: 30px; border-radius: 30px;}
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;} 
   @media screen and (max-width: 1200px) {
     /* flex-flow: column; align-items: center; justify-content: center; */
@@ -458,9 +457,7 @@ const ProICOSbx02 = styled(FlexDiv)`
 `
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px; padding-bottom:20px;
-
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:0; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
-
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
   @media screen and (max-width: 640px) {
     .Btn01{max-width: 50%}

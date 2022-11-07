@@ -2173,7 +2173,9 @@ export default class Home extends PureComponent {
       }
     );
   }
-
+  state = {
+    ShowSidebar: true,
+  };
   render() {
     const options = [
       { label: 'Ethereum', value: 'Ethereum' },
@@ -2275,7 +2277,7 @@ export default class Home extends PureComponent {
                       </div>
                       {this.state.wrapBox === "swap" ? (
                         <>
-                          <div className="tab-container hasSidebar">
+                          <div className={`tab-container ${this.state.ShowSidebar ? 'hasSidebar' : ''}`}>
                             <div className="tab-main-wrapper">
                               <ul className="tabs-n">
                                 <li className="tab-link current-n" data-tab="native-tokens">
@@ -2298,7 +2300,13 @@ export default class Home extends PureComponent {
                                 </li>
                                 <li className="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>
                                   <div>
-                                  dFX
+                                  W3B
+                                    {/* <span className="text-sm-n">COMING SOON</span> */}
+                                  </div>
+                                </li>
+                                <li className="tab-link" data-tab="tab-3" style={{ pointerEvents: 'none' }}>
+                                  <div>
+                                  CBDC
                                     {/* <span className="text-sm-n">COMING SOON</span> */}
                                   </div>
                                 </li>
@@ -2372,7 +2380,9 @@ export default class Home extends PureComponent {
                               </div> */}
                               <div className="tab-content-n-main">
                                 <div id="native-tokens" className="tab-content-n current-n">
-                                  <div className="native-icons"><a href="#"><img height="13" src={Filter} /></a><a href="#"><img height="14" src={Doller} /></a></div>
+                                  <div className="native-icons">
+                                    <a href="#"><img height="13" src={Filter} /></a>
+                                    <a onClick={() => this.setState({ ShowSidebar: !this.state.ShowSidebar })} href="#"><img height="14" src={Doller} /></a></div>
                                   <div className=" form-group-n  items-center-n">
                                     <div className="flex-1 w-100-sm flex-auto-sm">
                                         <div className="inputs-wrap light-controls-n">
@@ -3234,7 +3244,7 @@ export default class Home extends PureComponent {
                                 </div>
                               </div>
                             </div>
-                            <div className="side-pannel">
+                            <div  className={`side-pannel ${this.state.ShowSidebar ? '' : 'hidden'}`}>
                               <h4>Best cross chain prices</h4>
                               <div className="">
                                 <h5><span>1. <img src={SSIco} /></span>SmartSwap
@@ -3253,7 +3263,7 @@ export default class Home extends PureComponent {
                               </div>
                             </div>
                           </div>
-                          <div className="swap-Textlink hasSidebar">
+                          <div className={`swap-Textlink ${this.state.ShowSidebar ? 'hasSidebar' : ''}`}>
                             {this.state.web3 !== null ? (
                               <div className="swap-Link01">
                                 <a
@@ -3280,7 +3290,7 @@ export default class Home extends PureComponent {
                               </div>
                             ) : (
                               <div className="powertextBX">
-                                <p>
+                                <p className="poweredBy">
                                   Powered by
                                   <img src={SmartExchange} />
                                   {/* <a href="#">Start new swap</a> */}
@@ -3291,13 +3301,23 @@ export default class Home extends PureComponent {
                                     {/* <a href="">Free license</a> */}
                                     <a href="">Apply for licensing</a>
                                 </div>
+                                <div className="powertextBX-links estimated">
+                                    <p>Estimated gas and fees<i className="help-circle">
+                                            <i
+                                              className="fas fa-question-circle protip"
+                                              data-pt-position="top"
+                                              data-pt-title="Slippage free trades carry higher gas costs than slippage trades. Gas and fees are 100% reimbursed"
+                                              aria-hidden="true"
+                                            ></i>
+                                          </i>:&nbsp;<span>0.09806</span>&nbsp;BNB</p>
+                                </div>
                                 {/* <div className="d-flex">
                                   <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p>
                                 </div> */}
                               </div>
                             )}
                             <label className="slippage-outer">
-                              <p className="active" style={{ paddingRight: "10px" }}>Dollar amount </p>
+                              <p className="active" style={{ paddingRight: "8px" }}>Dollar amount </p>
                               <Switch
                                 checked={this.state.checked2}
                                 onChange={this.handleChange2}
@@ -3316,10 +3336,10 @@ export default class Home extends PureComponent {
                                 id="small-radius-switch"
                                 disabled={true}
                               />
-                              <p style={{ paddingLeft: "10px" }}>Token amount</p>
+                              <p style={{ paddingLeft: "8px" }}>Token amount</p>
                             </label>
                             <label className="slippage-outer">
-                              <p className="active" style={{ paddingRight: "10px" }}>Slippage free </p>
+                              <p className="active" style={{ paddingRight: "8px" }}>Slippage free </p>
                               <Switch
                                 checked={this.state.checked1}
                                 onChange={this.handleChange1}
@@ -3452,7 +3472,7 @@ export default class Home extends PureComponent {
                                                 <i
                                                   className="fas fa-question-circle protip"
                                                   data-pt-position="top"
-                                                  data-pt-title="Gas fees are paid to the corresponding blockchain network"
+                                                  data-pt-title="Info"
                                                   aria-hidden="true"
                                                 ></i></i></td> 
                                           <td>0.1819 SMART ($0.1819) </td>

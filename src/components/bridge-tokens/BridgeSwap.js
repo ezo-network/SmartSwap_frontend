@@ -10,9 +10,17 @@ import CheckAuthenticityPopup from "../../components/bridge-tokens/CheckAuthenti
 import web3Config from "../../config/web3Config";
 import BridgeApiHelper from "../../helper/bridgeApiHelper";
 import BridgeContract from "../../helper/bridgeContract";
+import ERC20TokenContract from "../../helper/erc20TokenContract";
+import styled from 'styled-components';
+import axios from "axios";
+let source;
+//const maxAprovalLimit =  Web3.utils.toBN('115792089237316200000000000000000000000000000000000000000000'); // 60 digit number
+// https://velvetshark.com/articles/max-int-values-in-solidity
+const maxAprovalLimit =  Web3.utils.toBN('79228162514264337593543950335'); // uint96 max 
 
 
 export default class BridgeSwap extends PureComponent {
+    _isMounted = false;
     pendingNetworkSwitchRequest = false;
     sourceTokenBalance = 0;
     constructor(props) {
@@ -51,19 +59,27 @@ export default class BridgeSwap extends PureComponent {
             accountAddress: null,
             networks: [],
             tokens: [],
-            wrappedTokens: []
+            tokensWithBalance: [],
+            wrappedTokens: [],
+            customTokenBalance: null
         };
+
+        source = axios.CancelToken.source();
 
         this.connectWallet = this.connectWallet.bind(this);
         this.walletConnectCallback = this.walletConnectCallback.bind(this);
         this.setSourceToken = this.setSourceToken.bind(this);
+        this.tokenAddressCallback = this.tokenAddressCallback.bind(this)
     }
 
     componentDidMount = async() => {
-        await this.getNetworkList();
-        await this.getTokenList(); 
-        await this.getAllWrappedTokens();       
-        await this.connectWallet();
+        this._isMounted = true;
+		if(this._isMounted === true){
+            await this.getNetworkList();
+            await this.getTokenList(); 
+            await this.getAllWrappedTokens();       
+            await this.connectWallet();
+        }
     }
     
     componentDidUpdate(newProps) {
@@ -78,34 +94,51 @@ export default class BridgeSwap extends PureComponent {
                 //console.log('accountChanged', accounts);
                 if(accounts.length > 0){
                     await web3Config.connectWallet(0);
-                    this.walletConnectCallback(true, web3Config.getWeb3());
+                    await this.walletConnectCallback(true, web3Config.getWeb3());
                 } else {
-                    this.walletConnectCallback(false, null);              
+                    await this.walletConnectCallback(false, null);              
                 }
             });
 
-            window.ethereum.on('disconnect', (error) => {
-                this.walletConnectCallback(false, null);          
+            window.ethereum.on('disconnect', async (error) => {
+                await this.walletConnectCallback(false, null);          
             });
         }
-    }    
+    }  
 
-    toggleSourceTokenPopup = () => {
+    componentWillUnmount() {
+		this._isMounted = false;
+        if (source) {
+          source.cancel("BridgeSwap Component got unmounted");
+        }
+	}
+
+    toggleSourceTokenPopup = async() => {
         if(this.pendingNetworkSwitchRequest === false){
-            this.setState({
-                toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
-            });
+            if(this.state.walletConnected){
+                await this.filterTokenByWalletBalance().then(() => {
+                    this.setState({
+                        toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
+                    });
+                });
+            } else {
+                notificationConfig.info('Connect your wallet first.');
+            }
         } else {
-            notificationConfig.info('A switch network request is pending. Check metamask.');            
+            notificationConfig.info('A switch network request is pending. Check metamask.');
         }
     }
 
     toggleDestinationTokensPopup = () => {
         if(this.state.isSourceTokenSelected){
             if(this.pendingNetworkSwitchRequest === false){
-                this.setState({
-                    toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
-                });
+                if(this.state.walletConnected === true && (Number(web3Config.getNetworkId()) === Number(this.state.sourceTokenData.chainId))){
+                    this.setState({
+                        toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
+                    });
+                } else {
+                    notificationConfig.info('Please switch network');                    
+                }
             } else {
                 notificationConfig.info('A switch network request is pending. Check metamask.');
             } 
@@ -144,16 +177,18 @@ export default class BridgeSwap extends PureComponent {
         }
     
         await web3Config.connectWallet(0).then(async(response) => {
-          if(window.ethereum.isConnected() === true){
-            if(response === true){
-              this.walletConnectCallback(true, web3Config.getWeb3());
-              //notificationConfig.success('Wallet connected');
-            } else {
-              notificationConfig.info('Wallet not connected to metamask');                  
+            if(this._isMounted === true){
+                if(window.ethereum.isConnected() === true){
+                  if(response === true){
+                    await this.walletConnectCallback(true, web3Config.getWeb3());
+                    //notificationConfig.success('Wallet connected');
+                  } else {
+                    notificationConfig.info('Wallet not connected to metamask');                  
+                  }
+                } else {
+                  notificationConfig.info('Wallet not connected to metamask');        
+                }
             }
-          } else {
-            notificationConfig.info('Wallet not connected to metamask');        
-          }
         }).catch(error => {
           console.log({
             error:error
@@ -161,7 +196,7 @@ export default class BridgeSwap extends PureComponent {
         });
     }
 
-    walletConnectCallback(walletConnected, web3Instance) {
+    async walletConnectCallback(walletConnected, web3Instance) {
         this.setState({
           walletConnected: walletConnected,
           web3Instance: web3Instance,
@@ -198,7 +233,6 @@ export default class BridgeSwap extends PureComponent {
               destinationTokenData
             };
         });
-
     }
 
     getNetworkList = async() => {
@@ -207,14 +241,16 @@ export default class BridgeSwap extends PureComponent {
             response, 
             error,
             code
-          } = await BridgeApiHelper.getNetworkList();
-      
-          if(code === 200){
-            this.setState({
-              networks: response
-            });
-          } else {
-            console.error(error)
+          } = await BridgeApiHelper.getNetworkList(source.token);
+          
+          if(this._isMounted === true){
+              if(code === 200){
+                this.setState({
+                  networks: response
+                });
+              } else {
+                console.error(error)
+              }
           }
         } catch (error){
           console.error(error)
@@ -224,17 +260,19 @@ export default class BridgeSwap extends PureComponent {
     getTokenList = async () => {
         try {
             const {
-            response, 
-            error,
-            code
-            } = await BridgeApiHelper.getTokenList();
-            
-            if(code === 200){
-            this.setState({
-                tokens: response
-            });
-            } else {
-            console.error(error)
+                response, 
+                error,
+                code
+            } = await BridgeApiHelper.getTokenList(source.token);
+
+            if(this._isMounted === true){
+                if(code === 200){
+                    this.setState({
+                        tokens: response
+                    });
+                } else {
+                    console.error(error)
+                }
             }
 
         } catch (error){
@@ -248,14 +286,15 @@ export default class BridgeSwap extends PureComponent {
             response,
             error,
             code
-          } = await BridgeApiHelper.getWrappedTokens(null, null, true);
-    
-          if (code === 200) {
-            this.setState({
-              wrappedTokens: response
-            });
-          } else {
-            console.error(error)
+          } = await BridgeApiHelper.getWrappedTokens(null, null, true, source.token);
+          if(this._isMounted === true){
+              if (code === 200) {
+                this.setState({
+                  wrappedTokens: response
+                });
+              } else {
+                console.error(error)
+              }
           }
     
         } catch (error) {
@@ -445,9 +484,9 @@ export default class BridgeSwap extends PureComponent {
             tokenAddresses.forEach(tokenAddress => {
                 // will only work with erc20 token addresses
                 var obj = {
-                target: tokenAddress,
-                call: ['balanceOf(address)(uint256)', accountAddress],
-                returns: [['BALANCE_OF_' + tokenAddress, val => val / 10 ** decimals]]
+                    target: tokenAddress,
+                    call: ['balanceOf(address)(uint256)', accountAddress],
+                    returns: [['BALANCE_OF_' + tokenAddress, val => val / 10 ** decimals]]
                 }
                 multicallTokensConfig.push(obj);
             });
@@ -458,9 +497,10 @@ export default class BridgeSwap extends PureComponent {
             );
             
             Object.keys(response.results.transformed).forEach((token, index) => {
-                const balanceInWei = response.results.transformed[token];
-                console.log(`${index} ${token} - ${balanceInWei}`)
-                this.sourceTokenBalance = balanceInWei;
+                console.log(response.results.transformed[token]);
+                const balanceInDecimals = (response.results.transformed[token]).toFixed(decimals);
+                console.log(`${index} ${token} - ${balanceInDecimals}`)
+                this.sourceTokenBalance = balanceInDecimals;
 
                 const sourceTokenData = {...this.state.sourceTokenData};
                 sourceTokenData.balance = this.sourceTokenBalance;
@@ -471,6 +511,103 @@ export default class BridgeSwap extends PureComponent {
           console.error(error.message);
         }
     }    
+
+    aggregateTokenBalanceWithMultiCall = async (chainId, tokenAddresses = [], accountAddress) => {
+        try {
+
+            const networkConfig = _.find(this.state.networks, { chainId: Number(chainId) });
+            console.log(networkConfig);
+            
+            const config = {
+                rpcUrl: networkConfig.rpc,
+                multicallAddress: networkConfig.multicallContractAddress
+            };
+            
+            const multicallTokensConfig = [];
+            tokenAddresses.forEach(tokenAddress => {
+                const token = _.find(this.state.tokens, { address: (tokenAddress).toLowerCase() });
+                // will only work with erc20 token addresses
+                var obj = {
+                    target: tokenAddress,
+                    call: ['balanceOf(address)(uint256)', accountAddress],
+                    returns: [['BALANCE_OF_' + tokenAddress, val => val / 10 ** Number(token.decimals)]]
+                }
+                multicallTokensConfig.push(obj);
+            });
+
+            console.log(multicallTokensConfig);
+
+            const response = await aggregate(
+                multicallTokensConfig,
+                config
+            );
+
+            Object.keys(response.results.transformed).forEach((token, index) => {
+                const tokenAddress = (token.substring(11)).toLowerCase();
+                const isTokenExist = _.find(this.state.tokens, {
+                    address: tokenAddress,
+                    chainId: Number(chainId)
+                });
+                if (isTokenExist) {
+                    console.log(`${index} ${isTokenExist.symbol}  ${isTokenExist.chainId} - ${token} - ${response.results.transformed[token]}`)
+                    if (response.results.transformed[token] > 0) {
+                        this.setState(prevState => ({
+                            tokensWithBalance: [...prevState.tokensWithBalance, isTokenExist]
+                        }))
+                    }
+                }
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
+    }    
+
+    getCustomTokenBalance = async(tokenAddress) => {
+        try {
+
+            tokenAddress = (tokenAddress).toLowerCase();
+
+            const networkConfig = _.find(this.state.networks, {chainId: Number(this.state.chainId)});
+
+            console.log(tokenAddress);
+            console.log(networkConfig);
+
+            const config = {
+                rpcUrl: networkConfig.rpc,
+                multicallAddress: networkConfig.multicallContractAddress
+            };
+        
+            const multicallTokensConfig = [];
+            // will only work with erc20 token addresses
+            const key = 'BALANCE_OF_' + tokenAddress
+            var obj = {
+                target: tokenAddress,
+                call: ['balanceOf(address)(uint256)', this.state.accountAddress],
+                returns: [['BALANCE_OF_' + tokenAddress, val => val]]
+            }
+
+            multicallTokensConfig.push(obj);
+            
+            const response = await aggregate(
+                multicallTokensConfig,
+                config
+            );
+
+            console.log({
+                'custom token balance': (response.results.transformed[key]).toString()
+            });
+                        
+            if(response.results.transformed){
+                this.setState({
+                    customTokenBalance: (response.results.transformed[key]).toString()
+                })
+            }
+          
+        } catch(error){
+          console.error(error.message);
+          return false;
+        }
+    }
 
     updateSourceTokenBalance = async() => {
         await this.aggregateBalanceOfMultiCall(
@@ -491,13 +628,11 @@ export default class BridgeSwap extends PureComponent {
 
     setAmount = (amount) => {
         if(!isNaN(amount)){
-            if(amount <= this.sourceTokenBalance){
-                const sourceTokenData = {...this.state.sourceTokenData};
-                const destinationTokenData = {...this.state.destinationTokenData};
-                sourceTokenData.amount = amount;
-                destinationTokenData.amount = amount;
-                this.setState({sourceTokenData, destinationTokenData});
-            }
+            const sourceTokenData = {...this.state.sourceTokenData};
+            const destinationTokenData = {...this.state.destinationTokenData};
+            sourceTokenData.amount = amount;
+            destinationTokenData.amount = amount;
+            this.setState({sourceTokenData, destinationTokenData});
         }
     }
 
@@ -511,14 +646,35 @@ export default class BridgeSwap extends PureComponent {
                 notificationConfig.error('Destination token not selected yet.');
                 return;
             }
+            
+            let depositAmount = this.state.sourceTokenData.amount.toString();
+            //depositAmount = Web3.utils.toWei(depositAmount);
 
-            if(this.state.sourceTokenData.amount <= 0){
-                notificationConfig.info('Enter amount to bridge');                
+            depositAmount = (this.state.sourceTokenData.amount) * (10 ** Number(this.state.sourceTokenData.decimals));
+            
+            depositAmount = (depositAmount).toString().split('.')[0];
+
+            depositAmount = Web3.utils.toBN(depositAmount);
+
+            let balance = (this.sourceTokenBalance).toString();
+            //balance = Web3.utils.toWei(balance);
+            balance = Number(balance) * (10 ** Number(this.state.sourceTokenData.decimals));
+            balance = (balance).toString().split('.')[0];
+            balance = Web3.utils.toBN(balance);
+            console.log({
+                inputAmount: (depositAmount).toString(),
+                balance: (balance).toString(),
+                cond: depositAmount.gt(balance),
+                decimals: Number(this.state.sourceTokenData.decimals)
+            });
+
+            if(depositAmount.gt(balance)){
+                notificationConfig.error(`Amount can't be more then wallet balance`);                
                 return;
             }
 
-            if(this.state.sourceTokenData.amount > this.sourceTokenBalance){
-                notificationConfig.error(`Amount can't be more then wallet balance`);                
+            if(depositAmount.lte(Web3.utils.toBN('0'))){
+                notificationConfig.error(`Amount can't be zero.`);                
                 return;
             }
 
@@ -533,81 +689,216 @@ export default class BridgeSwap extends PureComponent {
 
             // check for allowence and approval
             const networkConfig = _.find(this.state.networks, {chainId: this.state.chainId});
-            const bridgeContract = new BridgeContract(this.state.web3Instance, networkConfig.bridgeContractAddress);
-            await bridgeContract.depositTokens(
-                this.state.sourceTokenData.address,
-                Web3.utils.toWei(this.state.sourceTokenData.amount, 'ether'),
-                this.state.destinationTokenData.chainId,
-                async (hash) => {
-                    console.log({
-                        hash: hash
+
+            const erc20TokenContract = new ERC20TokenContract(this.state.web3Instance, this.state.sourceTokenData.address, networkConfig.bridgeContractAddress);
+
+            await erc20TokenContract.allowance(async(response) => {
+
+                console.log({allowance: response});
+
+                // get apporval
+                const allowedSpendLimit = Web3.utils.toBN((response).toString());
+                //const depositAmountInWei = Number(depositAmount) * (10 ** Number(this.state.sourceTokenData.decimals));
+
+                console.log({
+                    depositAmount: (depositAmount).toString(),
+                    allowedSpendLimit: (allowedSpendLimit).toString(),
+                    cond: depositAmount.gt(allowedSpendLimit)
+                });
+
+                if (depositAmount.gt(allowedSpendLimit)) {
+                    this.setState({
+                        btnAction: "APPROVE TOKEN ACCESS"
                     });
-                },
-                async (response) => {
-                    console.log(response)
+                    //const diffAmount = depositAmount.sub(allowedSpendLimit);
+                    //console.log({ 'diffAmount': (diffAmount).toString() })
+                    // get approval
+                    await erc20TokenContract.approve(maxAprovalLimit, (hash) => {
+                        console.log({ 'approveHash': hash });
+                        this.setState({
+                            btnAction: "AWATING APPROVAL..."
+                        });
+                    }, (response) => {
+                        console.log({
+                            approveReceiptResponse: response
+                        });
 
-                    if (response.code === "ACTION_REJECTED") {
-                        notificationConfig.error(response.reason);
-                    }
-            
-                    if (response.code === "UNPREDICTABLE_GAS_LIMIT") {
-                        notificationConfig.error(response.reason);
-                    }
-            
-                    if (response.code === -32016) {
-                        notificationConfig.error(response.message);
-                    }
-            
-                    if (response.code === -32000){
-                        notificationConfig.error("Intrinsic gas too low");
-                    }
+                        if (response.code === 4001) {
+                            notificationConfig.error(response.message);
+                        }
 
-                    if(response.code === -32603){
-                        notificationConfig.error("execution reverted: TransferHelper: TRANSFER_FROM_FAILED");                        
-                    }
-            
-                    if(response.code === 'NOT_A_CONTRACT'){
-                        notificationConfig.error('Bridge address is not a contract.');
-                    }          
-            
-                    if(
-                        response.code === 'CALL_EXCEPTION' 
-                        || response.code === 'INSUFFICIENT_FUNDS' 
-                        || response.code === 'NETWORK_ERROR' 
-                        || response.code === 'NONCE_EXPIRED' 
-                        || response.code === 'REPLACEMENT_UNDERPRICED'
-                        || response.code === 'UNPREDICTABLE_GAS_LIMIT'
-                    ){
-                        notificationConfig.error(response.reason);            
-                    }
-            
-                    if(response.code === 'TRANSACTION_REPLACED'){
-                        if(response.cancelled === false && response.receipt?.transactionHash){
-                            //response.receipt.transactionHash,
+                        if (response?.error?.data?.originalError?.code === 3) {
+                            notificationConfig.error(response?.error?.data?.originalError?.message);
+                        }
+
+                        if (response.code === "ACTION_REJECTED") {
+                            notificationConfig.error(response.reason);
+                        }
+                
+                        if (response.code === "UNPREDICTABLE_GAS_LIMIT") {
+                            notificationConfig.error(response.reason);
+                        }
+                
+                        if (response.code === -32016) {
+                            notificationConfig.error(response.message);
+                        }
+                
+                        if (response.code === -32000){
+                            notificationConfig.error("Intrinsic gas too low");
+                        }
+
+                        if(response.code === -32603){
+                            notificationConfig.error("execution reverted: TransferHelper: TRANSFER_FROM_FAILED");                        
+                        }
+                
+                        if(response.code === 'NOT_A_CONTRACT'){
+                            notificationConfig.error('Token address is not a valid ERC-20 contract.');
+                        }
+                
+                        if(
+                            response.code === 'CALL_EXCEPTION' 
+                            || response.code === 'INSUFFICIENT_FUNDS' 
+                            || response.code === 'NETWORK_ERROR' 
+                            || response.code === 'NONCE_EXPIRED' 
+                            || response.code === 'REPLACEMENT_UNDERPRICED'
+                            || response.code === 'UNPREDICTABLE_GAS_LIMIT'
+                        ){
+                            notificationConfig.error(response.reason);            
+                        }
+                
+                        if(response.code === 'TRANSACTION_REPLACED'){
+                            if(response.cancelled === false && response.receipt?.transactionHash){
+                                //response.receipt.transactionHash,
+                                notificationConfig.success('Successfully Approved');
+                            }
+                        }
+                                    
+                        if(response.status === 1) {
+                            //response.transactionHash
+                            notificationConfig.success('Successfully Approved');
+                        }
+
+                        this.setState({
+                            btnClicked: false,
+                            btnAction: btnAction
+                        });
+                    });         
+                    return;
+                }
+
+                // deposit tokens
+                const bridgeContract = new BridgeContract(this.state.web3Instance, networkConfig.bridgeContractAddress);
+                await bridgeContract.depositTokens(
+                    this.state.sourceTokenData.address,
+                    depositAmount,
+                    this.state.destinationTokenData.chainId,
+                    async (hash) => {
+                        console.log({
+                            hash: hash
+                        });
+                    },
+                    async (response) => {
+                        console.log(response)
+
+                        if (response.code === "ACTION_REJECTED") {
+                            notificationConfig.error(response.reason);
+                        }
+                
+                        if (response.code === "UNPREDICTABLE_GAS_LIMIT") {
+                            notificationConfig.error(response.reason);
+                        }
+                
+                        if (response.code === -32016) {
+                            notificationConfig.error(response.message);
+                        }
+                
+                        if (response.code === -32000){
+                            notificationConfig.error("Intrinsic gas too low");
+                        }
+
+                        if(response.code === -32603){
+                            notificationConfig.error("execution reverted: TransferHelper: TRANSFER_FROM_FAILED");                        
+                        }
+                
+                        if(response.code === 'NOT_A_CONTRACT'){
+                            notificationConfig.error('Bridge address is not a contract.');
+                        }          
+                
+                        if(
+                            response.code === 'CALL_EXCEPTION' 
+                            || response.code === 'INSUFFICIENT_FUNDS' 
+                            || response.code === 'NETWORK_ERROR' 
+                            || response.code === 'NONCE_EXPIRED' 
+                            || response.code === 'REPLACEMENT_UNDERPRICED'
+                            || response.code === 'UNPREDICTABLE_GAS_LIMIT'
+                        ){
+                            notificationConfig.error(response.reason);            
+                        }
+                
+                        if(response.code === 'TRANSACTION_REPLACED'){
+                            if(response.cancelled === false && response.receipt?.transactionHash){
+                                //response.receipt.transactionHash,
+                                notificationConfig.success('Swapped Successfully!');
+                                await this.updateSourceTokenBalance();
+                            }
+                        }
+                                    
+                        if(response.status === 1) {
+                            //response.transactionHash
                             notificationConfig.success('Swapped Successfully!');
                             await this.updateSourceTokenBalance();
                         }
-                    }
-                                  
-                    if(response.status === 1) {
-                        //response.transactionHash
-                        notificationConfig.success('Swapped Successfully!');
-                        await this.updateSourceTokenBalance();
-                    }
 
-                    this.setState({
-                        btnClicked: false,
-                        btnAction: btnAction
-                    });
-                }
-            );
+                        this.setState({
+                            btnClicked: false,
+                            btnAction: btnAction
+                        });
+                    }
+                );                
+
+
+            }, (error) => {
+                console.log({
+                    allowanceError: error
+                });
+                return error;
+            });
 
 
         } catch(err) {
             console.error({
-                swapBridgeToken: err.message
+                depositTokensCatch: err.message
             })
         }
+    }
+
+    filterTokenByWalletBalance = async () => {
+        try {
+            this.setState({
+                tokensWithBalance: []
+            });
+            const groupedTokenByNetwork = this.state.tokens.reduce(function (r, token) {
+                r[token.chainId] = r[token.chainId] || [];
+                r[token.chainId].push(token.address);
+                return r;
+            }, Object.create(null));
+
+            Object.keys(groupedTokenByNetwork).forEach(async (network) => {
+                // only active network
+                if(Number(this.state.chainId) === Number(network)){
+                    await this.aggregateTokenBalanceWithMultiCall(network, groupedTokenByNetwork[network], this.state.accountAddress);
+                }
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
+    tokenAddressCallback = async() => {
+        await this.getTokenList().then(async() => {
+            await this.filterTokenByWalletBalance();
+
+        });
     }
 
     render() {
@@ -646,7 +937,7 @@ export default class BridgeSwap extends PureComponent {
                 </div>
                 <div className="tabRow">
                     <div className="tabCol">
-                        <label>SEND</label>
+                        <label>DEPOSIT</label>
                         <div className="from-token inputIcon white">
                             <i>
                                 <img
@@ -706,35 +997,54 @@ export default class BridgeSwap extends PureComponent {
                         </figure>
                     </div>
                 </div>
-                <div className="tabRow hasBtn">
+                <div className="tabRow hasBtn action-btn">
                     {
                         this.state.walletConnected === false && 
                         <button onClick={() => this.connectWallet()} className="btn btn-primary">CONNECT YOUR WALLET</button>                        
                     }
                     {
                         this.state.walletConnected === true && (Number(web3Config.getNetworkId()) !== Number(this.state.sourceTokenData.chainId)) && 
-                        <button onClick={() => this.switchNetwork(Number(this.state.sourceTokenData.chainId))} className="btn btn-switch">SWITCH NETWORK</button>                        
+                        <button onClick={() => this.switchNetwork(Number(this.state.sourceTokenData.chainId))} className="btn btn-switch">
+                            <div className="btn-container">
+                                <img 
+                                    src={'/images/free-listing/chains/' + (this.state.sourceTokenData.chain + '.png').toLowerCase()}
+                                    onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
+                                    alt={this.state.sourceTokenData.chain}
+                                ></img>
+                                SWITCH NETWORK
+                            </div>
+                        </button>                        
                     }
                     {
                         this.state.walletConnected === true && 
                         (Number(web3Config.getNetworkId()) === Number(this.state.sourceTokenData.chainId)) && 
-                        <button 
-                            disabled={
-                                this.state.btnClicked 
-                                || !this.state.isDestinationTokenSelected 
-                                || !this.state.isSourceTokenSelected
-                            }
-                            onClick={
-                                () => this.depositTokens()
-                            }
-                            className="btn btn-primary">{this.state.btnAction}
-                        </button>
+                        <>
+                            <button 
+                                disabled={
+                                    this.state.btnClicked 
+                                    || !this.state.isDestinationTokenSelected 
+                                    || !this.state.isSourceTokenSelected
+                                }
+                                onClick={
+                                    () => this.depositTokens()
+                                }
+                                className="btn btn-primary">
+                                    <div className="btn-container">
+                                        <img 
+                                            src={'/images/free-listing/chains/' + (this.state.sourceTokenData.chain + '.png').toLowerCase()}
+                                            onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
+                                            alt={this.state.sourceTokenData.chain}
+                                        ></img>
+                                        {this.state.btnAction}                                    
+                                    </div>
+                            </button>
+                        </>
                     }
                     {
                         this.state.walletConnected === true && 
                         (Number(web3Config.getNetworkId()) === Number(this.state.sourceTokenData.chainId)) && 
-                        this.sourceTokenBalance <= 0 && 
-                        this.state.isDestinationTokenSelected && 
+                        this.sourceTokenBalance <= 0 &&
+                        this.state.isDestinationTokenSelected &&
                         this.state.isSourceTokenSelected &&
                         <button className="btn btn-primary">{`Insufficient ${this.state.sourceTokenData.symbol} balance`}</button>
                     }
@@ -744,10 +1054,16 @@ export default class BridgeSwap extends PureComponent {
                 <SourceTokenPopup 
                     show={this.state.toggleSourceTokenPopup} 
                     closePopupCallback={this.toggleSourceTokenPopup}
-                    tokens={this.state.tokens}
+                    tokens={this.state.tokensWithBalance}
                     networks={this.state.networks}
                     wrappedTokens={this.state.wrappedTokens}
                     sourceTokenSelectedCallback={this.setSourceToken}
+                    accountAddress={this.state.accountAddress}
+                    walletConnected={this.state.walletConnected}
+                    chainId={this.state.chainId}
+                    onTokenAddedCallback={this.tokenAddressCallback}
+                    onCustomTokenBalanceCheck={this.getCustomTokenBalance}
+                    customTokenBalance={this.state.customTokenBalance}
                 ></SourceTokenPopup>
                 
                 <DestinationTokensPopup 

@@ -7,6 +7,8 @@ import pinAct from "../../assets/images/pin.png";
 import pin from "../../assets/images/pin-u.png";
 import pinDeact from "../../assets/images/pind-d.png";
 
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
+
 const textMasking = (text, maskingChar = '.', noOfMaskingChar = 3, startingLettersLength = 5, endingLettersLength = 5) => {
     return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
 }
@@ -97,7 +99,7 @@ export default class DestinationTokensPopup extends PureComponent {
         filteredNetworks.forEach(network => {
             if (Number(network.chainId) !== Number(this.props.selectedSourceToken.chainId)) {
                 const wrappedToken = _.find(this.props.wrappedTokens, {
-                    tokenSymbol: 'SB' + (this.props.selectedSourceToken.symbol).toUpperCase(),
+                    tokenSymbol: wrapTokenSymbolPrefix + (this.props.selectedSourceToken.symbol).toUpperCase(),
                     fromChainId: Number(this.props.selectedSourceToken.chainId),
                     toChainId: Number(network.chainId)
                 });
@@ -268,7 +270,14 @@ export default class DestinationTokensPopup extends PureComponent {
                                                         }
 
                                                         {network['isBridgeExistOnChain'] === false &&
-                                                            <Link to='/freelisting'>
+
+                                                            <Link to={{ 
+                                                                pathname: "/freelisting", 
+                                                                state: {
+                                                                    sourceTokenData: this.props.selectedSourceToken,
+                                                                    destinationNetworkData: network
+                                                                }
+                                                            }}>
                                                                 <ButtonPrimary>CREATE NEW BRIDGE</ButtonPrimary>
                                                             </Link>
                                                         }
