@@ -8,6 +8,7 @@ import close from "../../assets/images/close.png";
 import Web3 from 'web3';
 import BridgeApiHelper from "../../helper/bridgeApiHelper";
 import notificationConfig from "../../config/notificationConfig";
+import errors from "../../helper/errorConstantsHelper";
 
 const visibleBridgesNumber = process.env.REACT_APP_VISIBLE_BRIDGES_NUMBER;
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
@@ -87,19 +88,19 @@ export default class SourceTokenPopup extends PureComponent {
         console.log(response, code, error);
         if(code === 201){
             await this.props.onTokenAddedCallback().then(async() => {
-                notificationConfig.success('Token imported');
+                notificationConfig.success(errors.tokenImported);
                 await this.props.onCustomTokenBalanceCheck(this.state.filteredToken).then(async() => {
                     if(this.props.customTokenBalance == 0 || this.props.customTokenBalance === null){
-                        notificationConfig.error("Token not listed here due to insufficient token balance");
+                        notificationConfig.error(errors.tokenCouldNotList);
                     }
-                });        
-            })
-        } 
+                });
+            });
+        }
         
         if(error === 'A TOKEN ALREADY EXIST'){
             await this.props.onCustomTokenBalanceCheck(this.state.filteredToken).then(async() => {
                 if(this.props.customTokenBalance == 0 || this.props.customTokenBalance === null){
-                    notificationConfig.error("Token not listed here due to insufficient token balance");
+                    notificationConfig.error(errors.tokenCouldNotList);
                 }
             });                    
         }

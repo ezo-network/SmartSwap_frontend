@@ -5,6 +5,7 @@ import notificationConfig from "../config/notificationConfig";
 import styled from 'styled-components';
 import Lineimg from "../assets/freelisting-images/line01.png";
 import { createWatcher, aggregate } from '@makerdao/multicall';
+import errors from "../helper/errorConstantsHelper";
 
 
 const $ = window.$;
@@ -168,12 +169,12 @@ export default class Screen2 extends PureComponent {
         }).catch(async(error) => {
           console.error(error);
           if(error.code === -32002){
-            notificationConfig.info('A switch network request is pending. Check metamask.');
+            notificationConfig.info(errors.switchRequestPending);
             this.pendingNetworkSwitchRequest = true;
           }
 
           if(error.code === 4902){
-            notificationConfig.error('Unrecognized network. Adding network to metamask');
+            notificationConfig.error(errors.metamask.networkNotFound);
             //await this.addNetworkToWallet(chainId, chain, token, token, decimals, explorerUrl, explorerUrl);
             //https://matic-mumbai.chainstacklabs.com
             await this.addNetworkToWallet(chainId);
@@ -185,7 +186,7 @@ export default class Screen2 extends PureComponent {
         this.setState(sourceObject);
       }
     } else {
-      notificationConfig.info('A switch network request is pending. Check metamask.');      
+      notificationConfig.info(errors.switchRequestPending);      
     }
   }
 
@@ -193,7 +194,7 @@ export default class Screen2 extends PureComponent {
     if(this.pendingNetworkSwitchRequest === false){
       this.props.onBackButtonClicked(1)
     } else {
-      notificationConfig.info('A switch network request is pending. Check metamask.');            
+      notificationConfig.info(errors.switchRequestPending);            
     }
   }
 
@@ -217,7 +218,7 @@ export default class Screen2 extends PureComponent {
           ||
           this.state.selectedSource.decimals == null
         ){
-          notificationConfig.error('Please select a token first.');
+          notificationConfig.error(errors.tokenNotSelected);
           return;
         }
     
@@ -235,7 +236,7 @@ export default class Screen2 extends PureComponent {
         this.props.onAddCustomTokenClicked();      
       }
     } else {
-      notificationConfig.info('A switch network request is pending. Check metamask.');            
+      notificationConfig.info(errors.switchRequestPending);
     }
   }
 

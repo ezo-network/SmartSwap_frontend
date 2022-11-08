@@ -2,6 +2,7 @@ import React, { PureComponent, lazy, Suspense } from "react";
 import styled from 'styled-components';
 import BridgeApiHelper from "../helper/bridgeApiHelper";
 import notificationConfig from "../config/notificationConfig";
+import errors from "../helper/errorConstantsHelper";
 const $ = window.$;
 
 export default class Screen8 extends PureComponent {
@@ -40,9 +41,9 @@ export default class Screen8 extends PureComponent {
         if(init === false){
 
           if(response.instructionSent === true){
-            notificationConfig.info(`Instructions sent on ${response.emailAddress} email address`);
+            notificationConfig.info(errors.email.INSTRUCTION_ALREADY_SENT(response.emailAddress));
           } else {
-            notificationConfig.info(`Instructions will be send on ${response.emailAddress} email address shortly`);
+            notificationConfig.info(errors.email.INSTRUCTION_SENT(response.emailAddress));
           }
           
           this.props.onEmailAddressExist();
@@ -56,10 +57,10 @@ export default class Screen8 extends PureComponent {
               await this.addEmailAddress();
               await this.getEmailStatus();
             } else {
-              notificationConfig.error(`Invalid email address provided.`);
+              notificationConfig.error(errors.email.INVALID);
             }
           } else {
-            notificationConfig.error(`Please provide an email address.`);          
+            notificationConfig.error(errors.email.REQUIRED);          
           }
         }
       } else {

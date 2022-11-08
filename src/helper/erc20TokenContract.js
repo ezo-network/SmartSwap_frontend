@@ -5,6 +5,7 @@ import web3Js from 'web3';
 import { ethers } from 'ethers';
 import ERC20TokenContractAbi from "../abis/erc20TokenAbi.json";
 import web3Config from "../config/web3Config";
+import errors from '../helper/errorConstantsHelper';
 
 const pad32Bytes = (data) => {
     var s = String(data);
@@ -27,9 +28,11 @@ class ERC20TokenContract extends EventEmitter {
         );
     }
 
-    async isContractExist(){
+    async isContractExist(address = null){
         try {
-            const response = await this.web3.getCode(this.contractAddress);
+            address = address === null ? this.contractAddress : address;
+            address = web3Js.utils.toChecksumAddress(address);
+            const response = await this.web3.getCode(address);
             if(response === '0x'){
                 return false;
             } else {
@@ -53,7 +56,7 @@ class ERC20TokenContract extends EventEmitter {
                 successCb({name: name, symbol: symbol, decimals: decimals, totalSupply: ethers.utils.formatUnits(totalSupply, decimals)});
             } else {
                 errorCb({
-                    error: 'Token contract does not exist.'
+                    error: errors.erc20Errors.CONTRACT_NOT_FOUND('Token', this.contractAddress)
                 });
             }
         } catch(error){
@@ -72,7 +75,7 @@ class ERC20TokenContract extends EventEmitter {
                 successCb((allowanceLimit).toString());
             } else {
                 errorCb({
-                    error: 'Token contract does not exist.'
+                    error: errors.erc20Errors.CONTRACT_NOT_FOUND('Token', this.contractAddress)
                 });
             }
         } catch(error){
@@ -109,7 +112,7 @@ class ERC20TokenContract extends EventEmitter {
 
             } else {
                 receiptCb({
-                    error: 'Token contract does not exist.'
+                    error: errors.erc20Errors.CONTRACT_NOT_FOUND('Token', this.contractAddress)
                 });
             }
         } catch(error){
