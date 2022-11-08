@@ -4,6 +4,7 @@ import CONSTANT from "../constants";
 import styled from 'styled-components';
 import _ from "lodash";
 import BridgeApiHelper from "../helper/bridgeApiHelper";
+import errors from "../helper/errorConstantsHelper";
 const $ = window.$;
 
 const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
@@ -79,7 +80,7 @@ export default class Screen6 extends PureComponent {
 			}
 		} catch (err){
 			console.error(err.message);
-			notificationConfig.error('Something went wrong');
+			notificationConfig.error(errors.somethingWentWrong);
 		}
     }
 

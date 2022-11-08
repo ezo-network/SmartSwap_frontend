@@ -13,10 +13,12 @@ import BridgeContract from "../../helper/bridgeContract";
 import ERC20TokenContract from "../../helper/erc20TokenContract";
 import styled from 'styled-components';
 import axios from "axios";
+import errors from '../../helper/errorConstantsHelper';
+
 let source;
 //const maxAprovalLimit =  Web3.utils.toBN('115792089237316200000000000000000000000000000000000000000000'); // 60 digit number
 // https://velvetshark.com/articles/max-int-values-in-solidity
-const maxAprovalLimit =  Web3.utils.toBN('79228162514264337593543950335'); // uint96 max 
+const maxAprovalLimit =  Web3.utils.toBN(process.env.REACT_APP_MAX_TOKEN_APPROVE_LIMIT); // uint96 max 
 
 
 export default class BridgeSwap extends PureComponent {
@@ -122,10 +124,10 @@ export default class BridgeSwap extends PureComponent {
                     });
                 });
             } else {
-                notificationConfig.info('Connect your wallet first.');
+                notificationConfig.info(errors.connectWalletRequestMessage);
             }
         } else {
-            notificationConfig.info('A switch network request is pending. Check metamask.');
+            notificationConfig.info(errors.switchRequestPending);
         }
     }
 
@@ -137,13 +139,13 @@ export default class BridgeSwap extends PureComponent {
                         toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
                     });
                 } else {
-                    notificationConfig.info('Please switch network');                    
+                    notificationConfig.info(errors.switchRequestMessage);                    
                 }
             } else {
-                notificationConfig.info('A switch network request is pending. Check metamask.');
+                notificationConfig.info(errors.switchRequestPending);
             } 
         } else {
-            notificationConfig.info('Please select source token first.')
+            notificationConfig.info(errors.selectSourceTokenMessage);
         }
     }
 
@@ -155,16 +157,16 @@ export default class BridgeSwap extends PureComponent {
                 });
             } else {
                 if(!this.state.isSourceTokenSelected){
-                    notificationConfig.info('Please select source token first.');
+                    notificationConfig.info(errors.selectSourceTokenMessage);
                     return;
                 }
                 if(!this.state.isDestinationTokenSelected){
-                    notificationConfig.info('Please select destination token first.');
+                    notificationConfig.info(errors.selectedDestinationToken);
                     return;
                 }
             }
         } else {
-            notificationConfig.info('A switch network request is pending. Check metamask.');
+            notificationConfig.info(errors.switchRequestPending);
         }
     }
 
@@ -172,7 +174,7 @@ export default class BridgeSwap extends PureComponent {
     
         if (typeof window.ethereum == 'undefined') {
           console.log('MetaMask is not installed!');
-          notificationConfig.error('Metamask not found.');
+          notificationConfig.error(errors.metamask.walletNotFound);
           return;
         }
     
@@ -183,10 +185,10 @@ export default class BridgeSwap extends PureComponent {
                     await this.walletConnectCallback(true, web3Config.getWeb3());
                     //notificationConfig.success('Wallet connected');
                   } else {
-                    notificationConfig.info('Wallet not connected to metamask');                  
+                    notificationConfig.info(errors.metamask.walletNotConnected);                  
                   }
                 } else {
-                  notificationConfig.info('Wallet not connected to metamask');        
+                  notificationConfig.info(errors.metamask.walletNotConnected);        
                 }
             }
         }).catch(error => {
@@ -358,11 +360,11 @@ export default class BridgeSwap extends PureComponent {
     swapDirections = async() => {
         
         if(this.state.isSourceTokenSelected === false){
-            notificationConfig.error('Source token not selected yet.');
+            notificationConfig.error(errors.sourceTokenNotSelected);
             return;
         }
         if(this.state.isDestinationTokenSelected === false){
-            notificationConfig.error('Destination token not selected yet.');
+            notificationConfig.error(errors.destinationTokenNotSelected);
             return;
         }
 
@@ -443,12 +445,12 @@ export default class BridgeSwap extends PureComponent {
                     }).catch(async (error) => {
                         console.error(error);
                         if (error.code === -32002) {
-                            notificationConfig.info('A switch network request is pending. Check metamask.');
+                            notificationConfig.info(errors.switchRequestPending);
                             this.pendingNetworkSwitchRequest = true;
                         }
     
                         if (error.code === 4902) {
-                            notificationConfig.error('Unrecognized network. Adding network to metamask');
+                            notificationConfig.error(errors.metamask.networkNotFound);
                             await this.addNetworkToWallet(chainId);
                             this.pendingNetworkSwitchRequest = false;
                         }
@@ -460,7 +462,7 @@ export default class BridgeSwap extends PureComponent {
                     });
                 }
             } else {
-                notificationConfig.info('A switch network request is pending. Check metamask.');                
+                notificationConfig.info(errors.switchRequestPending);                
                 this.pendingNetworkSwitchRequest = true;
             }
         } catch (err) {
@@ -639,11 +641,11 @@ export default class BridgeSwap extends PureComponent {
     depositTokens = async() => {
         try {
             if(this.state.isSourceTokenSelected === false){
-                notificationConfig.error('Source token not selected yet.');
+                notificationConfig.error(errors.sourceTokenNotSelected);
                 return;
             }
             if(this.state.isDestinationTokenSelected === false){
-                notificationConfig.error('Destination token not selected yet.');
+                notificationConfig.error(errors.destinationTokenNotSelected);
                 return;
             }
             
@@ -669,12 +671,12 @@ export default class BridgeSwap extends PureComponent {
             });
 
             if(depositAmount.gt(balance)){
-                notificationConfig.error(`Amount can't be more then wallet balance`);                
+                notificationConfig.error(errors.amountGreaterThanBalance);
                 return;
             }
 
             if(depositAmount.lte(Web3.utils.toBN('0'))){
-                notificationConfig.error(`Amount can't be zero.`);                
+                notificationConfig.error(errors.amountEqualToZero);                
                 return;
             }
 
@@ -723,7 +725,8 @@ export default class BridgeSwap extends PureComponent {
                             approveReceiptResponse: response
                         });
 
-                        if (response.code === 4001) {
+                        if (response.code >= 4001 && response.code <= 4901) {
+                            // https://blog.logrocket.com/understanding-resolving-metamask-error-codes/#4001
                             notificationConfig.error(response.message);
                         }
 
@@ -752,7 +755,7 @@ export default class BridgeSwap extends PureComponent {
                         }
                 
                         if(response.code === 'NOT_A_CONTRACT'){
-                            notificationConfig.error('Token address is not a valid ERC-20 contract.');
+                            notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Token', this.state.sourceTokenData.address));
                         }
                 
                         if(
@@ -799,6 +802,11 @@ export default class BridgeSwap extends PureComponent {
                     },
                     async (response) => {
                         console.log(response)
+                        
+                        if (response.code >= 4001 && response.code <= 4901) {
+                            // https://blog.logrocket.com/understanding-resolving-metamask-error-codes/#4001
+                            notificationConfig.error(response.message);
+                        }
 
                         if (response.code === "ACTION_REJECTED") {
                             notificationConfig.error(response.reason);
@@ -821,8 +829,8 @@ export default class BridgeSwap extends PureComponent {
                         }
                 
                         if(response.code === 'NOT_A_CONTRACT'){
-                            notificationConfig.error('Bridge address is not a contract.');
-                        }          
+                            notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', networkConfig.bridgeContractAddress));
+                        }
                 
                         if(
                             response.code === 'CALL_EXCEPTION' 
@@ -858,8 +866,13 @@ export default class BridgeSwap extends PureComponent {
 
 
             }, (error) => {
-                console.log({
-                    allowanceError: error
+                console.log(error);
+                if(error?.error !== undefined){
+                    notificationConfig.error(error?.error);
+                }
+                this.setState({
+                    btnClicked: false,
+                    btnAction: btnAction
                 });
                 return error;
             });

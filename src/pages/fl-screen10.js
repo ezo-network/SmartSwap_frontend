@@ -5,6 +5,7 @@ import _ from "lodash";
 import Lineimg from "../assets/freelisting-images/line01.png";
 import BridgeApiHelper from "../helper/bridgeApiHelper";
 import { ethers } from "ethers";
+import errors from "../helper/errorConstantsHelper";
 const $ = window.$;
 
 
@@ -113,19 +114,18 @@ export default class Screen10 extends PureComponent {
           await this.getOwnershipRequests(this.props.accountAddress);
           this.pendingDeploymentRequestCount = 0;
         } else {
-          notificationConfig.error("Something went wrong when signing message.");
           this.setState({
             btnClicked: false
           });
         }
       } else {
-        notificationConfig.error('Select a token');
+        notificationConfig.error(errors.selectToken);
         this.setState({
           btnClicked: false
         });
       }
     } else {
-      notificationConfig.info('A sing message request is pending. Check metamask.');
+      notificationConfig.info(errors.metamask.signMessageRequestPending);
     }
   }
 
@@ -145,6 +145,9 @@ export default class Screen10 extends PureComponent {
       })
 
       const signature = await signer.signMessage(message);
+
+      console.log()
+
       const address = ethers.utils.verifyMessage(message, signature);
   
       if(address === this.props.accountAddress){
@@ -157,6 +160,11 @@ export default class Screen10 extends PureComponent {
         return false;
       }
     } catch(error){
+      if(error.code === 4001){
+        notificationConfig.error(error.message);
+      } else {
+        notificationConfig.error(errors.somethingWentWrong);
+      }
       console.error({
         signDataError: error.message
       });
@@ -169,7 +177,7 @@ export default class Screen10 extends PureComponent {
     if(this.pendingSignMessageRequest === false){
       this.props.onBackButtonClicked(9);
     } else {
-      notificationConfig.info('A sing message request is pending. Check metamask and decline request to go back.');
+      notificationConfig.info(errors.metamask.signMessageRequestPendingOnBackAction);
     }
   }
 

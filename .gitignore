@@ -57,3 +57,5 @@ Thumbs.db
 .env
 testing
 .eslintcache
+yarn.lock
+package-lock.json

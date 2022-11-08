@@ -2,6 +2,7 @@ import React, { PureComponent, lazy, Suspense } from "react";
 import notificationConfig from "../config/notificationConfig";
 import styled from 'styled-components';
 import BridgeApiHelper from "../helper/bridgeApiHelper";
+import errors from "../helper/errorConstantsHelper";
 import Web3 from 'web3';
 
 const $ = window.$;
@@ -47,7 +48,7 @@ export default class Screen9 extends PureComponent {
             validatorAddress: response.validatorAddress,
             isAddressSet: true
           });
-          notificationConfig.info('Validator address already set.');
+          notificationConfig.info(errors.validator.ADDRESS_ALREADY_SET);
         } else {
           this.setState({
             isAddressSet: false
@@ -64,14 +65,14 @@ export default class Screen9 extends PureComponent {
       if(Web3.utils.isAddress(this.state.validatorAddress)){
         const {response, error, code} = await BridgeApiHelper.addValidator(this.props.accountAddress, this.state.validatorAddress);
         if(code === 200){
-          notificationConfig.info('Validator address added successfully.');
+          notificationConfig.info(errors.validator.ADDED);
           await this.getValidator();
         }
       } else {
         this.setState({
           validatorAddress: ''
         });
-        notificationConfig.error('Please provide a valid address.');
+        notificationConfig.error(errors.validator.REQUIRED);
       }
     } catch(err){
       console.error(err);

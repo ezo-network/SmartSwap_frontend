@@ -3,6 +3,7 @@ import notificationConfig from "../config/notificationConfig";
 import styled from 'styled-components';
 import { LoopCircleLoading } from 'react-loadingg';
 import BridgeContract from "../helper/bridgeContract";
+import errors from "../helper/errorConstantsHelper";
 const $ = window.$;
 
 export default class Screen3 extends PureComponent {
@@ -121,7 +122,7 @@ export default class Screen3 extends PureComponent {
             this.setState({
               btnClicked: false
             });
-            notificationConfig.error('Bridge address is not a contract.');
+            notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', this.props.bridgeContractAddress));
           }
 
           if(

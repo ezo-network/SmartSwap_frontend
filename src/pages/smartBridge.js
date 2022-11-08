@@ -120,7 +120,7 @@ const SecImg = styled.div `
 const SecTxt = styled.div `
     width: 50%; padding: 0 0 0 0;
     h3 {font-size: 36px; margin: 0 0 36px; }
-    p {font-size: 24px; color: #fff; line-height: 30px; margin: 0 0 30px;
+    p {font-size: 24px; color: #fff; line-height: 35px; margin: 0 0 30px;
         .help-circle {top: -9px;}
     }
     @media (max-width: 767px){

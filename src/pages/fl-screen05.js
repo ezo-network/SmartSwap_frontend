@@ -8,6 +8,7 @@ import Lineimg from "../assets/freelisting-images/line01.png";
 import addImg from "../assets/images/add-chain.png";
 import BridgeApiHelper from "../helper/bridgeApiHelper";
 import BridgeContract from "../helper/bridgeContract";
+import errors from "../helper/errorConstantsHelper";
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 
 const $ = window.$;
@@ -79,13 +80,13 @@ export default class Screen5 extends PureComponent {
         }).catch(async(error) => {
           console.error(error);
           if(error.code === -32002){
-            notificationConfig.info('A switch network request is pending. Check metamask.');
+            notificationConfig.info(errors.switchRequestPending);
             this.pendingNetworkSwitchRequest = true;
             this.canMoveForward = true;
           }
 
           if(error.code === 4902){
-            notificationConfig.error('Unrecognized network. Adding network to metamask');
+            notificationConfig.error(errors.metamask.networkNotFound);
             await this.addNetworkToWallet(chainId);
           }
           
@@ -251,7 +252,7 @@ export default class Screen5 extends PureComponent {
             this.setState({
               btnClicked: false
             });
-            notificationConfig.error('Bridge address is not a contract.');
+            notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', this.props.bridgeContractAddress));
           }
           
 
@@ -276,7 +277,7 @@ export default class Screen5 extends PureComponent {
                 response.receipt.transactionHash,
                 response.receipt.blockNumber
               );
-              notificationConfig.success('Token Wrapped Successfully!');
+              notificationConfig.success(errors.tokenWrapped);
             }
           }
           
@@ -287,7 +288,7 @@ export default class Screen5 extends PureComponent {
               response.transactionHash,
               response.blockNumber
             );
-            notificationConfig.success('Token Wrapped Successfully!');
+            notificationConfig.success(errors.tokenWrapped);
           }
 
         });
@@ -305,7 +306,7 @@ export default class Screen5 extends PureComponent {
         ||
         blockNumber == null
       ) {
-        notificationConfig.error('Could not saved wrapped token.');
+        notificationConfig.error(errors.wrapTokenCouldNotSaved);
         return;
       }
 
@@ -333,7 +334,7 @@ export default class Screen5 extends PureComponent {
         this.props.onFinishButtonClicked();
       });
     } else {
-      notificationConfig.info('A switch network request is pending. Check metamask.');            
+      notificationConfig.info(errors.switchRequestPending);            
     }
   }
 
@@ -342,7 +343,7 @@ export default class Screen5 extends PureComponent {
       if(this.pendingNetworkSwitchRequest === false){
         this.props.onBackButtonClicked(4);
       } else {
-        notificationConfig.info('A switch network request is pending. Check metamask.');
+        notificationConfig.info(errors.switchRequestPending);
       }
   }
 
