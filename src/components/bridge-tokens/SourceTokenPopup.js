@@ -193,20 +193,22 @@ export default class SourceTokenPopup extends PureComponent {
                                 }
                                 <SelectList>
                                     {this.state.pinnedTokens.map(function(pinnedToken, i) {
-                                    const token = _.find(this.props.tokens, {address: (pinnedToken).toLowerCase() })
-                                    return <Selected 
-                                        key={pinnedToken}
-                                        onClick={(e) => this.removePinnedToken(pinnedToken)}
-                                    >
-                                        <Token>
-                                            <img 
-                                                src={`/images/free-listing/tokens/${(token.symbol).toLowerCase()}.png`}
-                                                alt={`pinned-token-${pinnedToken}`}
-                                                onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                            ></img> {token.symbol}
-                                        </Token>
-                                        <i className="fa fa-times" aria-hidden="true"></i>
-                                    </Selected>
+                                        const token = _.find(this.props.tokens, {address: (pinnedToken).toLowerCase() })
+                                        if(token !== undefined){
+                                            return <Selected 
+                                                key={pinnedToken}
+                                                onClick={(e) => this.removePinnedToken(pinnedToken)}
+                                            >
+                                                <Token>
+                                                    <img 
+                                                        src={`/images/free-listing/tokens/${(token.symbol).toLowerCase()}.png`}
+                                                        alt={`pinned-token-${pinnedToken}`}
+                                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                                                    ></img> {token.symbol}
+                                                </Token>
+                                                <i className="fa fa-times" aria-hidden="true"></i>
+                                            </Selected>
+                                        }
                                     }.bind(this))}
                                 </SelectList>                                
                             </Popcol>
