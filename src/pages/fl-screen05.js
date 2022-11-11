@@ -352,7 +352,8 @@ export default class Screen5 extends PureComponent {
     let networksData = [];
     const selectedDestinationNetworks = this.props.selectedDestinationNetworks;
     selectedDestinationNetworks.forEach(networkId => {
-      const wrappedToken = _.find(this.props.wrappedTokens, { 
+      const wrappedToken = _.find(this.props.wrappedTokens, {
+        projectId: this.props.projectId,
         toChainId: Number(networkId), 
         fromChainId: Number(this.props.selectedSourceTokenData.chainId)
       });
