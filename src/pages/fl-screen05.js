@@ -205,28 +205,28 @@ export default class Screen5 extends PureComponent {
           //   "byzantium": true
           // }
 
-          if (response.code === "ACTION_REJECTED") {
+          if (response?.code === "ACTION_REJECTED") {
             this.setState({
               btnClicked: false
             });
             notificationConfig.error(response.reason);
           }
 
-          if (response.code === "UNPREDICTABLE_GAS_LIMIT") {
+          if (response?.code === "UNPREDICTABLE_GAS_LIMIT") {
             this.setState({
               btnClicked: false
             });
             notificationConfig.error(response.reason);
           }
 
-          if (response.code === -32016) {
+          if (response?.code === -32016) {
             this.setState({
               btnClicked: false
             });
             notificationConfig.error(response.message);
           }
 
-          if(response.code === 4001) {
+          if(response?.code === 4001) {
             this.setState({
               btnClicked: false
             });
@@ -241,14 +241,14 @@ export default class Screen5 extends PureComponent {
           }
           
 
-          if (response.code === -32000 || response.code === -32603){
+          if (response?.code === -32000 || response?.code === -32603){
             this.setState({
               btnClicked: false
             });
             notificationConfig.error("Intrinsic gas too low");
           }
 
-          if(response.code === 'NOT_A_CONTRACT'){
+          if(response?.code === 'NOT_A_CONTRACT'){
             this.setState({
               btnClicked: false
             });
@@ -257,12 +257,12 @@ export default class Screen5 extends PureComponent {
           
 
           if(
-            response.code === 'CALL_EXCEPTION' 
-            || response.code === 'INSUFFICIENT_FUNDS' 
-            || response.code === 'NETWORK_ERROR' 
-            || response.code === 'NONCE_EXPIRED' 
-            || response.code === 'REPLACEMENT_UNDERPRICED'
-            || response.code === 'UNPREDICTABLE_GAS_LIMIT'
+            response?.code === 'CALL_EXCEPTION' 
+            || response?.code === 'INSUFFICIENT_FUNDS' 
+            || response?.code === 'NETWORK_ERROR' 
+            || response?.code === 'NONCE_EXPIRED' 
+            || response?.code === 'REPLACEMENT_UNDERPRICED'
+            || response?.code === 'UNPREDICTABLE_GAS_LIMIT'
           ){
             this.setState({
               btnClicked: false
@@ -270,8 +270,8 @@ export default class Screen5 extends PureComponent {
             notificationConfig.error(response.reason);            
           }
 
-          if(response.code === 'TRANSACTION_REPLACED'){
-            if(response.cancelled === false && response.receipt?.transactionHash){
+          if(response?.code === 'TRANSACTION_REPLACED'){
+            if(response?.cancelled === false && response?.receipt?.transactionHash){
               await this.attachWrapToken(
                 this.props.chainId,
                 response.receipt.transactionHash,
@@ -282,7 +282,7 @@ export default class Screen5 extends PureComponent {
           }
           
 
-          if(response.status === 1) {
+          if(response?.status === 1) {
             await this.attachWrapToken(
               this.props.chainId,
               response.transactionHash,
@@ -331,7 +331,11 @@ export default class Screen5 extends PureComponent {
   async onFinishButtonClicked(){
     if(this.canMoveForward === true){
       await this.props.onFetchWrappedTokens(true).then(response => {
-        this.props.onFinishButtonClicked();
+        if(this.props.wrappedTokens.length > 0){
+          this.props.onFinishButtonClicked();
+        } else {
+          notificationConfig.warning(errors.noWrapTokens);
+        }
       });
     } else {
       notificationConfig.info(errors.switchRequestPending);            

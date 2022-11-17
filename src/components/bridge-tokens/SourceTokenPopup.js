@@ -246,6 +246,7 @@ export default class SourceTokenPopup extends PureComponent {
                                             <Tcell>
                                                 <Token>
                                                     <img 
+                                                        className="cursor"
                                                         src={'/images/free-listing/tokens/' + (token.symbol).toLowerCase() + '.png'}
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                         alt="to-token-input-icon"
@@ -258,6 +259,7 @@ export default class SourceTokenPopup extends PureComponent {
                                                         )}                                                        
                                                     ></img> 
                                                     <span
+                                                        className="cursor"                                                    
                                                         onClick={(e) => this.setSourceToken(
                                                             token.symbol,
                                                             Number(token.chainId),
@@ -269,10 +271,11 @@ export default class SourceTokenPopup extends PureComponent {
                                                 </Token>
                                                 <Pin 
                                                     onClick={(e) => this.addToPinnedToken(token.address)}
-                                                    className={this.state.pinnedTokens.includes((token.address).toUpperCase()) ? 'selected' : ''}
+                                                    className={this.state.pinnedTokens.includes((token.address).toUpperCase()) ? 'cursor selected' : 'cursor'}
                                                 ></Pin>
                                             </Tcell>
-                                            <Tcell 
+                                            <Tcell
+                                                className="cursor"
                                                 onClick={(e) => goToContractOnExplorer(networkConfig.explorerUrl, token.address)}
                                             >
                                                 <TDLink>{textMasking(token.address)}</TDLink>

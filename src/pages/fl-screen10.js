@@ -7,7 +7,8 @@ import BridgeApiHelper from "../helper/bridgeApiHelper";
 import { ethers } from "ethers";
 import errors from "../helper/errorConstantsHelper";
 const $ = window.$;
-
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
+const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
 
 export default class Screen10 extends PureComponent {
   pendingDeploymentRequestCount = 0;
@@ -249,11 +250,11 @@ export default class Screen10 extends PureComponent {
                               {ownershipRequestExist ? false : true && <i className="fa fa-check-circle" aria-hidden="true"></i>}
                               <ProICOSbx02>
                                 <img 
-                                  src={'/images/free-listing/tokens/' + (wrappedToken.tokenSymbol.substring(2) + '.png').toLowerCase()}
+                                  src={'/images/free-listing/tokens/' + (wrappedToken.tokenSymbol.substring(wrapTokenSymbolPrefixLength) + '.png').toLowerCase()}
                                   onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                 />
-                                {(wrappedToken.tokenSymbol.substring(-2, 2)).toLowerCase()}
-                                {(wrappedToken.tokenSymbol.substring(2)).toUpperCase()}                                
+                                {(wrappedToken.tokenSymbol.substring(-wrapTokenSymbolPrefixLength, wrapTokenSymbolPrefixLength)).toLowerCase()}
+                                {(wrappedToken.tokenSymbol.substring(wrapTokenSymbolPrefixLength)).toUpperCase()}                                
                               </ProICOSbx02>
                               <ProICOSbx02>{wrappedToken.chain}</ProICOSbx02>
                             </ProICOSbx01>
