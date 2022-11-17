@@ -210,9 +210,12 @@ export default class DestinationTokensPopup extends PureComponent {
                                             </Token>
                                             <Pin className="disabled"></Pin>
                                         </Tcell>
-                                        <Tcell onClick={
-                                            (e) => this.goToContractOnExplorer(this.props.selectedSourceToken.chainId, this.props.selectedSourceToken.address)
-                                        }>
+                                        <Tcell 
+                                            className="cursor"
+                                            onClick={
+                                                (e) => this.goToContractOnExplorer(this.props.selectedSourceToken.chainId, this.props.selectedSourceToken.address)
+                                            }
+                                        >
                                             <TDLink>{textMasking(this.props.selectedSourceToken.address)}</TDLink>
                                         </Tcell>
                                         <Tcell>
@@ -229,6 +232,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                     <Tcell>
                                                         <Token>
                                                             <img
+                                                                className="cursor"
                                                                 src={'/images/free-listing/chains/' + (network.chain).toLowerCase() + '.png'}
                                                                 onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                                 alt="destination-chain-icon"
@@ -240,6 +244,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                                 ) : e.preventDefault()}
                                                             ></img>
                                                             <span
+                                                                className="cursor"                                                                
                                                                 onClick={(e) => network['isBridgeExistOnChain'] === true ? this.setDestinationToken(
                                                                     network['wrappedTokenSymbol'],
                                                                     network.chainId,
@@ -252,14 +257,17 @@ export default class DestinationTokensPopup extends PureComponent {
                                                         </Token>
                                                         <Pin
                                                             onClick={(e) => this.addToPinnedNetwork(network.chainId)}
-                                                            className={this.state.pinnedNetworks.includes(Number(network.chainId)) ? 'selected' : ''}
+                                                            className={this.state.pinnedNetworks.includes(Number(network.chainId)) ? 'cursor selected' : 'cursor'}
                                                         ></Pin>
                                                     </Tcell>
-                                                    <Tcell onClick={
-                                                        (e) => network['wrappedTokenAddress'] !== undefined 
-                                                        ? goToContractOnExplorer(network.explorerUrl, network['wrappedTokenAddress'])
-                                                        : e.preventDefault()
-                                                    }>
+                                                    <Tcell 
+                                                        className="cursor"
+                                                        onClick={
+                                                            (e) => network['wrappedTokenAddress'] !== undefined 
+                                                            ? goToContractOnExplorer(network.explorerUrl, network['wrappedTokenAddress'])
+                                                            : e.preventDefault()
+                                                        }
+                                                    >
                                                         {network['wrappedTokenAddress'] === undefined ? '-' : <TDLink>{textMasking(network['wrappedTokenAddress'])}</TDLink>}
                                                     </Tcell>
                                                     <Tcell>
@@ -353,7 +361,8 @@ const Selected = styled.div`
 const Table = styled.table`
     width: 100%;
     tr:hover { background: #191a22;}
-    tr.disabled {background: #2e2f3a;}
+    tr.disabled {background: #2e2f3a; color: #aaa}
+    tr.disabled > td > div {color: #aaa}
 `
 const Thd = styled.th`
     font-size: 14px; color: #fff; padding: 15px 18px; border-top: 2px solid #3b3e4b; border-bottom: 2px solid #3b3e4b; text-align: left; font-weight: normal; width: 20%;

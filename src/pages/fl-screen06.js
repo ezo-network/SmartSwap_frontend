@@ -6,6 +6,8 @@ import _ from "lodash";
 import BridgeApiHelper from "../helper/bridgeApiHelper";
 import errors from "../helper/errorConstantsHelper";
 const $ = window.$;
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
+const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
 
 const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
     if(explorerUrl !== undefined){
@@ -126,10 +128,10 @@ export default class Screen6 extends PureComponent {
 										return (
 											<List key={i}>
 												<ListTxt><span>
-													{(wrappedToken.tokenSymbol.substring(-2, 2)).toLowerCase()}
-					    	                        {(wrappedToken.tokenSymbol.substring(2)).toUpperCase()}
+													{(wrappedToken.tokenSymbol.substring(-wrapTokenSymbolPrefixLength, wrapTokenSymbolPrefixLength)).toLowerCase()}
+					    	                        {(wrappedToken.tokenSymbol.substring(wrapTokenSymbolPrefixLength)).toUpperCase()}
 												</span><span>{wrappedToken.chain}</span></ListTxt>
-												<ListTxt><ListLink onClick={(e) => goToContractOnExplorer(wrappedToken.explorerUrl, wrappedToken.address)}>{wrappedToken.address === null ? 'FETHING...' : wrappedToken.address}</ListLink></ListTxt>
+												<ListTxt className="cursor"><ListLink onClick={(e) => goToContractOnExplorer(wrappedToken.explorerUrl, wrappedToken.address)}>{wrappedToken.address === null ? 'FETHING...' : wrappedToken.address}</ListLink></ListTxt>
 											</List>
 										)
 									})}

@@ -19,6 +19,9 @@ let source;
 //const maxAprovalLimit =  Web3.utils.toBN('115792089237316200000000000000000000000000000000000000000000'); // 60 digit number
 // https://velvetshark.com/articles/max-int-values-in-solidity
 const maxAprovalLimit =  Web3.utils.toBN(process.env.REACT_APP_MAX_TOKEN_APPROVE_LIMIT); // uint96 max 
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
+const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
+
 
 
 export default class BridgeSwap extends PureComponent {
@@ -890,6 +893,7 @@ export default class BridgeSwap extends PureComponent {
             this.setState({
                 tokensWithBalance: []
             });
+            
             const groupedTokenByNetwork = this.state.tokens.reduce(function (r, token) {
                 r[token.chainId] = r[token.chainId] || [];
                 r[token.chainId].push(token.address);
@@ -917,21 +921,21 @@ export default class BridgeSwap extends PureComponent {
     render() {
 
         let sideAIcon = this.state.sourceTokenData.isWrappedToken === true
-            ? ((this.state.sourceTokenData.symbol.substring(2)).toLowerCase()).toString()
+            ? ((this.state.sourceTokenData.symbol.substring(wrapTokenSymbolPrefixLength)).toLowerCase()).toString()
             : ((this.state.sourceTokenData.symbol).toLowerCase()).toString();
 
         let sideASymbol = this.state.sourceTokenData.isWrappedToken === true
-            ? (this.state.sourceTokenData.symbol.substring(-2, 2)).toLowerCase() + 
-              this.state.sourceTokenData.symbol.substring(2)
+            ? (this.state.sourceTokenData.symbol.substring(-wrapTokenSymbolPrefixLength, wrapTokenSymbolPrefixLength)).toLowerCase() + 
+              this.state.sourceTokenData.symbol.substring(wrapTokenSymbolPrefixLength)
             : this.state.sourceTokenData.symbol;
 
         let sideBIcon = this.state.destinationTokenData.isWrappedToken === true
-        ? ((this.state.destinationTokenData.symbol.substring(2)).toLowerCase()).toString()
+        ? ((this.state.destinationTokenData.symbol.substring(wrapTokenSymbolPrefixLength)).toLowerCase()).toString()
         : ((this.state.destinationTokenData.symbol).toLowerCase()).toString();            
 
         let sideBSymbol = this.state.destinationTokenData.isWrappedToken === true
-        ? (this.state.destinationTokenData.symbol.substring(-2, 2)).toLowerCase() + 
-          this.state.destinationTokenData.symbol.substring(2)
+        ? (this.state.destinationTokenData.symbol.substring(-wrapTokenSymbolPrefixLength, wrapTokenSymbolPrefixLength)).toLowerCase() + 
+          this.state.destinationTokenData.symbol.substring(wrapTokenSymbolPrefixLength)
         : this.state.destinationTokenData.symbol;
 
         return (
@@ -940,7 +944,7 @@ export default class BridgeSwap extends PureComponent {
                     <div className="tabCol">
                         <div className="d-flex balance-row">
                             <div className="b-text">
-                                Balance: {this.state.sourceTokenData.balance} &nbsp;<span onClick={() => this.setMaxAmount()}>MAX</span>
+                                Balance: {this.state.sourceTokenData.balance} &nbsp;<span className="cursor" onClick={() => this.setMaxAmount()}>MAX</span>
                             </div>
                         </div>
                     </div>
@@ -1061,7 +1065,7 @@ export default class BridgeSwap extends PureComponent {
                         this.state.isSourceTokenSelected &&
                         <button className="btn btn-primary">{`Insufficient ${this.state.sourceTokenData.symbol} balance`}</button>
                     }
-                    <p>Bridge to any EVM chain for free with 1:1 wrap value</p>
+                    <p>Bridge to any EVM chain for free with 1:1 derivative token</p>
                 </div>
 
                 <SourceTokenPopup 

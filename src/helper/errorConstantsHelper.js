@@ -3,6 +3,7 @@ const errors = {
     'switchRequestPending': 'A switch network request is pending. Check metamask.',
     'switchRequestMessage': 'Please switch network',
     'connectWalletRequestMessage': 'Connect your wallet first.',
+    'selectToken': 'Select a token',
     'selectSourceTokenMessage': 'Please select source token first.',
     'tokenNotSelected': 'Please select a token first',
     'sourceTokenNotSelected': 'Source token not selected yet.',
@@ -24,6 +25,7 @@ const errors = {
     'tokenImported': "Token imported",
     'tokenWrapped': 'Token Wrapped Successfully!',
     'wrapTokenCouldNotSaved': 'Could not saved wrapped token.',
+    'noWrapTokens': `You've not wapped any tokens yet`,
     'somethingWentWrong': 'Something went wrong!',
     'email': {
         'REQUIRED': 'Please provide an email address.',
