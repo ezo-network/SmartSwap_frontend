@@ -1,4 +1,4 @@
-import React, { PureComponent, lazy, Suspense } from "react";
+import React, { PureComponent, lazy, Suspense, useState } from "react";
 import { Link, Redirect } from "react-router-dom";
 import Loader from "react-loader-spinner";
 import web3Js from "web3";
@@ -72,6 +72,7 @@ import Dropdown from "../components/DropDown";
 import Counter from "../components/Counter";
 import BridgeSwap from "../components/bridge-tokens/BridgeSwap";
 
+  
 
 const responsive = {
   desktop: {
@@ -2193,6 +2194,8 @@ export default class Home extends PureComponent {
 
     let counter = 0;
 
+  
+
     return (
       <>
         {this.state.isloading ? (
@@ -2309,6 +2312,12 @@ export default class Home extends PureComponent {
                                 <li className="tab-link" data-tab="tab-4" style={{ pointerEvents: 'none' }}>
                                   <div>
                                   CBDC
+                                    {/* <span className="text-sm-n">COMING SOON</span> */}
+                                  </div>
+                                </li>
+                                <li className="tab-link" data-tab="tab-5" style={{ pointerEvents: 'none' }}>
+                                  <div>
+                                  dSTOCKS
                                     {/* <span className="text-sm-n">COMING SOON</span> */}
                                   </div>
                                 </li>
@@ -3260,7 +3269,7 @@ export default class Home extends PureComponent {
                               </div>
                             </div>
                           </div>
-                          <div className={`swap-Textlink ${this.state.ShowSidebar ? 'hasSidebar' : ''}`}>
+                          <div data-select="native-tokens" className={`swap-Textlink ${this.state.ShowSidebar ? 'hasSidebar' : ''}`}>
                             {this.state.web3 !== null ? (
                               <div className="swap-Link01">
                                 <a
@@ -3380,6 +3389,51 @@ export default class Home extends PureComponent {
                                                         SmartSwap reimburses users with ZERO/1 at 100%.</p>
                                                 </div>
                                             </div> */}
+                          </div>
+                          <div data-select="bridge-tokens" className="swap-Textlink bridge-Textlink">
+                            {this.state.web3 !== null ? (
+                              <div className="swap-Link01">
+                                <a
+                                  className="icon-Box Setting"
+                                  // onClick={() => { this.setState({ sideBar: !this.state.sideBar }) }}
+                                  href="javascript:void(0);"
+                                >
+                                  <i className="fas fa-cog"></i>
+                                </a>
+                                Estimated gas and fees:
+                                {Number(this.state.estimatedGasFee).toFixed(
+                                  5
+                                )}{" "}
+                                {this.state.selectedSendCurrency}{" "}
+                                <a
+                                  href="javascript:void(0);"
+                                  className="gas-Est"
+                                >
+                                  <i
+                                    className="fas fa-question-circle"
+                                    aria-hidden="true"
+                                  ></i>
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="powertextBX">
+                                <p className="poweredBy">
+                                  Powered by
+                                  <img src={SmartExchange} />
+                                  {/* <a href="#">Start new swap</a> */}
+                                </p>
+                                <div className="powertextBX-links">
+                                    <Link to='/freelisting'>Free listing</Link> 
+                                    <span>|</span>
+                                    {/* <a href="">Free license</a> */}
+                                    <a href="">Apply for licensing</a>
+                                </div>
+                                                             
+                                {/* <div className="d-flex">
+                                  <p className="ml-198">Estimated gas and fees: <span>0.09806</span> BNB</p>
+                                </div> */}
+                              </div>
+                            )}
                           </div>
 
                           <div>
@@ -3783,7 +3837,7 @@ export default class Home extends PureComponent {
                                         <a href="javascript:void(0);" className="">Completed</a>
                                         <a href="javascript:void(0);" className="active">Pending</a>
                                     </div> */}
-                        {web3Config.getAddress() !== null ? (
+                       {/*  {web3Config.getAddress() !== null ? (
                           !this.state.showTxHistory ? (
                             <div className="bb-traHistoryBTNbar">
                               <a
@@ -3821,7 +3875,7 @@ export default class Home extends PureComponent {
                               &nbsp;
                             </div>
                           )
-                        ) : null}
+                        ) : null} */}
 
                         {this.state.showTxHistory
                           ? this.state.loadingHistory ?

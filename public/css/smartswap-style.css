@@ -6180,9 +6180,13 @@ select:focus {
   justify-content: space-between;
   font-size: 11px;
   color: #aaaaaa;
-  margin-right: auto;
+  margin-right: auto; 
 }
 
+.powertextBX p.poweredBy {
+  width: 198px;
+  opacity: 0;
+}
 .powertextBX p,
 .powertextBX a {
   font-size: 11px;
@@ -8702,10 +8706,11 @@ a.color-light-n:hover {
   opacity: 1;
 }
 
+
 .swap-Textlink label {
   display: flex;
   align-items: center;
-  margin-left: 26px;
+  margin-left: 22px;
 }
 
 .ddIconBX img {
@@ -9400,7 +9405,7 @@ a.dc-file:hover {
 .dropdown-title {font-size: 24px; font-weight: bold; margin: 0;}
 .dropdown-title:after {content: ""; display: inline-block; vertical-align: top; margin: 12px 0 0 50px; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 9px solid #91dc27}
 .dropdown-title.active:after {transform: scaleY(-1)}
-.powertextBX-links {display: none; font-size: 11px; margin-left: 20px;}
+.powertextBX-links {display: none; font-size: 11px; margin-left: 0;}
 .powertextBX-links a {color: #91dc27; margin: 0;}
 .powertextBX-links span {color: #595959 !important; margin: 0 10px;}
 .powertextBX-links.estimated {display: block;}
@@ -9527,3 +9532,9 @@ a.dc-file:hover {
 #bridge-tokens .to-token img, .from-token img {
   border-radius: 25px;
 }
+.swap-Textlink.bridge-Textlink {}
+.swap-Textlink.bridge-Textlink  .powertextBX p.poweredBy {opacity: 1;}
+.swap-Textlink.bridge-Textlink  .powertextBX-links {display: flex;}
+.swap-Textlink.bridge-Textlink  .powertextBX {width: 100%;}
+.swap-Textlink {display: none}
+.swap-Textlink[data-class=show] {display: flex}

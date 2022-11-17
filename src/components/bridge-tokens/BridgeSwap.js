@@ -1065,7 +1065,7 @@ export default class BridgeSwap extends PureComponent {
                         this.state.isSourceTokenSelected &&
                         <button className="btn btn-primary">{`Insufficient ${this.state.sourceTokenData.symbol} balance`}</button>
                     }
-                    <p>Bridge to any EVM chain for free with 1:1 derivative token</p>
+                    <p>Bridge to any EVM chain for free with 1:1 wrap value</p>
                 </div>
 
                 <SourceTokenPopup 
