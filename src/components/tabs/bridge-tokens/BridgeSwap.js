@@ -8,7 +8,7 @@ import notificationConfig from "../../../config/notificationConfig";
 import SourceTokenPopup from "./SourceTokenPopup";
 import DestinationTokensPopup from "./DestinationTokensPopup";
 import CheckAuthenticityPopup from "./CheckAuthenticityPopup";
-import web3Config from "../../../config/web3Config";
+
 import BridgeApiHelper from "../../../helper/bridgeApiHelper";
 import BridgeContract from "../../../helper/bridgeContract";
 import ERC20TokenContract from "../../../helper/erc20TokenContract";
@@ -103,6 +103,7 @@ export default class BridgeSwap extends PureComponent {
 
             await this.getNetworkList();
             await this.getTokenList();
+            await this.walletConnectCallback();
 
             // detect Network account change
             window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async(chainId) => {

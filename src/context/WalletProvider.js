@@ -40,7 +40,7 @@ const WalletProvider = React.memo((args) => {
     console.log({ chainId, account, web3, isAuthenticated });
 
     React.useEffect(() => {
-        //connectEagerly();
+        connectEagerly();
         return () => {
             const provider = getProvider();
             unsubscribeToEvents(provider);
@@ -169,7 +169,7 @@ const WalletProvider = React.memo((args) => {
 
     const handleConnect = () => {
         setAuthenticated(true);
-        connectWallet();
+        //connectWallet();
         console.log("[connected]")
     }
 
