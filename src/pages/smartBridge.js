@@ -2,7 +2,7 @@ import React, { PureComponent, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import CONSTANT from "../constants";
-import HeadFreeListing from "../components/Header02";
+import HeadFreeListing from "../components/Header/HeadFreeListing";
 
 import Carousel from "react-multi-carousel";
 import AnimatedNumber from "react-animated-numbers";

@@ -14,11 +14,11 @@ import SwapFactoryContract from "../helper/swapFactoryContract";
 import { LoopCircleLoading } from 'react-loadingg';
 import CONSTANT from "../constants";
 import data from "../config/constantConfig";
-import Header from "../components/Header";
+import Header from "../components/Header/Header";
 import RightSideMenu from "../components/RightSideMenu";
-import WalletPopup from "../components/WalletPopup";
-import CoinPopup from "../components/CoinPopup";
-import SidePopup from "../components/SidePopup";
+import WalletPopup from "../components/popups/WalletPopup";
+import CoinPopup from "../components/popups/CoinPopup";
+import SidePopup from "../components/popups/SidePopup";
 
 const $ = window.$;
 

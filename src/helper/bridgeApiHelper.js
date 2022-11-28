@@ -430,6 +430,64 @@ const BridgeApiHelper = {
         }
     },
 
+    getProjects: async(args = {}, cancelToken) => {
+        let response, error, code;
+        try {
+
+            let params = {};
+
+            if(args?.projectId){
+                params['projectId'] = args.projectId
+            }
+
+            if(args?.creatorAddress){
+                params['creatorAddress'] = args?.creatorAddress
+            }
+
+            if(args?.chainId){
+                params['chainId'] = args?.chainId
+            }
+
+            if(args?.tokenAddress){
+                params['tokenAddress'] = args?.tokenAddress
+            }
+
+            params =  '?' + new URLSearchParams(params);
+            
+
+            const result = await axiosRequest.request({
+                path: apiEndpoints.projects + params,
+                cancelToken: cancelToken
+            });
+            
+            if(result !== undefined){
+                if(result.status === 200){
+                    return {
+                        response: result.data.data,
+                        code: result.data.code,
+                        error: undefined
+                    }
+                } else {
+                    return {
+                        response: undefined,
+                        code: result.data.code,
+                        error: result.data.error
+                    }
+                }
+            }
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }
+    },
+
     getNetworkList: async(cancelToken) => {
         let response, error, code;
         try {

@@ -1,7 +1,7 @@
 import React, { PureComponent, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
-import HeaderWC from "../components/Header03";
+import HeaderWC from "../components/Header/Header03";
 
 import Carousel from "react-multi-carousel";
 import AnimatedNumber from "react-animated-numbers";

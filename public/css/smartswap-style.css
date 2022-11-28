@@ -6180,9 +6180,12 @@ select:focus {
   justify-content: space-between;
   font-size: 11px;
   color: #aaaaaa;
-  margin-right: auto;
+  margin-right: auto; 
 }
 
+.powertextBX p.poweredBy {
+  width: 198px;
+}
 .powertextBX p,
 .powertextBX a {
   font-size: 11px;
@@ -6231,7 +6234,6 @@ select:focus {
 
 .balance-row {
   justify-content: space-between;
-  position: absolute;
   top: 18px;
   left: 40px;
   right: 15px;
@@ -8702,10 +8704,11 @@ a.color-light-n:hover {
   opacity: 1;
 }
 
+
 .swap-Textlink label {
   display: flex;
   align-items: center;
-  margin-left: 26px;
+  margin-left: 22px;
 }
 
 .ddIconBX img {
@@ -9400,7 +9403,7 @@ a.dc-file:hover {
 .dropdown-title {font-size: 24px; font-weight: bold; margin: 0;}
 .dropdown-title:after {content: ""; display: inline-block; vertical-align: top; margin: 12px 0 0 50px; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 9px solid #91dc27}
 .dropdown-title.active:after {transform: scaleY(-1)}
-.powertextBX-links {display: none; font-size: 11px; margin-left: 20px;}
+.powertextBX-links {font-size: 11px; margin-left: 0;}
 .powertextBX-links a {color: #91dc27; margin: 0;}
 .powertextBX-links span {color: #595959 !important; margin: 0 10px;}
 .powertextBX-links.estimated {display: block;}
@@ -9415,7 +9418,7 @@ a.dc-file:hover {
 
 .tab-container.hasSidebar {padding-right: 326px; width: auto; display: table; position: relative;}
 .tab-container.hasSidebar .tab-main-wrapper {width: 894px;}
-.side-pannel {background-color: rgb(54 56 64 / 50%); padding: 43px 40px 11px 34px; width: 317px; position: absolute; right: 0; top: 0; bottom: 0; box-shadow: 0px 0px 30px 0 rgb(255 255 255 / 25%); }
+.side-pannel {background-color: rgb(54 56 64 / 50%); padding: 43px 40px 11px 34px; width: 317px; position: absolute; right: -327px; top: 0; bottom: 0; box-shadow: 0px 0px 30px 0 rgb(255 255 255 / 25%); }
 .side-pannel h4 {font-size: 18px; margin: 0 0 26px 0;}
 .side-pannel h5 {font-size: 18px; color: #fff; border-bottom: 1px solid #000000; box-shadow: 0 1px 0 #373c47; padding: 0 0 15px 0; margin: 0 0 20px; min-height: 93px}
 .side-pannel h5:last-child {margin: 0; border: 0; box-shadow: none;}
@@ -9526,4 +9529,14 @@ a.dc-file:hover {
 }
 #bridge-tokens .to-token img, .from-token img {
   border-radius: 25px;
+}
+.swap-Textlink.bridge-Textlink  .powertextBX p.poweredBy {opacity: 1;}
+.swap-Textlink.bridge-Textlink  .powertextBX-links {display: flex;}
+.swap-Textlink.bridge-Textlink  .powertextBX {width: 100%;}
+.swap-Textlink[data-class=show] {display: flex}
+.cursor {cursor: pointer;}
+.bottom-action-bar {
+  position: absolute;
+  bottom: -10%;
+  display: flex;
 }
