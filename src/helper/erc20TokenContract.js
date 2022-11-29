@@ -4,7 +4,7 @@ import {
 import web3Js from 'web3';
 import { ethers } from 'ethers';
 import ERC20TokenContractAbi from "../abis/erc20TokenAbi.json";
-import web3Config from "../config/web3Config";
+import {WalletContext} from "../context/WalletProvider"
 import errors from '../helper/errorConstantsHelper';
 
 const pad32Bytes = (data) => {
@@ -15,9 +15,10 @@ const pad32Bytes = (data) => {
 
 class ERC20TokenContract extends EventEmitter {
     
-    constructor(web3, contractAddress, spenderAddress = null) {
+    constructor(web3, ownerAddress, contractAddress, spenderAddress = null) {
         super();
         this.web3 = web3;
+        this.ownerAddress = ownerAddress;
         this.contractAddress = contractAddress;
         this.spenderAddress = spenderAddress;
 
@@ -70,8 +71,8 @@ class ERC20TokenContract extends EventEmitter {
         try {
             const isContractExist = await this.isContractExist();
             if(isContractExist){
-                console.log({ownerAddress: web3Config.getAddress(), tokenAddress: this.contractAddress, bridgeAddress: this.spenderAddress});
-                const allowanceLimit = await this.contractInstance.allowance(web3Config.getAddress(), this.spenderAddress);
+                console.log({ownerAddress: this.ownerAddress, tokenAddress: this.contractAddress, bridgeAddress: this.spenderAddress});
+                const allowanceLimit = await this.contractInstance.allowance(this.ownerAddress, this.spenderAddress);
                 successCb((allowanceLimit).toString());
             } else {
                 errorCb({
@@ -168,6 +169,8 @@ class ERC20TokenContract extends EventEmitter {
     }    
 
 }
+
+ERC20TokenContract.contextType = WalletContext;
 
 
 export default ERC20TokenContract;

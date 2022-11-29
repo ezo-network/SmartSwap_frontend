@@ -1,40 +1,16 @@
 import React, { PureComponent, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
-import CONSTANT from "../constants";
-import HeadFreeListing from "../components/Header02";
-
-import Carousel from "react-multi-carousel";
-import AnimatedNumber from "react-animated-numbers";
 import "react-multi-carousel/lib/styles.css";
-
-
-import BannerBg from "../assets/welcome/home-bg.png";
 import img02 from "../assets/images/se.png";
-
-
-
+import HeroSectionVideoOverlay from "../components/sections/HeroSectionVideoOverlay";
 
 export default class Welcome extends PureComponent {
- 
-
-
   render() {
     return (
       <>
+        <HeroSectionVideoOverlay></HeroSectionVideoOverlay>
         <WelcomeMain id="main" className="welcome-page">
-            <div className="fullscreen-bg">
-              <div className="fsbg_sad01"></div>
-              <div className="fsbg_container">
-                <video loop autoPlay muted className="fullscreen-bg__video">
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.webm?v=1.18"} type="video/webm" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4?v=1.18"} type="video/mp4" />
-                  <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv?v=1.18"} type="video/ogg" />
-                </video>
-              </div>
-            </div>
-            <HeadFreeListing />
-
             <SecImgTxt>
                 <Container>
                     <SecTxt className="wow fadeInLeft" data-wow-delay="0.5s">

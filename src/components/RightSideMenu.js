@@ -14,10 +14,10 @@ export default class RightSideMenu extends PureComponent {
   }
 
   componentWillReceiveProps(newProps) {
-    this.setState({
-      web3: newProps.web3,
-      web3Config: newProps.web3Config,
-    });
+    // this.setState({
+    //   web3: newProps.web3,
+    //   web3Config: newProps.web3Config,
+    // });
     // remove this line when stop testing on swap provider
     //this.props.openPopup("LiquidityProvider")
   }
@@ -35,39 +35,25 @@ export default class RightSideMenu extends PureComponent {
   }
 
   render() {
-    const { cloneData } = this.props;
-    const showSideBar =
-      cloneData.sideBar === "true"
-        ? true
-        : cloneData.sideBar === undefined
-          ? true
-          : false;
     return (
       <>
-        {showSideBar && (
+        {this.props.show && (
           <div
-            className={
-              cloneData.logoImage ? "menuSideBar subdomain" : "menuSideBar"
-            }
-            style={
-              cloneData.fontStyle && cloneData.fontStyle !== "Default"
-                ? {
-                  right: "-100%",
-                  opacity: "0",
-                  fontFamily: cloneData.fontStyle,
-                }
-                : { right: "-100%", opacity: "0" }
-            }
+            className="menuSideBar"
+            style={{
+              // right: "-100%",
+              // opacity: "0",
+              // fontFamily: 'Default'
+            }}
           >
             <div className="menuSideBarContainer">
               <div className="msb-Waddress">
                 <span className="waltFix01">
-                  {web3Config.getAddress() !== null
-                    ? web3Config.getAddress().slice(0, 45)
-                    : null}
+                  {/* { masked account } */}
                 </span>
                 <a
-                  href="javascript:void(0);"
+                  href="#"
+                  onClick={(e) => this.props.onMenuButtonClicked()}
                   className="rmDotLink active MenuClose"
                 >
                   {/* <i className="fas fa-times"></i> */}
@@ -93,7 +79,7 @@ export default class RightSideMenu extends PureComponent {
               </div>
               <div className="msb-Linkbox02">
                 <a
-                  href="javascript:void(0);"
+                  href="#"
                   className="active"
                   data-toggle="n-collapse"
                   data-target="#msbSL-01"
@@ -104,25 +90,23 @@ export default class RightSideMenu extends PureComponent {
                 </a>
                 <div className="msbLinkSubBox n-collapse in" id="msbSL-01">
                   <a
-                    href="javascript:void(0);"
-                    onClick={(ev) => {
-                      ev.preventDefault();
+                    href="#"
+                    onClick={(e) => {
                       this.showWithId("HowItWorks", "tab-4");
                     }}
                   >
                     How it Works{" "}
                   </a>
                   <a
-                    href="javascript:void(0);"
+                    href="#"
                     onClick={(ev) => {
-                      ev.preventDefault();
                       this.showWithId("HowItWorks", "tab-5");
                     }}
                   >
                     SmartSwap vs Atomic Swap
                   </a>
                   <a
-                    href="javascript:void(0);"
+                    href="#"
                     onClick={(ev) => {
                       ev.preventDefault();
                       this.showWithId("CefiToDefi", "tab-7");
@@ -131,7 +115,7 @@ export default class RightSideMenu extends PureComponent {
                     Decentralize CEX: CeFi {"<>"} DeFi
                   </a>
                   <a
-                    href="javascript:void(0);"
+                    href="#"
                     onClick={(ev) => {
                       ev.preventDefault();
                       this.showWithId("CefiToDefi", "tab-8");
@@ -140,7 +124,7 @@ export default class RightSideMenu extends PureComponent {
                     What is a Swap Provider
                   </a>
                   <a
-                    href="javascript:void(0);"
+                    href="#"
                     onClick={() => {
                       this.props.openPopup("LiquidityFountainSP");
                     }}
@@ -148,7 +132,7 @@ export default class RightSideMenu extends PureComponent {
                     Liquidity Fountain for SPs
                   </a>
                   <a
-                    href="javascript:void(0);"
+                    href="#"
                     onClick={(ev) => {
                       ev.preventDefault();
                       this.showWithId("CefiToDefi", "tab-9");
@@ -156,13 +140,13 @@ export default class RightSideMenu extends PureComponent {
                   >
                     SmartSwap Liquidity Process
                   </a>
-                  <a href="javascript:void(0);">Ledger</a>
-                  <a href="javascript:void(0);">100% Fee Reimbursement</a>
+                  <a href="#" onClick={(ev) => { ev.preventDefault();}}>Ledger</a>
+                  <a href="#" onClick={(ev) => { ev.preventDefault();}}>100% Fee Reimbursement</a>
                 </div>
               </div>
               <div className="msb-Linkbox02">
                 <a
-                  href="javascript:void(0);"
+                  href="#" onClick={(ev) => { ev.preventDefault();}}
                   className="active"
                   data-toggle="n-collapse"
                   data-target="#msbSL-02"
@@ -209,7 +193,7 @@ export default class RightSideMenu extends PureComponent {
                     </div> */}
               <div className="msb-Linkbox02">
                 <a
-                  href="javascript:void(0);"
+                  href="#" onClick={(ev) => { ev.preventDefault();}}
                   className="active"
                   data-toggle="n-collapse"
                   data-target="#msbSL-05"
@@ -230,7 +214,7 @@ export default class RightSideMenu extends PureComponent {
               </div>
               <div className="msb-Linkbox02">
                 <a
-                  href="javascript:void(0);"
+                  href="#" onClick={(ev) => { ev.preventDefault();}}
                   className="active"
                   data-toggle="n-collapse"
                   data-target="#msbSL-06"
@@ -241,19 +225,21 @@ export default class RightSideMenu extends PureComponent {
                 </a>
                 <div className="msbLinkSubBox n-collapse in" id="msbSL-06">
                   <a
-                    href="javascript:void(0);"
-                    onClick={() => {
+                    href="#"
+                    onClick={(ev) => {
+                      ev.preventDefault();
                       this.props.openPopup("About");
                     }}
                   >
                     About Us
                   </a>
-                  <a href="javascript:void(0);">Privacy Policy</a>
-                  <a href="javascript:void(0);">Terms of Use</a>
-                  <a href="javascript:void(0);">Cookie Policy</a>
+                  <a href="#" onClick={(ev) => { ev.preventDefault();}}>Privacy Policy</a>
+                  <a href="#" onClick={(ev) => { ev.preventDefault();}}>Terms of Use</a>
+                  <a href="#" onClick={(ev) => { ev.preventDefault();}}>Cookie Policy</a>
                   <div className="footerV2-LanBoxM">
                     <a
-                      href="javascript:void();"
+                      href="#"
+                      onClick={(e) => e.preventDefault()}
                       className="footerV2-LanBoxLink n-collapsed"
                       data-toggle="n-collapse"
                       data-target="#langBox"
@@ -270,7 +256,7 @@ export default class RightSideMenu extends PureComponent {
                 </div>
               </div>
               <div className="auditLogo">
-                <a href="javascript:void(0);">
+                <a href="#" onClick={(ev) => { ev.preventDefault();}}>
                   <img src="images/callistoLogo.png" alt="" />
                 </a>
               </div>
@@ -287,7 +273,7 @@ export default class RightSideMenu extends PureComponent {
                     </div> */}
               <div className="footer-Bottom">
                 <div className="footer-Logo">
-                  <a href="javascript:void(0);">
+                  <a href="#" onClick={(ev) => { ev.preventDefault();}}>
                     <img src="images/menu-rb-logo.png" alt="" />
                   </a>
                 </div>

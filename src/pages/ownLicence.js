@@ -16,11 +16,11 @@ import { LoopCircleLoading } from "react-loadingg";
 import CONSTANT from "../constants";
 import data from "../config/constantConfig";
 import WithDrawToken from "../components/withdraw_token";
-import Header from "../components/Header";
+import Header from "../components/Header/Header";
 import RightSideMenu from "../components/RightSideMenu";
-import WalletPopup from "../components/WalletPopup";
-import CoinPopup from "../components/CoinPopup";
-import SidePopup from "../components/SidePopup";
+import WalletPopup from "../components/popups/WalletPopup";
+import CoinPopup from "../components/popups/CoinPopup";
+import SidePopup from "../components/popups/SidePopup";
 import Collapse from "@kunukn/react-collapse";
 import CreateLicence from "../components/CreateLicense";
 import axios from "axios";
@@ -31,6 +31,8 @@ import { isValidAddress } from "ethereumjs-util";
 import reimbursementAbi from "../abis/reimbursementAbi.json";
 import tokenVaultAbi from "../abis/tokenVaultAbi.json";
 import DepositToken from "../components/Deposit-withdraw";
+import HeroSectionVideoOverlay from "../components/sections/HeroSectionVideoOverlay";
+
 
 const $ = window.$;
 
@@ -1348,1481 +1350,1459 @@ export default class ownLicence extends PureComponent {
       allowClone
     } = this.state;
     return (
-      <main id="main" className="smartSwap">
-        <div className="fullscreen-bg">
-          <div className="fsbg_sad01"></div>
-          <div className="fsbg_container">
-            <video loop autoPlay muted className="fullscreen-bg__video">
-              <source src={CONSTANT.PrePath + "/video/14559736-hd.webm?v=1.18"} type="video/webm" />
-              <source src={CONSTANT.PrePath + "/video/14559736-hd.mp4?v=1.18"} type="video/mp4" />
-              <source src={CONSTANT.PrePath + "/video/14559736-hd.ogv?v=1.18"} type="video/ogg" />
-            </video>
-          </div>
-        </div>
-        <div className="main">
-          {/* <!--======================= RIGHT SIDE MENU =====================--> */}
-          <RightSideMenu
-            web3={this.state.web3}
-            web3Config={web3Config}
-            cloneData={this.state.cloneData}
-          ></RightSideMenu>
-          {/* <!--======================= RIGHT SIDE MENU END  =====================-->
-                    <!--======================= HEADER START =====================--> */}
-          <Header
-            web3={this.state.web3}
-            web3Config={web3Config}
-            cloneData={this.state.cloneData}
-          ></Header>
-          {/* <!--======================= HEADER END =====================--> */}
-          <div className="mainBlock">
-            {/* <!--======================= SWAP BLOCK START =====================--> */}
+        <>
+          <HeroSectionVideoOverlay></HeroSectionVideoOverlay>
+          <div className="main">
+            {/* <!--======================= HEADER END =====================--> */}
+            <div className="mainBlock">
+              {/* <!--======================= SWAP BLOCK START =====================--> */}
 
-            <Link to="/" class="close-Icon" style={{ zIndex: '1000', top: '70px', right: '35px' }}></Link>
-            <div className="swap-Block">
-              <div className="container-Grid">
-                <div className="smeTitle01-v2"> {/*   onClick={() => { this.openPopup("WithdrawToken"); }} */}
-                  Get Your Own License For FREE
-                </div>
-              </div>
-              <div className="swap-textBox">
+              <Link to="/" class="close-Icon" style={{ zIndex: '1000', top: '70px', right: '35px' }}></Link>
+              <div className="swap-Block">
                 <div className="container-Grid">
-                  <div className="gwFormMbox">
-                    <div className="gwFormLMbox">
-                      <div className="gwFormSTitle01">
-                        <span>1</span> Set up your fees and reimbursement
-                      </div>
-
-                      <div className="gwFormSbox01">
-                        <div className="gwFormTitle01" >Do you want to charge your users a fee above our fee?</div>
-                        <div className="gwFormSFormbox02">
-                          <div className="md-radio md-radio-inline gwFroWidthFix01">
-                            <input type="radio" id="rr01" checked={this.state.showFeeInpt ? true : false} name="stepin46" value="option146" onChange={this.handleChange.bind(this)} />
-                            <label htmlFor="rr01">Yes </label>
-                          </div>
-                          <div className="md-radio md-radio-inline gwFroWidthFix01">
-                            <input type="radio" id="rr02" checked={this.state.showFeeInpt ? false : true} name="stepin46" value="option145" onChange={this.handleChange.bind(this)} />
-                            <label htmlFor="rr02">No</label>
-                          </div>
+                  <div className="smeTitle01-v2"> {/*   onClick={() => { this.openPopup("WithdrawToken"); }} */}
+                    Get Your Own License For FREE
+                  </div>
+                </div>
+                <div className="swap-textBox">
+                  <div className="container-Grid">
+                    <div className="gwFormMbox">
+                      <div className="gwFormLMbox">
+                        <div className="gwFormSTitle01">
+                          <span>1</span> Set up your fees and reimbursement
                         </div>
-                      </div>
 
-                      {this.state.showFeeInpt ?
-                        <div>
-                          <div className="gwFormSbox01">
-                            <div className="gwFormTitle01" >Choose blockchain  <i className="help-circle"> <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="You can only charge fees and reimbursement users with your tokens on blockchains that your token is deploy on. If your token is for example on one chain like Ethereum users from other chains like BSC can use your license but they will not be charged with fees or reimbursement for it" aria-hidden="true"></i> </i>
+                        <div className="gwFormSbox01">
+                          <div className="gwFormTitle01" >Do you want to charge your users a fee above our fee?</div>
+                          <div className="gwFormSFormbox02">
+                            <div className="md-radio md-radio-inline gwFroWidthFix01">
+                              <input type="radio" id="rr01" checked={this.state.showFeeInpt ? true : false} name="stepin46" value="option146" onChange={this.handleChange.bind(this)} />
+                              <label htmlFor="rr01">Yes </label>
                             </div>
-                            <div className="gwFormSCheckbx01">
-                              <div className="md-checkbox">
-                                <input type="checkbox" id="rr04" name="bsc" onChange={(e) => this.onNetworkChange(e)} />
-                                <label htmlFor="rr04">BSC </label>
-                              </div>
-                              <div className="md-checkbox">
-                                <input type="checkbox" id="rr03" name="ethereum" onChange={(e) => this.onNetworkChange(e)} />
-                                <label htmlFor="rr03">Ethereum </label>
-                              </div>
-                              <div className="md-checkbox">
-                                <input type="checkbox" id="rr05" name="polygon" onChange={(e) => this.onNetworkChange(e)} disabled />
-                                <label htmlFor="rr05">Polygon </label>
-                              </div>
+                            <div className="md-radio md-radio-inline gwFroWidthFix01">
+                              <input type="radio" id="rr02" checked={this.state.showFeeInpt ? false : true} name="stepin46" value="option145" onChange={this.handleChange.bind(this)} />
+                              <label htmlFor="rr02">No</label>
                             </div>
                           </div>
-
-                          {this.state.bsc ?
-                            <CreateLicence reimbursementAddress={constantConfig[CONSTANT.NETWORK_ID.BINANCE].reimbursementContract} network="BSC" currency="BNB" connectWallet={() => { this.connectWallet() }} web3={this.state.web3} updateLicenseAddress={this.updateLicenseAddress.bind(this)} web3Binance={this.state.web3Binance}></CreateLicence>
-                            : null}
-                          {this.state.ethereum ?
-                            <CreateLicence reimbursementAddress={constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].reimbursementContract} network="Ethereum" currency="ETH" connectWallet={() => { this.connectWallet() }} web3={this.state.web3} updateLicenseAddress={this.updateLicenseAddress.bind(this)} web3Ethereum={this.state.web3Ethereum}></CreateLicence>
-                            : null}
-                          {this.state.polygon ?
-                            <CreateLicence network="Polygon" currency="MATIC"></CreateLicence>
-                            : null}
-
-                        </div>
-                        : null}
-
-                      {/* <div className="gwFormBRBox01">
-                        <div className="gwFormBRTitle01">
-                          <span>Ethereum</span>
-                        </div>
-                        <div className="gwFormSbox01">
-                          <div className="gwFormTitle01">
-                            Add your native token smart contract on Ethereum
-                          </div>
-                          <div className="gwFormSFormbox01">
-                            <input type="text" /> <span>TOKEN</span>
-                          </div>
-                        </div>
-                        <div className="gwFormSbox01">
-                          <div className="gwFormTitle01">
-                            Add a pool contract between your TOKEN to ETH
-                            <i className="help-circle">
-                              {" "}
-                              <i
-                                className="fas fa-question-circle protip"
-                                data-pt-position="top"
-                                data-pt-title="Help Text"
-                                aria-hidden="true"
-                              ></i>{" "}
-                            </i>
-                          </div>
-                          <div className="gwFormSFormbox01">
-                            <input type="text" /> <span>TOKEN</span>
-                          </div>
                         </div>
 
-                        <div className="gwFormSbox01">
-                          <div className="gwFormTitle01">
-                            How many days users need to stake to get 100%
-                            reimbursement?
-                            <i className="help-circle">
-                              {" "}
-                              <i
-                                className="fas fa-question-circle protip"
-                                data-pt-position="top"
-                                data-pt-title="Help Text"
-                                aria-hidden="true"
-                              ></i>{" "}
-                            </i>
-                          </div>
-                          <div className="gwFormSFormbox01">
-                            <input type="text" /> <span>DAYS</span>
-                          </div>
-                        </div>
+                        {this.state.showFeeInpt ?
+                          <div>
+                            <div className="gwFormSbox01">
+                              <div className="gwFormTitle01" >Choose blockchain  <i className="help-circle"> <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="You can only charge fees and reimbursement users with your tokens on blockchains that your token is deploy on. If your token is for example on one chain like Ethereum users from other chains like BSC can use your license but they will not be charged with fees or reimbursement for it" aria-hidden="true"></i> </i>
+                              </div>
+                              <div className="gwFormSCheckbx01">
+                                <div className="md-checkbox">
+                                  <input type="checkbox" id="rr04" name="bsc" onChange={(e) => this.onNetworkChange(e)} />
+                                  <label htmlFor="rr04">BSC </label>
+                                </div>
+                                <div className="md-checkbox">
+                                  <input type="checkbox" id="rr03" name="ethereum" onChange={(e) => this.onNetworkChange(e)} />
+                                  <label htmlFor="rr03">Ethereum </label>
+                                </div>
+                                <div className="md-checkbox">
+                                  <input type="checkbox" id="rr05" name="polygon" onChange={(e) => this.onNetworkChange(e)} disabled />
+                                  <label htmlFor="rr05">Polygon </label>
+                                </div>
+                              </div>
+                            </div>
 
-                        <div className="gwFormSbox01">
-                          <div className="gwFormTitle01">
-                            Choose the token ratio users will need to stake
-                            <i className="help-circle">
-                              {" "}
-                              <i
-                                className="fas fa-question-circle protip"
-                                data-pt-position="top"
-                                data-pt-title="Help Text"
-                                aria-hidden="true"
-                              ></i>{" "}
-                            </i>
-                          </div>
-                          <div className="gwFormSFormbox01">
-                            <input type="text" /> <span>: 1</span>
-                          </div>
-                        </div>
+                            {this.state.bsc ?
+                              <CreateLicence reimbursementAddress={constantConfig[CONSTANT.NETWORK_ID.BINANCE].reimbursementContract} network="BSC" currency="BNB" connectWallet={() => { this.connectWallet() }} web3={this.state.web3} updateLicenseAddress={this.updateLicenseAddress.bind(this)} web3Binance={this.state.web3Binance}></CreateLicence>
+                              : null}
+                            {this.state.ethereum ?
+                              <CreateLicence reimbursementAddress={constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].reimbursementContract} network="Ethereum" currency="ETH" connectWallet={() => { this.connectWallet() }} web3={this.state.web3} updateLicenseAddress={this.updateLicenseAddress.bind(this)} web3Ethereum={this.state.web3Ethereum}></CreateLicence>
+                              : null}
+                            {this.state.polygon ?
+                              <CreateLicence network="Polygon" currency="MATIC"></CreateLicence>
+                              : null}
 
-                        <button className="gwFormBTN02">
-                          Connect your Ethereum wallet to create a license on
-                          Ethereum{" "}
-                        </button>
-                      </div>
+                          </div>
+                          : null}
 
-                      <div className="gwFormBRBox01">
-                        <div className="gwFormBRTitle01">
-                          <span>BSC</span>
-                        </div>
-                        <div className="gwFormSbox01">
-                          <div className="gwFormTitle01">
-                            Add your native token smart contract on BSC
+                        {/* <div className="gwFormBRBox01">
+                          <div className="gwFormBRTitle01">
+                            <span>Ethereum</span>
                           </div>
-                          <div className="gwFormSFormbox01">
-                            <input type="text" /> <span>TOKEN</span>
-                          </div>
-                        </div>
-                        <div className="gwFormSbox01">
-                          <div className="gwFormTitle01">
-                            Add a pool contract between your TOKEN to BNB
-                            <i className="help-circle">
-                              {" "}
-                              <i
-                                className="fas fa-question-circle protip"
-                                data-pt-position="top"
-                                data-pt-title="Help Text"
-                                aria-hidden="true"
-                              ></i>{" "}
-                            </i>
-                          </div>
-                          <div className="gwFormSFormbox01">
-                            <input type="text" /> <span>TOKEN</span>
-                          </div>
-                        </div>
-
-                        <div className="gwFormSbox01">
-                          <div className="gwFormTitle01">
-                            How many days users need to stake to get 100%
-                            reimbursement?
-                            <i className="help-circle">
-                              {" "}
-                              <i
-                                className="fas fa-question-circle protip"
-                                data-pt-position="top"
-                                data-pt-title="Help Text"
-                                aria-hidden="true"
-                              ></i>{" "}
-                            </i>
-                          </div>
-                          <div className="gwFormSFormbox01">
-                            <input type="text" /> <span>DAYS</span>
-                          </div>
-                        </div>
-
-                        <div className="gwFormSbox01">
-                          <div className="gwFormTitle01">
-                            Choose the token ratio users will need to stake
-                            <i className="help-circle">
-                              {" "}
-                              <i
-                                className="fas fa-question-circle protip"
-                                data-pt-position="top"
-                                data-pt-title="Help Text"
-                                aria-hidden="true"
-                              ></i>{" "}
-                            </i>
-                          </div>
-                          <div className="gwFormSFormbox01">
-                            <input type="text" /> <span>: 1</span>
-                          </div>
-                        </div>
-
-                        <button className="gwFormBTN02 greenC">
-                          <i className="fas fa-check"></i> BSC license been
-                          created successfully
-                        </button>
-                      </div> */}
-
-                    </div>
-
-
-                    <div className="gwFormRMbox">
-                      <div className="gwFormSTitle01">
-                        <span>2</span>Set up your design{" "}
-                      </div>
-                      <div className="gwFormSbox01">
-                        <div className="gwFormTitle01">
-                          Choose the type of integration{" "}
-                        </div>
-                        <div className="gwFormSFormbox02">
-                          <div className="md-radio md-radio-inline gwFroWidthFix01">
-                            <input
-                              type="radio"
-                              id="radio145"
-                              name="typeofLicense"
-                              checked={this.state.typeofLicense === "Zero integration" ? true : false}
-                              value="Zero integration"
-                              defaultChecked
-                              onChange={this._onChangeRadio}
-                            />
-                            <label htmlFor="radio145">
-                              Zero integration
-                              <i className="help-circle">
-                                <i
-                                  className="fas fa-question-circle protip"
-                                  data-pt-position="top"
-                                  data-pt-title="This option allow licensees to create an instant license under one minute, with no coding knowledge needed or any server costs."
-                                  aria-hidden="true"
-                                ></i>
-                              </i>
-                            </label>
-                          </div>
-                          <div className="md-radio md-radio-inline gwFroWidthFix01">
-                            <input
-                              type="radio"
-                              id="radio146"
-                              name="typeofLicense"
-                              checked={this.state.typeofLicense === "Smart contract integration" ? true : false}
-                              value="Smart contract integration"
-                              onChange={this._onChangeRadio}
-                            // onClick={() => { notificationConfig.info("Coming Soon!") }}
-                            // disabled
-                            />
-                            <label htmlFor="radio146">
-                              Smart contract integration
-                              <i className="help-circle">
-                                <i
-                                  className="fas fa-question-circle protip"
-                                  data-pt-position="top"
-                                  data-pt-title="This option allow licensees to designed their own UI and do direct integration with the smart contract code. "
-                                  aria-hidden="true"
-                                ></i>
-                              </i>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                      {typeofLicense === "Zero integration" && (
-                        <>
-
                           <div className="gwFormSbox01">
-                            {/* <div className="gwFormTitle01">
-                              Do you want to display your native token first during
-                              the lauding?
+                            <div className="gwFormTitle01">
+                              Add your native token smart contract on Ethereum
+                            </div>
+                            <div className="gwFormSFormbox01">
+                              <input type="text" /> <span>TOKEN</span>
+                            </div>
+                          </div>
+                          <div className="gwFormSbox01">
+                            <div className="gwFormTitle01">
+                              Add a pool contract between your TOKEN to ETH
                               <i className="help-circle">
+                                {" "}
                                 <i
                                   className="fas fa-question-circle protip"
                                   data-pt-position="top"
                                   data-pt-title="Help Text"
                                   aria-hidden="true"
-                                ></i>
+                                ></i>{" "}
                               </i>
                             </div>
-                            <div className="gwFormSFormbox02">
-                              <div className="md-radio md-radio-inline gwFroWidthFix01">
-                                <input
-                                  type="radio"
-                                  id="rr200"
-                                  defaultChecked
-                                  name="stepin101"
-                                  value="1"
-                                />
-                                <label htmlFor="rr200">Yes</label>
-                              </div>
-                              <div className="md-radio md-radio-inline gwFroWidthFix01">
-                                <input
-                                  type="radio"
-                                  id="rr201"
-                                  name="stepin101"
-                                  value="option145"
-                                />
-                                <label htmlFor="rr201">No</label>
-                              </div>
-                            </div> */}
-                            {/* <div className="gwFormSFormbox02">
-                              <div className="md-radio md-radio-inline gwFroWidthFix01">
-                                <input
-                                  type="radio"
-                                  id="rr202"
-                                  name="displayToken"
-                                  value="Display all tokens"
-                                  onChange={this._onChangeRadio}
-                                />
-                                <label htmlFor="rr202">
-                                  Display all tokens
-                                  <i className="help-circle">
-                                    <i
-                                      className="fas fa-question-circle protip"
-                                      data-pt-position="top"
-                                      data-pt-title="Help Text"
-                                      aria-hidden="true"
-                                    ></i>
-                                  </i>
-                                </label>
-                              </div>
-                              <div className="md-radio md-radio-inline gwFroWidthFix01">
-                                <input
-                                  type="radio"
-                                  id="rr203"
-                                  name="displayToken"
-                                  value="Display token lists"
-                                  onChange={this._onChangeRadio}
-                                  defaultChecked
-                                />
-                                <label htmlFor="rr203">
-                                  Display token lists
-                                  <i className="help-circle">
-                                    <i
-                                      className="fas fa-question-circle protip"
-                                      data-pt-position="top"
-                                      data-pt-title="Help Text"
-                                      aria-hidden="true"
-                                    ></i>
-                                  </i>
-                                </label>
-                              </div>
-                            </div> */}
-                          </div>
-                          {/* {displayToken === "Display token lists" && (
-                            <div className="gwFormSbox01">
-                              <div class="gwFormSFormbox01">
-                                <input
-                                  type="text"
-                                  style={{ width: "100%" }}
-                                  placeholder="https:// or ipfs:// or ENS name"
-                                  defaultValue=""
-                                />
-                              </div>
+                            <div className="gwFormSFormbox01">
+                              <input type="text" /> <span>TOKEN</span>
                             </div>
-                          )} */}
+                          </div>
 
-                          <div className="gwFormSbox01 ">
+                          <div className="gwFormSbox01">
                             <div className="gwFormTitle01">
-                              Choose your subdomain name
+                              How many days users need to stake to get 100%
+                              reimbursement?
                               <i className="help-circle">
+                                {" "}
                                 <i
                                   className="fas fa-question-circle protip"
                                   data-pt-position="top"
-                                  data-pt-title="After you choose your subdomain, you can create a redirect with a mask to it, from your own main domain. so your users will not even know about that subdomain and it will look and fell like it yours"
+                                  data-pt-title="Help Text"
                                   aria-hidden="true"
-                                ></i>
-                              </i>{" "}
+                                ></i>{" "}
+                              </i>
                             </div>
-                            <div className="gwFormSFormbox01 v2 smFixer03">
+                            <div className="gwFormSFormbox01">
+                              <input type="text" /> <span>DAYS</span>
+                            </div>
+                          </div>
+
+                          <div className="gwFormSbox01">
+                            <div className="gwFormTitle01">
+                              Choose the token ratio users will need to stake
+                              <i className="help-circle">
+                                {" "}
+                                <i
+                                  className="fas fa-question-circle protip"
+                                  data-pt-position="top"
+                                  data-pt-title="Help Text"
+                                  aria-hidden="true"
+                                ></i>{" "}
+                              </i>
+                            </div>
+                            <div className="gwFormSFormbox01">
+                              <input type="text" /> <span>: 1</span>
+                            </div>
+                          </div>
+
+                          <button className="gwFormBTN02">
+                            Connect your Ethereum wallet to create a license on
+                            Ethereum{" "}
+                          </button>
+                        </div>
+
+                        <div className="gwFormBRBox01">
+                          <div className="gwFormBRTitle01">
+                            <span>BSC</span>
+                          </div>
+                          <div className="gwFormSbox01">
+                            <div className="gwFormTitle01">
+                              Add your native token smart contract on BSC
+                            </div>
+                            <div className="gwFormSFormbox01">
+                              <input type="text" /> <span>TOKEN</span>
+                            </div>
+                          </div>
+                          <div className="gwFormSbox01">
+                            <div className="gwFormTitle01">
+                              Add a pool contract between your TOKEN to BNB
+                              <i className="help-circle">
+                                {" "}
+                                <i
+                                  className="fas fa-question-circle protip"
+                                  data-pt-position="top"
+                                  data-pt-title="Help Text"
+                                  aria-hidden="true"
+                                ></i>{" "}
+                              </i>
+                            </div>
+                            <div className="gwFormSFormbox01">
+                              <input type="text" /> <span>TOKEN</span>
+                            </div>
+                          </div>
+
+                          <div className="gwFormSbox01">
+                            <div className="gwFormTitle01">
+                              How many days users need to stake to get 100%
+                              reimbursement?
+                              <i className="help-circle">
+                                {" "}
+                                <i
+                                  className="fas fa-question-circle protip"
+                                  data-pt-position="top"
+                                  data-pt-title="Help Text"
+                                  aria-hidden="true"
+                                ></i>{" "}
+                              </i>
+                            </div>
+                            <div className="gwFormSFormbox01">
+                              <input type="text" /> <span>DAYS</span>
+                            </div>
+                          </div>
+
+                          <div className="gwFormSbox01">
+                            <div className="gwFormTitle01">
+                              Choose the token ratio users will need to stake
+                              <i className="help-circle">
+                                {" "}
+                                <i
+                                  className="fas fa-question-circle protip"
+                                  data-pt-position="top"
+                                  data-pt-title="Help Text"
+                                  aria-hidden="true"
+                                ></i>{" "}
+                              </i>
+                            </div>
+                            <div className="gwFormSFormbox01">
+                              <input type="text" /> <span>: 1</span>
+                            </div>
+                          </div>
+
+                          <button className="gwFormBTN02 greenC">
+                            <i className="fas fa-check"></i> BSC license been
+                            created successfully
+                          </button>
+                        </div> */}
+
+                      </div>
+
+
+                      <div className="gwFormRMbox">
+                        <div className="gwFormSTitle01">
+                          <span>2</span>Set up your design{" "}
+                        </div>
+                        <div className="gwFormSbox01">
+                          <div className="gwFormTitle01">
+                            Choose the type of integration{" "}
+                          </div>
+                          <div className="gwFormSFormbox02">
+                            <div className="md-radio md-radio-inline gwFroWidthFix01">
                               <input
-                                type="text"
-                                value={subDomain}
-                                onChange={this.handalFormChange}
-                              />{" "}
-                              <span>.smartswap.exchange </span>
+                                type="radio"
+                                id="radio145"
+                                name="typeofLicense"
+                                checked={this.state.typeofLicense === "Zero integration" ? true : false}
+                                value="Zero integration"
+                                defaultChecked
+                                onChange={this._onChangeRadio}
+                              />
+                              <label htmlFor="radio145">
+                                Zero integration
+                                <i className="help-circle">
+                                  <i
+                                    className="fas fa-question-circle protip"
+                                    data-pt-position="top"
+                                    data-pt-title="This option allow licensees to create an instant license under one minute, with no coding knowledge needed or any server costs."
+                                    aria-hidden="true"
+                                  ></i>
+                                </i>
+                              </label>
+                            </div>
+                            <div className="md-radio md-radio-inline gwFroWidthFix01">
+                              <input
+                                type="radio"
+                                id="radio146"
+                                name="typeofLicense"
+                                checked={this.state.typeofLicense === "Smart contract integration" ? true : false}
+                                value="Smart contract integration"
+                                onChange={this._onChangeRadio}
+                              // onClick={() => { notificationConfig.info("Coming Soon!") }}
+                              // disabled
+                              />
+                              <label htmlFor="radio146">
+                                Smart contract integration
+                                <i className="help-circle">
+                                  <i
+                                    className="fas fa-question-circle protip"
+                                    data-pt-position="top"
+                                    data-pt-title="This option allow licensees to designed their own UI and do direct integration with the smart contract code. "
+                                    aria-hidden="true"
+                                  ></i>
+                                </i>
+                              </label>
                             </div>
                           </div>
+                        </div>
+                        {typeofLicense === "Zero integration" && (
+                          <>
 
-
-                          <div className="gwFormSbox01 NpDisplyFix01 ">
-                            <div className="gwFormSubBox01 smFixer04">
-                              Add logo
-                              <div className="SSMainInputBX ">
-                                <input
-                                  placeholder="Choose file"
-                                  disabled="disabled"
-                                  className="ssInputtype01"
-                                />
-                                <label className="custom-file-input">
-                                  <input
-                                    type="file"
-                                    id="contained-button-file-logo"
-                                    onChange={this.changeLogo.bind(this)}
-                                    accept="image/*"
-                                  />
-                                </label>
+                            <div className="gwFormSbox01">
+                              {/* <div className="gwFormTitle01">
+                                Do you want to display your native token first during
+                                the lauding?
+                                <i className="help-circle">
+                                  <i
+                                    className="fas fa-question-circle protip"
+                                    data-pt-position="top"
+                                    data-pt-title="Help Text"
+                                    aria-hidden="true"
+                                  ></i>
+                                </i>
                               </div>
-                            </div>
-                            <div className="gwFormSubBox01 smFixer04">
-                              Add a URL link behind your logo
-                              <div className="SSMainInputBX">
-                                <input
-                                  id="urlLink"
-                                  placeholder="http:///www.yourwebsite.com"
-                                  style={{ width: "100%", color: "white" }}
-                                  className="ssInputtype01"
-                                  value={logoUrl}
-                                  onChange={this.changeurl}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          {logoImage !== "" && (
-                            <div className="gwFormSbox01 NpDisplyFix01 ">
-                              <img src={logoImage} alt="" width="200" />
-                            </div>
-                          )}
-
-                          <div className="gwFormSbox01 NpDisplyFix01 smFixer04">
-                            <div className="gwFormSubBox01">
-                              Add new background
-                              <div className="SSMainInputBX">
-                                <input
-                                  placeholder="Choose file"
-                                  disabled="disabled"
-                                  className="ssInputtype01"
-                                />
-                                <label className="custom-file-input">
+                              <div className="gwFormSFormbox02">
+                                <div className="md-radio md-radio-inline gwFroWidthFix01">
                                   <input
-                                    type="file"
-                                    onChange={this.Main.bind(this)}
-                                    id="contained-button-file"
-                                    accept="image/*"
+                                    type="radio"
+                                    id="rr200"
+                                    defaultChecked
+                                    name="stepin101"
+                                    value="1"
                                   />
-                                </label>
-                              </div>
-                            </div>
-                            <div className="gwFormSubBox01">
-                              Background dark layer
-                              <div className="dragorInput">
-                                <div className="bg-slider">
-                                  <input
-                                    type="range"
-                                    min="1"
-                                    max="99"
-                                    value={this.state.backgroundOverLay}
-                                    class="overlay-slider"
-                                    id="myRange"
-                                    onChange={this.changeOverlay}
-                                    title="title"
-                                  />
-
-                                  <span className="bar"></span>
-
-                                  <span
-                                    className="progress"
-                                    style={{
-                                      width: `calc(${this.state.backgroundOverLay}% )`,
-                                    }}
-                                  ></span>
-                                  <span className="text">0%</span>
-                                  <span className="text right">100%</span>
-                                  <span
-                                    className="percent"
-                                    style={{
-                                      left: `calc(${this.state.backgroundOverLay
-                                        }% - ${this.state.backgroundOverLay / 3 - 23
-                                        }px)`,
-                                      borderRadius: "0",
-                                      border: "0",
-                                      boxShadow: "none",
-                                    }}
-                                  >
-                                    {this.state.backgroundOverLay}%
-                                  </span>
+                                  <label htmlFor="rr200">Yes</label>
                                 </div>
-                              </div>
+                                <div className="md-radio md-radio-inline gwFroWidthFix01">
+                                  <input
+                                    type="radio"
+                                    id="rr201"
+                                    name="stepin101"
+                                    value="option145"
+                                  />
+                                  <label htmlFor="rr201">No</label>
+                                </div>
+                              </div> */}
+                              {/* <div className="gwFormSFormbox02">
+                                <div className="md-radio md-radio-inline gwFroWidthFix01">
+                                  <input
+                                    type="radio"
+                                    id="rr202"
+                                    name="displayToken"
+                                    value="Display all tokens"
+                                    onChange={this._onChangeRadio}
+                                  />
+                                  <label htmlFor="rr202">
+                                    Display all tokens
+                                    <i className="help-circle">
+                                      <i
+                                        className="fas fa-question-circle protip"
+                                        data-pt-position="top"
+                                        data-pt-title="Help Text"
+                                        aria-hidden="true"
+                                      ></i>
+                                    </i>
+                                  </label>
+                                </div>
+                                <div className="md-radio md-radio-inline gwFroWidthFix01">
+                                  <input
+                                    type="radio"
+                                    id="rr203"
+                                    name="displayToken"
+                                    value="Display token lists"
+                                    onChange={this._onChangeRadio}
+                                    defaultChecked
+                                  />
+                                  <label htmlFor="rr203">
+                                    Display token lists
+                                    <i className="help-circle">
+                                      <i
+                                        className="fas fa-question-circle protip"
+                                        data-pt-position="top"
+                                        data-pt-title="Help Text"
+                                        aria-hidden="true"
+                                      ></i>
+                                    </i>
+                                  </label>
+                                </div>
+                              </div> */}
                             </div>
-                          </div>
-                          {bgimage !== "" && (
-                            <div className="gwFormSbox01 NpDisplyFix01 ">
-                              <img src={bgimage} alt="" width="200" />
-                            </div>
-                          )}
-
-                          <div className="gwFormSbox01 smFixer04">
-                            <div className="gwFormTitle01" style={{ margin: '20px 0 0 0' }}>
-                              Keep SmartSwap side bar
-                            </div>
-                            <div className="gwFormSFormbox02">
-                              <div className="md-radio md-radio-inline ">
-                                <input
-                                  type="radio"
-                                  id="radio21"
-                                  name="sideBar"
-                                  value="true"
-                                  defaultChecked
-                                  onClick={this._onChangeRadio}
-                                />
-                                <label htmlFor="radio21">Yes</label>
-                              </div>
-                              <div className="md-radio md-radio-inline ">
-                                <input
-                                  type="radio"
-                                  id="radio22"
-                                  name="sideBar"
-                                  value="false"
-                                  defaultChecked={
-                                    this.state.sideBar === "false"
-                                  }
-                                  onClick={this._onChangeRadio}
-                                />
-                                <label htmlFor="radio22">No </label>
-                              </div>
-                            </div>
-                            <div className="gwFormTitle01" style={{ margin: '20px 0 0 0' }}>
-                              Change button and text
-                            </div>
-                            <div className="gwFormSFormbox02">
-                              <div className="md-radio md-radio-inline ">
-                                <input
-                                  type="radio"
-                                  id="radio11"
-                                  name="changeText"
-                                  value="Yes"
-                                  defaultChecked
-                                  onClick={this._onChangeRadio}
-                                />
-                                <label htmlFor="radio11">Yes</label>
-                              </div>
-                              <div className="md-radio md-radio-inline ">
-                                <input
-                                  type="radio"
-                                  id="radio12"
-                                  name="changeText"
-                                  value="No"
-                                  defaultChecked={
-                                    this.state.changeText === "No"
-                                  }
-                                  onClick={this._onChangeRadio}
-                                />
-                                <label htmlFor="radio12">No </label>
-                              </div>
-                            </div>
-
-                            {/* <div className="gwFormTitle01" style={{ margin: '20px 0 0 0' }}>
-                              Keep button "BECOME A SWAP PROVIDER"
-                            </div>
-
-                            <div className="gwFormSFormbox02">
-                              <div className="md-radio md-radio-inline ">
-                                <input
-                                  type="radio"
-                                  id="radio13"
-                                  name="aaaa"
-                                  value="Yes"
-                                  defaultChecked
-                                />
-                                <label htmlFor="radio13">Yes</label>
-                              </div>
-                              <div className="md-radio md-radio-inline ">
-                                <input
-                                  type="radio"
-                                  id="radio14"
-                                  name="aaaa"
-                                  value="No"
-                                />
-                                <label htmlFor="radio14">No </label>
-                              </div>
-                            </div>
-
-                            <div className="gwFormTitle01" style={{ margin: '20px 0 0 0' }}>
-                              Keep button "GET YOUR OWN FREE LICENSE"
-                            </div>
-
-                            <div className="gwFormSFormbox02">
-                              <div className="md-radio md-radio-inline ">
-                                <input
-                                  type="radio"
-                                  id="radio15"
-                                  name="bbb"
-                                  value="Yes"
-                                  defaultChecked
-                                />
-                                <label htmlFor="radio15">Yes</label>
-                              </div>
-                              <div className="md-radio md-radio-inline ">
-                                <input
-                                  type="radio"
-                                  id="radio16"
-                                  name="bbb"
-                                  value="No"
-                                />
-                                <label htmlFor="radio16">No </label>
-                              </div>
-                            </div> */}
-                          </div>
-                          {changeText === "Yes" && (
-                            <>
+                            {/* {displayToken === "Display token lists" && (
                               <div className="gwFormSbox01">
-                                <div className="gwFormTitle01">
-                                  Select font style
+                                <div class="gwFormSFormbox01">
+                                  <input
+                                    type="text"
+                                    style={{ width: "100%" }}
+                                    placeholder="https:// or ipfs:// or ENS name"
+                                    defaultValue=""
+                                  />
                                 </div>
-                                <select
-                                  name="fontStyle"
-                                  id="fontStyle"
-                                  className="subdomain"
-                                  value={fontStyle}
-                                  onChange={this.changeFontStyle}
-                                  style={{
-                                    padding: "20px 15px",
-                                    width: "100%",
-                                    backgroundColor: "#16171e",
-                                    color: "#fff",
-                                    border: 0,
-                                  }}
-                                >
-                                  <option value="Default">Default</option>
-                                  <option value="Montserrat">Montserrat</option>
-                                  <option value="Nunito">Nunito</option>
-                                  <option value="Poppins">Poppins</option>
-                                  <option value="Roboto">Roboto</option>
-                                </select>
-                                {/* <div className="LiproDropdown">
-                                  <button
-                                    className="LiproDDbtn01"
-                                    onClick={() => this.toggle(1)}
-                                  >
-                                    <div className="ddIconBX">Default</div>
-                                    <i className="fas fa-caret-down"></i>
-                                  </button>
-                                  <div className="ddContainer">
-                                    <Collapse
-                                      isOpen={this.state.isOpen1}
-                                      className={"collapse-css-transition"}
-                                    >
-                                      <button className="LiproDDbtn01">
-                                        <div className="ddIconBX">Font 01</div>
-                                      </button>
-                                      <button className="LiproDDbtn01">
-                                        <div className="ddIconBX">Font 02</div>
-                                      </button>
-                                    </Collapse>
-                                    
-                                  </div>
-                                </div> */}
                               </div>
+                            )} */}
 
-                              <div className="colorPlateMBox npFixer05">
-                                <div className="colorPlateTitle01">
-                                  Text color
-                                </div>
-                                <div className="colorPlateSBox01">
-                                  <div className="md-radio md-radio-inline ">
+                            <div className="gwFormSbox01 ">
+                              <div className="gwFormTitle01">
+                                Choose your subdomain name
+                                <i className="help-circle">
+                                  <i
+                                    className="fas fa-question-circle protip"
+                                    data-pt-position="top"
+                                    data-pt-title="After you choose your subdomain, you can create a redirect with a mask to it, from your own main domain. so your users will not even know about that subdomain and it will look and fell like it yours"
+                                    aria-hidden="true"
+                                  ></i>
+                                </i>{" "}
+                              </div>
+                              <div className="gwFormSFormbox01 v2 smFixer03">
+                                <input
+                                  type="text"
+                                  value={subDomain}
+                                  onChange={this.handalFormChange}
+                                />{" "}
+                                <span>.smartswap.exchange </span>
+                              </div>
+                            </div>
+
+
+                            <div className="gwFormSbox01 NpDisplyFix01 ">
+                              <div className="gwFormSubBox01 smFixer04">
+                                Add logo
+                                <div className="SSMainInputBX ">
+                                  <input
+                                    placeholder="Choose file"
+                                    disabled="disabled"
+                                    className="ssInputtype01"
+                                  />
+                                  <label className="custom-file-input">
                                     <input
-                                      type="radio"
-                                      id="s01"
-                                      name="s11"
-                                      value="s10"
-                                      defaultChecked
-                                      onClick={() =>
-                                        this.setState({ primaryColor: "#fff" })
-                                      }
+                                      type="file"
+                                      id="contained-button-file-logo"
+                                      onChange={this.changeLogo.bind(this)}
+                                      accept="image/*"
                                     />
-                                    <label htmlFor="s01"></label>
-                                  </div>
-                                  <div
-                                    className="colorPlater"
-                                    onClick={() => {
-                                      document.getElementById(
-                                        "s01"
-                                      ).checked = true;
-                                      this.setState({ primaryColor: "#fff" });
-                                    }}
-                                  >
-                                    Current color{" "}
-                                    <div
-                                      className="ColorBX"
-                                      style={{ backgroundColor: "#fff" }}
-                                    ></div>
-                                  </div>
-                                  <div className="chevrBox">
-                                    <i className="fas fa-chevron-right"></i>
-                                  </div>
+                                  </label>
                                 </div>
-                                <div
-                                  className="colorPlateSBox02"
-                                  style={{ position: "relative" }}
-                                >
-                                  <div className="md-radio md-radio-inline ">
+                              </div>
+                              <div className="gwFormSubBox01 smFixer04">
+                                Add a URL link behind your logo
+                                <div className="SSMainInputBX">
+                                  <input
+                                    id="urlLink"
+                                    placeholder="http:///www.yourwebsite.com"
+                                    style={{ width: "100%", color: "white" }}
+                                    className="ssInputtype01"
+                                    value={logoUrl}
+                                    onChange={this.changeurl}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            {logoImage !== "" && (
+                              <div className="gwFormSbox01 NpDisplyFix01 ">
+                                <img src={logoImage} alt="" width="200" />
+                              </div>
+                            )}
+
+                            <div className="gwFormSbox01 NpDisplyFix01 smFixer04">
+                              <div className="gwFormSubBox01">
+                                Add new background
+                                <div className="SSMainInputBX">
+                                  <input
+                                    placeholder="Choose file"
+                                    disabled="disabled"
+                                    className="ssInputtype01"
+                                  />
+                                  <label className="custom-file-input">
                                     <input
-                                      type="radio"
-                                      id="s02"
-                                      name="s11"
-                                      value="s11"
-                                      defaultChecked={primaryColor !== "#fff"}
+                                      type="file"
+                                      onChange={this.Main.bind(this)}
+                                      id="contained-button-file"
+                                      accept="image/*"
                                     />
-                                    <label htmlFor="s02"></label>
-                                  </div>
-                                  <div
-                                    className="colorPlater"
-                                    onClick={(e) => {
-                                      this.toggalColor(
-                                        e,
-                                        "showPrimaryColor",
-                                        "s02"
-                                      );
-                                    }}
-                                  >
-                                    New color
-                                    <span className="colorPlaterSbx">
-                                      <div
-                                        className="ColorBX"
-                                        style={{ background: primaryColor }}
-                                      ></div>
-                                      <button>
-                                        {" "}
-                                        <i class="fas fa-sort-down"></i>{" "}
-                                      </button>
+                                  </label>
+                                </div>
+                              </div>
+                              <div className="gwFormSubBox01">
+                                Background dark layer
+                                <div className="dragorInput">
+                                  <div className="bg-slider">
+                                    <input
+                                      type="range"
+                                      min="1"
+                                      max="99"
+                                      value={this.state.backgroundOverLay}
+                                      class="overlay-slider"
+                                      id="myRange"
+                                      onChange={this.changeOverlay}
+                                      title="title"
+                                    />
+
+                                    <span className="bar"></span>
+
+                                    <span
+                                      className="progress"
+                                      style={{
+                                        width: `calc(${this.state.backgroundOverLay}% )`,
+                                      }}
+                                    ></span>
+                                    <span className="text">0%</span>
+                                    <span className="text right">100%</span>
+                                    <span
+                                      className="percent"
+                                      style={{
+                                        left: `calc(${this.state.backgroundOverLay
+                                          }% - ${this.state.backgroundOverLay / 3 - 23
+                                          }px)`,
+                                        borderRadius: "0",
+                                        border: "0",
+                                        boxShadow: "none",
+                                      }}
+                                    >
+                                      {this.state.backgroundOverLay}%
                                     </span>
                                   </div>
-                                  {showPrimaryColor && (
-                                    <>
-                                      <div
-                                        className="overPicker"
-                                        onClick={this.closeChromePickerPopUp.bind(
-                                          this
-                                        )}
-                                      ></div>
-                                      <div className="color-picker">
-                                        <ChromePicker
-                                          color={primaryColor}
-                                          onChangeComplete={(color) => {
-                                            this.handleChangeComplete(
-                                              color,
-                                              "primaryColor"
-                                            );
-                                          }}
-                                        />
-                                      </div>
-                                    </>
-                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            {bgimage !== "" && (
+                              <div className="gwFormSbox01 NpDisplyFix01 ">
+                                <img src={bgimage} alt="" width="200" />
+                              </div>
+                            )}
+
+                            <div className="gwFormSbox01 smFixer04">
+                              <div className="gwFormTitle01" style={{ margin: '20px 0 0 0' }}>
+                                Keep SmartSwap side bar
+                              </div>
+                              <div className="gwFormSFormbox02">
+                                <div className="md-radio md-radio-inline ">
+                                  <input
+                                    type="radio"
+                                    id="radio21"
+                                    name="sideBar"
+                                    value="true"
+                                    defaultChecked
+                                    onClick={this._onChangeRadio}
+                                  />
+                                  <label htmlFor="radio21">Yes</label>
+                                </div>
+                                <div className="md-radio md-radio-inline ">
+                                  <input
+                                    type="radio"
+                                    id="radio22"
+                                    name="sideBar"
+                                    value="false"
+                                    defaultChecked={
+                                      this.state.sideBar === "false"
+                                    }
+                                    onClick={this._onChangeRadio}
+                                  />
+                                  <label htmlFor="radio22">No </label>
+                                </div>
+                              </div>
+                              <div className="gwFormTitle01" style={{ margin: '20px 0 0 0' }}>
+                                Change button and text
+                              </div>
+                              <div className="gwFormSFormbox02">
+                                <div className="md-radio md-radio-inline ">
+                                  <input
+                                    type="radio"
+                                    id="radio11"
+                                    name="changeText"
+                                    value="Yes"
+                                    defaultChecked
+                                    onClick={this._onChangeRadio}
+                                  />
+                                  <label htmlFor="radio11">Yes</label>
+                                </div>
+                                <div className="md-radio md-radio-inline ">
+                                  <input
+                                    type="radio"
+                                    id="radio12"
+                                    name="changeText"
+                                    value="No"
+                                    defaultChecked={
+                                      this.state.changeText === "No"
+                                    }
+                                    onClick={this._onChangeRadio}
+                                  />
+                                  <label htmlFor="radio12">No </label>
                                 </div>
                               </div>
 
-                              <div className="colorPlateMBox npFixer05">
-                                <div className="colorPlateTitle01">
-                                  Connect your wallet button
+                              {/* <div className="gwFormTitle01" style={{ margin: '20px 0 0 0' }}>
+                                Keep button "BECOME A SWAP PROVIDER"
+                              </div>
+
+                              <div className="gwFormSFormbox02">
+                                <div className="md-radio md-radio-inline ">
+                                  <input
+                                    type="radio"
+                                    id="radio13"
+                                    name="aaaa"
+                                    value="Yes"
+                                    defaultChecked
+                                  />
+                                  <label htmlFor="radio13">Yes</label>
                                 </div>
-                                <div className="colorPlateSBox01">
-                                  <div className="md-radio md-radio-inline ">
-                                    <input
-                                      type="radio"
-                                      id="s03"
-                                      name="s12"
-                                      value="s12"
-                                      defaultChecked
-                                      onClick={() =>
+                                <div className="md-radio md-radio-inline ">
+                                  <input
+                                    type="radio"
+                                    id="radio14"
+                                    name="aaaa"
+                                    value="No"
+                                  />
+                                  <label htmlFor="radio14">No </label>
+                                </div>
+                              </div>
+
+                              <div className="gwFormTitle01" style={{ margin: '20px 0 0 0' }}>
+                                Keep button "GET YOUR OWN FREE LICENSE"
+                              </div>
+
+                              <div className="gwFormSFormbox02">
+                                <div className="md-radio md-radio-inline ">
+                                  <input
+                                    type="radio"
+                                    id="radio15"
+                                    name="bbb"
+                                    value="Yes"
+                                    defaultChecked
+                                  />
+                                  <label htmlFor="radio15">Yes</label>
+                                </div>
+                                <div className="md-radio md-radio-inline ">
+                                  <input
+                                    type="radio"
+                                    id="radio16"
+                                    name="bbb"
+                                    value="No"
+                                  />
+                                  <label htmlFor="radio16">No </label>
+                                </div>
+                              </div> */}
+                            </div>
+                            {changeText === "Yes" && (
+                              <>
+                                <div className="gwFormSbox01">
+                                  <div className="gwFormTitle01">
+                                    Select font style
+                                  </div>
+                                  <select
+                                    name="fontStyle"
+                                    id="fontStyle"
+                                    className="subdomain"
+                                    value={fontStyle}
+                                    onChange={this.changeFontStyle}
+                                    style={{
+                                      padding: "20px 15px",
+                                      width: "100%",
+                                      backgroundColor: "#16171e",
+                                      color: "#fff",
+                                      border: 0,
+                                    }}
+                                  >
+                                    <option value="Default">Default</option>
+                                    <option value="Montserrat">Montserrat</option>
+                                    <option value="Nunito">Nunito</option>
+                                    <option value="Poppins">Poppins</option>
+                                    <option value="Roboto">Roboto</option>
+                                  </select>
+                                  {/* <div className="LiproDropdown">
+                                    <button
+                                      className="LiproDDbtn01"
+                                      onClick={() => this.toggle(1)}
+                                    >
+                                      <div className="ddIconBX">Default</div>
+                                      <i className="fas fa-caret-down"></i>
+                                    </button>
+                                    <div className="ddContainer">
+                                      <Collapse
+                                        isOpen={this.state.isOpen1}
+                                        className={"collapse-css-transition"}
+                                      >
+                                        <button className="LiproDDbtn01">
+                                          <div className="ddIconBX">Font 01</div>
+                                        </button>
+                                        <button className="LiproDDbtn01">
+                                          <div className="ddIconBX">Font 02</div>
+                                        </button>
+                                      </Collapse>
+                                      
+                                    </div>
+                                  </div> */}
+                                </div>
+
+                                <div className="colorPlateMBox npFixer05">
+                                  <div className="colorPlateTitle01">
+                                    Text color
+                                  </div>
+                                  <div className="colorPlateSBox01">
+                                    <div className="md-radio md-radio-inline ">
+                                      <input
+                                        type="radio"
+                                        id="s01"
+                                        name="s11"
+                                        value="s10"
+                                        defaultChecked
+                                        onClick={() =>
+                                          this.setState({ primaryColor: "#fff" })
+                                        }
+                                      />
+                                      <label htmlFor="s01"></label>
+                                    </div>
+                                    <div
+                                      className="colorPlater"
+                                      onClick={() => {
+                                        document.getElementById(
+                                          "s01"
+                                        ).checked = true;
+                                        this.setState({ primaryColor: "#fff" });
+                                      }}
+                                    >
+                                      Current color{" "}
+                                      <div
+                                        className="ColorBX"
+                                        style={{ backgroundColor: "#fff" }}
+                                      ></div>
+                                    </div>
+                                    <div className="chevrBox">
+                                      <i className="fas fa-chevron-right"></i>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className="colorPlateSBox02"
+                                    style={{ position: "relative" }}
+                                  >
+                                    <div className="md-radio md-radio-inline ">
+                                      <input
+                                        type="radio"
+                                        id="s02"
+                                        name="s11"
+                                        value="s11"
+                                        defaultChecked={primaryColor !== "#fff"}
+                                      />
+                                      <label htmlFor="s02"></label>
+                                    </div>
+                                    <div
+                                      className="colorPlater"
+                                      onClick={(e) => {
+                                        this.toggalColor(
+                                          e,
+                                          "showPrimaryColor",
+                                          "s02"
+                                        );
+                                      }}
+                                    >
+                                      New color
+                                      <span className="colorPlaterSbx">
+                                        <div
+                                          className="ColorBX"
+                                          style={{ background: primaryColor }}
+                                        ></div>
+                                        <button>
+                                          {" "}
+                                          <i class="fas fa-sort-down"></i>{" "}
+                                        </button>
+                                      </span>
+                                    </div>
+                                    {showPrimaryColor && (
+                                      <>
+                                        <div
+                                          className="overPicker"
+                                          onClick={this.closeChromePickerPopUp.bind(
+                                            this
+                                          )}
+                                        ></div>
+                                        <div className="color-picker">
+                                          <ChromePicker
+                                            color={primaryColor}
+                                            onChangeComplete={(color) => {
+                                              this.handleChangeComplete(
+                                                color,
+                                                "primaryColor"
+                                              );
+                                            }}
+                                          />
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="colorPlateMBox npFixer05">
+                                  <div className="colorPlateTitle01">
+                                    Connect your wallet button
+                                  </div>
+                                  <div className="colorPlateSBox01">
+                                    <div className="md-radio md-radio-inline ">
+                                      <input
+                                        type="radio"
+                                        id="s03"
+                                        name="s12"
+                                        value="s12"
+                                        defaultChecked
+                                        onClick={() =>
+                                          this.setState({
+                                            secondaryColor: "#5c6bc0",
+                                          })
+                                        }
+                                      />
+                                      <label htmlFor="s03"></label>
+                                    </div>
+                                    <div
+                                      className="colorPlater"
+                                      onClick={() => {
+                                        document.getElementById(
+                                          "s03"
+                                        ).checked = true;
                                         this.setState({
                                           secondaryColor: "#5c6bc0",
-                                        })
-                                      }
-                                    />
-                                    <label htmlFor="s03"></label>
-                                  </div>
-                                  <div
-                                    className="colorPlater"
-                                    onClick={() => {
-                                      document.getElementById(
-                                        "s03"
-                                      ).checked = true;
-                                      this.setState({
-                                        secondaryColor: "#5c6bc0",
-                                      });
-                                    }}
-                                  >
-                                    Current color{" "}
-                                    <div
-                                      className="ColorBX"
-                                      style={{ backgroundColor: "#5c6bc0" }}
-                                    ></div>
-                                  </div>
-                                  <div className="chevrBox">
-                                    <i className="fas fa-chevron-right"></i>
-                                  </div>
-                                </div>
-                                <div
-                                  className="colorPlateSBox02"
-                                  style={{ position: "relative" }}
-                                >
-                                  <div className="md-radio md-radio-inline ">
-                                    <input
-                                      type="radio"
-                                      id="s04"
-                                      name="s12"
-                                      value="s12"
-                                      defaultChecked={
-                                        secondaryColor !== "#5c6bc0"
-                                      }
-                                    />
-                                    <label htmlFor="s04"></label>
-                                  </div>
-                                  <div
-                                    className="colorPlater"
-                                    onClick={(e) => {
-                                      this.toggalColor(
-                                        e,
-                                        "showSecondaryColor",
-                                        "s04"
-                                      );
-                                    }}
-                                  >
-                                    New color
-                                    <span className="colorPlaterSbx">
+                                        });
+                                      }}
+                                    >
+                                      Current color{" "}
                                       <div
                                         className="ColorBX"
-                                        style={{ background: secondaryColor }}
+                                        style={{ backgroundColor: "#5c6bc0" }}
                                       ></div>
-                                      <button>
-                                        {" "}
-                                        <i class="fas fa-sort-down"></i>{" "}
-                                      </button>
-                                    </span>
+                                    </div>
+                                    <div className="chevrBox">
+                                      <i className="fas fa-chevron-right"></i>
+                                    </div>
                                   </div>
-                                  {showSecondaryColor && (
-                                    <>
-                                      <div
-                                        className="overPicker"
-                                        onClick={this.closeChromePickerPopUp.bind(
-                                          this
-                                        )}
-                                      ></div>
-                                      <div className="color-picker">
-                                        <ChromePicker
-                                          color={secondaryColor}
-                                          onChangeComplete={(color) => {
-                                            this.handleChangeComplete(
-                                              color,
-                                              "secondaryColor"
-                                            );
-                                          }}
-                                        />
-                                      </div>
-                                    </>
-                                  )}
+                                  <div
+                                    className="colorPlateSBox02"
+                                    style={{ position: "relative" }}
+                                  >
+                                    <div className="md-radio md-radio-inline ">
+                                      <input
+                                        type="radio"
+                                        id="s04"
+                                        name="s12"
+                                        value="s12"
+                                        defaultChecked={
+                                          secondaryColor !== "#5c6bc0"
+                                        }
+                                      />
+                                      <label htmlFor="s04"></label>
+                                    </div>
+                                    <div
+                                      className="colorPlater"
+                                      onClick={(e) => {
+                                        this.toggalColor(
+                                          e,
+                                          "showSecondaryColor",
+                                          "s04"
+                                        );
+                                      }}
+                                    >
+                                      New color
+                                      <span className="colorPlaterSbx">
+                                        <div
+                                          className="ColorBX"
+                                          style={{ background: secondaryColor }}
+                                        ></div>
+                                        <button>
+                                          {" "}
+                                          <i class="fas fa-sort-down"></i>{" "}
+                                        </button>
+                                      </span>
+                                    </div>
+                                    {showSecondaryColor && (
+                                      <>
+                                        <div
+                                          className="overPicker"
+                                          onClick={this.closeChromePickerPopUp.bind(
+                                            this
+                                          )}
+                                        ></div>
+                                        <div className="color-picker">
+                                          <ChromePicker
+                                            color={secondaryColor}
+                                            onChangeComplete={(color) => {
+                                              this.handleChangeComplete(
+                                                color,
+                                                "secondaryColor"
+                                              );
+                                            }}
+                                          />
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
 
-                              <div className="colorPlateMBox npFixer05">
-                                <div className="colorPlateTitle01">
-                                  Swap button
-                                </div>
-                                <div className="colorPlateSBox01">
-                                  <div className="md-radio md-radio-inline ">
-                                    <input
-                                      type="radio"
-                                      id="swap"
-                                      name="swapButtonColor"
-                                      value="s12"
-                                      defaultChecked
-                                      onClick={() =>
+                                <div className="colorPlateMBox npFixer05">
+                                  <div className="colorPlateTitle01">
+                                    Swap button
+                                  </div>
+                                  <div className="colorPlateSBox01">
+                                    <div className="md-radio md-radio-inline ">
+                                      <input
+                                        type="radio"
+                                        id="swap"
+                                        name="swapButtonColor"
+                                        value="s12"
+                                        defaultChecked
+                                        onClick={() =>
+                                          this.setState({
+                                            swapButtonColor: "#91dc27",
+                                          })
+                                        }
+                                      />
+                                      <label htmlFor="swap"></label>
+                                    </div>
+                                    <div
+                                      className="colorPlater"
+                                      onClick={() => {
+                                        document.getElementById(
+                                          "swap"
+                                        ).checked = true;
                                         this.setState({
                                           swapButtonColor: "#91dc27",
-                                        })
-                                      }
-                                    />
-                                    <label htmlFor="swap"></label>
-                                  </div>
-                                  <div
-                                    className="colorPlater"
-                                    onClick={() => {
-                                      document.getElementById(
-                                        "swap"
-                                      ).checked = true;
-                                      this.setState({
-                                        swapButtonColor: "#91dc27",
-                                      });
-                                    }}
-                                  >
-                                    Current color{" "}
-                                    <div
-                                      className="ColorBX"
-                                      style={{ backgroundColor: "#91dc27" }}
-                                    ></div>
-                                  </div>
-                                  <div className="chevrBox">
-                                    <i className="fas fa-chevron-right"></i>
-                                  </div>
-                                </div>
-                                <div
-                                  className="colorPlateSBox02"
-                                  style={{ position: "relative" }}
-                                >
-                                  <div className="md-radio md-radio-inline ">
-                                    <input
-                                      type="radio"
-                                      id="swap1"
-                                      name="swapButtonColor"
-                                      value="s12"
-                                      defaultChecked={
-                                        swapButtonColor !== "#91dc27"
-                                      }
-                                    />
-                                    <label htmlFor="swap1"></label>
-                                  </div>
-                                  <div
-                                    className="colorPlater"
-                                    onClick={(e) => {
-                                      this.toggalColor(
-                                        e,
-                                        "showSwapButtonColor",
-                                        "swap1"
-                                      );
-                                    }}
-                                  >
-                                    New color
-                                    <span className="colorPlaterSbx">
+                                        });
+                                      }}
+                                    >
+                                      Current color{" "}
                                       <div
                                         className="ColorBX"
-                                        style={{ background: swapButtonColor }}
+                                        style={{ backgroundColor: "#91dc27" }}
                                       ></div>
-                                      <button>
-                                        {" "}
-                                        <i class="fas fa-sort-down"></i>{" "}
-                                      </button>
-                                    </span>
+                                    </div>
+                                    <div className="chevrBox">
+                                      <i className="fas fa-chevron-right"></i>
+                                    </div>
                                   </div>
-                                  {showSwapButtonColor && (
-                                    <>
-                                      <div
-                                        className="overPicker"
-                                        onClick={this.closeChromePickerPopUp.bind(
-                                          this
-                                        )}
-                                      ></div>
-                                      <div className="color-picker">
-                                        <ChromePicker
-                                          color={swapButtonColor}
-                                          onChangeComplete={(color) => {
-                                            this.handleChangeComplete(
-                                              color,
-                                              "swapButtonColor"
-                                            );
-                                          }}
-                                        />
-                                      </div>
-                                    </>
-                                  )}
+                                  <div
+                                    className="colorPlateSBox02"
+                                    style={{ position: "relative" }}
+                                  >
+                                    <div className="md-radio md-radio-inline ">
+                                      <input
+                                        type="radio"
+                                        id="swap1"
+                                        name="swapButtonColor"
+                                        value="s12"
+                                        defaultChecked={
+                                          swapButtonColor !== "#91dc27"
+                                        }
+                                      />
+                                      <label htmlFor="swap1"></label>
+                                    </div>
+                                    <div
+                                      className="colorPlater"
+                                      onClick={(e) => {
+                                        this.toggalColor(
+                                          e,
+                                          "showSwapButtonColor",
+                                          "swap1"
+                                        );
+                                      }}
+                                    >
+                                      New color
+                                      <span className="colorPlaterSbx">
+                                        <div
+                                          className="ColorBX"
+                                          style={{ background: swapButtonColor }}
+                                        ></div>
+                                        <button>
+                                          {" "}
+                                          <i class="fas fa-sort-down"></i>{" "}
+                                        </button>
+                                      </span>
+                                    </div>
+                                    {showSwapButtonColor && (
+                                      <>
+                                        <div
+                                          className="overPicker"
+                                          onClick={this.closeChromePickerPopUp.bind(
+                                            this
+                                          )}
+                                        ></div>
+                                        <div className="color-picker">
+                                          <ChromePicker
+                                            color={swapButtonColor}
+                                            onChangeComplete={(color) => {
+                                              this.handleChangeComplete(
+                                                color,
+                                                "swapButtonColor"
+                                              );
+                                            }}
+                                          />
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            </>
-                          )}
-                          {errormsg !== "" && (
-                            <p style={{ color: "red" }}>{errormsg}</p>
-                          )}
-                          {successmsg !== "" && (
-                            <p style={{ color: "#92db28" }}>{successmsg}</p>
-                          )}
+                              </>
+                            )}
+                            {errormsg !== "" && (
+                              <p style={{ color: "red" }}>{errormsg}</p>
+                            )}
+                            {successmsg !== "" && (
+                              <p style={{ color: "#92db28" }}>{successmsg}</p>
+                            )}
 
-                          <div className="colorPlateMBox">
-                            <div className="colorPlateTitle01">
-                              <button
-                                disabled={isloading}
-                                onClick={this.preview}
-                              >
-                                Preview
-                              </button>
-                              {visitDomain !== "" && (
+                            <div className="colorPlateMBox">
+                              <div className="colorPlateTitle01">
                                 <button
-                                  className=""
-                                  style={{ marginLeft: 25 }}
-                                  onClick={() => {
-                                    window.open(visitDomain, "_blank");
-                                  }}
+                                  disabled={isloading}
+                                  onClick={this.preview}
                                 >
-                                  Go to Page
+                                  Preview
                                 </button>
-                              )}
+                                {visitDomain !== "" && (
+                                  <button
+                                    className=""
+                                    style={{ marginLeft: 25 }}
+                                    onClick={() => {
+                                      window.open(visitDomain, "_blank");
+                                    }}
+                                  >
+                                    Go to Page
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </>
-                      )}
-                      {typeofLicense === "Smart contract integration" && (
-                        <div id="contract-integration">
-                          {/* <div className="gwFormTitle01">swapMulti </div>
-                          <div className="swapMulti">
-                            <Highlight language="javascript">
-                              {` function swapMulti (                          
- IERC20[] memory tokens,
- uint256 amounts,
- uint256 minReturn,
- uint256[] memory distribution,
- uint256[] memory flags,
- ) public payable returns (uint256)`}
-                            </Highlight>
-                          </div>
+                          </>
+                        )}
+                        {typeofLicense === "Smart contract integration" && (
+                          <div id="contract-integration">
+                            {/* <div className="gwFormTitle01">swapMulti </div>
+                            <div className="swapMulti">
+                              <Highlight language="javascript">
+                                {` function swapMulti (                          
+    IERC20[] memory tokens,
+    uint256 amounts,
+    uint256 minReturn,
+    uint256[] memory distribution,
+    uint256[] memory flags,
+    ) public payable returns (uint256)`}
+                              </Highlight>
+                            </div>
 
-                          <p className="swapMultiP">
-                            Swap <span style={{ color: "white" }}>amount</span>{" "}
-                            first element of{" "}
-                            <span style={{ color: "white" }}>tokens</span> of
-                            the latest element.<br></br>
-                            The length of{" "}
-                            <span style={{ color: "white" }}>flags</span> array
-                            should be 1 element less than tokens array length.
-                            Each element from{" "}
-                            <span style={{ color: "white" }}>flags</span> array
-                            corresponds to 2 neighboring elements from{" "}
-                            <span style={{ color: "white" }}>tokens</span>{" "}
-                            array.
-                          </p>
-                          <table className="swapMultiTable">
-                            <tr style={{ color: "white" }}>
-                              <td className="lefttd">Params</td>
-                              <td>Type</td>
-                              <td>Description </td>
-                            </tr>
-                            <tr>
-                              <td className="lefttd">token</td>
-                              <td>IERC20[]</td>
-                              <td>
-                                Addresses of tokens or{" "}
-                                <span style={{ color: "white" }}>
-                                  address(0)
-                                </span>{" "}
-                                for Ether
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="lefttd">amount</td>
-                              <td>uint256</td>
-                              <td>Amount of tokens</td>
-                            </tr>
-                            <tr>
-                              <td className="lefttd">minReturn</td>
-                              <td>uint256</td>
-                              <td>
-                                Minimum expected return,else revert transaction
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="lefttd">distribution</td>
-                              <td>uint256[]</td>
-                              <td style={{ lineHeight: "1.8" }}>
-                                Array of weights for volume distribution
-                                (returned by{" "}
-                                <span style={{ color: "white" }}>
-                                  getRespectReturn)
-                                </span>
-                              </td>
-                            </tr>
-                            <tr style={{ borderBottom: "1px solid #271e3a" }}>
-                              <td className="lefttd">flags</td>
-                              <td>uint256[]</td>
-                              <td style={{ lineHeight: "1.8" }}>
-                                The sequence of flags for enabling and disabling
-                                some features (default:{" "}
-                                <span style={{ color: "white" }}>0</span>), see
-                                flags Description
-                              </td>
-                            </tr>
-                          </table> */}
-                        </div>
-                      )}
+                            <p className="swapMultiP">
+                              Swap <span style={{ color: "white" }}>amount</span>{" "}
+                              first element of{" "}
+                              <span style={{ color: "white" }}>tokens</span> of
+                              the latest element.<br></br>
+                              The length of{" "}
+                              <span style={{ color: "white" }}>flags</span> array
+                              should be 1 element less than tokens array length.
+                              Each element from{" "}
+                              <span style={{ color: "white" }}>flags</span> array
+                              corresponds to 2 neighboring elements from{" "}
+                              <span style={{ color: "white" }}>tokens</span>{" "}
+                              array.
+                            </p>
+                            <table className="swapMultiTable">
+                              <tr style={{ color: "white" }}>
+                                <td className="lefttd">Params</td>
+                                <td>Type</td>
+                                <td>Description </td>
+                              </tr>
+                              <tr>
+                                <td className="lefttd">token</td>
+                                <td>IERC20[]</td>
+                                <td>
+                                  Addresses of tokens or{" "}
+                                  <span style={{ color: "white" }}>
+                                    address(0)
+                                  </span>{" "}
+                                  for Ether
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="lefttd">amount</td>
+                                <td>uint256</td>
+                                <td>Amount of tokens</td>
+                              </tr>
+                              <tr>
+                                <td className="lefttd">minReturn</td>
+                                <td>uint256</td>
+                                <td>
+                                  Minimum expected return,else revert transaction
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="lefttd">distribution</td>
+                                <td>uint256[]</td>
+                                <td style={{ lineHeight: "1.8" }}>
+                                  Array of weights for volume distribution
+                                  (returned by{" "}
+                                  <span style={{ color: "white" }}>
+                                    getRespectReturn)
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr style={{ borderBottom: "1px solid #271e3a" }}>
+                                <td className="lefttd">flags</td>
+                                <td>uint256[]</td>
+                                <td style={{ lineHeight: "1.8" }}>
+                                  The sequence of flags for enabling and disabling
+                                  some features (default:{" "}
+                                  <span style={{ color: "white" }}>0</span>), see
+                                  flags Description
+                                </td>
+                              </tr>
+                            </table> */}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
 
 
-                  <div className="gwFormSFormbox03">
-                    {/* <button
-                      className="gwFormBTN01 greenBack"
-                      disabled={
-                        isloading || typeofLicense !== "Zero integration"
-                      }
-                      onClick={this.uploadData}
-                    >
-                      {isloading
-                        ? "Cloning.."
-                        : "GET YOUR OWN LICENSE FOR FREE"}
-                    </button> */}
-
-                    {this.state.web3 !== null ?
-                      <button
-                        className={allowClone ? "gwFormBTN01 greenBack" : "gwFormBTN01 greenBack disable-btn"}
+                    <div className="gwFormSFormbox03">
+                      {/* <button
+                        className="gwFormBTN01 greenBack"
                         disabled={
-                          isloading || typeofLicense !== "Zero integration" || !allowClone
+                          isloading || typeofLicense !== "Zero integration"
                         }
                         onClick={this.uploadData}
                       >
                         {isloading
                           ? "Cloning.."
                           : "GET YOUR OWN LICENSE FOR FREE"}
-                      </button>
-                      :
-                      <button
-                        className="gwFormBTN01"
-                        disabled={
-                          isloading
-                        }
-                        onClick={() => { this.connectWallet() }}
-                      >
-                        Connect your wallet
-                      </button>
-                    }
-                  </div>
+                      </button> */}
 
-                  {/*     First Popup Part */}
-                  {(visitDomain && typeofLicense === "Zero integration") ? (
-                    <>
-                      <div className="spacerLine02"></div>
-                      <div className="smeTitle01-v3">
-                        Below is Your License URL and Smart Contract
-                      </div>
+                      {this.state.web3 !== null ?
+                        <button
+                          className={allowClone ? "gwFormBTN01 greenBack" : "gwFormBTN01 greenBack disable-btn"}
+                          disabled={
+                            isloading || typeofLicense !== "Zero integration" || !allowClone
+                          }
+                          onClick={this.uploadData}
+                        >
+                          {isloading
+                            ? "Cloning.."
+                            : "GET YOUR OWN LICENSE FOR FREE"}
+                        </button>
+                        :
+                        <button
+                          className="gwFormBTN01"
+                          disabled={
+                            isloading
+                          }
+                          onClick={() => { this.connectWallet() }}
+                        >
+                          Connect your wallet
+                        </button>
+                      }
+                    </div>
 
-                      <div className="LicMbx">
-                        Your licensee sub domain
-                        <div className="LicInputBX01">
-                          <input type="text" value={visitDomain} id="license" />
-                          <a
-                            href="#"
-                            className="LicCopyBTN"
-                            onClick={(a) => copyAffiliateLink(a, "license")}
-                          >
-                            <i class="fas fa-copy"></i>
-                          </a>
+                    {/*     First Popup Part */}
+                    {(visitDomain && typeofLicense === "Zero integration") ? (
+                      <>
+                        <div className="spacerLine02"></div>
+                        <div className="smeTitle01-v3">
+                          Below is Your License URL and Smart Contract
                         </div>
-                      </div>
-                      <div className="gwFormBRBox01">
-                        {ethLicenseAddress !== "0x0000000000000000000000000000000000000000" ?
-                          <div className="LicMbx">
-                            Your licensee smart contract for Ethereum
-                            <div className="LicInputBX01">
-                              <input
-                                type="text"
-                                value={ethLicenseAddress}
-                                id="Ethereum"
-                              />
-                              <a
-                                href="#"
-                                className="LicCopyBTN"
-                                onClick={(a) => copyAffiliateLink(a, "Ethereum")}
-                              >
-                                <i class="fas fa-copy"></i>
-                              </a>
-                            </div>
-                            <div className="LicInfoBX">
-                              {" "}
-                              Created: July 21, 2021 11:23:01 am UTC |
-                              <a href="#" onClick={() => { this.showDepWdrwPopup("Ethereum", ethLicenseAddress, 'DepositToken', "tab-A1") }}>
-                                <span className="greenC">
-                                  Deposit your reimbursement TOKEN to this smart
-                                  contract
-                                </span>{" "}
-                              </a>
-                              {/* | Balance: 8569.563 [TOKEN] |{" "} */}
-                              | Balance: {ethLicenseTokenBalance} |{" "}
-                              <a href="#" onClick={() => { this.showDepWdrwPopup("Ethereum", ethLicenseAddress, 'DepositToken', "tab-A2") }}>
-                                <span className="redC">
-                                  Withdraw your reimbursement tokens
-                                </span>
-                              </a>
-                            </div>
-                            <div style={{ marginTop: "15px" }}>
-                              Change the fees that you want to charge your users <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i>
-                            </div>
 
-                            <div className='DragrMBX'>
-                              <div className='DragrSBX'>
-
-                                <div className="dragorInput">
-                                  <InputRange
-                                    maxValue={300}
-                                    minValue={0}
-                                    value={this.state.ethLicenseFees}
-                                    formatLabel={value => `${value / 100}%`}
-                                    onChange={value => this.setState({ ethLicenseFees: value })} />
-                                </div>
-                              </div>
-                              <button className="DragrSBTN" onClick={() => { this.setLicenseeFee("Ethereum", constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].reimbursementContract, ethLicenseAddress, this.state.ethLicenseFees) }}>Save</button>
-
-                            </div>
-                          </div> : null
-                        }
-
-                        {bscLicenseAddress !== "0x0000000000000000000000000000000000000000" ?
-                          <div className="LicMbx">
-                            Your licensee smart contract for BSC
-                            <div className="LicInputBX01">
-                              <input
-                                type="text"
-                                value={bscLicenseAddress}
-                                id="BSC"
-                              />
-                              <a
-                                href="#"
-                                className="LicCopyBTN"
-                                onClick={(a) => copyAffiliateLink(a, "BSC")}
-                              >
-                                <i class="fas fa-copy"></i>
-                              </a>
-                            </div>
-                            <div className="LicInfoBX">
-                              {" "}
-                              Created: July 21, 2021 11:23:01 am UTC |
-
-                              <a href="#" onClick={() => { this.showDepWdrwPopup("BSC", bscLicenseAddress, 'DepositToken', "tab-A1") }}>
-                                <span className="greenC">
-                                  Deposit your reimbursement TOKEN to this smart
-                                  contract
-                                </span>{" "}
-                              </a>
-
-                              {/* | Balance: 8569.563 [TOKEN] |{" "} */}
-                              | Balance: {bscLicenseTokenBalance} |{" "}
-                              <a href="#" onClick={() => { this.showDepWdrwPopup("BSC", bscLicenseAddress, 'DepositToken', "tab-A2") }}>
-                                <span className="redC">
-                                  Withdraw your reimbursement tokens
-                                </span>
-                              </a>
-                            </div>
-                            <div style={{ marginTop: "15px" }}>
-                              Change the fees that you want to charge your users <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i>
-                            </div>
-                            <div className='DragrMBX'>
-                              <div className='DragrSBX'>
-                                <div className="dragorInput">
-                                  <InputRange
-                                    maxValue={300}
-                                    minValue={0}
-                                    value={this.state.bscLicenseFees}
-                                    formatLabel={value => `${value / 100}%`}
-                                    onChange={value => this.setState({ bscLicenseFees: value })} />
-
-                                </div>
-                              </div>
-                              <button className="DragrSBTN" onClick={() => { this.setLicenseeFee("BSC", constantConfig[CONSTANT.NETWORK_ID.BINANCE].reimbursementContract, bscLicenseAddress, this.state.bscLicenseFees) }}>Save</button>
-                            </div>
-                          </div>
-                          : null}
-                        {/* <div className="LicMbx">
-                          Your licensee smart contract for Polygon
+                        <div className="LicMbx">
+                          Your licensee sub domain
                           <div className="LicInputBX01">
-                            <input
-                              type="text"
-                              value="0x0000000000000000000000000000000000000000"
-                              id="Polygon"
-                            />
+                            <input type="text" value={visitDomain} id="license" />
                             <a
                               href="#"
                               className="LicCopyBTN"
-                              onClick={(a) => copyAffiliateLink(a, "Polygon")}
+                              onClick={(a) => copyAffiliateLink(a, "license")}
                             >
                               <i class="fas fa-copy"></i>
                             </a>
                           </div>
-                          <div className="LicInfoBX">
-                            {" "}
-                            Created: July 21, 2021 11:23:01 am UTC |
-                            <span className="greenC">
-                              Deposit your reimbursement TOKEN to this smart
-                              contract
-                            </span>{" "}
-                            | Balance: 8569.563 [TOKEN] |{" "}
-                            <span className="redC">
-                              Withdraw your reimbursement tokens
-                            </span>
+                        </div>
+                        <div className="gwFormBRBox01">
+                          {ethLicenseAddress !== "0x0000000000000000000000000000000000000000" ?
+                            <div className="LicMbx">
+                              Your licensee smart contract for Ethereum
+                              <div className="LicInputBX01">
+                                <input
+                                  type="text"
+                                  value={ethLicenseAddress}
+                                  id="Ethereum"
+                                />
+                                <a
+                                  href="#"
+                                  className="LicCopyBTN"
+                                  onClick={(a) => copyAffiliateLink(a, "Ethereum")}
+                                >
+                                  <i class="fas fa-copy"></i>
+                                </a>
+                              </div>
+                              <div className="LicInfoBX">
+                                {" "}
+                                Created: July 21, 2021 11:23:01 am UTC |
+                                <a href="#" onClick={() => { this.showDepWdrwPopup("Ethereum", ethLicenseAddress, 'DepositToken', "tab-A1") }}>
+                                  <span className="greenC">
+                                    Deposit your reimbursement TOKEN to this smart
+                                    contract
+                                  </span>{" "}
+                                </a>
+                                {/* | Balance: 8569.563 [TOKEN] |{" "} */}
+                                | Balance: {ethLicenseTokenBalance} |{" "}
+                                <a href="#" onClick={() => { this.showDepWdrwPopup("Ethereum", ethLicenseAddress, 'DepositToken', "tab-A2") }}>
+                                  <span className="redC">
+                                    Withdraw your reimbursement tokens
+                                  </span>
+                                </a>
+                              </div>
+                              <div style={{ marginTop: "15px" }}>
+                                Change the fees that you want to charge your users <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i>
+                              </div>
+
+                              <div className='DragrMBX'>
+                                <div className='DragrSBX'>
+
+                                  <div className="dragorInput">
+                                    <InputRange
+                                      maxValue={300}
+                                      minValue={0}
+                                      value={this.state.ethLicenseFees}
+                                      formatLabel={value => `${value / 100}%`}
+                                      onChange={value => this.setState({ ethLicenseFees: value })} />
+                                  </div>
+                                </div>
+                                <button className="DragrSBTN" onClick={() => { this.setLicenseeFee("Ethereum", constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].reimbursementContract, ethLicenseAddress, this.state.ethLicenseFees) }}>Save</button>
+
+                              </div>
+                            </div> : null
+                          }
+
+                          {bscLicenseAddress !== "0x0000000000000000000000000000000000000000" ?
+                            <div className="LicMbx">
+                              Your licensee smart contract for BSC
+                              <div className="LicInputBX01">
+                                <input
+                                  type="text"
+                                  value={bscLicenseAddress}
+                                  id="BSC"
+                                />
+                                <a
+                                  href="#"
+                                  className="LicCopyBTN"
+                                  onClick={(a) => copyAffiliateLink(a, "BSC")}
+                                >
+                                  <i class="fas fa-copy"></i>
+                                </a>
+                              </div>
+                              <div className="LicInfoBX">
+                                {" "}
+                                Created: July 21, 2021 11:23:01 am UTC |
+
+                                <a href="#" onClick={() => { this.showDepWdrwPopup("BSC", bscLicenseAddress, 'DepositToken', "tab-A1") }}>
+                                  <span className="greenC">
+                                    Deposit your reimbursement TOKEN to this smart
+                                    contract
+                                  </span>{" "}
+                                </a>
+
+                                {/* | Balance: 8569.563 [TOKEN] |{" "} */}
+                                | Balance: {bscLicenseTokenBalance} |{" "}
+                                <a href="#" onClick={() => { this.showDepWdrwPopup("BSC", bscLicenseAddress, 'DepositToken', "tab-A2") }}>
+                                  <span className="redC">
+                                    Withdraw your reimbursement tokens
+                                  </span>
+                                </a>
+                              </div>
+                              <div style={{ marginTop: "15px" }}>
+                                Change the fees that you want to charge your users <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i>
+                              </div>
+                              <div className='DragrMBX'>
+                                <div className='DragrSBX'>
+                                  <div className="dragorInput">
+                                    <InputRange
+                                      maxValue={300}
+                                      minValue={0}
+                                      value={this.state.bscLicenseFees}
+                                      formatLabel={value => `${value / 100}%`}
+                                      onChange={value => this.setState({ bscLicenseFees: value })} />
+
+                                  </div>
+                                </div>
+                                <button className="DragrSBTN" onClick={() => { this.setLicenseeFee("BSC", constantConfig[CONSTANT.NETWORK_ID.BINANCE].reimbursementContract, bscLicenseAddress, this.state.bscLicenseFees) }}>Save</button>
+                              </div>
+                            </div>
+                            : null}
+                          {/* <div className="LicMbx">
+                            Your licensee smart contract for Polygon
+                            <div className="LicInputBX01">
+                              <input
+                                type="text"
+                                value="0x0000000000000000000000000000000000000000"
+                                id="Polygon"
+                              />
+                              <a
+                                href="#"
+                                className="LicCopyBTN"
+                                onClick={(a) => copyAffiliateLink(a, "Polygon")}
+                              >
+                                <i class="fas fa-copy"></i>
+                              </a>
+                            </div>
+                            <div className="LicInfoBX">
+                              {" "}
+                              Created: July 21, 2021 11:23:01 am UTC |
+                              <span className="greenC">
+                                Deposit your reimbursement TOKEN to this smart
+                                contract
+                              </span>{" "}
+                              | Balance: 8569.563 [TOKEN] |{" "}
+                              <span className="redC">
+                                Withdraw your reimbursement tokens
+                              </span>
+                            </div>
+                            <div style={{ marginTop: "15px" }}>
+                              Change the fees that you want to charge your users <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i>
+                            </div>
+                            <div className="dragorInput">
+                              <InputRange
+                                maxValue={100}
+                                minValue={0}
+                                value={this.state.value}
+                                formatLabel={value => `${value}%`}
+                                onChange={value => this.setState({ value })} />
+                            </div>
+                          </div> */}
+                        </div>
+                      </>
+                    ) : (this.state.web3 !== null && typeofLicense === "Smart contract integration") && (
+                      <>
+                        <div className='smeTitle01-v3'>Below is Your License URL and Integration Instruction</div>
+
+                        <div className='LicMbx'>
+                          Your licensee sub domain
+                          <div className='LicInputBX01'>
+                            <input type="text" value="http://yourwebsite.smartswap.exchange" />
                           </div>
-                          <div style={{ marginTop: "15px" }}>
-                            Change the fees that you want to charge your users <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Help Text" aria-hidden="true"></i>
-                          </div>
-                          <div className="dragorInput">
-                            <InputRange
-                              maxValue={100}
-                              minValue={0}
-                              value={this.state.value}
-                              formatLabel={value => `${value}%`}
-                              onChange={value => this.setState({ value })} />
-                          </div>
-                        </div> */}
-                      </div>
-                    </>
-                  ) : (this.state.web3 !== null && typeofLicense === "Smart contract integration") && (
-                    <>
-                      <div className='smeTitle01-v3'>Below is Your License URL and Integration Instruction</div>
-
-                      <div className='LicMbx'>
-                        Your licensee sub domain
-                        <div className='LicInputBX01'>
-                          <input type="text" value="http://yourwebsite.smartswap.exchange" />
-                        </div>
-                      </div>
-
-                      <div className='LicMbx'>
-                        You need to  call this function in SmartSwap contract  <a href='#' className='LicCopyBTN v2'><i class="fas fa-copy"></i></a>
-
-                        <div className='settingCodeBx'>
-                    //user should approve tokens transfer before calling this function. <br />
-//if no licensee set it to address(0) <br />
-                          function swap( <br />
-                          address tokenA, // token that user send to swap ( address(1) for BNB, address(2) for ETH) <br />
-                          address tokenB, // token that user want to receive ( address(1) for BNB, address(2) for ETH) <br />
-                          address receiver, // address that will receive tokens on other chain (user's wallet address) <br />
-                          uint256 amountA,  // amount of tokens user sends to swap <br />
-                          address licensee,   // for now, = address(0) <br />
-                          bool isInvestment,  // for now, = false <br />
-                          uint128 minimumAmountToClaim,   // do not claim on user behalf less of this amount. Only exception if order fulfilled. For now, = 0 <br />
-                          uint128 limitPice   // Do not match user if token A price less this limit. For now, = 0 <br />
-                          ) <br />
-                          external <br />
-                          payable <br />
-                          returns (bool)
                         </div>
 
-                        <button class="LicSBTN01">Download ABI of smart contract file</button>
+                        <div className='LicMbx'>
+                          You need to  call this function in SmartSwap contract  <a href='#' className='LicCopyBTN v2'><i class="fas fa-copy"></i></a>
 
-
-                      </div>
-
-                      <div className='LicMbx'>
-                        Smart contract address BSC
-                        <div className='LicInputBX01'>
-                          <input type="text" value={constantConfig[CONSTANT.NETWORK_ID.BINANCE].swapFactoryContract} />
-                          <a href='#' className='LicCopyBTN'><i class="fas fa-copy"></i></a>
-                        </div>
-                      </div>
-
-                      <div className='LicMbx'>
-                        Smart contract address Ethereum
-                        <div className='LicInputBX01'>
-                          <input type="text" value={constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].swapFactoryContract} />
-                          <a href='#' className='LicCopyBTN'><i class="fas fa-copy"></i></a>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {/* Second Popup Part 
-
-                      <div className='smeTitle01-v3'>Below is Your License URL and Integration Instruction</div>
-
-                                    <div className='LicMbx'>
-                                    Your licensee sub domain
-                                        <div className='LicInputBX01'>
-                                        <input type="text" value="http://yourwebsite.smartswap.exchange" /> 
-                                        </div>
-                                    </div>
-
-                                    <div className='LicMbx'>
-                                    You need to  call this function in SmartSwap contract  <a href='#' className='LicCopyBTN v2'><i class="fas fa-copy"></i></a>
-
-                                    <div className='settingCodeBx'> 
-                                                        //user should approve tokens transfer before calling this function. <br />
+                          <div className='settingCodeBx'>
+                      //user should approve tokens transfer before calling this function. <br />
     //if no licensee set it to address(0) <br />
-    function swap( <br />
-        address tokenA, // token that user send to swap ( address(1) for BNB, address(2) for ETH) <br />
-        address tokenB, // token that user want to receive ( address(1) for BNB, address(2) for ETH) <br />
-        address receiver, // address that will receive tokens on other chain (user's wallet address) <br />
-        uint256 amountA,  // amount of tokens user sends to swap <br />
-        address licensee,   // for now, = address(0) <br />
-        bool isInvestment,  // for now, = false <br />
-        uint128 minimumAmountToClaim,   // do not claim on user behalf less of this amount. Only exception if order fulfilled. For now, = 0 <br />
-        uint128 limitPice   // Do not match user if token A price less this limit. For now, = 0 <br />
-    ) <br />
-        external <br />
-        payable <br />
-        returns (bool)
-                                                </div>
+                            function swap( <br />
+                            address tokenA, // token that user send to swap ( address(1) for BNB, address(2) for ETH) <br />
+                            address tokenB, // token that user want to receive ( address(1) for BNB, address(2) for ETH) <br />
+                            address receiver, // address that will receive tokens on other chain (user's wallet address) <br />
+                            uint256 amountA,  // amount of tokens user sends to swap <br />
+                            address licensee,   // for now, = address(0) <br />
+                            bool isInvestment,  // for now, = false <br />
+                            uint128 minimumAmountToClaim,   // do not claim on user behalf less of this amount. Only exception if order fulfilled. For now, = 0 <br />
+                            uint128 limitPice   // Do not match user if token A price less this limit. For now, = 0 <br />
+                            ) <br />
+                            external <br />
+                            payable <br />
+                            returns (bool)
+                          </div>
 
-                                        <button class="LicSBTN01">Download ABI of smart contract file</button>
+                          <button class="LicSBTN01">Download ABI of smart contract file</button>
 
 
-                                    </div>
+                        </div>
 
-                                    <div className='LicMbx'>
-                                    Smart contract address BSC
-                                        <div className='LicInputBX01'>
-                                        <input type="text" value="0x084374b068Eb3db504178b4909eDC26D01226a80" />
-                                        <a href='#' className='LicCopyBTN'><i class="fas fa-copy"></i></a>
-                                        </div> 
-                                    </div>
+                        <div className='LicMbx'>
+                          Smart contract address BSC
+                          <div className='LicInputBX01'>
+                            <input type="text" value={constantConfig[CONSTANT.NETWORK_ID.BINANCE].swapFactoryContract} />
+                            <a href='#' className='LicCopyBTN'><i class="fas fa-copy"></i></a>
+                          </div>
+                        </div>
 
-                                    <div className='LicMbx'>
-                                    Smart contract address Ethereum
-                                        <div className='LicInputBX01'>
-                                        <input type="text" value="0x084374b068Eb3db504178b4909eDC26D01226a80" />
-                                        <a href='#' className='LicCopyBTN'><i class="fas fa-copy"></i></a>
-                                        </div> 
-                                    </div>
-                               
-       */}
+                        <div className='LicMbx'>
+                          Smart contract address Ethereum
+                          <div className='LicInputBX01'>
+                            <input type="text" value={constantConfig[CONSTANT.NETWORK_ID.ETHEREUM].swapFactoryContract} />
+                            <a href='#' className='LicCopyBTN'><i class="fas fa-copy"></i></a>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Second Popup Part 
+
+                        <div className='smeTitle01-v3'>Below is Your License URL and Integration Instruction</div>
+
+                                      <div className='LicMbx'>
+                                      Your licensee sub domain
+                                          <div className='LicInputBX01'>
+                                          <input type="text" value="http://yourwebsite.smartswap.exchange" /> 
+                                          </div>
+                                      </div>
+
+                                      <div className='LicMbx'>
+                                      You need to  call this function in SmartSwap contract  <a href='#' className='LicCopyBTN v2'><i class="fas fa-copy"></i></a>
+
+                                      <div className='settingCodeBx'> 
+                                                          //user should approve tokens transfer before calling this function. <br />
+      //if no licensee set it to address(0) <br />
+      function swap( <br />
+          address tokenA, // token that user send to swap ( address(1) for BNB, address(2) for ETH) <br />
+          address tokenB, // token that user want to receive ( address(1) for BNB, address(2) for ETH) <br />
+          address receiver, // address that will receive tokens on other chain (user's wallet address) <br />
+          uint256 amountA,  // amount of tokens user sends to swap <br />
+          address licensee,   // for now, = address(0) <br />
+          bool isInvestment,  // for now, = false <br />
+          uint128 minimumAmountToClaim,   // do not claim on user behalf less of this amount. Only exception if order fulfilled. For now, = 0 <br />
+          uint128 limitPice   // Do not match user if token A price less this limit. For now, = 0 <br />
+      ) <br />
+          external <br />
+          payable <br />
+          returns (bool)
+                                                  </div>
+
+                                          <button class="LicSBTN01">Download ABI of smart contract file</button>
+
+
+                                      </div>
+
+                                      <div className='LicMbx'>
+                                      Smart contract address BSC
+                                          <div className='LicInputBX01'>
+                                          <input type="text" value="0x084374b068Eb3db504178b4909eDC26D01226a80" />
+                                          <a href='#' className='LicCopyBTN'><i class="fas fa-copy"></i></a>
+                                          </div> 
+                                      </div>
+
+                                      <div className='LicMbx'>
+                                      Smart contract address Ethereum
+                                          <div className='LicInputBX01'>
+                                          <input type="text" value="0x084374b068Eb3db504178b4909eDC26D01226a80" />
+                                          <a href='#' className='LicCopyBTN'><i class="fas fa-copy"></i></a>
+                                          </div> 
+                                      </div>
+                                  
+          */}
+                  </div>
                 </div>
               </div>
+              {/* <!--======================= SWAP BLOCK END =====================--> */}
             </div>
-            {/* <!--======================= SWAP BLOCK END =====================--> */}
+            {/* <!--======================= WALLET POPUP START =====================--> */}
+            <WalletPopup
+              web3={this.state.web3}
+              web3Config={web3Config}
+            ></WalletPopup>
+
+
+            <WithDrawToken closePopup={this.closePopup} openPopup={this.openPopup} />
+
+
+            {/* <!--======================= WALLET POPUP END =====================-->
+                      <!--======================= COIN POPUP START =====================--> */}
+            <CoinPopup
+              web3={this.state.web3}
+              web3Config={web3Config}
+              setCurrency={this.setSendCurrency}
+              popId={"sendCurPop"}
+              opositeSelectedCurrrency={this.state.selectedReceiveCurrency}
+              selectedCurrrency={this.state.selectedSendCurrency}
+            ></CoinPopup>
+            <CoinPopup
+              web3={this.state.web3}
+              web3Config={web3Config}
+              setCurrency={this.setReceiveCurrency}
+              popId={"receiveCurPop"}
+              opositeSelectedCurrrency={this.state.selectedSendCurrency}
+              selectedCurrrency={this.state.selectedReceiveCurrency}
+            ></CoinPopup>
+            {/* <!--======================= COIN POPUP END =====================-->
+                      <!--======================= SIDE POPUP START =====================--> */}
+            <SidePopup web3={this.state.web3} web3Config={web3Config}></SidePopup>
+            {/* <!--======================= SIDE POPUP END =====================--> */}
+            {/* =========================== DEPOSIT TOKENS POPUP START ================================= */}
+            <DepositToken
+              tokenAddress={this.state.depositTokenAddress}
+              network={this.state.depositWithdrawNetwork}
+              vaultAddress={this.state.depositWithdrawVaultAddress}
+              closePopup={this.closePopup}
+              openPopup={this.openPopup}
+            ></DepositToken>
+            {/* =========================== DEPOSIT TOKENS POPUP END ================================= */}
+            {/* <iframe width="560" height="315" src="https://www.youtube.com/embed/gnaJlUA20lk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> */}
           </div>
-          {/* <!--======================= WALLET POPUP START =====================--> */}
-          <WalletPopup
-            web3={this.state.web3}
-            web3Config={web3Config}
-          ></WalletPopup>
-
-
-          <WithDrawToken closePopup={this.closePopup} openPopup={this.openPopup} />
-
-
-          {/* <!--======================= WALLET POPUP END =====================-->
-                    <!--======================= COIN POPUP START =====================--> */}
-          <CoinPopup
-            web3={this.state.web3}
-            web3Config={web3Config}
-            setCurrency={this.setSendCurrency}
-            popId={"sendCurPop"}
-            opositeSelectedCurrrency={this.state.selectedReceiveCurrency}
-            selectedCurrrency={this.state.selectedSendCurrency}
-          ></CoinPopup>
-          <CoinPopup
-            web3={this.state.web3}
-            web3Config={web3Config}
-            setCurrency={this.setReceiveCurrency}
-            popId={"receiveCurPop"}
-            opositeSelectedCurrrency={this.state.selectedSendCurrency}
-            selectedCurrrency={this.state.selectedReceiveCurrency}
-          ></CoinPopup>
-          {/* <!--======================= COIN POPUP END =====================-->
-                    <!--======================= SIDE POPUP START =====================--> */}
-          <SidePopup web3={this.state.web3} web3Config={web3Config}></SidePopup>
-          {/* <!--======================= SIDE POPUP END =====================--> */}
-          {/* =========================== DEPOSIT TOKENS POPUP START ================================= */}
-          <DepositToken
-            tokenAddress={this.state.depositTokenAddress}
-            network={this.state.depositWithdrawNetwork}
-            vaultAddress={this.state.depositWithdrawVaultAddress}
-            closePopup={this.closePopup}
-            openPopup={this.openPopup}
-          ></DepositToken>
-          {/* =========================== DEPOSIT TOKENS POPUP END ================================= */}
-          {/* <iframe width="560" height="315" src="https://www.youtube.com/embed/gnaJlUA20lk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> */}
-        </div>
-      </main>
+        </>
     );
   }
 }

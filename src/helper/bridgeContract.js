@@ -4,15 +4,15 @@ import {
 import web3Js from 'web3';
 import { ethers } from 'ethers';
 import bridgeContractAbi from "../abis/bridgeContract.json";
-import web3Config from "../config/web3Config";
 
 const Logger = new ethers.utils.Logger(ethers.version);
 
 class BridgeContract extends EventEmitter {
     
-    constructor(web3, contractAddress) {
+    constructor(web3, ownerAddress, contractAddress) {
         super();
         this.web3 = web3;
+        this.ownerAddress = ownerAddress;
         this.contractAddress = contractAddress;
         
         try {
@@ -180,7 +180,7 @@ class BridgeContract extends EventEmitter {
         try {
 
             const args = {
-                receiver: web3Config.getAddress(),
+                receiver: this.ownerAddress,
                 token: originalTokenAddress,
                 value: (amountToDepositInWei).toString(),
                 toChainId: Number(toChainId)
@@ -194,7 +194,7 @@ class BridgeContract extends EventEmitter {
                 "uint256",
                 "uint256"
             ], [
-                web3Config.getAddress(),
+                this.ownerAddress,
                 originalTokenAddress,
                 (amountToDepositInWei).toString(),
                 Number(toChainId)
