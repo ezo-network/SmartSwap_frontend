@@ -36,7 +36,7 @@ export default class LedgerHistory extends PureComponent {
                                 <p>X0456c19d5A61AeA886E6D657EsEF8849565</p>
                                 <div className="flex">
                                     <a href="#">View transaction</a>
-                                    <a className="color-green" href="#">Fees breakdown <i className="fas fa-caret-down ml-2"></i></a>
+                                    <a className="color-green" href="#">Fees breakdown <i className="fas fa-caret-up ml-2"></i></a>
                                 </div>
                                 <table className="ledger-table">
                                     <tbody>

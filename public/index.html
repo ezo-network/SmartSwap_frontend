@@ -212,13 +212,12 @@
   });
 
   var CurrentTab = $(".tab-content-n.current-n").attr("id");
-  // console.log("subham", $(".swap-Textlink").attr("data-select", CurrentTab).length);
   $(".swap-Textlink[data-select="+CurrentTab+"]").attr("data-class", "show");
   $(document).on("click",".tab-link ",function() {
     var CurrentTab = $(".tab-content-n.current-n").attr("id");
     $(".swap-Textlink").attr("data-class", "");
     $(".swap-Textlink[data-select="+CurrentTab+"]").attr("data-class", "show");
-  });
+  }); 
 </script>
 
 </html>

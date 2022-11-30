@@ -1210,13 +1210,13 @@ export default class BridgeSwap extends PureComponent {
 
 
                 {/** Bottom bar */}
-                <div className="bottom-action-bar">
+                <div className="bottom-action-bar swap-Textlink bridge-Textlink">
                     <div className="powertextBX">
-                        <span className="poweredBy">
+                        <p className="poweredBy">
                             Powered by
                             <img src={SmartExchange} />
                             {/* <a href="#">Start new swap</a> */}
-                        </span>
+                        </p>
                         <div className="powertextBX-links">
                             <Link to='/freelisting'>Free listing</Link>
                             <span>|</span>

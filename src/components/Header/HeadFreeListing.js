@@ -174,7 +174,7 @@ const FlexDiv = styled.div`
 
 
 const LHead = styled(FlexDiv)` 
-    padding:14px 40px; justify-content:flex-start;   width: 100%; position: relative; 
+    /* padding:14px 40px; */ padding: 18px 42px; justify-content:flex-start;   width: 100%; position: relative; 
     @media screen and (max-width: 1600px){
         padding-bottom: 50px; padding-top: 10px;
     }
@@ -196,7 +196,7 @@ const Logo = styled(FlexDiv)`
 `
 const Nav = styled(FlexDiv)`
     font-size:16px; font-weight:400; 
-    span{ font-size:18px; font-weight:200; color: #aaaaaa; margin:0 19px;} 
+    span{ font-size: 29px; font-weight:200; color: #3c3c3c; margin: 0 14px;} 
     &.deskNav {}
     &.mobNav {display: none;
         i {margin-left: 27px;}

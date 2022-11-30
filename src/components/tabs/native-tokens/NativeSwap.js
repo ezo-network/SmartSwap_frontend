@@ -12,6 +12,7 @@ import CONSTANT from "../../../constants";
 import notificationConfig from "../../../config/notificationConfig";
 import SwapFactoryContract from "../../../helper/swapFactoryContract";
 import LedgerHistory from "../../../components/LedgerHistory/LedgerHistory";
+import SmartExchange from "../../../../src/assets/images/smart-exchange.png";
 
 
 // images
@@ -454,12 +455,11 @@ export default class NativeSwap extends PureComponent {
             <>
                 <div className="native-icons">
                     <a href onClick={(e) => e.preventDefault()}><img height="13" src={Filter} /></a>
-                    <a href onClick={() => this.setState({ showSidebar: !this.state.showSidebar })}><img height="14" src={Doller} /></a>
+                    <a className='nativeToggle' href onClick={() => this.props.closeSideBar()}><img height="14" src={Doller} /></a>
                 </div>
                 <div className=" form-group-n  items-center-n">
                     <div className="flex-1 w-100-sm flex-auto-sm">
                         <div className="inputs-wrap light-controls-n">
-
                             <div className="inputs-wrap-control">
                                 <div className="input-box1">
                                     <label htmlFor="" className="form-label">from</label>
@@ -811,7 +811,7 @@ export default class NativeSwap extends PureComponent {
     </div> */}
 
             { /** sidebar */ }
-                <div className={`side-pannel ${this.state.showSidebar ? '' : 'hidden'}`}>
+                <div className={`side-pannel ${this.state.showSidebar ? '' : ''}`}>
                     <h4>Best cross chain prices</h4>
                     <div className="">
                         <h5><span>1. <img src={SSIco} /></span>SmartSwap
@@ -833,26 +833,15 @@ export default class NativeSwap extends PureComponent {
                 { /** Bottom bar */ }
                 <div className="bottom-action-bar">
                     <div className="swap-Textlink">
-                        <div className="swap-Link01">
-                            <a
-                                className="icon-Box Setting"
-                                href
-                                onClick={(e) => e.preventDefault()}
-                            >
-                                <i className="fas fa-cog"></i>
-                            </a>
-                            Estimated gas and fees: {Number(this.state.estimatedGasFee).toFixed(5)} {this.state.selectedSendCurrency}
-                            <a
-                                href
-                                onClick={(e) => e.preventDefault()}
-                                className="gas-Est"
-                            >
-                                <i
-                                    className="fas fa-question-circle"
-                                    aria-hidden="true"
-                                ></i>
-                            </a>
-                        </div>
+                        <div className="powertextBX">
+                            <p className='poweredBy'>Powered by <img src={SmartExchange} /></p>
+                            <div class="powertextBX-links"><a href="/freelisting">Free listing</a><span>|</span><a href="">Apply for licensing</a></div>
+                            <div className='powertextBX-links estimated'>
+                                <p>
+                                    Estimated gas and fees: <i class="help-circle"><i class="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Slippage free trades carry higher gas costs than slippage trades. Gas and fees are 100% reimbursed" aria-hidden="true"></i></i> <span>&nbsp; {Number(this.state.estimatedGasFee).toFixed(5)}&nbsp; </span> {this.state.selectedSendCurrency}
+                                </p>
+                            </div>
+                        </div> 
                         <label className="slippage-outer">
                             <p className="active" style={{ paddingRight: "8px" }}>Dollar amount </p>
                             <Switch

@@ -2,9 +2,9 @@ import React, { PureComponent } from "react";
 import BridgeSwap from "./bridge-tokens/BridgeSwap";
 import NativeSwap from "./native-tokens/NativeSwap";
 
-const activeComponent = (tabLink) => {
+const activeComponent = (tabLink,callback) => {
     const tabComponentsMap = {
-        'native-tokens': <NativeSwap></NativeSwap>,
+        'native-tokens': <NativeSwap closeSideBar={()=> callback()}></NativeSwap>,
         'bridge-tokens': <BridgeSwap></BridgeSwap>
     }
     return tabComponentsMap[tabLink];
@@ -16,6 +16,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
         super();
         this.state = {
             activeTabLink: 'native-tokens',
+            showSidebar: false, 
             tabs: [
                 {
                     title: 'Native Tokens',
@@ -57,6 +58,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
         }
 
         this.changeTab = this.changeTab.bind(this);
+        this.closeSideBar = this.closeSideBar.bind(this);
     }
 
     changeTab = (tab) => {
@@ -67,10 +69,15 @@ export default class SmartEcoSystemTabs extends PureComponent {
         }
     }
 
+    closeSideBar = () => {
+        let currentStatus = !this.state.showSidebar;
+        this.setState({showSidebar: currentStatus});
+    }    
+
     render() {
         return (
             <>
-                <div className="tab-container">
+                <div className={(this.state.showSidebar && this.state.activeTabLink === "native-tokens") ? "tab-container hasSidebar" : "tab-container" }>
                     <div className="tab-main-wrapper">
                         <ul className="tabs-n">
                             {this.state.tabs.map((tab) => {
@@ -87,7 +94,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
 
                         <div className="tab-content-n-main">
                             <div id={`${this.state.activeTabLink}`}>
-                                {activeComponent(this.state.activeTabLink)}
+                                {activeComponent(this.state.activeTabLink,this.closeSideBar)}
                             </div>
                         </div>
                     </div>
