@@ -17,7 +17,7 @@ import CONSTANT from "../constants";
 import data from "../config/constantConfig";
 import WithDrawToken from "../components/withdraw_token";
 import Header from "../components/Header/Header";
-import RightSideMenu from "../components/RightSideMenu";
+import RightSideMenu from "../components/Navigations/RightSideMenu";
 import WalletPopup from "../components/popups/WalletPopup";
 import CoinPopup from "../components/popups/CoinPopup";
 import SidePopup from "../components/popups/SidePopup";

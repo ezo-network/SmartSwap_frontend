@@ -25,7 +25,7 @@ export default class VerifyAndAddToken extends PureComponent {
         bridgeContractAddress: this.props.bridgeContractAddress,
         sourceTokenAddress: this.props.selectedSourceTokenData.address
       });
-      const bridgeContract = new BridgeContract(this.context.web3, this.props.bridgeContractAddress);
+      const bridgeContract = new BridgeContract(this.context.web3, this.context.account, this.props.bridgeContractAddress);
       await bridgeContract.addTokenOnSourceChain(this.props.selectedSourceTokenData.address, async (hash) => {
         console.log({
           hash: hash

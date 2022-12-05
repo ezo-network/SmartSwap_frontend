@@ -1,10 +1,11 @@
 import React, { PureComponent } from "react";
 import BridgeSwap from "./bridge-tokens/BridgeSwap";
 import NativeSwap from "./native-tokens/NativeSwap";
+import LedgerHistory from "../LedgerHistory/LedgerHistory";
 
-const activeComponent = (tabLink,callback) => {
+const activeComponent = (tabLink, callback, props) => {
     const tabComponentsMap = {
-        'native-tokens': <NativeSwap closeSideBar={()=> callback()}></NativeSwap>,
+        'native-tokens': <NativeSwap showSidebar={props.showSidebar} closeSideBar={()=> callback()}></NativeSwap>,
         'bridge-tokens': <BridgeSwap></BridgeSwap>
     }
     return tabComponentsMap[tabLink];
@@ -16,7 +17,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
         super();
         this.state = {
             activeTabLink: 'native-tokens',
-            showSidebar: false, 
+            showSidebar: false,
             tabs: [
                 {
                     title: 'Native Tokens',
@@ -72,7 +73,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
     closeSideBar = () => {
         let currentStatus = !this.state.showSidebar;
         this.setState({showSidebar: currentStatus});
-    }    
+    }
 
     render() {
         return (
@@ -94,11 +95,15 @@ export default class SmartEcoSystemTabs extends PureComponent {
 
                         <div className="tab-content-n-main">
                             <div id={`${this.state.activeTabLink}`}>
-                                {activeComponent(this.state.activeTabLink,this.closeSideBar)}
+                                {activeComponent(this.state.activeTabLink, this.closeSideBar, {showSidebar: this.state.showSidebar})}
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {this.state.activeTabLink === "native-tokens" &&
+                <LedgerHistory></LedgerHistory>
+                }
             </>
         )
     }

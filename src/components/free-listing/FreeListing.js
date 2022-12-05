@@ -580,6 +580,7 @@ export default class FreeListing extends PureComponent {
               onSwitchNetwork={this.switchNetworkCallback}
               onFinishButtonClicked={this.finishButtonClicked}
               onFetchWrappedTokens={this.fetchWrappedTokens}
+              onAddMoreBridgeButtonClicked={this.addMoreBridgeButtonClicked}
             />
           }
 

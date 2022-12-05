@@ -7,9 +7,8 @@ import CTAButtons2 from "../components/sections//CTAButtons2";
 import AskMeAnythingVideo from "../components/sections//AskMeAnythingVideo";
 import TokenTokenomicsStats from "../components/sections//TokenTokenomicsStats";
 import SupportedBlockchainsCarousel from "../components/sections/SupportedBlockchainsCarousel";
-import SmartEcoSystemFeatures from "../components/SmartEcoSystemFeatures";
+import SmartEcoSystemFeatures from "../components/sections/SmartEcoSystemFeatures";
 import HeroSectionVideoOverlay from "../components/sections/HeroSectionVideoOverlay"
-import LedgerHistory from "../components/LedgerHistory/LedgerHistory";
 
 const $ = window.$;
 
@@ -69,7 +68,6 @@ export default class Home extends PureComponent {
                   </div>
                   <>
                     <SmartEcoSystemTabs></SmartEcoSystemTabs>
-                    <LedgerHistory></LedgerHistory>
                     <CTAButtons2></CTAButtons2>
                   </>
 

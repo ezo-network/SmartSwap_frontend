@@ -11,8 +11,14 @@ import BridgeApiHelper from "../../helper/bridgeApiHelper";
 import BridgeContract from "../../helper/bridgeContract";
 import errors from "../../helper/errorConstantsHelper";
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
-
 const $ = window.$;
+
+const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
+  if(explorerUrl !== undefined){
+      window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
+  }
+}
+
 export default class WrapTokenOnDestinationChain extends PureComponent {
   pendingNetworkSwitchRequest = false;
   canMoveForward = true;
@@ -20,7 +26,8 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
     super();
     this.state = {
       addWrappedTokenSignedParams: [],
-      btnClicked: false
+      btnClicked: false,
+      createdBridgeAddress: null
     };
   }
 
@@ -140,7 +147,7 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
         btnClicked: true
       });
       await this.activeToken();
-      const bridgeContract = new BridgeContract(this.context.web3, this.props.bridgeContractAddress);
+      const bridgeContract = new BridgeContract(this.context.web3, this.context.account, this.props.bridgeContractAddress);
       await bridgeContract.addWrappedTokenOnDestinationChain(
         this.state.addWrappedTokenSignedParams.token,
         this.state.addWrappedTokenSignedParams.chainID,
@@ -366,6 +373,7 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
       let networkData = networkConfig;
       if (wrappedToken !== undefined) {
         networkData['wrappedTokenExist'] = true;
+        networkData['wrappedTokenAddress'] = wrappedToken.address;
       } else {
         networkData['wrappedTokenExist'] = false;
       }
@@ -435,7 +443,9 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                         </ProICOSbx01>
                         <ProColBtn>
                           {network.wrappedTokenExist === true && (
-                            <label className="Btn02"><i className="fa fa-check" aria-hidden="true"></i> Bridge Created</label>
+                            <label onClick={(e) => goToContractOnExplorer(network.explorerUrl, network.wrappedTokenAddress)} className="Btn02">
+                              <i className="far fa-check-circle" aria-hidden="true"></i> Bridge Created <i className="fas fa-external-link-alt" aria-hidden="true"></i>
+                            </label>
                           )}
                           {network.wrappedTokenExist === false && Number(network.chainId) === Number(this.context.chainIdNumber) && (
                             <button disabled={this.state.btnClicked} onClick={e => this.addWrappedTokenOnDestinationChain()} className="Btn01">
@@ -455,7 +465,7 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                             </button>
                           )}
                           {network.wrappedTokenExist === false && Number(network.chainId) !== Number(this.context.chainIdNumber) && (
-                            <button disabled={this.state.btnClicked} onClick={e => this.switchNetwork(network.chainId)} className="Btn01">SWITCH NETWORK</button>
+                            <button disabled={this.state.btnClicked} onClick={e => this.switchNetwork(network.chainId)} className="Btn01 switch-network-alert">CREATE A BRIDGE</button>
                           )}
                         </ProColBtn>
                       </ProRowCol1>
@@ -465,7 +475,8 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
 
                 <BtnMbox>
                   <button onClick={() => this.onBackButtonClicked(this.props.selectedSourceTokenData.chainId)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button onClick={() => this.onFinishButtonClicked()} className="Btn01">FINISH</button>
+                  {/* <button onClick={() => this.onFinishButtonClicked()} className="Btn01">FINISH</button> */}
+                  <LinkGreen className="cursor" onClick={e => this.props.onAddMoreBridgeButtonClicked()}>+ Add more bridges </LinkGreen>
                 </BtnMbox>
 
               </CMbx>
@@ -608,6 +619,14 @@ const ProColBtn = styled.div `
     color:#fff; background-color:#0d0e13; width: 100%;  text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5);
     &:hover{ background-color:#91dc27;}
   }
+  .switch-network-alert {
+    color: #fff;
+    border:2px solid #ff0000;
+    -webkit-box-shadow: 0 0 12px 5px rgba(255, 0, 0, 0.5); 
+    box-shadow: 0 0 12px 5px rgba(255, 0, 0, 0.5)
+    
+  }
+  .switch-network-alert:hover{ background-color:#ff0000;}
   .Btn02 {
     color: #91dc27;
     font-size: 18px;
@@ -638,4 +657,15 @@ const ProICOTitle = styled.span`
   @media screen and (max-width: 640px) {
     width: 100%;
   }
+`
+
+const LinkGreen = styled.a `
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	color: #91dc27;
+	font-weight: bold;
+	@media screen and (max-width: 575px) {
+		margin-bottom: 8px;
+	}
 `

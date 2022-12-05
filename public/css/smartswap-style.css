@@ -3189,6 +3189,7 @@ a.dc-file:hover { color: #0303ff; }
 .hasBtn p { text-align: center; color: #aaaaaa; margin: 15px 0 0; font-size: 11px; } 
 .color-green { color: #91dc27 } 
 .btn-grp { display: flex; margin: 14px -17px 0; padding: 0 43px; } 
+.btn-grp-cm { margin: 70px 0px; } 
 .btn-grp .btn { margin: 0 17px; } 
 
 .dropdown { padding: 104px 43px 80px; } 

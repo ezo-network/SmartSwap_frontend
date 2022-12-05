@@ -1,6 +1,7 @@
 import {WalletContext} from '../../context/WalletProvider';
 import React, { PureComponent, lazy, Suspense } from "react";
 import styled from 'styled-components';
+import notificationConfig from "../../config/notificationConfig";
 import Lineimg from "../../assets/freelisting-images/line01.png";
 import Badge from "../../assets/freelisting-images/imgIco02.png";
 const $ = window.$;
@@ -11,6 +12,17 @@ export default class DeployerOwnershipIntroduction extends PureComponent {
     this.state = {
 
     };
+  }
+
+  connectWallet = async () => {
+    try {
+      const walletConnected = await this.context.connectWallet();
+      if (walletConnected === false) {
+        notificationConfig.error('Matamask wallet not connected');
+      }
+    } catch (error) {
+      console.error('connectWallet', error.message)
+    }
   }
 
   render() {
@@ -29,7 +41,7 @@ export default class DeployerOwnershipIntroduction extends PureComponent {
                       this.context.isAuthenticated === false && 
                       this.props.claimDeployerOwnerShip === true &&
                       <>
-                        <button onClick={(e) => this.context.connectWallet()} className="Btn01">CONNECT YOUR WALLET</button>
+                        <button onClick={(e) => this.connectWallet()} className="Btn01">CONNECT YOUR WALLET</button>
                         <p>Connect with the wallet used to deploy the original token</p>
                       </>
                     }
