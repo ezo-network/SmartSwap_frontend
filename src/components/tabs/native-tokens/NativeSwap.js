@@ -243,10 +243,10 @@ export default class NativeSwap extends PureComponent {
                                 className="react-switch"
                                 id="input-mode"
                             />
-                            <p style={{ paddingLeft: "10px" }}>Token amount</p>
+                            <p style={{ paddingLeft: "8px" }}>Token amount</p>
                         </label>
                         <label className="slippage-outer">
-                            <p className="active" style={{ paddingRight: "10px" }}>Slippage free </p>
+                            <p className="active" style={{ paddingRight: "8px" }}>Slippage free </p>
                             <Switch
                                 checked={this.state.slippageMode === SLIPPAGE_MODES[1] ? true : false}
                                 onChange={(e) => this.toggleSlippageMode(this.state.slippageMode)}
@@ -264,7 +264,7 @@ export default class NativeSwap extends PureComponent {
                                 className="react-switch"
                                 id="slippage-mode"
                             />
-                            <p style={{ paddingLeft: "10px" }}>Best slippage</p>
+                            <p style={{ paddingLeft: "8px" }}>Best slippage</p>
                         </label>
                     </div>
                 </div>

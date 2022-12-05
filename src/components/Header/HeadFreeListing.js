@@ -80,7 +80,7 @@ export default class HeadFreeListing extends PureComponent {
                         <Link to=''>SmartBridge</Link><span>|</span>
                         <Link to=''>SmartPayment</Link><span>|</span>
                         <Link to=''>SmartWallet</Link><span>|</span>
-                        <Link to='/'>SmartSwap</Link>
+                        <Link className="active" to='/'>SmartSwap</Link>
                         {/* <Link to='/freelisting' className="active">FREE Listing</Link> */}
                     </Nav>
                     <Nav className="mobNav">
@@ -203,7 +203,7 @@ const Nav = styled(FlexDiv)`
     }
     a{ color: #aaaaaa; 
         :hover{ color: #91dc27;}
-        &.active{ color: #91dc27; font-weight:700; text-decoration: underline}
+        &.active{ color: #fff; font-weight:700; text-decoration: underline}
     }
     @media screen and (max-width: 1650px){
         font-size: 15px;
