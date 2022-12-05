@@ -41,7 +41,7 @@
     "react-multi-carousel": "^2.6.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
-    "react-select": "^5.2.2",
+    "react-select": "^5.6.1",
     "react-spinners": "^0.10.4",
     "react-switch": "^6.0.0",
     "react-toastify": "^6.1.0",

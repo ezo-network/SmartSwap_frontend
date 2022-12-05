@@ -5,7 +5,7 @@ import notificationConfig from "../config/notificationConfig";
 import SwapFactoryContract from "../helper/swapFactoryContract";
 import CONSTANT from "../constants";
 import Header from "../components/Header/Header";
-import RightSideMenu from "../components/RightSideMenu";
+import RightSideMenu from "../components/Navigations/RightSideMenu";
 import axios from "axios";
 import { isValidAddress } from 'ethereumjs-util';
 

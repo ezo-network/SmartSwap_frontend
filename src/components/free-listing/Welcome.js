@@ -1,6 +1,7 @@
 import {WalletContext} from '../../context/WalletProvider';
 import React, { PureComponent} from "react";
 import styled from 'styled-components';
+import notificationConfig from "../../config/notificationConfig";
 import ImgIco01 from "../../assets/freelisting-images/imgIco01.png";
 import ImgIco02 from "../../assets/freelisting-images/imgIco02.png";
 const $ = window.$;
@@ -12,6 +13,17 @@ export default class Welcome extends PureComponent {
 
   textMasking = (text, maskingChar = '.', noOfMaskingChar = 4, startingLettersLength = 5, endingLettersLength = 4) => {
     return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
+  }
+
+  connectWallet = async () => {
+    try {
+      const walletConnected = await this.context.connectWallet();
+      if (walletConnected === false) {
+        notificationConfig.error('Matamask wallet not connected');
+      }
+    } catch (error) {
+      console.error('connectWallet', error.message)
+    }
   }
 
   render() {
@@ -31,7 +43,7 @@ export default class Welcome extends PureComponent {
                       { 
                         this.context.isAuthenticated === false && 
                         this.props.claimDeployerOwnerShip === false &&
-                        <button onClick={(e) => this.context.connectWallet()} className="Btn01 ani-1">CONNECT YOUR WALLET</button>
+                        <button onClick={(e) => this.connectWallet()} className="Btn01 ani-1">CONNECT YOUR WALLET</button>
                       }
                       { 
                         this.context.isAuthenticated === true &&

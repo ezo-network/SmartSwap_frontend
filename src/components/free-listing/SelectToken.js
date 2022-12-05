@@ -35,11 +35,12 @@ export default class SelectToken extends PureComponent {
 
   }
   
-  componentDidMount(){
+  componentDidMount = async() => {
     this._componentMounted = true;
     if(this._componentMounted){
       console.log('Screen2 mounted');
-      this.filterTokenByWalletBalance();
+      await this.context.connectWallet();
+      await this.filterTokenByWalletBalance();
     }
   }
 
@@ -110,6 +111,9 @@ export default class SelectToken extends PureComponent {
       }, Object.create(null));
 
       Object.keys(groupedTokenByNetwork).forEach(async(network) => {
+        console.log({
+          'this.context.account': this.context.account
+        });
         await this.aggregateBalanceOfMultiCall(network, groupedTokenByNetwork[network], this.context.account);
       });
     } catch(error) {

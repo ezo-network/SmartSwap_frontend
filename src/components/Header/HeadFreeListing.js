@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Link } from "react-router-dom";
 import LogoM from '../../assets/freelisting-images/logo.png'
 import JPico from '../../assets/freelisting-images/jackpot.png'
-import RightSideMenu from "../RightSideMenu";
+import RightSideMenu from "../Navigations/RightSideMenu";
 import { WalletContext } from '../../context/WalletProvider';
 
 // popups

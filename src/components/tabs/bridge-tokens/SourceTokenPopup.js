@@ -136,6 +136,13 @@ export default class SourceTokenPopup extends PureComponent {
                 });
             }
         }
+
+        if(error === 'PROVIDED ADDRESS IS NOT A VALID CONTRACT ADDRESS'){
+            if(this._componentMounted === true){
+                notificationConfig.error(`${error}. PLEASE CHECK CONNECTED NETWORK OR USE CORRECT ADDRESS.`);
+            }
+        }
+
     }
 
     render() {

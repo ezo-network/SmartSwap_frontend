@@ -164,10 +164,10 @@ export default class SelectDestinationChains extends PureComponent {
                     
                     {finalFilteredNetworks.length > 0 && finalFilteredNetworks.map(function(network, i){
                       if(network.isBridgeExistOnChain === true){
-                          return <ProICOSbx02 key={i}>
+                          return <ProICOSbx02 key={i} className={network.selectedNetwork ? 'selected' : ''} onClick={e => this.selectNetwork(network.chainId)}>
                             <img
+                              className="disable"
                               src={'/images/free-listing/chains/' + (((network.chain).toLowerCase()).toString() + '.png').toLowerCase()}
-                              className='disable' 
                               onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                             /> {network.chain}
                           </ProICOSbx02>
@@ -275,7 +275,11 @@ const ProICOSbx01 = styled.div`
 ` 
 const ProICOSbx02 = styled(FlexDiv)`
   background-color:#21232b; height:60px; width:100%; padding:0 18px; justify-content:flex-start; font-size:14px; font-weight:400; color:#fff;
-  img{ margin-right:15px; max-width: 30px; border-radius: 30px;}
+  img{ margin-right:15px; max-width: 30px; border-radius: 30px;
+    &.disable{filter: grayscale(100%); }  
+  }
+  :hover{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  } 
+  &.selected{  -webkit-box-shadow: 0 0 10px 1px rgba(145,220,39,0.5); box-shadow: 0 0 10px 1px rgba(145,220,39,0.5);  }
   &.disable{filter: grayscale(100%); }
   &:nth-child(01){ background-image:url(${Lineimg}); background-repeat:no-repeat; background-position:right 50%;}
 `

@@ -119,7 +119,7 @@ export default class AddCustomToken extends PureComponent {
           web3: this.context.web3,
           sourceTokenAddress: this.state.selectedSourceTokenData.address
         });
-        const erc20TokenContract = new ERC20TokenContract(this.context.web3, this.state.selectedSourceTokenData.address);
+        const erc20TokenContract = new ERC20TokenContract(this.context.web3, this.context.account, this.state.selectedSourceTokenData.address);
         await erc20TokenContract.getTokenInfo((response) => {
             console.log({
               getTokenInfoResponse: response

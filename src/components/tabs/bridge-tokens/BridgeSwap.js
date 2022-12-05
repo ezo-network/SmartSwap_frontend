@@ -105,35 +105,39 @@ export default class BridgeSwap extends PureComponent {
             await this.getTokenList();
             await this.walletConnectCallback();
 
-            // detect Network account change
-            window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async(chainId) => {
-                console.log(EthereumEvents.CHAIN_CHANGED, chainId);
-                await this.resetSelectedTokens();
-                await this.walletConnectCallback();
-            });
-
-            window.ethereum.on(EthereumEvents.ACCOUNTS_CHANGED, async(accounts) => {
-                console.log(EthereumEvents.ACCOUNTS_CHANGED, accounts[0]);
-                await this.walletConnectCallback();
-                if(this.state.isSourceTokenSelected){
-                    await this.aggregateBalanceOfMultiCall(
-                        this.context.chainIdNumber,
-                        [this.state.sourceTokenData.address],
-                        this.context.account,
-                        this.state.sourceTokenData.decimals
-                    );
-                }
-            });
-
-            window.ethereum.on(EthereumEvents.CONNECT, async (error) => {
-                console.log(EthereumEvents.CONNECT);
-                await this.walletConnectCallback();
-            });
-
-            window.ethereum.on(EthereumEvents.DISCONNECT, async (error) => {
-                console.log(EthereumEvents.DISCONNECT);
-                await this.walletConnectCallback();          
-            });
+            if(window?.ethereum !== undefined){
+                // detect Network account change
+                window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async(chainId) => {
+                    console.log(EthereumEvents.CHAIN_CHANGED, chainId);
+                    await this.resetSelectedTokens();
+                    await this.walletConnectCallback();
+                });
+    
+                window.ethereum.on(EthereumEvents.ACCOUNTS_CHANGED, async(accounts) => {
+                    console.log(EthereumEvents.ACCOUNTS_CHANGED, accounts[0]);
+                    await this.walletConnectCallback();
+                    if(this.state.isSourceTokenSelected){
+                        await this.aggregateBalanceOfMultiCall(
+                            this.context.chainIdNumber,
+                            [this.state.sourceTokenData.address],
+                            this.context.account,
+                            this.state.sourceTokenData.decimals
+                        );
+                    }
+                });
+    
+                window.ethereum.on(EthereumEvents.CONNECT, async (error) => {
+                    console.log(EthereumEvents.CONNECT);
+                    await this.walletConnectCallback();
+                });
+    
+                window.ethereum.on(EthereumEvents.DISCONNECT, async (error) => {
+                    console.log(EthereumEvents.DISCONNECT);
+                    await this.walletConnectCallback();          
+                });
+            } else {
+                console.error('Metamask is not installed');
+            }
         }
     }
     
@@ -156,9 +160,11 @@ export default class BridgeSwap extends PureComponent {
             const walletConnected = await this.context.connectWallet();
             if(walletConnected){
                 await this.walletConnectCallback();
+            } else {
+                notificationConfig.error('Matamask wallet not connected');
             }
         } catch(error){
-
+            console.error('connectWallet', error.message)
         }
     }
 
