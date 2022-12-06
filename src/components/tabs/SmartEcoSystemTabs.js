@@ -82,7 +82,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
                     <div className="tab-main-wrapper">
                         <ul className="tabs-n">
                             {this.state.tabs.map((tab) => {
-                                return <li key={tab.link} onClick={(e) => this.changeTab(tab)} className={`tab-link ${this.state.activeTabLink === tab.link ? 'current-n' : ''}`} data-tab={tab.link}>
+                                return <li key={tab.link} onClick={(e) => this.changeTab(tab)} className={`tab-link ${this.state.activeTabLink === tab.link ? 'current-n' : '', tab.disabled ? 'disable' : ''}`} data-tab={tab.link}>
                                     <div>
                                         {tab.title}
                                         {tab.inBeta && !tab.disabled &&

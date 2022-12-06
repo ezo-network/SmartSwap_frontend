@@ -56,7 +56,7 @@ const selectElementStyleOptions = (mode) => {
             display: 'flex',
             //justifyContent: 'center',
             alignItems: 'center',
-            gap: '5px'
+            gap: '9px'
         }),
         option: (styles, { data, isDisabled, isFocused, isSelected }) => {
             // const color = chroma(data.color);

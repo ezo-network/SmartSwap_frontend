@@ -2139,7 +2139,7 @@ select:focus { border-color: #fff !important; box-shadow: none; }
 
 .powertextBX p.poweredBy { width: 198px; } 
 .powertextBX p,
-.powertextBX a { font-size: 11px; color: #aaaaaa; margin: 0px; display: flex; align-items: center; } 
+.powertextBX a { font-size: 10px; color: #aaaaaa; margin: 0px; display: flex; align-items: center; } 
 
 .powertextBX a { margin-left: 30px; } 
 
@@ -2740,6 +2740,15 @@ ul.tabs-n li:last-child { margin-bottom: 0; }
 
 ul.tabs-n li.current-n { background-color: rgb(54 56 64 / 50%); color: #91dc27; } 
 
+ul.tabs-n li.disable {position: relative;}
+ul.tabs-n li.disable:after {
+    content: "Coming Soon";
+    position: absolute; display: flex; padding: 0px 18px; align-items: center;
+    top: 0; bottom: 0; left: 0; right: 0; opacity: 0; 
+}
+ul.tabs-n li.disable:hover {color: transparent;}
+ul.tabs-n li.disable:hover:after {opacity: 1; color: #a6a2b0;}
+
 .tab-content-n { display: none; /* padding: 15px; */
  animation: fadeEffect 1s; /* Fading effect takes 1 second */}
 
@@ -2883,6 +2892,7 @@ a.color-light-n:hover { color: #ccc; }
 .input-box2.ver2 button img { filter: grayscale(1) brightness(0.7); } 
 
 .input-box2.ver2 button:after { border-top: 5px solid #fff; } 
+.input-box2.ver2 div > div[class$="control"] {border: 2px solid #0d0e13;}
 
 .input-box2 button.border-left-0 { border-left: 0px; } 
 
@@ -2898,7 +2908,7 @@ a.color-light-n:hover { color: #ccc; }
 
 .currency-ic-n.ver2 { background-color: #21232b; border: 2px solid #0d0e13; color: #656565; } 
 
-.slippage-outer p { margin: 0px; color: #aaaaaa; font-size: 11px; } 
+.slippage-outer p { margin: 0px; color: #aaaaaa; font-size: 10px; } 
 
 .slippage-outer p.active { color: #91dc27; font-weight: 700; } 
 
@@ -3188,8 +3198,9 @@ a.dc-file:hover { color: #0303ff; }
 .hasBtn { padding: 0 26px; flex-flow: column; } 
 .hasBtn p { text-align: center; color: #aaaaaa; margin: 15px 0 0; font-size: 11px; } 
 .color-green { color: #91dc27 } 
-.btn-grp { display: flex; margin: 14px -17px 0; padding: 0 43px; } 
-.btn-grp-cm { margin: 70px 0px; } 
+.btn-grp { display: flex; margin: 14px -17px 0; padding: 0 28px; } 
+.btn-grp-cm { margin: 100px 0px 70px; } 
+.n-collapse + .btn-grp-cm {margin-top: 15px;}
 .btn-grp .btn { margin: 0 17px; } 
 
 .dropdown { padding: 104px 43px 80px; } 
@@ -3298,6 +3309,8 @@ a.dc-file:hover { color: #0303ff; }
 .bottom-action-bar { position: absolute; bottom: -30px; display: flex; left: 0; right: 0; } 
 
 .tab-container.hasSidebar .side-pannel {display: block;}
-.tab-container.hasSidebar .powertextBX p.poweredBy {opacity: 0;}
+.tab-container .powertextBX p.poweredBy {opacity: 0;}
+.tab-container.hasSidebar .powertextBX p.poweredBy {opacity: 1;}
 .tab-container.hasSidebar .powertextBX-links {display: flex;}
+.tab-container.hasSidebar .powertextBX-links .help-circle {font-size: 10px;}
 .tab-container.hasSidebar .powertextBX-links.estimated {display: none;}
