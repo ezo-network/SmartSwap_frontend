@@ -31,7 +31,8 @@ export default class NativeSwap extends PureComponent {
             slippageMode: SLIPPAGE_MODES[0],
             inputMode: INPUT_MODES[0],
             estimateGasAndFeesData: {},
-            activeNetworkNativeTokenSymbol: 'UNSUPPORTED'
+            activeNetworkNativeTokenSymbol: 'UNSUPPORTED',
+            activeNetworkNativeTokenDecimals: 0
         }
 
         axiosSource = axios.CancelToken.source();
@@ -91,6 +92,7 @@ export default class NativeSwap extends PureComponent {
                         this.setState({
                             networks: response
                         });
+                        this.props.setNetworkList(response);
                     }
                 } else {
                     console.error(error)
@@ -141,11 +143,12 @@ export default class NativeSwap extends PureComponent {
         }
     }
 
-    updateEstimatedGasAndFees = (estimateGasAndFeesData, activeNetworkNativeTokenSymbol) => {
+    updateEstimatedGasAndFees = (estimateGasAndFeesData, activeNetworkNativeTokenSymbol, decimalPoints) => {
         if(this._componentMounted){
             this.setState({
                 estimateGasAndFeesData: estimateGasAndFeesData,
-                activeNetworkNativeTokenSymbol: activeNetworkNativeTokenSymbol
+                activeNetworkNativeTokenSymbol: activeNetworkNativeTokenSymbol,
+                activeNetworkNativeTokenDecimals: decimalPoints
             });
         }
     }
@@ -155,8 +158,8 @@ export default class NativeSwap extends PureComponent {
         return (
             <>
                 <div className="native-icons">
-                    <a href onClick={(e) => e.preventDefault()}><img height="13" src={Filter} /></a>
-                    <a className='nativeToggle' href onClick={() => this.props.closeSideBar()}><img height="14" src={Doller} /></a>
+                    <a href onClick={(e) => e.preventDefault()}><img height="13" alt="filters" src={Filter} /></a>
+                    <a className='nativeToggle' href onClick={() => this.props.closeSideBar()}><img height="14" src={Doller} alt="3rd-parties-rates" /></a>
                 </div>
                 <div id="slippage-mode">
                     {this.state.slippageMode === SLIPPAGE_MODES[0] && 
@@ -167,6 +170,7 @@ export default class NativeSwap extends PureComponent {
                             selectedSlippageMode={this.state.slippageMode} 
                             selectedInputMode={this.state.inputMode}
                             onGasFeeUpdate={this.updateEstimatedGasAndFees}
+                            openLedger={this.props.openLedger}
                         ></SmartSwap>                
                     }
 
@@ -185,16 +189,16 @@ export default class NativeSwap extends PureComponent {
                 <div className={`side-pannel ${this.props.showSidebar ? '' : 'hidden'}`}>
                     <h4>Best cross chain prices</h4>
                     <div className="">
-                        <h5><span>1. <img src={SSIco} /></span>SmartSwap
+                        <h5><span>1. <img alt="SmartSwap" src={SSIco} /></span>SmartSwap
                             <b><strong>0.06015 ETH</strong> [$1662.44]</b>
                             <p>Estimated fees: $0 <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options" aria-hidden="true"></i></i></p>
                             <p className="color-green mt-1">Super bonus 145.37% <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options" aria-hidden="true"></i></i></p>
                         </h5>
-                        <h5><span>2. <img src={SUSIco} /></span>Sushiswap
+                        <h5><span>2. <img alt="Sushiswap" src={SUSIco} /></span>Sushiswap
                             <b><strong>0.05892 ETH</strong> [$1599.78]</b>
                             <p>Estimated fees: <span className="color-red">-$5.37</span></p>
                         </h5>
-                        <h5><span>3. <img src={MUCIco} /></span>Multichain
+                        <h5><span>3. <img alt="Multichain" src={MUCIco} /></span>Multichain
                             <b><strong>0.05882 ETH</strong> [$1593.78]</b>
                             <p>Estimated fees: <span className="color-red">-$5.37</span></p>
                         </h5>
@@ -209,7 +213,7 @@ export default class NativeSwap extends PureComponent {
                             <div className="powertextBX-links">
                                 <Link to='/freelisting'>Free listing</Link>
                                 <span>|</span>
-                                <a href="" onClick={(e) => {e.preventDefault();}}>Apply for licensing</a>
+                                <a href onClick={(e) => {e.preventDefault();}}>Apply for licensing</a>
                             </div>
                             <div className='powertextBX-links estimated'>
                                 <p>
@@ -219,7 +223,7 @@ export default class NativeSwap extends PureComponent {
                                         <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Slippage free trades carry higher gas costs than slippage trades. Gas and fees are 100% reimbursed" aria-hidden="true"></i>
                                     </i>
                                     &nbsp;
-                                    <span>{Number(this.state.estimateGasAndFeesData?.result ?? 0).toFixed(5)}</span>
+                                    <span>{Number(this.state.estimateGasAndFeesData?.result ?? 0).toFixed(this.state.activeNetworkNativeTokenDecimals)}</span>
                                     &nbsp;{this.state.activeNetworkNativeTokenSymbol}
                                 </p>
                             </div>

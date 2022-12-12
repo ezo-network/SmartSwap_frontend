@@ -211,6 +211,51 @@ class BridgeContract extends EventEmitter {
             return err;   
         }
     }
+
+    async claimToken(orignalToken, orignalChainId, txId, to, value, fromChainId, sig, txCb, receiptCb){
+        try {
+
+            const args = {
+                orignalToken: orignalToken,
+                orignalChainId: orignalChainId,
+                txId: txId,
+                to: to,
+                value: value,
+                fromChainId: fromChainId,
+                sig: sig
+            };
+
+            console.log("claimToken args:", args);
+
+            let payload = ethers.utils.defaultAbiCoder.encode([
+                "address", // orignalToken
+                "uint256", // orignalChainId
+                "bytes32", // txId
+                "address", // to
+                "uint256", // value
+                "uint256", // fromChainId
+                "bytes[]" // sig
+            ], [
+                orignalToken,
+                orignalChainId,
+                txId,
+                to,
+                value,
+                fromChainId,
+                [sig]
+            ]);
+
+            payload = payload.slice(2);
+            payload = `0x1c9499e8${this.pad32Bytes(payload)}`;
+
+            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+        } catch (err){
+            console.error({
+               depositTokens: err.message
+            });
+            return err;   
+        }        
+    }
 }
 
 

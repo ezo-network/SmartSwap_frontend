@@ -7,33 +7,63 @@ import web3 from "web3";
 import axios from "axios";
 import Select, { components } from 'react-select';
 import _ from "lodash";
-import { aggregate } from '@makerdao/multicall';
 import bigInt from 'big-integer';
+import CONSTANT from "../../../constants";
 import Validation from "../../../helper/validation";
 import notificationConfig from "../../../config/notificationConfig";
-import SmartSwapContract from "../../../helper/smartSwapContract";
 import NewReimbursementContract from "../../../helper/newReimbursementContract";
+import SmartSwapContract from "../../../helper/smartSwapContract";
+import SmartSwapApiHelper from "../../../helper/smartswapApiHelper";
 import errors from "../../../helper/errorConstantsHelper";
 const { Option, SingleValue } = components;
 
-const apisEndpoints = (type, args = {}) => {
-    const allEndpoints = {
-        coingeckoUsdPrice: () => 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple%2Cmatic-network&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true',
-        estimateGasAndFees: () => {
-            return `http://0.0.0.0:8082/swap-fee/${args?.fromChainId}-${args?.toChainId}`
-        },
-        estimatedProcessingFees: () => {
-            return `http://0.0.0.0:8082/processing-fee/${args?.fromChainId}-${args?.toChainId}`            
-        }
-    }
-    return allEndpoints[type]();
-}
+/********************************************************
+ * Converts Exponential (e-Notation) Numbers to Decimals
+ ********************************************************
+ * @function numberExponentToLarge()
+ * @version  1.00
+ * @param   {string}  Number in exponent format.
+ *                   (other formats returned as is).
+ * @return  {string}  Returns a decimal number string.
+ * @author  Mohsen Alyafei
+ * @date    12 Jan 2020
+ *
+ * Notes: No check is made for NaN or undefined inputs
+ *
+ *******************************************************/
 
+function numberExponentToLarge(numIn) {
+    numIn += "";                                            // To cater to numric entries
+    var sign = "";                                           // To remember the number sign
+    numIn.charAt(0) == "-" && (numIn = numIn.substring(1), sign = "-"); // remove - sign & remember it
+    var str = numIn.split(/[eE]/g);                        // Split numberic string at e or E
+    if (str.length < 2) return sign + numIn;                   // Not an Exponent Number? Exit with orginal Num back
+    var power = str[1];                                    // Get Exponent (Power) (could be + or -)
+    if (power === '0' || power == '-0') return sign + str[0];       // If 0 exponents (i.e. 0|-0|+0) then That's any easy one
+
+    var deciSp = 1.1.toLocaleString().substring(1, 2);  // Get Deciaml Separator
+    str = str[0].split(deciSp);                        // Split the Base Number into LH and RH at the decimal point
+    var baseRH = str[1] || "",                         // RH Base part. Make sure we have a RH fraction else ""
+        baseLH = str[0];                               // LH base part.
+
+    if (power > 0) {   // ------- Positive Exponents (Process the RH Base Part)
+        if (power > baseRH.length) baseRH += "0".repeat(power - baseRH.length); // Pad with "0" at RH
+        baseRH = baseRH.slice(0, power) + deciSp + baseRH.slice(power);      // Insert decSep at the correct place into RH base
+        if (baseRH.charAt(baseRH.length - 1) == deciSp) baseRH = baseRH.slice(0, -1); // If decSep at RH end? => remove it
+
+    } else {         // ------- Negative Exponents (Process the LH Base Part)
+        let num = Math.abs(power) - baseLH.length;                               // Delta necessary 0's
+        if (num > 0) baseLH = "0".repeat(num) + baseLH;                       // Pad with "0" at LH
+        baseLH = baseLH.slice(0, power) + deciSp + baseLH.slice(power);     // Insert "." at the correct place into LH base
+        if (baseLH.charAt(0) == deciSp) baseLH = "0" + baseLH;                // If decSep at LH most? => add "0"
+    }
+    return sign + baseLH + baseRH;                                          // Return the long number (with sign)
+}
 
 const toFixedWithoutRounding = (input, decimalPoints) => {
-    const regExp = new RegExp("^-?\\d+(?:\\.\\d{0," + decimalPoints + "})?", "g"); // toFixed without rounding
-    return input.toString().match(regExp)[0] ?? '0.00000';    
-}
+    let regExp = new RegExp("^-?\\d+(?:\\.\\d{0," + decimalPoints + "})?", "g"); // toFixed without rounding
+    return regExp.test(input.toString()) ? input.toString().match(regExp) : '0.00000';
+}   
 
 const numberToBn = (number, decimalPoints, toString = false) => {
     const pow = bigInt(10).pow(decimalPoints);
@@ -87,7 +117,7 @@ export default class SmartSwap extends PureComponent {
         super();
         this.state = {
             showSidebar: false,
-            amountToSwap: 0,
+            amountToSwap: '',
             userBalance: 0,
             tokenUsdPrices: [],
             estimatedAmountToSwap: 0,
@@ -110,7 +140,8 @@ export default class SmartSwap extends PureComponent {
             await this.getBalance();
             await this.setChainIds();
             await this.estimateGasAndFees();
-            this.interval = setInterval(async() => { 
+            await this.reFetch();
+            this.interval = setInterval(async() => {
                 await this.estimateGasAndFees();
             }, 30000);
 
@@ -118,16 +149,17 @@ export default class SmartSwap extends PureComponent {
                 // detect Network account change
                 window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async (chainId) => {
                     console.log(EthereumEvents.CHAIN_CHANGED, chainId);
-                    await this.setChainIds();
                     await this.estimateGasAndFees();
                 });
     
                 window.ethereum.on(EthereumEvents.ACCOUNTS_CHANGED, async (accounts) => {
                     console.log(EthereumEvents.ACCOUNTS_CHANGED, accounts[0]);
+                    await this.getBalance();
                 });
     
                 window.ethereum.on(EthereumEvents.CONNECT, async (error) => {
                     console.log(EthereumEvents.CONNECT);
+                    await this.getBalance();
                 });
     
                 window.ethereum.on(EthereumEvents.DISCONNECT, async (error) => {
@@ -140,7 +172,7 @@ export default class SmartSwap extends PureComponent {
         }
     }
 
-    componentDidUpdate(prevProps, prevState, snapsho) {
+    componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.selectedInputMode !== prevProps.selectedInputMode) {
             this.setState({
                 amountToSwap: 0,
@@ -171,28 +203,36 @@ export default class SmartSwap extends PureComponent {
 
     setChainIds = async() => {
         // To network config - filter out from network then choose first element
-        const toNetworkConfig = (_.filter(this.props.networks, function(network) {
-            return network.chainId !== this.context.chainIdNumber;
-        }.bind(this)))[1];
-
-        if(toNetworkConfig !== undefined){
-            if(this._componentMounted){
-                this.setState({
-                    fromChainId: this.context.chainIdNumber,
-                    toChainId: toNetworkConfig?.chainId ?? null
-                });
+        if(this.state.toChainId === null){
+            const toNetworkConfig = (_.filter(this.props.networks, function(network) {
+                return network.chainId !== this.context.chainIdNumber;
+            }.bind(this)))[1];
+    
+            if(toNetworkConfig !== undefined){
+                if(this._componentMounted){
+                    this.setState({
+                        fromChainId: this.context.chainIdNumber,
+                        toChainId: toNetworkConfig.chainId ?? null
+                    });
+                }
             }
-        }
+        }   
     }
 
-    switchNetwork = async(chainId) => {
-        if (Number(this.context.chainIdNumber) !== Number(chainId)) {
+    switchNetwork = async(newfromChainId, newToChainId) => {
+        if (Number(this.context.chainIdNumber) !== Number(newfromChainId)) {
             if(this._componentMounted){
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: web3.utils.toHex(chainId) }],
+                    params: [{ chainId: web3.utils.toHex(newfromChainId) }],
                 }).then(async(response) => {
-                    await this.getBalance();
+                    if(this._componentMounted){
+                        this.setState({
+                            fromChainId: newfromChainId,
+                            toChainId: newToChainId
+                        });
+                        await this.getBalance();
+                    }
                 }).catch(async (error) => {
                     console.error(error);
                     if (error.code === -32002) {
@@ -201,7 +241,7 @@ export default class SmartSwap extends PureComponent {
     
                     if (error.code === 4902) {
                         notificationConfig.error(errors.metamask.networkNotFound);
-                        await this.addNetworkToWallet(chainId);
+                        await this.addNetworkToWallet(newfromChainId);
                     }
                 });
             }
@@ -251,19 +291,33 @@ export default class SmartSwap extends PureComponent {
         }
     }    
 
-    swapDirection = async(fromChainId, toChainId) => {
-        console.log({
-            'swapDirection': 'swapDirection',
-            fromChainId: fromChainId,
-            toChainId: toChainId
-        });
+    swapDirection = async(toChainId) => {
         try {
+
+            const newfromChainId = toChainId;
+            const newToChainId = this.state.fromChainId;
             if(this._componentMounted){
-                await this.switchNetwork(toChainId);
+                if(this.context.chainIdNumber === toChainId){
+                    return 
+                }
+                await this.switchNetwork(newfromChainId, newToChainId);
             }
         } catch(error) {
             console.error('swapDirection', error.message);
         }
+    }
+
+    changeToDirection = async(toChainId) => {
+        console.log(toChainId);
+        if(this._componentMounted){
+            if(this.context.chainIdNumber === toChainId){
+                return;         
+            }
+
+            this.setState({
+                toChainId: toChainId    
+            })
+        }        
     }
 
     getBalance = async () => {
@@ -285,7 +339,7 @@ export default class SmartSwap extends PureComponent {
     }
 
     fetchCoingeckoMarketPrice = async () => {
-        await axios.get(apisEndpoints('coingeckoUsdPrice')).then(async(res) => {
+        await axios.get(CONSTANT.API_ENDPOINTS['3RD_PARTY_APPS'].COIN_GECKO_API.tokensUsdPrice).then(async(res) => {
             const response = res.data;
 
             let tokens = [];            
@@ -311,18 +365,28 @@ export default class SmartSwap extends PureComponent {
         });
     }
 
-    setMaxAmount = async() => {
+    setMaxAmount = () => {
         if(this.props.selectedInputMode === this.props.inputModes[0]){
             const rate = _.find(this.tokenUsdPrices, {chainId: this.context.chainIdNumber});
             if(rate !== undefined){
+                console.log({
+                    calc: "setMaxAmount dollar mode",
+                    amountToSwap: this.userBalance * rate.value,
+                    estimatedAmountToSwap: this.userBalance
+                });
                 this.setState({
-                    amountToSwap: this.userBalance,
-                    estimatedAmountToSwap: this.userBalance * rate.value
+                    amountToSwap: toFixedWithoutRounding(numberExponentToLarge(this.userBalance * rate.value), 2),
+                    estimatedAmountToSwap: this.userBalance
                 });
             }
         }
 
         if(this.props.selectedInputMode === this.props.inputModes[1]){
+            console.log({
+                calc: "setMaxAmount token amount mode",
+                amountToSwap: this.userBalance,
+                estimatedAmountToSwap: this.userBalance
+            });            
             this.setState({
                 amountToSwap: this.userBalance,
                 estimatedAmountToSwap: this.userBalance
@@ -330,21 +394,34 @@ export default class SmartSwap extends PureComponent {
         }
     }
 
-    setAmount = async(e) => {
+    setAmount = (e) => {
+
+        let inputValue = e.target.value;
+
+        if(isNaN(inputValue)){
+            return;
+        }
 
         if(this._componentMounted){
             // amountToSwap will be in USD
-            
             if(this.props.selectedInputMode === this.props.inputModes[0]){
+                if(this.decimalPointsFilter(inputValue) === false){
+                    return;
+                }
                 const rate = _.find(this.tokenUsdPrices, {chainId: this.context.chainIdNumber});
                 if(rate !== undefined){
-                    const userBalanceInUsd = this.userBalance * rate.value;
-                    const amountToSwapInUsd = e.target.value / rate.value;
-                    
+                    inputValue = toFixedWithoutRounding(inputValue, 2);
+                    const amountToSwapInUsd = inputValue / rate.value;
+                    console.log({
+                        calc: "setAmount dollar mode",
+                        estimatedAmountToSwap: amountToSwapInUsd,
+                        amountToSwap: Number(inputValue)
+                    });                                
+
                     if(this._componentMounted){
                         this.setState({
                             estimatedAmountToSwap: amountToSwapInUsd,
-                            amountToSwap: Number(e.target.value)
+                            amountToSwap: Number(inputValue)
                         });
                     }
                 }
@@ -353,9 +430,15 @@ export default class SmartSwap extends PureComponent {
             // amountToSwap will be in native token
             if(this.props.selectedInputMode === this.props.inputModes[1]){
                 if(this._componentMounted){
+                    console.log({
+                        calc: "setAmount token mode",
+                        estimatedAmountToSwap: Number(inputValue),
+                        amountToSwap: Number(inputValue)
+                    });
+
                     this.setState({
-                        estimatedAmountToSwap: Number(e.target.value),
-                        amountToSwap: Number(e.target.value)
+                        estimatedAmountToSwap: Number(inputValue),
+                        amountToSwap: Number(inputValue)
                     });
                 }
             }
@@ -370,27 +453,22 @@ export default class SmartSwap extends PureComponent {
         if(fromChainId === null || toChainId === null){
             return;
         }
-        const uri = apisEndpoints('estimateGasAndFees', {
-            fromChainId: fromChainId,
-            toChainId: toChainId
-        });
 
-        await axios.get(uri).then(async(res) => {
-            const response = res.data;
-            if(response?.result){
-                if(this._componentMounted){
-                    this.estimateGasAndFeesData = response;
-                    const fromNetworkConfig = _.find(this.props.networks, {
-                        chainId: this.context.chainIdNumber
-                    });
-                    if(fromNetworkConfig !== undefined){
-                        this.props.onGasFeeUpdate(response, fromNetworkConfig.nativeCurrencySymbol)
-                    }
+        const {response, code, error} = await SmartSwapApiHelper.getEstimateGasAndFees(fromChainId, toChainId);
+        if(code !== 200){
+            console.error("estimateGasAndFees", response, code, error);
+        }
+        if(code === 200){
+            if(this._componentMounted){
+                this.estimateGasAndFeesData = response;
+                const fromNetworkConfig = _.find(this.props.networks, {
+                    chainId: this.context.chainIdNumber
+                });
+                if(fromNetworkConfig !== undefined){
+                    this.props.onGasFeeUpdate(response, fromNetworkConfig.nativeCurrencySymbol, fromNetworkConfig.nativeCurrencyDecimals)
                 }
-            }
-        }).catch((err) => {
-            console.error("estimateGasAndFees", err.message);
-        });
+            }            
+        }
     }
 
     estimateProcessingFees = async() => {
@@ -399,33 +477,41 @@ export default class SmartSwap extends PureComponent {
         if(fromChainId === null || toChainId === null){
             return null;
         }
-
-        const uri = apisEndpoints('estimatedProcessingFees', {
-            fromChainId: fromChainId,
-            toChainId: toChainId
-        });
-
-        return await axios.get(uri).then(async(res) => {
-            const response = res.data;
+        
+        const {response, code, error} = await SmartSwapApiHelper.getEstimateProcessingFees(fromChainId, toChainId);     
+        if(code !== 200){
+            console.error("estimateProcessingFees", response, code, error);
+        }
+        if(code === 200){
             return response?.result ?? null;
-        }).catch((err) => {
-            console.error("estimateProcessingFees", err.message);
-        });
+        } else {
+            return null;            
+        }
     }
 
     swap = async() => {
         try {
+            this.setState({
+                btnClicked: true
+            });
+            await this.connectWallet();
             const {web3: web3Provider, chainIdNumber, account} = this.context;
             const {networks} = this.props;
             let {amountToSwap, estimatedAmountToSwap, toChainId} = this.state;
 
             if (amountToSwap === "" || amountToSwap === 0) {
                 notificationConfig.error("Enter value to swap");
+                this.setState({
+                    btnClicked: false
+                });
                 return;
             }
 
             if (estimatedAmountToSwap === "" || estimatedAmountToSwap === 0) {
                 notificationConfig.error("Enter value to swap");
+                this.setState({
+                    btnClicked: false
+                });
                 return;
             }
 
@@ -453,13 +539,18 @@ export default class SmartSwap extends PureComponent {
                 console.log('swap processingFee big number', processingFee);
                 const companyFeeRatio = await smartSwapContractInstance.getCompanyFeeRatio();
                 console.log('swap companyFeeRatio', companyFeeRatio);
-                const reimbursementFee = await reimbursementContractInstance.getLicenseeFee(activeNetworkConfig.licenseeAddress, smartSwapContract.address);
-                console.log('swap reimbursementFee', reimbursementFee);
-                const fee = bigInt(companyFeeRatio).add(reimbursementFee);
-                console.log('swap fee', fee);
+                const companyFee = bigInt(bigInt(amountToSwap).multiply(companyFeeRatio)).divide(1000);
+                console.log('swap companyFee from amount', companyFee);
+                const reimbursementFeeRatio = await reimbursementContractInstance.getLicenseeFee(activeNetworkConfig.licenseeAddress, smartSwapContract.address);
+                console.log('swap reimbursementFeeRatio', reimbursementFeeRatio);
+                const reimbursementFee = bigInt(bigInt(amountToSwap).multiply(reimbursementFeeRatio)).divide(1000);
+                console.log('swap reimbursementFee from amount', reimbursementFee);
+                const fee = bigInt(companyFee).add(reimbursementFee);
+                console.log('swap fee', fee.toString());
                 const totalFee = bigInt(processingFee).add(fee);
-                console.log('swap totalFee', totalFee);
+                console.log('swap totalFee', totalFee.toString());
                 const value = bigInt(amountToSwap).add(totalFee);
+                console.log('swap value without fee', amountToSwap.toString());
                 console.log('swap value', value.toString());
 
 
@@ -476,12 +567,11 @@ export default class SmartSwap extends PureComponent {
                     fee,
                     activeNetworkConfig.licenseeAddress,
                     (hash) => {
-                        this.setState({
-                            btnClicked: true,
-                            swapTxhash: hash,
-                        });
+                        // this.setState({
+                        //     swapTxhash: hash
+                        // });
                     },
-                    (response) => {
+                    async(response) => {
 
                         if (response.code >= 4001 && response.code <= 4901) {
                             // https://blog.logrocket.com/understanding-resolving-metamask-error-codes/#4001
@@ -530,6 +620,8 @@ export default class SmartSwap extends PureComponent {
                                 this.setState({
                                     swapTxhash:response.receipt.transactionHash
                                 });
+                                await this.getBalance();
+                                this.props.openLedger();
                             }
                         }
                                     
@@ -539,6 +631,8 @@ export default class SmartSwap extends PureComponent {
                             this.setState({
                                 swapTxhash: response.transactionHash
                             });
+                            await this.getBalance();
+                            this.props.openLedger();
                         }
 
                         this.setState({
@@ -550,11 +644,44 @@ export default class SmartSwap extends PureComponent {
 
             } else {
                 console.error("Something went wrong with web3 provider");
+                this.setState({
+                    btnClicked: false
+                });
             }
 
         } catch(err) {
             console.error("swap", err.message);
+            this.setState({
+                btnClicked: false
+            });
         }
+    }
+
+    decimalPointsFilter = (value) => {
+        if(this.props.selectedInputMode === this.props.inputModes[0]){
+            const decimalPointsFilter = value.match(/^(\d*\.{0,1}\d{0,2}$)/)
+            if (decimalPointsFilter === false) {
+                return false;
+            }
+            return true
+        }
+    }
+
+    reFetch = async() => {
+		try {
+			if(this._componentMounted){
+				const fetchCoingeckoMarketPrice = await this.fetchCoingeckoMarketPrice();
+				const timeOutPromise = new Promise(function (resolve, reject) {
+					setTimeout(resolve, 30000, 'Refetching token prices');
+				});
+		
+				Promise.all([fetchCoingeckoMarketPrice, timeOutPromise]).then(async (responses) => {
+                    await this.reFetch();
+				});
+			}
+		} catch (err){
+			console.error("reFetch", err.message);
+		}
     }
     
     render() {
@@ -569,9 +696,17 @@ export default class SmartSwap extends PureComponent {
         });
 
         // To network config - filter out from network then choose first element
-        const toNetworkConfig = (_.filter(this.props.networks, function(network) {
-            return network.chainId !== this.context.chainIdNumber;
-        }.bind(this)))[1];
+        let toNetworkConfig = null;
+        if(this.state.toChainId === null){
+            toNetworkConfig = (_.filter(this.props.networks, function(network) {
+                return network.chainId !== this.context.chainIdNumber;
+            }.bind(this)))[1];
+        } else {
+            toNetworkConfig = _.find(this.props.networks, {
+                chainId: this.state.toChainId
+            });
+        }
+
         const toNetworkTokenUsdValue = _.find(this.tokenUsdPrices, {chainId: toNetworkConfig?.chainId});
 
         // all options array
@@ -609,28 +744,40 @@ export default class SmartSwap extends PureComponent {
                 if(this.props.selectedInputMode === this.props.inputModes[0]){
                     const tokeUsdValue = toNetworkTokenUsdValue?.value ?? 0;
                     if(!isNaN(tokeUsdValue) && (tokeUsdValue > 0)){
-                        return toFixedWithoutRounding(this.state.amountToSwap / tokeUsdValue, 5);
+                        console.log({
+                            calc: "estimatedAmountToReceive dollar mode",
+                            ex: toFixedWithoutRounding(numberExponentToLarge(this.state.amountToSwap / tokeUsdValue), toNetworkConfig?.nativeCurrencyDecimals)
+                        });
+                        return toFixedWithoutRounding(numberExponentToLarge(this.state.amountToSwap / tokeUsdValue), toNetworkConfig?.nativeCurrencyDecimals);
                     } else {
-                        return toFixedWithoutRounding(0)
+                        return toFixedWithoutRounding(0, toNetworkConfig?.nativeCurrencyDecimals);
                     }
                 } else {
                     const tokeUsdValue = toNetworkTokenUsdValue?.value ?? 0;
                     if(!isNaN(tokeUsdValue) && (tokeUsdValue > 0)){
-                        return toFixedWithoutRounding(this.state.amountToSwap * (defaultFromSelectOption.nativeTokenUsdValue / tokeUsdValue), 5);
+                        console.log({
+                            calc: "estimatedAmountToReceive token mode",
+                            ex: toFixedWithoutRounding(numberExponentToLarge(this.state.amountToSwap * (defaultFromSelectOption.nativeTokenUsdValue / tokeUsdValue)), toNetworkConfig?.nativeCurrencyDecimals)
+                        });
+                        return toFixedWithoutRounding(numberExponentToLarge(this.state.amountToSwap * (defaultFromSelectOption.nativeTokenUsdValue / tokeUsdValue)), toNetworkConfig?.nativeCurrencyDecimals);
                     } else {
-                        return toFixedWithoutRounding(0)
+                        return toFixedWithoutRounding(0, toNetworkConfig?.nativeCurrencyDecimals);
                     }                    
                 }
             },
             amountToReceive: () => {
                 if(this.props.selectedInputMode === this.props.inputModes[0]){
-                    return this.state.amountToSwap;
+                    return toFixedWithoutRounding(numberExponentToLarge(this.state.amountToSwap), 2);
                 } else {
                     const tokeUsdValue = toNetworkTokenUsdValue?.value ?? 0;
                     if(!isNaN(tokeUsdValue) && (tokeUsdValue > 0)){
-                        return toFixedWithoutRounding(this.state.amountToSwap * (defaultFromSelectOption.nativeTokenUsdValue / tokeUsdValue), 5);
+                        console.log({
+                            calc: "amountToReceive token mode",
+                            ex: toFixedWithoutRounding(numberExponentToLarge(this.state.amountToSwap * (defaultFromSelectOption.nativeTokenUsdValue / tokeUsdValue)), toNetworkConfig?.nativeCurrencyDecimals)
+                        });    
+                        return toFixedWithoutRounding(numberExponentToLarge(this.state.amountToSwap * (defaultFromSelectOption.nativeTokenUsdValue / tokeUsdValue)), toNetworkConfig?.nativeCurrencyDecimals);
                     } else {
-                        return toFixedWithoutRounding(0);
+                        return toFixedWithoutRounding(0, toNetworkConfig?.nativeCurrencyDecimals);
                     }
                 }
             }, 
@@ -641,7 +788,7 @@ export default class SmartSwap extends PureComponent {
                             <>
                             <p className="font-11 color-light-n">
                                 You are swapping&nbsp;
-                                <span className="color-white">{this.props.selectedInputMode === this.props.inputModes[0] ? '$' : ''}{this.state.amountToSwap}</span>
+                                <span className="color-white">{this.props.selectedInputMode === this.props.inputModes[0] ? '$' : ''}{toFixedWithoutRounding(numberExponentToLarge(this.state.amountToSwap), activeNetworkConfig?.nativeCurrencyDecimals)}</span>
                                 &nbsp;of {defaultFromSelectOption.nativeTokenSymbol} to&nbsp;
                                 <span className="color-white">{this.props.selectedInputMode === this.props.inputModes[0] ? '$' : ''}{defaultToSelectOption.amountToReceive()}</span> 
                                 &nbsp;of {defaultToSelectOption.nativeTokenSymbol}  |  Estimated swap time:&nbsp;
@@ -683,18 +830,14 @@ export default class SmartSwap extends PureComponent {
         });
 
         const chainOptions = ({ children, ...props }) => (
-            <Option {...props}>
-                <span 
-                    //onClick={(e) => this.swapDirection(this.context.chainIdNumber, props.data.value)}
-                >
-                    <img
-                        src={props.data.icon}
-                        style={{ width: 15 }}
-                        alt={props.data.label}
-                        onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
-                    />
-                    {props.data.label}
-                </span>
+            <Option {...props} value={props.data.value}>
+                <img
+                    src={props.data.icon}
+                    style={{ width: 15 }}
+                    alt={props.data.label}
+                    onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
+                />
+                {props.data.label}
             </Option>
         );
         
@@ -711,7 +854,7 @@ export default class SmartSwap extends PureComponent {
         );
         
         const tokenOptions = ({ children, ...props }) => (
-            <Option {...props}>
+            <Option {...props} value={props.data.value}>
                 <img
                     src={props.data.nativeTokenIcon}
                     style={{ width: 15 }}
@@ -735,200 +878,205 @@ export default class SmartSwap extends PureComponent {
         );
 
         return (
-            <>
-                <div className=" form-group-n  items-center-n">
-                    <div className="flex-1 w-100-sm flex-auto-sm">
-                        <div className="inputs-wrap light-controls-n">
-                            <div className="inputs-wrap-control">
-                                <div className="input-box1">
-                                    <label htmlFor="" className="form-label">from</label>
-                                    <div className="i-outer">
-                                        <input
-                                            type="text"
-                                            className="form-control-n"
-                                            placeholder="0"
-                                            id="input04"
-                                            value={this.state.amountToSwap}
-                                            onKeyDown={(e) => Validation.floatOnly(e)}
-                                            onChange={(e) => this.setAmount(e)}
-                                            autoComplete="off"
+            <>  
+                {this.state.swapTxhash === null && 
+                <>
+                    <div className=" form-group-n  items-center-n">
+                        <div className="flex-1 w-100-sm flex-auto-sm">
+                            <div className="inputs-wrap light-controls-n">
+                                <div className="inputs-wrap-control">
+                                    <div className="input-box1">
+                                        <label htmlFor="" className="form-label">from</label>
+                                        <div className="i-outer">
+                                            <input
+                                                type="number"
+                                                step="any"
+                                                className="form-control-n"
+                                                placeholder={this.state.amountToSwap.length === 0 ? 0 : this.state.amountToSwap}
+                                                id="native-token-input"
+                                                value={this.state.amountToSwap}
+                                                onChange={(e) => this.setAmount(e)}
+                                                autoComplete="off"
+                                            />
+                                            <span className="currency-ic-n">
+                                                {
+                                                    this.props.selectedInputMode === this.props.inputModes[0]
+                                                        ? '$'
+                                                        : <img
+                                                            alt={defaultFromSelectOption.nativeTokenSymbol}
+                                                            style={{ width: '20px' }}
+                                                            src={defaultFromSelectOption.nativeTokenIcon}
+                                                        ></img>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="input-box2">
+                                        <label htmlFor="" className="form-label">BLOCKCHAIN</label>
+                                        <Select
+                                            value={defaultFromSelectOption}
+                                            onChange={(e) => this.swapDirection(e.value)}
+                                            options={supportedChainSelectOptions}
+                                            filterOption={(option) => option.value !== null && option.value !== this.context.chainIdNumber}
+                                            components={{ Option: chainOptions, SingleValue: singleChain }}
+                                            styles={selectElementStyleOptions("light")}
                                         />
-                                        <span className="currency-ic-n">
-                                            {
-                                                this.props.selectedInputMode === this.props.inputModes[0]
-                                                    ? '$'
-                                                    : <img
-                                                        alt={defaultFromSelectOption.nativeTokenSymbol}
-                                                        style={{ width: '20px' }}
-                                                        src={defaultFromSelectOption.nativeTokenIcon}
-                                                    ></img>
-                                            }
-                                        </span>
+                                    </div>
+                                    <div className="input-box2">
+                                        <label htmlFor="" className="form-label">TOKEN</label>
+                                        <Select
+                                            value={defaultFromSelectOption}
+                                            onChange={(e) => this.swapDirection(e.value)}
+                                            options={supportedChainSelectOptions}
+                                            filterOption={(option) => option.value !== null && option.value !== this.context.chainIdNumber}
+                                            components={{ Option: tokenOptions, SingleValue: singleToken }}
+                                            styles={selectElementStyleOptions("light")}
+                                        />
                                     </div>
                                 </div>
-                                <div className="input-box2">
-                                    <label htmlFor="" className="form-label">BLOCKCHAIN</label>
-                                    <Select
-                                        value={defaultFromSelectOption}
-                                        onChange={(e) => { return false; }}
-                                        options={supportedChainSelectOptions}
-                                        filterOption={(option) => option.value !== null}
-                                        components={{ Option: chainOptions, SingleValue: singleChain }}
-                                        styles={selectElementStyleOptions("light")}
-                                    />
-                                </div>
-                                <div className="input-box2">
-                                    <label htmlFor="" className="form-label">TOKEN</label>
-                                    <Select
-                                        value={defaultFromSelectOption}
-                                        onChange={(e) => { return false; }}
-                                        options={supportedChainSelectOptions}
-                                        filterOption={(option) => option.value !== null}
-                                        components={{ Option: tokenOptions, SingleValue: singleToken }}
-                                        styles={selectElementStyleOptions("light")}
-                                    />
-                                </div>
+                            </div>
+                            <div className="d-flex jc-sb">
+                                <p className="form-label font-normal mb-0">≈ {toFixedWithoutRounding(numberExponentToLarge(this.state.estimatedAmountToSwap), activeNetworkConfig?.nativeCurrencyDecimals)} | 1 {defaultFromSelectOption.nativeTokenSymbol} : ${defaultFromSelectOption.nativeTokenUsdValue}</p>
+                                {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
+                                <p className="form-label font-normal mb-0">
+                                    Balance: {this.state.userBalance} {defaultFromSelectOption.nativeTokenSymbol}&nbsp;
+                                    <span onClick={(e) => this.setMaxAmount()} className="color-green">MAX</span>
+                                </p>
                             </div>
                         </div>
-                        <div className="d-flex jc-sb">
-                            <p className="form-label font-normal mb-0">≈ {toFixedWithoutRounding(this.state.estimatedAmountToSwap, 5)} | 1 {defaultFromSelectOption.nativeTokenSymbol} : ${defaultFromSelectOption.nativeTokenUsdValue}</p>
-                            {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
-                            <p className="form-label font-normal mb-0">
-                                Balance: {this.state.userBalance} {defaultFromSelectOption.nativeTokenSymbol}&nbsp;
-                                <span onClick={(e) => this.setMaxAmount()} className="color-green">MAX</span>
-                            </p>
+                        <div className="form-ic">
+                            <a className="grey-arrow"
+                                href
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    this.swapDirection(defaultToSelectOption.value);
+                                }}
+                            >
+                                <img width="22" src={Swap} alt="" />
+                            </a>
+                            <a className="green-arrow"
+                                href
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    this.swapDirection(defaultToSelectOption.value);
+                                }}
+                            >
+                                <img width="22" src={Swap} alt="" />
+                            </a>
                         </div>
-                    </div>
-                    <div className="form-ic">
-                        <a className="grey-arrow"
-                            href
-                            onClick={(e) => {
-                                e.preventDefault();
-                                this.swapDirection(this.context.chainIdNumber, defaultToSelectOption.value);
-                            }}
-                        >
-                            <img width="22" src={Swap} alt="" />
-                        </a>
-                        <a className="green-arrow"
-                            href
-                            onClick={(e) => {
-                                e.preventDefault();
-                                this.swapDirection(this.context.chainIdNumber, defaultToSelectOption.value);
-                            }}
-                        >
-                            <img width="22" src={Swap} alt="" />
-                        </a>
-                    </div>
-                    <div className="flex-1 w-100-sm flex-auto-sm">
-                        <div className="inputs-wrap dark-controls-n">
-                            <div className="inputs-wrap-control">
-                                <div className="input-box1 ver2">
-                                    <label htmlFor="" className="form-label">to</label>
-                                    <div className="i-outer">
-                                        <input
-                                            type="text"
-                                            className="form-control-n"
-                                            placeholder="0"
-                                            disabled={true}
-                                            readOnly={true}
-                                            value={defaultToSelectOption.amountToReceive()}
+                        <div className="flex-1 w-100-sm flex-auto-sm">
+                            <div className="inputs-wrap dark-controls-n">
+                                <div className="inputs-wrap-control">
+                                    <div className="input-box1 ver2">
+                                        <label htmlFor="" className="form-label">to</label>
+                                        <div className="i-outer">
+                                            <input
+                                                type="text"
+                                                className="form-control-n"
+                                                placeholder="0"
+                                                disabled={true}
+                                                readOnly={true}
+                                                value={defaultToSelectOption.amountToReceive()}
+                                            />
+                                            <span className="currency-ic-n ver2">
+                                                {
+                                                    this.props.selectedInputMode === this.props.inputModes[0]
+                                                        ? '$'
+                                                        : <img
+                                                            alt={defaultToSelectOption.nativeTokenSymbol}
+                                                            style={{ width: '20px' }}
+                                                            src={defaultToSelectOption.nativeTokenIcon}
+                                                        ></img>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="input-box2 ver2">
+                                        <label htmlFor="" className="form-label">BLOCKCHAIN</label>
+                                        <Select
+                                            value={defaultToSelectOption}
+                                            onChange={(e) => this.changeToDirection(e.value)}
+                                            options={supportedChainSelectOptions}
+                                            filterOption={(option) => ((option.value !== null) && (option.value !== defaultFromSelectOption.value)) }
+                                            components={{ Option: chainOptions, SingleValue: singleChain }}
+                                            styles={selectElementStyleOptions("dark")}
                                         />
-                                        <span className="currency-ic-n ver2">
-                                            {
-                                                this.props.selectedInputMode === this.props.inputModes[0]
-                                                    ? '$'
-                                                    : <img
-                                                        alt={defaultToSelectOption.nativeTokenSymbol}
-                                                        style={{ width: '20px' }}
-                                                        src={defaultToSelectOption.nativeTokenIcon}
-                                                    ></img>
-                                            }
-                                        </span>
+                                    </div>
+                                    <div className="input-box2 ver2">
+                                        <label htmlFor="" className="form-label">TOKEN</label>
+                                        <Select
+                                            value={defaultToSelectOption}
+                                            onChange={(e) => this.changeToDirection(e.value)}
+                                            options={supportedChainSelectOptions}
+                                            filterOption={(option) => ((option.value !== null) && (option.value !== defaultFromSelectOption.value)) }
+                                            components={{ Option: tokenOptions, SingleValue: singleToken }}
+                                            styles={selectElementStyleOptions("dark")}
+                                        />
                                     </div>
                                 </div>
-                                <div className="input-box2 ver2">
-                                    <label htmlFor="" className="form-label">BLOCKCHAIN</label>
-                                    <Select
-                                        value={defaultToSelectOption}
-                                        onChange={(e) => { return false; }}
-                                        options={supportedChainSelectOptions}
-                                        filterOption={(option) => option.value !== null}
-                                        components={{ Option: chainOptions, SingleValue: singleChain }}
-                                        styles={selectElementStyleOptions("dark")}
-                                    />
-                                </div>
-                                <div className="input-box2 ver2">
-                                    <label htmlFor="" className="form-label">TOKEN</label>
-                                    <Select
-                                        value={defaultToSelectOption}
-                                        onChange={(e) => { return false; }}
-                                        options={supportedChainSelectOptions}
-                                        filterOption={(option) => option.value !== null}
-                                        components={{ Option: tokenOptions, SingleValue: singleToken }}
-                                        styles={selectElementStyleOptions("dark")}
-                                    />
-                                </div>
+                            </div>
+                            <div className="d-flex jc-sb">
+                                <p className="form-label font-normal mb-0">≈ {defaultToSelectOption?.estimatedAmountToReceive()} | 1 {defaultToSelectOption.nativeTokenSymbol} : ${defaultToSelectOption.nativeTokenUsdValue}</p>
+                                {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
                             </div>
                         </div>
-                        <div className="d-flex jc-sb">
-                            <p className="form-label font-normal mb-0">≈ {defaultToSelectOption?.estimatedAmountToReceive()} | 1 {defaultToSelectOption.nativeTokenSymbol} : ${defaultToSelectOption.nativeTokenUsdValue}</p>
-                            {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
+                    </div>
+                    <div className="text-center ">
+                        {   this.context.isAuthenticated === false && 
+                            <button className="native-btn ani-1 connect-wallet" onClick={(e) => this.connectWallet()}>
+                                CONNECT YOUR WALLET
+                            </button>
+                        }
+                        {
+                            this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) !== activeNetworkConfig?.chainId ?? null) && 
+                            <button className="native-btn ani-1 connect btn-unsupported">
+                                <span className="currency">
+                                    <img 
+                                        style={{filter: 'none', width: '30px', height: '30px'}}
+                                        src={('/images/free-listing/chains/default.png').toLowerCase()}
+                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
+                                        alt='UNSUPPORTED NETWORK'
+                                    ></img>
+                                </span>
+                                <span>UNSUPPORTED NETWORK</span>
+                            </button>
+                        }
+                        {   this.context.isAuthenticated === true && defaultFromSelectOption.value === this.context.chainIdNumber &&
+                            <button disabled={this.state.btnClicked} className="native-btn ani-1 connect" onClick={(e) => this.swap()}>
+                                <span className="currency">
+                                    <img
+                                        style={{filter: 'none'}}
+                                        alt={defaultFromSelectOption.nativeTokenSymbol}
+                                        src={defaultFromSelectOption.nativeTokenIcon}
+                                    ></img>
+                                </span>
+
+                                {this.state.btnClicked === false ? 'SWAP' : 'Swapping'}
+                                {this.state.btnClicked === true &&
+                                <LoopCircleLoading
+                                    height={"20px"}
+                                    width={"20px"}
+                                    color={"#ffffff"}
+                                />
+                                }
+                            </button>
+                        }
+
+                        <div className="swap-outer">
+                            {defaultToSelectOption.swapInfoText()}
                         </div>
+
                     </div>
-                </div>
-                <div className="text-center ">
-                    {   this.context.isAuthenticated === false && 
-                        <button className="native-btn ani-1 connect-wallet" onClick={(e) => this.connectWallet()}>
-                            CONNECT YOUR WALLET
-                        </button>
-                    }
-                    {
-                        this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) !== activeNetworkConfig?.chainId ?? null) && 
-                        <button className="native-btn ani-1 connect">
-                            <span className="currency">
-                                <img 
-                                    style={{filter: 'none', width: '30px', height: '30px'}}
-                                    src={('/images/free-listing/chains/default.png').toLowerCase()}
-                                    onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
-                                    alt='UNSUPPORTED NETWORK'
-                                ></img>
-                            </span>
-                            UNSUPPORTED NETWORK
-                        </button>
-                    }
-                    {   this.context.isAuthenticated === true && defaultFromSelectOption.value === this.context.chainIdNumber &&
-                        <button className="native-btn ani-1 connect" onClick={(e) => this.swap()}>
-                            <span className="currency">
-                                <img
-                                    style={{filter: 'none'}}
-                                    alt={defaultFromSelectOption.nativeTokenSymbol}
-                                    src={defaultFromSelectOption.nativeTokenIcon}
-                                ></img>
-                            </span>
+                </>
+                }
 
-                            {this.state.btnClicked === false ? 'SWAP' : 'Swapping'}
-                            {this.state.btnClicked === true &&
-                            <LoopCircleLoading
-                                height={"20px"}
-                                width={"20px"}
-                                color={"#ffffff"}
-                            />
-                            }
-                        </button>
-                    }
-
-                    <div className="swap-outer">
-                        {defaultToSelectOption.swapInfoText()}
-                    </div>
-
-                </div>
-
-                
-                {/* <div className="success-msg">
+                {this.state.swapTxhash !== null &&
+                    <div className="success-msg">
                         <i className="fas fa-check"></i>
                         <h4>Swap sent successfully</h4>
                         <p>Check the ledger below</p>
-                    </div> */}
+                    </div>
+                }
             </>
         )
     }
