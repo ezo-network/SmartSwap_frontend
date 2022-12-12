@@ -3182,13 +3182,13 @@ a.dc-file:hover { color: #0303ff; }
 .inputIcon.black i { background: #21232b; } 
 .d-none { display: none !important; } 
 
-.tabCol figure { text-align: center; padding: 30px 0 0; } 
-.figIcon { background: #fff; border-radius: 100px; width: 110px; height: 110px; display: inline-flex; align-items: center; justify-content: center; } 
+.tabCol figure { text-align: center; padding: 30px 0; } 
+.figIcon { background: #fff; border-radius: 100px; width: 80px; height: 80px; display: inline-flex; align-items: center; justify-content: center; } 
 .figIcon img { height: 65px; margin-right: -10px; } 
 .tabCol figure figcaption { margin-top: 17px; } 
 .tabCol figure figcaption span { color: #aaa; } 
 .tabCol figure figcaption span:first-child::after { content:""; border-left: 1px solid #000; border-right: 1px solid #373c47; display: inline-block; vertical-align: top; width: 0; margin: 0 10px; height: 20px; } 
-.btn { color: #FFF; font-weight: 700; padding: 25px 24px; font-size: 24px; display: inline-block; cursor: pointer; text-align: center; border-radius: 0 !important; width:100%; margin-top: 16px; } 
+.btn { color: #FFF; font-weight: 700; padding: 20px 24px; font-size: 24px; display: inline-block; cursor: pointer; text-align: center; border-radius: 0 !important; width:100%; margin-top: 16px; } 
 .btn.btn-primary { background-color: inherit; border: 2px solid #91dc27; box-shadow: 0px 0px 10px #91dc27; } 
 .btn.btn-primary:hover { background: #91dc27; } 
 .btn.btn-secondary { background-color: inherit; border: 2px solid #9d9d9d; box-shadow: 0px 0px 10px #9d9d9d; } 
@@ -3314,3 +3314,17 @@ a.dc-file:hover { color: #0303ff; }
 .tab-container.hasSidebar .powertextBX-links {display: flex;}
 .tab-container.hasSidebar .powertextBX-links .help-circle {font-size: 10px;}
 .tab-container.hasSidebar .powertextBX-links.estimated {display: none;}
+
+/** hide spinners arrow from number input type */
+#native-token-input[type=number]::-webkit-inner-spin-button, 
+#native-token-input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+.btn-unsupported {
+  background: #f00 !important;
+  border: 0;
+  box-shadow: none;
+  -webkit-box-shadow: 0 0 12px 5px rgba(255,0,0,0.5);
+  box-shadow: 0 0 12px 5px rgba(255,0,0,0.5);
+}

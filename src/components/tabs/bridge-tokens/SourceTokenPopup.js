@@ -118,7 +118,7 @@ export default class SourceTokenPopup extends PureComponent {
                     notificationConfig.success(errors.tokenImported);
                     if(this._componentMounted === true){
                         await this.props.onCustomTokenBalanceCheck(this.state.filteredToken).then(async() => {
-                            if(this.props.customTokenBalance == 0 || this.props.customTokenBalance === null){
+                            if(this.props.customTokenBalance === 0 || this.props.customTokenBalance === null){
                                 notificationConfig.error(errors.tokenCouldNotList);
                             }
                         });
@@ -130,7 +130,7 @@ export default class SourceTokenPopup extends PureComponent {
         if(error === 'A TOKEN ALREADY EXIST'){
             if(this._componentMounted === true){
                 await this.props.onCustomTokenBalanceCheck(this.state.filteredToken).then(async() => {
-                    if(this.props.customTokenBalance == 0 || this.props.customTokenBalance === null){
+                    if(this.props.customTokenBalance === 0 || this.props.customTokenBalance === null){
                         notificationConfig.error(errors.tokenCouldNotList);
                     }
                 });

@@ -105,6 +105,27 @@ class SmartSwapContract extends EventEmitter {
             // var payload = `0xe0e45f0e${pad32Bytes(swap)}${pad32Bytes(tokenA)}${pad32Bytes(tokenB)}${pad32Bytes(receiver)}${pad32Bytes(amountA)}${pad32Bytes(licenseeAddress)}${pad32Bytes(0)}${pad32Bytes(0)}${pad32Bytes(0)}${pad32Bytes(fee)}`
             // console.log('payload', payload);
 
+            console.log([
+                "address", // tokenA
+                "address", // tokenB
+                "address", // receiver
+                "uint256", // amountA
+                "address", // licensee
+                "bool", // isInvestment
+                "uint256", // minimumAmountToClaim
+                "uint256", // limitPice
+                "uint256" // fee
+            ], [
+                tokenA,
+                tokenB,
+                this.walletAddress,
+                amountA.toString(),
+                licenseeAddress,
+                false,
+                0,
+                0,
+                fee.toString()
+            ]);
 
             let payload = ethers.utils.defaultAbiCoder.encode([
                 "address", // tokenA

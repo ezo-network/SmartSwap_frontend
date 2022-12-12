@@ -9,6 +9,7 @@ import SourceTokenPopup from "./SourceTokenPopup";
 import DestinationTokensPopup from "./DestinationTokensPopup";
 import CheckAuthenticityPopup from "./CheckAuthenticityPopup";
 
+import AuthorityServerApiHelper from "../../../helper/authorityServerApiHelper";
 import BridgeApiHelper from "../../../helper/bridgeApiHelper";
 import BridgeContract from "../../../helper/bridgeContract";
 import ERC20TokenContract from "../../../helper/erc20TokenContract";
@@ -30,7 +31,7 @@ const defaultSourceTokenData = {
     symbol:  'Choose token',
     chainId: undefined,
     chain: 'CUSTOM',
-    amount: 0,
+    amount: '',
     address: null,
     isWrappedToken: false,
     balance: 0,
@@ -61,7 +62,7 @@ export default class BridgeSwap extends PureComponent {
                 symbol:  'Choose token',
                 chainId: undefined,
                 chain: 'CUSTOM',
-                amount: 0,
+                amount: '',
                 address: null,
                 isWrappedToken: false,
                 balance: 0,
@@ -980,11 +981,122 @@ export default class BridgeSwap extends PureComponent {
         }
     }
 
+    claimToken = async(depositTxHash, depositTokenNetwork) => {
+        try {
+            console.log('send claim');
+            await this.context.connectWallet();            
+            const {response, code, error} = await AuthorityServerApiHelper.getAuthoritySignature(depositTxHash, depositTokenNetwork);
+            if(code === 200){
+                // check for allowence and approval
+                const networkConfig = _.find(this.state.networks, {chainId: this.context.chainIdNumber});
+                if(networkConfig !== undefined){
+                    const bridgeContract = new BridgeContract(this.context.web3, this.context.account, networkConfig.bridgeContractAddress);
+
+                    await bridgeContract.claimToken(
+                        response.originalToken,
+                        response.originalChainID,
+                        depositTxHash,
+                        response.to,
+                        response.value,
+                        response.originalChainID,
+                        response.signature,
+                        async (hash) => {
+                            console.log({
+                                hash: hash
+                            });
+                        },
+                        async (response) => {
+                            console.log(response)
+                            
+                            if (response.code >= 4001 && response.code <= 4901) {
+                                // https://blog.logrocket.com/understanding-resolving-metamask-error-codes/#4001
+                                notificationConfig.error(response.message);
+                            }
+    
+                            if (response.code === "ACTION_REJECTED") {
+                                notificationConfig.error(response.reason);
+                            }
+                    
+                            if (response.code === "UNPREDICTABLE_GAS_LIMIT") {
+                                notificationConfig.error(response.reason);
+                            }
+                    
+                            if (response.code === -32016) {
+                                notificationConfig.error(response.message);
+                            }
+                    
+                            if (response.code === -32000){
+                                notificationConfig.error("Intrinsic gas too low");
+                            }
+    
+                            if(response.code === -32603){
+                                notificationConfig.error("execution reverted: TransferHelper: TRANSFER_FROM_FAILED");                        
+                            }
+                    
+                            if(response.code === 'NOT_A_CONTRACT'){
+                                notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', networkConfig.bridgeContractAddress));
+                            }
+                    
+                            if(
+                                response.code === 'CALL_EXCEPTION' 
+                                || response.code === 'INSUFFICIENT_FUNDS' 
+                                || response.code === 'NETWORK_ERROR' 
+                                || response.code === 'NONCE_EXPIRED' 
+                                || response.code === 'REPLACEMENT_UNDERPRICED'
+                                || response.code === 'UNPREDICTABLE_GAS_LIMIT'
+                            ){
+                                notificationConfig.error(response.reason);            
+                            }
+                    
+                            if(response.code === 'TRANSACTION_REPLACED'){
+                                if(response.cancelled === false && response.receipt?.transactionHash){
+                                    //response.receipt.transactionHash,
+                                    notificationConfig.success('Swapped Successfully!');
+                                    //await this.updateSourceTokenBalance();
+                                }
+                            }
+                                        
+                            if(response.status === 1) {
+                                //response.transactionHash
+                                notificationConfig.success('Swapped Successfully!');
+                                //await this.updateSourceTokenBalance();
+                            }
+    
+                            this.setState({
+                                btnClicked: false
+                                //btnAction: btnAction
+                            });
+                        }
+                    ); 
+
+                }
+
+            } else {
+                console.log(error)
+                // if(error.includes('Confirming:')){
+                //     notificationConfig.info("warning", "Please wait!, Deposit token transaction is not yet confirmed completely"); 
+                //     return
+                // }
+
+                // if(error.includes('Wrong transaction:')){
+                //     notificationConfig.info("error", "Wrong deposit token transaction"); 
+                //     return                    
+                // }
+            }
+        } catch(err) {
+            console.error({
+                claimToken: err.message
+            })
+        }
+    }
+
     filterTokenByWalletBalance = async () => {
         try {
             this.setState({
                 tokensWithBalance: []
             });
+
+            await this.context.connectWallet();
             
             const groupedTokenByNetwork = this.state.tokens.reduce(function (r, token) {
                 r[token.chainId] = r[token.chainId] || [];
@@ -1007,7 +1119,6 @@ export default class BridgeSwap extends PureComponent {
     tokenAddressCallback = async() => {
         await this.getTokenList().then(async() => {
             await this.filterTokenByWalletBalance();
-
         });
     }
 
@@ -1067,7 +1178,13 @@ export default class BridgeSwap extends PureComponent {
                                     alt="from-token-input-icon"
                                 ></img>
                             </i>
-                            <input className="from-token-input" type="text" onChange={(e) => this.setAmount(e.target.value)} value={this.state.sourceTokenData.amount} placeholder="0"></input>
+                            <input 
+                                className="from-token-input" 
+                                type="text" 
+                                onChange={(e) => this.setAmount(e.target.value)} 
+                                value={this.state.sourceTokenData.amount} 
+                                placeholder="0"
+                            ></input>
                         </div>
                         <figure className="from-token-selector" onClick={(e) => this.toggleSourceTokenPopup('OPEN')}>
                             <div className="figIcon">
@@ -1101,7 +1218,7 @@ export default class BridgeSwap extends PureComponent {
                                     alt="to-token-input-icon"
                                 ></img>
                             </i>
-                            <input className="to-token-input" type="text" value={this.state.destinationTokenData.amount} readOnly></input>
+                            <input className="to-token-input" type="text" placeholder="0" value={this.state.destinationTokenData.amount} readOnly></input>
                         </div>
                         <figure className="to-token-selector" onClick={(e) => this.toggleDestinationTokensPopup()}>
                             <div className="figIcon">
@@ -1125,14 +1242,14 @@ export default class BridgeSwap extends PureComponent {
                     }
                     {
                         this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) !== sourceNetworkConfig?.chainId ?? null) && 
-                        <button className="btn btn-switch">
+                        <button className="btn btn-unsupported" onClick={(e) => e.preventDefault()}>
                             <div className="btn-container">
                                 <img 
                                     src={'/images/free-listing/chains/' + (this.state.sourceTokenData.chain + '.png').toLowerCase()}
                                     onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
                                     alt={this.state.sourceTokenData.chain}
                                 ></img>
-                                UNSUPPORTED NETWORK
+                                <span>UNSUPPORTED NETWORK</span>
                             </div>
                         </button>                        
                     }
@@ -1220,7 +1337,7 @@ export default class BridgeSwap extends PureComponent {
                     <div className="powertextBX">
                         <p className="poweredBy">
                             Powered by
-                            <img src={SmartExchange} />
+                            <img alt="smart exchange" src={SmartExchange} />
                             {/* <a href="#">Start new swap</a> */}
                         </p>
                         <div className="powertextBX-links">

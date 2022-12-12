@@ -1,36 +1,17 @@
 import axiosRequest from './axiosRequest';
-const apiEndpoints = {
-    'isProjectExist': 'customer/project-exist',
-    'createNewProject': 'customer/create-project',
-    'project': 'customer/project',
-    'projects': 'customer/projects',
-    'bridge': 'public/bridge',
-    'bridges': 'public/bridges',
-    'getWappedTokens': 'customer/wrapped-tokens',
-    'networks': 'public/networks',
-    'tokens': 'public/tokens',
-    'activateToken': 'customer/activate-token',
-    'attachWrappedToken': 'customer/attach-wrap-token',
-    'getEmailStatus': 'customer/get-email-status',
-    'addEmailAddress': 'customer/add-email-address',
-    'getValidatorFileInfo': 'public/validator-file-info',
-    'makeTransferWrapTokenOwnershipRequest': 'customer/transfer-wrap-token-ownership-request',
-    'addValidator': 'customer/add-validator',
-    'getValidator': 'customer/get-validator',
-    'getOwnershipRequests': 'public/ownership-requests',
-    'addErc20Token': 'customer/add-erc20-token'
-}
+import CONSTANT from '../constants';
 
 const BridgeApiHelper = {
-    
-    getValidatorFileInfo: async() => {
+
+    getValidatorFileInfo: async () => {
         let response, error, code;
         try {
             const result = await axiosRequest.request({
-                path: apiEndpoints.getValidatorFileInfo
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.getValidatorFileInfo
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -44,37 +25,38 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
     },
 
-    isProjectExist: async(chainId = null, sourceTokenAddress = null, cancelToken) => {
+    isProjectExist: async (chainId = null, sourceTokenAddress = null, cancelToken) => {
         let response, error, code;
         try {
-            if(chainId === null || sourceTokenAddress === null){
+            if (chainId === null || sourceTokenAddress === null) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.isProjectExist + `?chainId=${chainId}&sourceTokenAddress=${sourceTokenAddress}`,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.isProjectExist + `?chainId=${chainId}&sourceTokenAddress=${sourceTokenAddress}`,
                 cancelToken: cancelToken
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -88,37 +70,38 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
     },
 
-    getProject: async(chainId = null, sourceTokenAddress = null, cancelToken) => {
+    getProject: async (chainId = null, sourceTokenAddress = null, cancelToken) => {
         let response, error, code;
         try {
-            if(chainId === null || sourceTokenAddress === null){
+            if (chainId === null || sourceTokenAddress === null) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.project + `?chainId=${chainId}&tokenAddress=${sourceTokenAddress}`,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.project + `?chainId=${chainId}&tokenAddress=${sourceTokenAddress}`,
                 cancelToken: cancelToken
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -132,36 +115,37 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
     },
 
-    getValidator: async(walletAddress = null) => {
+    getValidator: async (walletAddress = null) => {
         let response, error, code;
         try {
-            if(walletAddress === null){
+            if (walletAddress === null) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.getValidator + `?walletAddress=${walletAddress}`,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.getValidator + `?walletAddress=${walletAddress}`,
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -175,41 +159,42 @@ const BridgeApiHelper = {
                 }
             }
 
-        }  catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
-        }      
+        }
     },
 
-    addValidator: async(walletAddress = null, validatorAddress = null) => {
+    addValidator: async (walletAddress = null, validatorAddress = null) => {
         let response, error, code;
         try {
-            if(walletAddress === null || validatorAddress === null){
+            if (walletAddress === null || validatorAddress === null) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.addValidator,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.addValidator,
                 method: "POST",
                 data: {
                     walletAddress: walletAddress,
                     validatorAddress: validatorAddress
-                }                
+                }
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -223,37 +208,38 @@ const BridgeApiHelper = {
                 }
             }
 
-        }  catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
-        }      
+        }
     },
 
-    getBridge: async(chainId = null, cancelToken) => {
+    getBridge: async (chainId = null, cancelToken) => {
         let response, error, code;
         try {
-            if(chainId === null){
+            if (chainId === null) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.bridge + `?chainId=${chainId}`,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.bridge + `?chainId=${chainId}`,
                 cancelToken: cancelToken
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -267,27 +253,28 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
-    },    
+    },
 
-    getBridges: async() => {
+    getBridges: async () => {
         let response, error, code;
         try {
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.bridges,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.bridges,
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -301,47 +288,48 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
-    },    
+    },
 
-    createNewProject: async(creatorAddress = null, sourceToken = null, sourceTokenAddress = null, sourceChain = null, sourceChainId = null, decimals = null, txHash = null) => {
+    createNewProject: async (creatorAddress = null, sourceToken = null, sourceTokenAddress = null, sourceChain = null, sourceChainId = null, decimals = null, txHash = null) => {
         let response, error, code;
         try {
-            if(
-                creatorAddress === null 
-                || 
+            if (
+                creatorAddress === null
+                ||
                 sourceToken === null
-                || 
+                ||
                 sourceTokenAddress === null
-                || 
+                ||
                 sourceChain === null
-                || 
+                ||
                 sourceChainId === null
                 ||
                 decimals === null
                 ||
                 txHash === null
-            ){
+            ) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.createNewProject,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.createNewProject,
                 method: "POST",
                 data: {
                     creatorAddress: creatorAddress,
@@ -354,7 +342,7 @@ const BridgeApiHelper = {
                 }
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -368,42 +356,43 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
-    },    
+    },
 
-    getWrappedTokens: async(projectId = null, creatorAddress = null, all = false, cancelToken) => {
+    getWrappedTokens: async (projectId = null, creatorAddress = null, all = false, cancelToken) => {
         let response, error, code;
         try {
 
             let params = {};
 
-            if(projectId !== null){
+            if (projectId !== null) {
                 params['projectId'] = projectId
             }
 
-            if(creatorAddress !== null){
+            if (creatorAddress !== null) {
                 params['creatorAddress'] = creatorAddress
             }
 
-            params =  '?' + new URLSearchParams(params);
-            
+            params = '?' + new URLSearchParams(params);
+
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.getWappedTokens + params,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.getWappedTokens + params,
                 cancelToken: cancelToken
             });
-            
-            if(result !== undefined){
-                if(result.status === 200){
+
+            if (result !== undefined) {
+                if (result.status === 200) {
                     return {
                         response: result.data.data,
                         code: result.data.code,
@@ -418,50 +407,51 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
     },
 
-    getProjects: async(args = {}, cancelToken) => {
+    getProjects: async (args = {}, cancelToken) => {
         let response, error, code;
         try {
 
             let params = {};
 
-            if(args?.projectId){
+            if (args?.projectId) {
                 params['projectId'] = args.projectId
             }
 
-            if(args?.creatorAddress){
+            if (args?.creatorAddress) {
                 params['creatorAddress'] = args?.creatorAddress
             }
 
-            if(args?.chainId){
+            if (args?.chainId) {
                 params['chainId'] = args?.chainId
             }
 
-            if(args?.tokenAddress){
+            if (args?.tokenAddress) {
                 params['tokenAddress'] = args?.tokenAddress
             }
 
-            params =  '?' + new URLSearchParams(params);
-            
+            params = '?' + new URLSearchParams(params);
+
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.projects + params,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.projects + params,
                 cancelToken: cancelToken
             });
-            
-            if(result !== undefined){
-                if(result.status === 200){
+
+            if (result !== undefined) {
+                if (result.status === 200) {
                     return {
                         response: result.data.data,
                         code: result.data.code,
@@ -476,29 +466,69 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
     },
 
-    getNetworkList: async(cancelToken) => {
+    getNetworkList: async (cancelToken) => {
+        let response, error, code;
+        try {
+            
+            const result = await axiosRequest.request({
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.networks,
+                cancelToken: cancelToken
+            });
+
+            if (result !== undefined) {
+                if (result.status === 200) {
+                    return {
+                        response: result.data.data,
+                        code: result.data.code,
+                        error: undefined
+                    }
+                } else {
+                    return {
+                        response: undefined,
+                        code: result.data.code,
+                        error: result.data.error
+                    }
+                }
+            }
+
+
+        } catch (err) {
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response,
+            error,
+            code
+        }
+    },
+
+    getTokenList: async (cancelToken) => {
         let response, error, code;
         try {
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.networks,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.tokens,
                 cancelToken: cancelToken
             });
 
-            if(result !== undefined){
-                if(result.status === 200){
+            if (result !== undefined) {
+                if (result.status === 200) {
                     return {
                         response: result.data.data,
                         code: result.data.code,
@@ -513,74 +543,37 @@ const BridgeApiHelper = {
                 }
             }
 
-
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
     },
 
-    getTokenList: async(cancelToken) => {
+    activateToken: async (sourceTokenchainId, sourceTokenAddedTxHash) => {
         let response, error, code;
         try {
-
-            const result = await axiosRequest.request({
-                path: apiEndpoints.tokens,
-                cancelToken: cancelToken
-            });
-
-            if(result !== undefined){
-                if(result.status === 200){
-                    return {
-                        response: result.data.data,
-                        code: result.data.code,
-                        error: undefined
-                    }
-                } else {
-                    return {
-                        response: undefined,
-                        code: result.data.code,
-                        error: result.data.error
-                    }
-                }
-            }
-
-        } catch(err){
-            error = err;
-            code = 500;
-        }
-
-        return {
-            response, 
-            error,
-            code
-        }
-    },
-
-    activateToken: async(sourceTokenchainId, sourceTokenAddedTxHash) => {
-        let response, error, code;
-        try { 
-            if(sourceTokenchainId === null || sourceTokenAddedTxHash === null){
+            if (sourceTokenchainId === null || sourceTokenAddedTxHash === null) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.activateToken + `?chainId=${sourceTokenchainId}&txHash=${sourceTokenAddedTxHash}`,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.activateToken + `?chainId=${sourceTokenchainId}&txHash=${sourceTokenAddedTxHash}`,
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -592,41 +585,42 @@ const BridgeApiHelper = {
                     code: result.data.code,
                     error: result.data.error
                 }
-            }            
-        } catch(err){
+            }
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
     },
 
-    attachWrapTokenOnProject: async(toChainId = null, txHash = null, blockNumber = null) => {
+    attachWrapTokenOnProject: async (toChainId = null, txHash = null, blockNumber = null) => {
         let response, error, code;
 
-        if(
+        if (
             toChainId == null
             ||
             txHash == null
             ||
             blockNumber == null
-        ){
+        ) {
             error = 'mandatory parameters are missing';
             code = 422;
             return {
-                response, 
+                response,
                 error,
                 code
             }
         }
 
-        try { 
+        try {
             const result = await axiosRequest.request({
-                path: apiEndpoints.attachWrappedToken,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.attachWrappedToken,
                 method: 'POST',
                 data: {
                     toChainId: toChainId,
@@ -635,7 +629,7 @@ const BridgeApiHelper = {
                 }
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -649,43 +643,44 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
-        }    
+        }
     },
 
-    getEmailStatus: async(walletAddress = null, emailAddress = null) => {
+    getEmailStatus: async (walletAddress = null, emailAddress = null) => {
         let response, error, code;
         try {
 
             let queryString = `?walletAddress=${walletAddress}`;
 
-            if(walletAddress === null){
+            if (walletAddress === null) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
-            if(emailAddress !== null){
+            if (emailAddress !== null) {
                 queryString = queryString + `&emailAddress=${emailAddress}`;
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.getEmailStatus + queryString,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.getEmailStatus + queryString,
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -699,38 +694,39 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
     },
 
-    addEmailAddress: async(walletAddress = null, emailAddress = null) => {
+    addEmailAddress: async (walletAddress = null, emailAddress = null) => {
         let response, error, code;
         try {
 
-            if(
+            if (
                 walletAddress === null
-                || 
+                ||
                 emailAddress === null
-            ){
+            ) {
                 error = 'mandatory parameters are missing';
                 code = 422;
                 return {
-                    response, 
+                    response,
                     error,
                     code
                 }
             }
 
             const result = await axiosRequest.request({
-                path: apiEndpoints.addEmailAddress,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.addEmailAddress,
                 method: 'POST',
                 data: {
                     walletAddress: (walletAddress).toLowerCase(),
@@ -738,7 +734,7 @@ const BridgeApiHelper = {
                 }
             });
 
-            if(result.status === 201){
+            if (result.status === 201) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -752,23 +748,23 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
-    },    
+    },
 
 
-    makeTransferWrapTokenOwnershipRequest: async(tokenSymbol = null, chain = null, chainId = null, requesterAddress = null, hashMessage = null) => {
+    makeTransferWrapTokenOwnershipRequest: async (tokenSymbol = null, chain = null, chainId = null, requesterAddress = null, hashMessage = null) => {
         let response, error, code;
 
-        if(
+        if (
             tokenSymbol == null
             ||
             chain == null
@@ -778,19 +774,20 @@ const BridgeApiHelper = {
             requesterAddress == null
             ||
             hashMessage == null
-        ){
+        ) {
             error = 'mandatory parameters are missing';
             code = 422;
             return {
-                response, 
+                response,
                 error,
                 code
             }
         }
 
-        try { 
+        try {
             const result = await axiosRequest.request({
-                path: apiEndpoints.makeTransferWrapTokenOwnershipRequest,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.makeTransferWrapTokenOwnershipRequest,
                 method: 'POST',
                 data: {
                     token: tokenSymbol,
@@ -801,7 +798,7 @@ const BridgeApiHelper = {
                 }
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -815,47 +812,48 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
-        }    
+        }
     },
 
-    getOwnershipRequests: async(requesterAddress = null, status = null, token = null, chainId = null) => {
+    getOwnershipRequests: async (requesterAddress = null, status = null, token = null, chainId = null) => {
         let response, error, code;
         try {
 
             let params = {};
 
-            if(requesterAddress !== null){
+            if (requesterAddress !== null) {
                 params['requesterAddress'] = requesterAddress
             }
 
-            if(status !== null){
+            if (status !== null) {
                 params['status'] = status
             }
 
-            if(token !== null){
+            if (token !== null) {
                 params['token'] = token
             }
 
-            if(chainId !== null){
+            if (chainId !== null) {
                 params['chainId'] = chainId
             }
 
-            params =  '?' + new URLSearchParams(params);
-            
+            params = '?' + new URLSearchParams(params);
+
             const result = await axiosRequest.request({
-                path: apiEndpoints.getOwnershipRequests + params,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.getOwnershipRequests + params,
             });
 
-            if(result.status === 200){
+            if (result.status === 200) {
                 return {
                     response: result.data.data,
                     code: result.data.code,
@@ -869,38 +867,39 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
         }
-    },    
+    },
 
-    addErc20Token: async(chainId = null, tokenAddress = null) => {
+    addErc20Token: async (chainId = null, tokenAddress = null) => {
         let response, error, code;
 
-        if(
+        if (
             chainId == null
             ||
             tokenAddress == null
-        ){
+        ) {
             error = 'mandatory parameters are missing';
             code = 422;
             return {
-                response, 
+                response,
                 error,
                 code
             }
         }
 
-        try { 
+        try {
             const result = await axiosRequest.request({
-                path: apiEndpoints.addErc20Token,
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.addErc20Token,
                 method: 'POST',
                 data: {
                     chainId: chainId,
@@ -908,7 +907,7 @@ const BridgeApiHelper = {
                 }
             });
 
-            if(result.status === 201){
+            if (result.status === 201) {
                 return {
                     response: result.data.data,
                     code: result.status,
@@ -922,16 +921,16 @@ const BridgeApiHelper = {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             error = err;
             code = 500;
         }
 
         return {
-            response, 
+            response,
             error,
             code
-        }            
+        }
     }
 
 }

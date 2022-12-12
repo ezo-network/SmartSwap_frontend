@@ -39,4 +39,66 @@ CONSTANT.WEB_RPC_PROVIDER_BINANCE = Number(process.env.REACT_APP_ETH_CHAIN_ID) =
 CONSTANT.RPC_PROVIDER_POLYGON = Number(process.env.REACT_APP_POLYGON_CHAIN_ID) === 137 ? 'https://polygon-rpc.com' : 'https://matic-mumbai.chainstacklabs.com';
 
 
+// new integration - dynamic
+
+CONSTANT.HOST_TYPES = {
+    'SMARTEXCHANGE_DATABASE_INSTANCE': process.env.REACT_APP_SMARTEXCHANGE_DATABASE_INSTANCE ?? "",
+    'SMARTSWAP_API_INSTANCE': process.env.REACT_APP_SMARTSWAP_API_INSTANCE ?? ""
+}
+
+CONSTANT.API_ENDPOINTS = {
+    'SMARTEXCHANGE_DATABASE_INSTANCE': {
+        'BRIDGE_TOKENS': {
+            'isProjectExist': 'customer/project-exist',
+            'createNewProject': 'customer/create-project',
+            'project': 'customer/project',
+            'projects': 'customer/projects',
+            'bridge': 'public/bridge',
+            'bridges': 'public/bridges',
+            'getWappedTokens': 'customer/wrapped-tokens',
+            'networks': 'public/networks',
+            'tokens': 'public/tokens',
+            'activateToken': 'customer/activate-token',
+            'attachWrappedToken': 'customer/attach-wrap-token',
+            'getEmailStatus': 'customer/get-email-status',
+            'addEmailAddress': 'customer/add-email-address',
+            'getValidatorFileInfo': 'public/validator-file-info',
+            'makeTransferWrapTokenOwnershipRequest': 'customer/transfer-wrap-token-ownership-request',
+            'addValidator': 'customer/add-validator',
+            'getValidator': 'customer/get-validator',
+            'getOwnershipRequests': 'public/ownership-requests',
+            'addErc20Token': 'customer/add-erc20-token'
+        }, 
+        'NATIVE_TOKENS': {
+            'networks': 'public/active-smartswap-networks'           
+        }
+    },
+    'SMARTSWAP_API_INSTANCE': (type, args = {}) =>  {
+        const endpoints = {
+            estimateGasAndFees: () => {
+                return `swap-fee/${args?.fromChainId}-${args?.toChainId}`
+            },
+            estimatedProcessingFees: () => {
+                return `processing-fee/${args?.fromChainId}-${args?.toChainId}`            
+            },
+            ledgerHistoryByAddress: () => {
+                return `ledgers/${args?.accountAddress}`
+            },
+            ledgerHistoryBySwapRequestTransactionHash: () => {
+                return `ledgers/tx/${args?.transactionHash}`
+            }
+        }
+        return endpoints[type]();
+    },
+    '3RD_PARTY_APPS': {
+        'COIN_GECKO_API': {
+            tokensUsdPrice: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Cbinancecoin%2Ccardano%2Cpolkadot%2Cuniswap%2Cripple%2Cmatic-network&vs_currencies=USD&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true'
+        }
+    }
+    
+}
+
+CONSTANT.DEFAULT_AUTHORITY_SERVER = process.env.REACT_APP_DEFAULT_AUTHORITY_SERVER;
+
+
 export default CONSTANT;

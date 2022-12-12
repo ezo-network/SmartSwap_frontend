@@ -1,13 +1,13 @@
 import axios from 'axios';
+import CONSTANT from "../constants";
 
 export default class axiosRequest {
 
     static async request(args) {
 
         try {
-
-            let path = `/${args.path}`;
-            const url = `${process.env.REACT_APP_API_HOST}${path}`;
+            const path = `/${args.path}`;
+            const url = `${args.hostType}${path}`;
             let options = {
                 method: args.method || 'GET',
                 url,
