@@ -967,7 +967,7 @@ export default class SmartSwap extends PureComponent {
                         <div className="flex-1 w-100-sm flex-auto-sm">
                             <div className="inputs-wrap dark-controls-n">
                                 <div className="inputs-wrap-control">
-                                    <div className="input-box1 ver2">
+                                    <div className="input-box1 ver2 Subh">
                                         <label htmlFor="" className="form-label">to</label>
                                         <div className="i-outer">
                                             <input
@@ -1062,6 +1062,11 @@ export default class SmartSwap extends PureComponent {
                             </button>
                         }
 
+                        <p className='nativ-bottomTxt'>Estimated gas and fees: 
+                        <i className="help-circle">
+                            <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Slippage free trades carry higher gas costs than slippage trades. Gas and fees are 100% reimbursed" aria-hidden="true"></i>
+                        </i>
+                        &nbsp;&nbsp;<span>0</span> UNSUPPORTED</p>
                         <div className="swap-outer">
                             {defaultToSelectOption.swapInfoText()}
                         </div>
