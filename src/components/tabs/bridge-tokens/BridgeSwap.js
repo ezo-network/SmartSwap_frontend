@@ -1238,7 +1238,7 @@ export default class BridgeSwap extends PureComponent {
                 <div className="tabRow hasBtn action-btn">
                     {
                         this.context.isAuthenticated === false && 
-                        <button onClick={() => this.connectWallet()} className="btn btn-primary">CONNECT YOUR WALLET</button>
+                        <button onClick={() => this.connectWallet()} className="btn btn-primary inactive">CONNECT YOUR WALLET</button>
                     }
                     {
                         this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) !== sourceNetworkConfig?.chainId ?? null) && 
