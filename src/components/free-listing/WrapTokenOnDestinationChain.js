@@ -410,7 +410,7 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                             />
                             {this.props.selectedSourceTokenData.name}
                           </ProICOSbx02>
-                          <ProICOSbx02>
+                          <ProICOSbx02> 
                             <img
                               alt={this.props.selectedSourceTokenData.chainIcon}
                               src={'/images/free-listing/chains/' + this.props.selectedSourceTokenData.chainIcon}
@@ -468,6 +468,7 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                             <button disabled={this.state.btnClicked} onClick={e => this.switchNetwork(network.chainId)} className="Btn01 switch-network-alert">CREATE A BRIDGE</button>
                           )}
                         </ProColBtn>
+                        <DeleteButtin><i class="fas fa-trash-alt"></i></DeleteButtin>
                       </ProRowCol1>
                     </ProRow>
                   )
@@ -478,7 +479,6 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                   {/* <button onClick={() => this.onFinishButtonClicked()} className="Btn01">FINISH</button> */}
                   <LinkGreen className="cursor" onClick={e => this.props.onAddMoreBridgeButtonClicked()}>+ Add more bridges </LinkGreen>
                 </BtnMbox>
-
               </CMbx>
             </MContainer>
 
@@ -541,7 +541,7 @@ const ProICOSbx02 = styled(FlexDiv)`
   }
 `
 const BtnMbox = styled(FlexDiv)`
-  border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
+  border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px; padding-bottom: 40px;
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
   @media screen and (max-width: 640px) {
@@ -559,11 +559,14 @@ const ProRow = styled.div `
   align-items: center;
   padding: 40px 0 0 0;
   margin: 0 0 50px;
+  @media (max-width: 1460px){
+    padding: 40px 40px 0 0;
+  }
   @media (max-width: 1100px){
     display: grid; grid-template-columns: 30px 1fr; column-gap: 40px;
   }
   @media (max-width: 640px){
-    display: grid; grid-template-columns: 1fr; column-gap: 0;
+    display: grid; grid-template-columns: 1fr; column-gap: 0; padding: 40px 0 0 0;
   }
   .labelNo {
     width:30px;
@@ -571,7 +574,7 @@ const ProRow = styled.div `
     line-height: 30px;
     text-align: center;
     font-size: 18px;
-    background: #fff;
+    background: #aaaaaa;
     color: #000;
     font-weight: bold;
     margin-right: 25px;
@@ -621,9 +624,8 @@ const ProColBtn = styled.div `
   }
   .switch-network-alert {
     color: #fff;
-    border:2px solid #ff0000;
-    -webkit-box-shadow: 0 0 12px 5px rgba(255, 0, 0, 0.5); 
-    box-shadow: 0 0 12px 5px rgba(255, 0, 0, 0.5)
+    border:2px solid #ff3737;
+    box-shadow: 0 0 12px 5px rgba(255, 55, 55, 0.5)
     
   }
   .switch-network-alert:hover{ background-color:#ff0000;}
@@ -636,9 +638,19 @@ const ProColBtn = styled.div `
     .fa {
       margin-right: 10px;
     }
+    .fa-check-circle {
+      font-size: 30px;
+      vertical-align: top;
+      margin: -5px 6px 0 0;
+    }
+    .fa-external-link-alt {
+      font-size: 12px;
+      vertical-align: top;
+      margin: -3px 0 0 3px;
+    }
   }
   @media screen and (max-width: 640px) {
-    width: 100%; padding-left: 0;
+    width: 100%; padding-left: 0; padding-right: 40px;
     button {
       margin-top: 40px; width: 100%;
     }
@@ -668,4 +680,10 @@ const LinkGreen = styled.a `
 	@media screen and (max-width: 575px) {
 		margin-bottom: 8px;
 	}
+`
+const DeleteButtin = styled.div `
+  position: absolute; left: calc(100% + 22px); color: #4c4c4a; font-size: 16px;
+  @media screen and (max-width: 640px) {
+    right: 0; left: inherit; bottom: 18px; font-size: 20px;
+  }
 `
