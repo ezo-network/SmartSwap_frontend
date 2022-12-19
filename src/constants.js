@@ -67,7 +67,10 @@ CONSTANT.API_ENDPOINTS = {
             'addValidator': 'customer/add-validator',
             'getValidator': 'customer/get-validator',
             'getOwnershipRequests': 'public/ownership-requests',
-            'addErc20Token': 'customer/add-erc20-token'
+            'addErc20Token': 'customer/add-erc20-token',
+            getDepositTokensHistoryByWalletAddress: (walletAddress, fromChainId) =>  {
+                return `ledgers/depositTokenHistory?walletAddress=${walletAddress}&fromChainId=${fromChainId}`
+            }
         }, 
         'NATIVE_TOKENS': {
             'networks': 'public/active-smartswap-networks'           

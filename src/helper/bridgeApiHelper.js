@@ -931,8 +931,47 @@ const BridgeApiHelper = {
             error,
             code
         }
-    }
+    },
 
+    /** ledger */
+    getDepositTokensHistoryByWalletAddress: async (walletAddress, fromChainId) => {
+        let response, error, code;
+        try {
+
+            const result = await axiosRequest.request({
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.getDepositTokensHistoryByWalletAddress(walletAddress, fromChainId),
+            });
+
+            console.log({
+                result: result
+            });
+
+            if (result.status === 200) {
+                return {
+                    response: result.data.data,
+                    code: result.data.code,
+                    error: ""
+                }
+            } else {
+                return {
+                    response: [],
+                    code: result.data.code,
+                    error: result.data.error
+                }
+            }
+
+        } catch (err) {
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response,
+            error,
+            code
+        }
+    },
 }
 
 

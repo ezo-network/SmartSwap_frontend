@@ -1,3 +1,5 @@
+
+import {WalletContext, EthereumEvents} from '../../../context/WalletProvider';
 import React, { PureComponent } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
@@ -31,7 +33,8 @@ export default class SourceTokenPopup extends PureComponent {
             currentPageNumber: 1,
             filteredToken: "",
             symbolSortOrder: 'asc',
-            pinnedTokens: []
+            pinnedTokens: [],
+            networkDropdownToggle: false
         };
     }
 
@@ -39,7 +42,33 @@ export default class SourceTokenPopup extends PureComponent {
         console.log('SourceTokenPopup mounted');
         this._componentMounted = true;
 		if(this._componentMounted === true){
-            
+            if(window?.ethereum !== undefined){
+
+                window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async(chainId) => {
+                    console.log(EthereumEvents.CHAIN_CHANGED, chainId);
+                    this.setState({
+                        pinnedTokens: []
+                    });
+                    await this.props.onTokenAddedCallback();
+                });
+
+                window.ethereum.on(EthereumEvents.ACCOUNTS_CHANGED, async(accounts) => {
+                    console.log(EthereumEvents.ACCOUNTS_CHANGED, accounts[0]);
+                    this.setState({
+                        pinnedTokens: []
+                    });
+                    await this.props.refetch();
+                });
+    
+                window.ethereum.on(EthereumEvents.CONNECT, async (error) => {
+                    console.log(EthereumEvents.CONNECT);
+                });
+    
+                window.ethereum.on(EthereumEvents.DISCONNECT, async (error) => {
+                    console.log(EthereumEvents.DISCONNECT);
+                });
+
+            }
         }
     }
 
@@ -145,11 +174,86 @@ export default class SourceTokenPopup extends PureComponent {
 
     }
 
+    addNetworkToWallet = async(chainId) => {
+        try {
+            
+          const networkConfig = _.find(this.props.networks, {chainId: Number(chainId)});
+
+          console.log({
+            addNetworkToWalletNetworkConfig: networkConfig,
+            chainId: chainId
+          });
+    
+          if(networkConfig !== undefined){
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: Web3.utils.toHex(networkConfig.chainId),
+                chainName: networkConfig.name,
+                nativeCurrency: {
+                  name: networkConfig.nativeCurrencyName,
+                  symbol: networkConfig.nativeCurrencySymbol,
+                  decimals: networkConfig.nativeCurrencyDecimals
+                },
+                rpcUrls: [networkConfig.rpc],
+                blockExplorerUrls: [networkConfig.explorerUrl]
+              }]
+            }).then((response) => {
+              console.log({
+                addNetworkToWalletResponse: response
+              });
+            }).catch((error) => {
+              console.error({
+                addNetworkToWalletError: error
+              });
+            });
+          } else {
+            console.error({
+              addNetworkToWalletError: 'networkConfig undefined'
+            });        
+          }
+          
+        } catch (error) {
+          console.error({
+            addNetworkToWalletCatch: error
+          });
+        }
+    }
+
+    switchNetwork = async (chainId) => {
+        try {
+            if (Number(this.context.chainIdNumber) !== Number(chainId)) {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: Web3.utils.toHex(chainId) }],
+                }).then(async(response) => {
+
+                }).catch(async (error) => {
+                    console.error(error);
+                    if (error.code === -32002) {
+                        notificationConfig.info(errors.switchRequestPending);
+                    }
+
+                    if (error.code === 4902) {
+                        notificationConfig.error(errors.metamask.networkNotFound);
+                        await this.addNetworkToWallet(chainId);
+                    }
+
+                    if (error.code === 4001) {
+
+                    }
+
+                });
+            }
+        } catch (err) {
+            console.error("switchNetwork", err.message);
+        }
+    }    
+
     render() {
         const pageSize = 10;
         let currentPageNumber = this.state.currentPageNumber;
         let pageIndex = currentPageNumber - 1;
-        
         let filteredTokens = this.props.tokens.filter(token => {
             if(
               token.symbol.match(new RegExp(this.state.filteredToken, "i"))
@@ -169,6 +273,8 @@ export default class SourceTokenPopup extends PureComponent {
         const tokensGroupList = _.chunk(filteredTokens, pageSize);
         let tokens = tokensGroupList[pageIndex <= 0 ? 0 : pageIndex];
 
+        const activeNetworkConfig = _.find(this.props.networks, {chainId: this.context.chainIdNumber});
+
         return (
             <>
                 {this.props.show &&
@@ -177,6 +283,34 @@ export default class SourceTokenPopup extends PureComponent {
                     <ContainerPop>
                         <PopTitle>
                             <h1>Select a token to bridge</h1> 
+                            <NetworkDropdownList>   
+
+                                    <NetworkListItem key={activeNetworkConfig?.chainId && "UNSUPPORTED"}>
+                                        <img 
+                                            src={`/images/free-listing/chains/${(activeNetworkConfig?.chain ?? "UNSUPPORTED").toLowerCase()}.png`}
+                                            onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
+                                        ></img>
+                                        <span>{activeNetworkConfig?.chain ?? "UNSUPPORTED"}</span>
+                                        <div onClick={(e) => this.setState({networkDropdownToggle: !this.state.networkDropdownToggle})} className="toggle-icon-container">
+                                            <i className={`fa fa-caret-${this.state.networkDropdownToggle ? 'up' : 'down'}`}></i>
+                                        </div>
+                                    </NetworkListItem>                                                                                
+                                    {this.props.networks.map((network, index) => {
+                                        if(this.state.networkDropdownToggle){
+                                            if(this.context.chainIdNumber !== network.chainId){
+                                                return (<>
+                                                    <NetworkListItem onClick={(e) => this.switchNetwork(network.chainId)} className='cursor' key={network.chainId}>
+                                                        <img 
+                                                            src={`/images/free-listing/chains/${(network.chain).toLowerCase()}.png`}
+                                                            onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
+                                                        ></img>
+                                                        <span>{network.chain}</span>
+                                                    </NetworkListItem>                                        
+                                                </>)
+                                            }
+                                        }
+                                    })}
+                            </NetworkDropdownList>
                         </PopTitle>
                         <PopRow>
                             {/* <Popcol>
@@ -396,6 +530,9 @@ export default class SourceTokenPopup extends PureComponent {
         )
     }
 }
+
+SourceTokenPopup.contextType = WalletContext;
+
 const PopupMain = styled.div `
     position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(13, 14, 19, 0.95); overflow: auto; padding: 0 0 90px;
 `
@@ -500,4 +637,35 @@ const Token = styled.div `
 const Pin = styled.div `
     width: 16px; height: 16px; position: absolute; right: 17px; top: calc(50% - 8px); background: url(${pin}); background-size: 100%;
     &.selected {background: url(${pinAct}); background-size: 100%;}
+`
+
+const NetworkDropdownList = styled.div `
+    padding: 20px; 
+    border: 2px solid #000;
+    position: absolute;
+    z-index: 999999;
+    background: #21232b;
+    top: 10%;
+    right: 13%;    
+    gap: 10px;
+    display: flex;
+    justify-content: flex-start;
+    row-gap: 15px; 
+    column-gap: 10px; 
+    flex-direction: column;
+    width: 200px;
+    max-height: 250px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+`
+
+const NetworkListItem = styled.div `
+    display: flex; align-items: center; justify-content: flex-start; gap: 10px; user-select: none;
+    div.toggle-icon-container {display: flex; justify-content: flex-end; width: 44%; align-items: center;}
+    img {width: 20px}
 `
