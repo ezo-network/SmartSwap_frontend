@@ -32,13 +32,13 @@ export default class Welcome extends PureComponent {
         { 
           <main id="main" className="smartSwap">           
             <div className="main">   
-             <MContainer> 
+              <MContainer> 
                   <CMbx>
                     <Csubbx01> 
                       <CStitle01>
                         <i className="imgIco"><img src={ImgIco01} alt="Ico" /></i>
-                        Create a cross-chain bridge token to any EVM blockchain by few seconds
-                        <span>It's free and open to any project and their users</span>
+                        Create a cross-chain bridge token to any EVM blockchain in a few seconds
+                        <span>It's free and open to any project or users</span>
                       </CStitle01> 
                       { 
                         this.context.isAuthenticated === false && 
@@ -97,11 +97,11 @@ const Csubbx01 = styled(FlexDiv)`
   &.v2{ padding-right:0; padding-left:70px; border-right:none;
     .imgIco{ margin-bottom:19px;}
   } 
-  .Btn01{ color:#fff; background-color:#0d0e13; width:100%; text-align:center; padding:30px 15px; border:2px solid #91dc27; font-size:24px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); 
+  .Btn01{ color:#fff; background-color:#0d0e13; width:100%; text-align:center; padding:26px 15px; border:2px solid #91dc27; font-size:24px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); box-shadow: 0 0 15px 5px rgba(145,220,39,0.5); 
     &:hover{ background-color:#91dc27;}
     
   }
-  .Btn02{ background-color:transparent; color:#91dc27; border:0; font-size:24px; font-weight:700; 
+  .Btn02{ background-color:transparent; color:#91dc27; border:0; font-size: 18px; font-weight:700; 
     :hover{ text-decoration:underline;}
   }
   @media screen and (max-width: 991px) {
@@ -120,9 +120,9 @@ const Csubbx01 = styled(FlexDiv)`
 `
 const CStitle01 = styled(FlexDiv)`
   align-items:flex-start; font-size:30px; font-weight:700; color:#fff; flex-direction:column;  text-align:left;
-  
-  .imgIco{ margin-bottom:30px;}
-  span{ font-size:21px; font-weight:300;  text-align:left; display:block; width:100%; margin:40px 0 55px 0;  }
+  line-height: 1.4;
+  .imgIco{ margin-bottom:8px;}
+  span{ font-size:21px; font-weight:300; text-align:left; display:block; width:100%; margin:27px 0 54px 0; }
   @media screen and (max-width: 991px) {
     font-size: 25px; 
   }

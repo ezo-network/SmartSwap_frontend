@@ -1244,11 +1244,11 @@ export default class BridgeSwap extends PureComponent {
                         this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) !== sourceNetworkConfig?.chainId ?? null) && 
                         <button className="btn btn-unsupported" onClick={(e) => e.preventDefault()}>
                             <div className="btn-container">
-                                <img 
+                                {/* <img 
                                     src={'/images/free-listing/chains/' + (this.state.sourceTokenData.chain + '.png').toLowerCase()}
                                     onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
                                     alt={this.state.sourceTokenData.chain}
-                                ></img>
+                                ></img> */}
                                 <span>UNSUPPORTED NETWORK</span>
                             </div>
                         </button>                        
@@ -1345,9 +1345,18 @@ export default class BridgeSwap extends PureComponent {
                             <span>|</span>
                             {/* <a href="">Free license</a> */}
                             <a href="">Apply for licensing</a>
+
+                            <a style={{marginLeft: "15px"}} href="">Bridge another token</a>
                         </div>
                     </div>
                 </div>
+
+                {/* Success message */} 
+                {/* <div className="success-msg">
+                    <i className="fas fa-check"></i>
+                    <h4>Token Bridged Successfully</h4>
+                    <p>Check the ledger below</p>
+                </div> */}
             </>            
         );
     }

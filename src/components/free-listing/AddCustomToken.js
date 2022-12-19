@@ -262,7 +262,7 @@ const FlexDiv = styled.div`
 `;
 
 const MContainer = styled(FlexDiv)` 
-  width:100%; max-width:1360px; margin:0 auto;
+  width: calc(100% - 40px); max-width:1360px; margin:0 auto;
 `
 const CMbx = styled(FlexDiv)`
   width:100%;  margin-top:90px;
@@ -274,8 +274,8 @@ width:100%; height:4px; background-color: #303030; display:flex ; margin-bottom:
 `
 
 const ProGTitle01 = styled(FlexDiv)` 
-    font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; 
-    i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px;  } 
+    font-size:24px; color:#ffffff; font-weight:700; justify-content:flex-start; width:100%; margin-bottom:50px; flex-flow : row;
+    i{ display:flex; font-style:normal; width:41px; height:41px; border:2px solid #fff; align-items:center; justify-content:center; margin-right:28px; flex-shrink: 0; } 
 `
 const ProInputbx = styled(FlexDiv)`
     width:100%;
@@ -288,6 +288,14 @@ const BtnMbox = styled(FlexDiv)`
   .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
 
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
+  
+  @media screen and (max-width: 640px) {
+    .Btn01{max-width: 50%}
+  }
+  @media screen and (max-width: 480px) {
+    flex-flow: column-reverse; padding-bottom: 30px; padding-top: 30px;
+    .Btn01{max-width: 100%; margin-bottom: 25px;}
+  }
 
 `
 const BtnMbox02 = styled(BtnMbox)`

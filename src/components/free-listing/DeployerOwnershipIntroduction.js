@@ -32,7 +32,7 @@ export default class DeployerOwnershipIntroduction extends PureComponent {
           <div className="main">
             <MContainer>
               <CMbx>
-                <ProGTitle01> <i className="hasImg"><img alt="badge" src={Badge}></img></i> Project, claim the deployer ownership and become a master validator for your own token</ProGTitle01>
+                <ProGTitle01> <i className="hasImg"><img alt="badge" src={Badge}></img></i> Projects can claim deployer ownership to become master validator of the token</ProGTitle01>
                 <ProPera>No need for projects to trust cross-chain solutions for bridging needs. SmartBridge allows projects to become a must validators meaning no transaction takes place without other validators consensus to the project.</ProPera>
                 <ProPera>Further, SmartBridge allows projects to take ownership of the deployer, leaving them fully in control of project tokens on any chain.</ProPera>
                 <BtnMbox>

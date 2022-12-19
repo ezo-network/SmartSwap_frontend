@@ -190,8 +190,11 @@ export default class SelectDestinationChains extends PureComponent {
 
                 <BtnMbox>
                   <button onClick={() => this.props.onBackButtonClicked(2)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>
-                  <button onClick={() => this.setDestinationNetworks()} className="Btn01"> NEXT STEP</button>
-                  <SmallInfo>Total chains to bridge to: <span>{this.state.selectedNetworks.length}</span></SmallInfo>
+
+                  <div className="rightBtn">
+                    <button onClick={() => this.setDestinationNetworks()} className="Btn01"> NEXT STEP</button>
+                    <SmallInfo>Total chains to bridge to: <span>{this.state.selectedNetworks.length}</span></SmallInfo>
+                  </div>
                 </BtnMbox>
 
               </CMbx>
@@ -240,7 +243,7 @@ const ProGTitle02 = styled(FlexDiv)`
 `
 
 const SmallInfo = styled(FlexDiv)`
-  font-size:12px; color:#a6a2b0; justify-content: flex-end; width:100%; margin-bottom:10px;
+  font-size:12px; color:#a6a2b0; justify-content: flex-start; width:100%; margin-bottom:10px; 
   span{ color:#fff; padding:0 0 0 3px;}
 `
 
@@ -286,13 +289,18 @@ const ProICOSbx02 = styled(FlexDiv)`
 
 const BtnMbox = styled(FlexDiv)`
   border-top:1px solid #303030;  width:100%; margin-top:30px; justify-content: space-between; padding-top:48px;
-  .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom:20px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
+  .Btn01{ color:#fff; background-color:#0d0e13; width:100%; max-width:430px; text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; margin-bottom: 17px; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); :hover{ background-color:#91dc27;}}
   .Btn02{ background-color:transparent; color:#a6a2b0; border:0; font-size:14px; font-weight:400; :hover{ color:#91dc27;}}
+
+  .rightBtn {
+    width:100%; max-width:430px;
+  }
 	@media screen and (max-width: 640px) {
-		.Btn01{max-width: 50%}
+		/* .Btn01{max-width: 50%} */
+    .rightBtn {max-width: 50%}
 	}
 	@media screen and (max-width: 480px) {
 		flex-flow: column-reverse; padding-bottom: 30px; padding-top: 30px; margin-top: 0;
-		.Btn01{max-width: 100%; margin-bottom: 25px;}
+		.rightBtn {max-width: 100%; margin-bottom: 25px;}
 	}
 `

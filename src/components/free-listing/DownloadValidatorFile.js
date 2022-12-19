@@ -109,7 +109,7 @@ export default class DownloadValidatorFile extends PureComponent {
 
 
                 <ProInputbx className="FirstChild"> 
-                    <label htmlFor="input01"><i>1</i> Type the validator address to activate master validator status</label>
+                    <label htmlFor="input01"><i>1</i> Type the validator wallet address to activate master validator status</label>
                     <input onChange={(e) => this.setValidatorAddressHandler(e)} type="text" id="input01" className="v2" value={this.state.validatorAddress}/>
                 </ProInputbx>
                 <ProInputbx> 

@@ -1030,14 +1030,14 @@ export default class SmartSwap extends PureComponent {
                         {
                             this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) !== activeNetworkConfig?.chainId ?? null) && 
                             <button className="native-btn ani-1 connect btn-unsupported">
-                                <span className="currency">
+                                {/* <span className="currency">
                                     <img 
                                         style={{filter: 'none', width: '30px', height: '30px'}}
                                         src={('/images/free-listing/chains/default.png').toLowerCase()}
                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
                                         alt='UNSUPPORTED NETWORK'
                                     ></img>
-                                </span>
+                                </span> */}
                                 <span>UNSUPPORTED NETWORK</span>
                             </button>
                         }
