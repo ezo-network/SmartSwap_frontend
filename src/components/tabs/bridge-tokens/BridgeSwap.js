@@ -4,12 +4,12 @@ import {Link} from "react-router-dom";
 import _ from "lodash";
 import Web3 from 'web3';
 import { aggregate } from '@makerdao/multicall';
+import PlaceholderLoading from 'react-placeholder-loading'
 import notificationConfig from "../../../config/notificationConfig";
 import SourceTokenPopup from "./SourceTokenPopup";
 import DestinationTokensPopup from "./DestinationTokensPopup";
 import CheckAuthenticityPopup from "./CheckAuthenticityPopup";
 
-import AuthorityServerApiHelper from "../../../helper/authorityServerApiHelper";
 import BridgeApiHelper from "../../../helper/bridgeApiHelper";
 import BridgeContract from "../../../helper/bridgeContract";
 import ERC20TokenContract from "../../../helper/erc20TokenContract";
@@ -39,7 +39,7 @@ const defaultSourceTokenData = {
 };
 
 const defaultDestinationTokenData = {
-    symbol: 'Wrap a token on',
+    symbol: 'Derivative token on',
     chainId: undefined,
     chain: 'chain',
     amount: 0,
@@ -49,59 +49,46 @@ const defaultDestinationTokenData = {
     decimals: null
 };
 
+const initialState = {
+    btnClicked: false,
+    btnAction: 'BRIDGE FOR FREE',
+    sourceTokenData: {...defaultSourceTokenData},
+    destinationTokenData: {...defaultDestinationTokenData},
+    isSourceTokenSelected: false,
+    isDestinationTokenSelected: false,
+    toggleSourceTokenPopup: false,
+    toggleDestinationTokensPopup: false,
+    toggleCheckAuthenticityPopup: false,
+    networks: [],
+    tokens: [],
+    tokensWithBalance: [],
+    wrappedTokens: [],
+    projects: [],
+    customTokenBalance: null,
+    depositTokenSuccessful: false
+}
+
 export default class BridgeSwap extends PureComponent {
     _componentMounted = false;
     pendingNetworkSwitchRequest = false;
     sourceTokenBalance = 0;
     constructor(props) {
         super();
-        this.state = {
-            btnClicked: false,
-            btnAction: 'BRIDGE FOR FREE',
-            sourceTokenData: {
-                symbol:  'Choose token',
-                chainId: undefined,
-                chain: 'CUSTOM',
-                amount: '',
-                address: null,
-                isWrappedToken: false,
-                balance: 0,
-                decimals: null
-            },
-            destinationTokenData: {
-                symbol: 'Wrap a token on',
-                chainId: undefined,
-                chain: 'chain',
-                amount: 0,
-                address: null,
-                isWrappedToken: false,
-                balance: 0,
-                decimals: null
-            },
-            isSourceTokenSelected: false,
-            isDestinationTokenSelected: false,
-            toggleSourceTokenPopup: false,
-            toggleDestinationTokensPopup: false,
-            toggleCheckAuthenticityPopup: false,
-            networks: [],
-            tokens: [],
-            tokensWithBalance: [],
-            wrappedTokens: [],
-            projects: [],
-            customTokenBalance: null
-        };
+        this.state = {...initialState}
 
         source = axios.CancelToken.source();
 
         this.walletConnectCallback = this.walletConnectCallback.bind(this);
         this.setSourceToken = this.setSourceToken.bind(this);
         this.tokenAddressCallback = this.tokenAddressCallback.bind(this)
+        this.refetch = this.refetch.bind(this);
     }
 
     componentDidMount = async() => {
         this._componentMounted = true;
 		if(this._componentMounted === true){
-
+            console.log('BridgeSwap component mounted');
+            await this.resetSelectedTokens();
             await this.getNetworkList();
             await this.getTokenList();
             await this.walletConnectCallback();
@@ -134,7 +121,7 @@ export default class BridgeSwap extends PureComponent {
     
                 window.ethereum.on(EthereumEvents.DISCONNECT, async (error) => {
                     console.log(EthereumEvents.DISCONNECT);
-                    await this.walletConnectCallback();          
+                    await this.walletConnectCallback();    
                 });
             } else {
                 console.error('Metamask is not installed');
@@ -152,7 +139,7 @@ export default class BridgeSwap extends PureComponent {
     componentWillUnmount() {
 		this._componentMounted = false;
         if (source) {
-          source.cancel("BridgeSwap Component got unmounted");
+          source.cancel("BridgeSwap Component unmounted");
         }
 	}
 
@@ -198,7 +185,8 @@ export default class BridgeSwap extends PureComponent {
                     isSourceTokenSelected: false,
                     isDestinationTokenSelected: false,
                     sourceTokenData,
-                    destinationTokenData
+                    destinationTokenData,
+                    depositTokenSuccessful: false
                 };
             });
         }            
@@ -272,12 +260,14 @@ export default class BridgeSwap extends PureComponent {
         }
     }
 
-    async walletConnectCallback() {
+    walletConnectCallback = async() => {
         if(this._componentMounted === true){
             this.sourceTokenBalance = 0;
             this.setState({
               customTokenBalance: null,
-              toggleSourceTokenPopup: false,
+              wrappedTokens: [],
+              projects: [],
+              //toggleSourceTokenPopup: false,
               toggleDestinationTokensPopup: false,
               toggleCheckAuthenticityPopup: false
             });
@@ -300,6 +290,7 @@ export default class BridgeSwap extends PureComponent {
                     this.setState({
                       networks: response
                     });
+                    this.props.setNetworkList(response, "bridge-tokens");
                 }
               } else {
                 console.error(error)
@@ -324,6 +315,7 @@ export default class BridgeSwap extends PureComponent {
                         this.setState({
                             tokens: response
                         });
+                        this.props.onTokenListFetched(response);
                     }
                 } else {
                     console.error(error)
@@ -401,7 +393,7 @@ export default class BridgeSwap extends PureComponent {
     
     
                 const destinationTokenData = {
-                    symbol: 'Wrap a token on',
+                    symbol: 'Derivative token on',
                     chainId: undefined,
                     chain: 'chain',
                     amount: 0,
@@ -518,7 +510,7 @@ export default class BridgeSwap extends PureComponent {
         }
     }
     
-    switchNetwork = async (chainId, actionType = null) => {
+    switchNetwork = async (chainId) => {
         try {
             if(this.pendingNetworkSwitchRequest === false){
                 if (Number(this.context.chainIdNumber) !== Number(chainId)) {
@@ -632,7 +624,8 @@ export default class BridgeSwap extends PureComponent {
                 config
             );
 
-            Object.keys(response.results.transformed).forEach((token, index) => {
+            const tokensBalances = [];
+            await Promise.all(Object.keys(response.results.transformed).map(async (token, index) => {
                 const tokenAddress = (token.substring(11)).toLowerCase();
                 const isTokenExist = _.find(this.state.tokens, {
                     address: tokenAddress,
@@ -641,12 +634,18 @@ export default class BridgeSwap extends PureComponent {
                 if (isTokenExist) {
                     console.log(`${index} ${isTokenExist.symbol}  ${isTokenExist.chainId} - ${token} - ${response.results.transformed[token]}`)
                     if (response.results.transformed[token] > 0) {
-                        this.setState(prevState => ({
-                            tokensWithBalance: [...prevState.tokensWithBalance, isTokenExist]
-                        }))
+                        tokensBalances.push(isTokenExist);
+                        // this.setState(prevState => ({
+                        //     tokensWithBalance: [...prevState.tokensWithBalance, isTokenExist]
+                        // }))
                     }
                 }
+            }));
+
+            this.setState({
+                tokensWithBalance: tokensBalances
             });
+
         } catch (error) {
             console.log({
                 error: error,
@@ -773,10 +772,12 @@ export default class BridgeSwap extends PureComponent {
 
             const btnAction = this.state.btnAction;
 
-            this.setState({
-                btnClicked: true,
-                btnAction: "PROCESSING..."
-            });
+            if(this._componentMounted){
+                this.setState({
+                    btnClicked: true,
+                    btnAction: "PROCESSING..."
+                });
+            }
 
             // deposit tokens
 
@@ -805,17 +806,21 @@ export default class BridgeSwap extends PureComponent {
                 });
 
                 if (depositAmount.gt(allowedSpendLimit)) {
-                    this.setState({
-                        btnAction: "APPROVE TOKEN ACCESS"
-                    });
+                    if(this._componentMounted){
+                        this.setState({
+                            btnAction: "APPROVE TOKEN ACCESS"
+                        });
+                    }
                     //const diffAmount = depositAmount.sub(allowedSpendLimit);
                     //console.log({ 'diffAmount': (diffAmount).toString() })
                     // get approval
                     await erc20TokenContract.approve(maxAprovalLimit, (hash) => {
                         console.log({ 'approveHash': hash });
-                        this.setState({
-                            btnAction: "AWATING APPROVAL..."
-                        });
+                        if(this._componentMounted){
+                            this.setState({
+                                btnAction: "AWATING APPROVAL..."
+                            });
+                        }
                     }, (response) => {
                         console.log({
                             approveReceiptResponse: response
@@ -877,10 +882,12 @@ export default class BridgeSwap extends PureComponent {
                             notificationConfig.success('Successfully Approved');
                         }
 
-                        this.setState({
-                            btnClicked: false,
-                            btnAction: btnAction
-                        });
+                        if(this._componentMounted){
+                            this.setState({
+                                btnClicked: false,
+                                btnAction: btnAction
+                            });
+                        }
                     });         
                     return;
                 }
@@ -942,21 +949,35 @@ export default class BridgeSwap extends PureComponent {
                         if(response.code === 'TRANSACTION_REPLACED'){
                             if(response.cancelled === false && response.receipt?.transactionHash){
                                 //response.receipt.transactionHash,
+                                if(this._componentMounted){
+                                    this.setState({
+                                        depositTokenSuccessful: true
+                                    });
+                                }
                                 notificationConfig.success('Swapped Successfully!');
                                 await this.updateSourceTokenBalance();
+                                this.props.openLedger();
                             }
                         }
                                     
                         if(response.status === 1) {
                             //response.transactionHash
+                            if(this._componentMounted){
+                                this.setState({
+                                    depositTokenSuccessful: true
+                                });
+                            }
                             notificationConfig.success('Swapped Successfully!');
                             await this.updateSourceTokenBalance();
+                            this.props.openLedger();
                         }
 
-                        this.setState({
-                            btnClicked: false,
-                            btnAction: btnAction
-                        });
+                        if(this._componentMounted){
+                            this.setState({
+                                btnClicked: false,
+                                btnAction: btnAction
+                            });
+                        }
                     }
                 );                
 
@@ -966,10 +987,12 @@ export default class BridgeSwap extends PureComponent {
                 if(error?.error !== undefined){
                     notificationConfig.error(error?.error);
                 }
-                this.setState({
-                    btnClicked: false,
-                    btnAction: btnAction
-                });
+                if(this._componentMounted){
+                    this.setState({
+                        btnClicked: false,
+                        btnAction: btnAction
+                    });
+                }
                 return error;
             });
 
@@ -977,115 +1000,6 @@ export default class BridgeSwap extends PureComponent {
         } catch(err) {
             console.error({
                 depositTokensCatch: err.message
-            })
-        }
-    }
-
-    claimToken = async(depositTxHash, depositTokenNetwork) => {
-        try {
-            console.log('send claim');
-            await this.context.connectWallet();            
-            const {response, code, error} = await AuthorityServerApiHelper.getAuthoritySignature(depositTxHash, depositTokenNetwork);
-            if(code === 200){
-                // check for allowence and approval
-                const networkConfig = _.find(this.state.networks, {chainId: this.context.chainIdNumber});
-                if(networkConfig !== undefined){
-                    const bridgeContract = new BridgeContract(this.context.web3, this.context.account, networkConfig.bridgeContractAddress);
-
-                    await bridgeContract.claimToken(
-                        response.originalToken,
-                        response.originalChainID,
-                        depositTxHash,
-                        response.to,
-                        response.value,
-                        response.originalChainID,
-                        response.signature,
-                        async (hash) => {
-                            console.log({
-                                hash: hash
-                            });
-                        },
-                        async (response) => {
-                            console.log(response)
-                            
-                            if (response.code >= 4001 && response.code <= 4901) {
-                                // https://blog.logrocket.com/understanding-resolving-metamask-error-codes/#4001
-                                notificationConfig.error(response.message);
-                            }
-    
-                            if (response.code === "ACTION_REJECTED") {
-                                notificationConfig.error(response.reason);
-                            }
-                    
-                            if (response.code === "UNPREDICTABLE_GAS_LIMIT") {
-                                notificationConfig.error(response.reason);
-                            }
-                    
-                            if (response.code === -32016) {
-                                notificationConfig.error(response.message);
-                            }
-                    
-                            if (response.code === -32000){
-                                notificationConfig.error("Intrinsic gas too low");
-                            }
-    
-                            if(response.code === -32603){
-                                notificationConfig.error("execution reverted: TransferHelper: TRANSFER_FROM_FAILED");                        
-                            }
-                    
-                            if(response.code === 'NOT_A_CONTRACT'){
-                                notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', networkConfig.bridgeContractAddress));
-                            }
-                    
-                            if(
-                                response.code === 'CALL_EXCEPTION' 
-                                || response.code === 'INSUFFICIENT_FUNDS' 
-                                || response.code === 'NETWORK_ERROR' 
-                                || response.code === 'NONCE_EXPIRED' 
-                                || response.code === 'REPLACEMENT_UNDERPRICED'
-                                || response.code === 'UNPREDICTABLE_GAS_LIMIT'
-                            ){
-                                notificationConfig.error(response.reason);            
-                            }
-                    
-                            if(response.code === 'TRANSACTION_REPLACED'){
-                                if(response.cancelled === false && response.receipt?.transactionHash){
-                                    //response.receipt.transactionHash,
-                                    notificationConfig.success('Swapped Successfully!');
-                                    //await this.updateSourceTokenBalance();
-                                }
-                            }
-                                        
-                            if(response.status === 1) {
-                                //response.transactionHash
-                                notificationConfig.success('Swapped Successfully!');
-                                //await this.updateSourceTokenBalance();
-                            }
-    
-                            this.setState({
-                                btnClicked: false
-                                //btnAction: btnAction
-                            });
-                        }
-                    ); 
-
-                }
-
-            } else {
-                console.log(error)
-                // if(error.includes('Confirming:')){
-                //     notificationConfig.info("warning", "Please wait!, Deposit token transaction is not yet confirmed completely"); 
-                //     return
-                // }
-
-                // if(error.includes('Wrong transaction:')){
-                //     notificationConfig.info("error", "Wrong deposit token transaction"); 
-                //     return                    
-                // }
-            }
-        } catch(err) {
-            console.error({
-                claimToken: err.message
             })
         }
     }
@@ -1104,22 +1018,48 @@ export default class BridgeSwap extends PureComponent {
                 return r;
             }, Object.create(null));
 
-            Object.keys(groupedTokenByNetwork).forEach(async (network) => {
+            await Promise.all(Object.keys(groupedTokenByNetwork).map(async (network) => {
+            // Object.keys(groupedTokenByNetwork).forEach(async (network) => {
                 // only active network
                 if(Number(this.context.chainIdNumber) === Number(network)){
                     console.log(this.context.account);
                     await this.aggregateTokenBalanceWithMultiCall(network, groupedTokenByNetwork[network], this.context.account);
                 }
-            });
+            }));
         } catch (error) {
             console.error(error.message);
         }
     }
 
     tokenAddressCallback = async() => {
-        await this.getTokenList().then(async() => {
-            await this.filterTokenByWalletBalance();
-        });
+        if(this._componentMounted){
+            try {
+                await this.getTokenList().then(async() => {
+                    await this.filterTokenByWalletBalance();
+                });       
+            } catch(error){
+                console.error("tokenAddressCallback", error.message);
+            }
+        }
+    }
+
+    refetch = async() => {
+        try {
+            if(this._componentMounted){
+                await this.filterTokenByWalletBalance();
+            }
+        } catch(error){
+            console.error("refetch", error.message);
+        }
+    }
+
+    resetComponent = async(e = null) => {
+        if(this._componentMounted){
+            if(e !== null){
+                e.preventDefault();
+                await this.resetSelectedTokens();
+            }
+        }
     }
 
     render() {
@@ -1155,180 +1095,192 @@ export default class BridgeSwap extends PureComponent {
 
         return (
             <>
-                <div className="tabRow">
-                    <div className="tabCol">
-                        <div className="d-flex balance-row">
-                            <div className="b-text">
-                                Balance: {this.state.sourceTokenData.balance} &nbsp;<span className="cursor" onClick={() => this.setMaxAmount()}>MAX</span>
+                {this.state.depositTokenSuccessful === false &&
+                <div className="tab-data">
+                    <div className="tabRow">
+                        <div className="tabCol">
+                            <div className="d-flex balance-row">
+                                <div className="b-text">
+                                    Balance: {this.state.sourceTokenData.balance} &nbsp;<span className="cursor" onClick={() => this.setMaxAmount()}>MAX</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="tabCol">
-                        <button onClick={(e) => this.toggleCheckAuthenticityPopup()} className="color-green button-link">Check authenticity</button>
-                    </div>
-                </div>
-                <div className="tabRow">
-                    <div className="tabCol">
-                        <label>DEPOSIT</label>
-                        <div className="from-token inputIcon white">
-                            <i>
-                                <img
-                                    src={'/images/free-listing/tokens/' + (sideAIcon + '.png').toLowerCase()}
-                                    onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                    alt="from-token-input-icon"
-                                ></img>
-                            </i>
-                            <input 
-                                className="from-token-input" 
-                                type="text" 
-                                onChange={(e) => this.setAmount(e.target.value)} 
-                                value={this.state.sourceTokenData.amount} 
-                                placeholder="0"
-                            ></input>
+                        <div className="tabCol">
+                            <button onClick={(e) => this.toggleCheckAuthenticityPopup()} className="color-green button-link">Check authenticity</button>
                         </div>
-                        <figure className="from-token-selector" onClick={(e) => this.toggleSourceTokenPopup('OPEN')}>
-                            <div className="figIcon">
-                                <img
-                                    src={'/images/free-listing/tokens/' + (sideAIcon + '.png').toLowerCase()}
-                                    onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                    alt={this.state.sourceTokenData.chain}
-                                ></img>
-                            </div>
-                            <figcaption>
-                                <span>{sideASymbol}</span>
-                                <span>{sourceNetworkConfig?.chain ?? defaultSourceTokenData.chain}</span>
-                            </figcaption>
-                        </figure>
                     </div>
-                    <div className="tabDivider">
-                        <button 
-                            className="swap"
+                    <div className="tabRow">
+                        <div className="tabCol">
+                            <label>DEPOSIT</label>
+                            <div className="from-token inputIcon white">
+                                <i>
+                                    <img
+                                        src={'/images/free-listing/tokens/' + (sideAIcon + '.png').toLowerCase()}
+                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                                        alt="from-token-input-icon"
+                                    ></img>
+                                </i>
+                                <input
+                                    className="from-token-input"
+                                    type="text"
+                                    onChange={(e) => this.setAmount(e.target.value)}
+                                    value={this.state.sourceTokenData.amount}
+                                    placeholder="0"
+                                ></input>
+                            </div>
+                            <figure className="from-token-selector" onClick={(e) => this.toggleSourceTokenPopup('OPEN')}>
+                                <div className="figIcon">
+                                    <img
+                                        src={'/images/free-listing/tokens/' + (sideAIcon + '.png').toLowerCase()}
+                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                                        alt={sideAIcon ?? 'unsupported'}
+                                    ></img>
+                                </div>
+                                <figcaption>
+                                    <span>{sideASymbol}</span>
+                                    <span>{sourceNetworkConfig?.chain ?? defaultSourceTokenData.chain}</span>
+                                </figcaption>
+                            </figure>
+                        </div>
+                        <div className="tabDivider">
+                            <button
+                                className="swap"
                             //onClick={() => this.swapDirections()}
-                        >
-                            <img src={swapImg} alt="swap-directions-button"></img>
-                        </button>
-                    </div>
-                    <div className="tabCol">
-                        <label>RECEIVE</label>
-                        <div className="to-token inputIcon black">
-                            <i>
-                                <img
-                                    src={'/images/free-listing/tokens/' + (sideBIcon + '.png').toLowerCase()}
-                                    onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                    alt="to-token-input-icon"
-                                ></img>
-                            </i>
-                            <input className="to-token-input" type="text" placeholder="0" value={this.state.destinationTokenData.amount} readOnly></input>
+                            >
+                                <img src={swapImg} alt="swap-directions-button"></img>
+                            </button>
                         </div>
-                        <figure className="to-token-selector" onClick={(e) => this.toggleDestinationTokensPopup()}>
-                            <div className="figIcon">
-                                <img 
-                                    src={'/images/free-listing/tokens/' + (sideBIcon + '.png').toLowerCase()}
-                                    onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                    alt={this.state.destinationTokenData.chain}
-                                ></img>
+                        <div className="tabCol">
+                            <label>RECEIVE</label>
+                            <div className="to-token inputIcon black">
+                                <i>
+                                    <img
+                                        src={'/images/free-listing/tokens/' + (sideBIcon + '.png').toLowerCase()}
+                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                                        alt="to-token-input-icon"
+                                    ></img>                                
+                                </i>
+                                <input className="to-token-input" type="text" placeholder="0" value={this.state.destinationTokenData.amount} readOnly></input>
                             </div>
-                            <figcaption>
-                                <span>{sideBSymbol}</span>
-                                <span>{this.state.destinationTokenData.chain}</span>
-                            </figcaption>
-                        </figure>
+                            <figure className="to-token-selector" onClick={(e) => this.toggleDestinationTokensPopup()}>
+                                <div className="figIcon">
+                                    <img
+                                        src={'/images/free-listing/tokens/' + (sideBIcon + '.png').toLowerCase()}
+                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                                        alt={sideBIcon ?? 'unsupported'}
+                                    ></img>                                
+                                </div>
+                                <figcaption>
+                                    <span>{sideBSymbol}</span>
+                                    <span>{this.state.destinationTokenData.chain}</span>
+                                </figcaption>
+                            </figure>
+                        </div>
                     </div>
-                </div>
-                <div className="tabRow hasBtn action-btn">
-                    {
-                        this.context.isAuthenticated === false && 
-                        <button onClick={() => this.connectWallet()} className="btn btn-primary inactive">CONNECT YOUR WALLET</button>
-                    }
-                    {
-                        this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) !== sourceNetworkConfig?.chainId ?? null) && 
-                        <button className="btn btn-unsupported" onClick={(e) => e.preventDefault()}>
-                            <div className="btn-container">
-                                {/* <img 
-                                    src={'/images/free-listing/chains/' + (this.state.sourceTokenData.chain + '.png').toLowerCase()}
-                                    onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
-                                    alt={this.state.sourceTokenData.chain}
-                                ></img> */}
-                                <span>UNSUPPORTED NETWORK</span>
-                            </div>
-                        </button>                        
-                    }
-                    {
-                        this.context.isAuthenticated === true && 
-                        (Number(this.context.chainIdNumber) === (Number(sourceNetworkConfig?.chainId) ?? null)) && 
-                        <>
-                            <button 
-                                disabled={
-                                    this.state.btnClicked 
-                                    || !this.state.isDestinationTokenSelected 
-                                    || !this.state.isSourceTokenSelected
-                                }
-                                onClick={
-                                    () => this.depositTokens()
-                                }
-                                className="btn btn-primary">
+                    <div className="tabRow hasBtn action-btn">
+                        {
+                            this.context.isAuthenticated === false &&
+                            <button onClick={() => this.connectWallet()} className="btn btn-primary inactive">CONNECT YOUR WALLET</button>
+                        }
+                        {
+                            this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) !== sourceNetworkConfig?.chainId ?? null) &&
+                            <button className="btn btn-unsupported" onClick={(e) => e.preventDefault()}>
+                                <div className="btn-container">
+                                    {/* <img
+                                        src={'/images/free-listing/chains/' + (this.state.sourceTokenData.chain + '.png').toLowerCase()}
+                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
+                                        alt={this.state.sourceTokenData.chain}
+                                    ></img> */}
+                                    <span>UNSUPPORTED NETWORK</span>
+                                </div>
+                            </button>
+                        }
+                        {
+                            this.context.isAuthenticated === true &&
+                            (Number(this.context.chainIdNumber) === (Number(sourceNetworkConfig?.chainId) ?? null)) &&
+                            <>
+                                <button
+                                    disabled={
+                                        this.state.btnClicked
+                                        || !this.state.isDestinationTokenSelected
+                                        || !this.state.isSourceTokenSelected
+                                    }
+                                    onClick={
+                                        () => this.depositTokens()
+                                    }
+                                    className="btn btn-primary">
                                     <div className="btn-container">
-                                        <img 
+                                        <img
                                             src={'/images/free-listing/chains/' + (sourceNetworkConfig?.chain + '.png').toLowerCase()}
                                             onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
                                             alt={sourceNetworkConfig?.chain}
                                         ></img>
-                                        {this.state.btnAction}                                    
+                                        {this.state.btnAction}
                                     </div>
-                            </button>
-                        </>
-                    }
-                    {/* {
-                        this.context.isAuthenticated === true && 
-                        (Number(this.context.chainIdNumber) === Number(this.state.sourceTokenData.chainId)) && 
-                        this.sourceTokenBalance <= 0 &&
-                        this.state.isDestinationTokenSelected &&
-                        this.state.isSourceTokenSelected &&
-                        <button className="btn btn-primary">{`Insufficient ${this.state.sourceTokenData.symbol} balance`}</button>
-                    } */}
-                    <p>Bridge to any EVM chain for free with 1:1 derivative token</p>
+                                </button>
+                            </>
+                        }
+                        {/* {
+                                this.context.isAuthenticated === true && 
+                                (Number(this.context.chainIdNumber) === Number(this.state.sourceTokenData.chainId)) && 
+                                this.sourceTokenBalance <= 0 &&
+                                this.state.isDestinationTokenSelected &&
+                                this.state.isSourceTokenSelected &&
+                                <button className="btn btn-primary">{`Insufficient ${this.state.sourceTokenData.symbol} balance`}</button>
+                            } */}
+                        <p>Bridge to any EVM chain for free with 1:1 derivative token</p>
+                    </div>
                 </div>
+                }
+                {this.state.depositTokenSuccessful === true && 
+                <div className="success-msg">
+                    <i className="fas fa-check"></i>
+                    <h4>Token Bridged Successfully</h4>
+                    <p className='cursor' onClick={(e) => this.props.openLedger()}>Check the ledger below</p>
+                </div>                
+                }
 
                 {this.state.toggleSourceTokenPopup &&
-                <SourceTokenPopup 
-                    show={this.state.toggleSourceTokenPopup} 
-                    closePopupCallback={this.toggleSourceTokenPopup}
-                    tokens={this.state.tokensWithBalance}
-                    networks={this.state.networks}
-                    wrappedTokens={this.state.wrappedTokens}
-                    sourceTokenSelectedCallback={this.setSourceToken}
-                    accountAddress={this.context.account}
-                    walletConnected={this.context.isAuthenticated}
-                    chainId={this.context.chainIdNumber}
-                    onTokenAddedCallback={this.tokenAddressCallback}
-                    onCustomTokenBalanceCheck={this.getCustomTokenBalance}
-                    customTokenBalance={this.state.customTokenBalance}
-                    projects={this.state.projects}
-                ></SourceTokenPopup>
+                    <SourceTokenPopup
+                        show={this.state.toggleSourceTokenPopup}
+                        closePopupCallback={this.toggleSourceTokenPopup}
+                        tokens={this.state.tokensWithBalance}
+                        networks={this.state.networks}
+                        wrappedTokens={this.state.wrappedTokens}
+                        sourceTokenSelectedCallback={this.setSourceToken}
+                        accountAddress={this.context.account}
+                        walletConnected={this.context.isAuthenticated}
+                        chainId={this.context.chainIdNumber}
+                        onTokenAddedCallback={this.tokenAddressCallback}
+                        onCustomTokenBalanceCheck={this.getCustomTokenBalance}
+                        customTokenBalance={this.state.customTokenBalance}
+                        projects={this.state.projects}
+                        refetch={this.refetch}
+                    ></SourceTokenPopup>
                 }
 
-                {this.state.toggleDestinationTokensPopup &&   
-                <DestinationTokensPopup 
-                    chainId={this.context.chainIdNumber}
-                    show={this.state.toggleDestinationTokensPopup} 
-                    closePopupCallback={this.toggleDestinationTokensPopup}
-                    tokens={this.state.tokens}
-                    networks={this.state.networks}
-                    wrappedTokens={this.state.wrappedTokens}
-                    selectedSourceToken={this.state.sourceTokenData}
-                    destinationTokenSelectedCallback={this.setDestinationToken}
-                    projects={this.state.projects}
-                ></DestinationTokensPopup>
+                {this.state.toggleDestinationTokensPopup &&
+                    <DestinationTokensPopup
+                        chainId={this.context.chainIdNumber}
+                        show={this.state.toggleDestinationTokensPopup}
+                        closePopupCallback={this.toggleDestinationTokensPopup}
+                        tokens={this.state.tokens}
+                        networks={this.state.networks}
+                        wrappedTokens={this.state.wrappedTokens}
+                        selectedSourceToken={this.state.sourceTokenData}
+                        destinationTokenSelectedCallback={this.setDestinationToken}
+                        projects={this.state.projects}
+                    ></DestinationTokensPopup>
                 }
-                
+
                 {this.state.toggleCheckAuthenticityPopup &&
-                <CheckAuthenticityPopup 
-                    show={this.state.toggleCheckAuthenticityPopup} 
-                    closePopupCallback={this.toggleCheckAuthenticityPopup}
-                    networks={this.state.networks}
-                    selectedSourceToken={this.state.sourceTokenData}
-                    selectedDestinationToken={this.state.destinationTokenData}
-                ></CheckAuthenticityPopup>
+                    <CheckAuthenticityPopup
+                        show={this.state.toggleCheckAuthenticityPopup}
+                        closePopupCallback={this.toggleCheckAuthenticityPopup}
+                        networks={this.state.networks}
+                        selectedSourceToken={this.state.sourceTokenData}
+                        selectedDestinationToken={this.state.destinationTokenData}
+                    ></CheckAuthenticityPopup>
                 }
 
 
@@ -1345,19 +1297,11 @@ export default class BridgeSwap extends PureComponent {
                             <span>|</span>
                             {/* <a href="">Free license</a> */}
                             <a href="">Apply for licensing</a>
-
-                            <a style={{marginLeft: "15px"}} href="">Bridge another token</a>
+                            <a href="" onClick={(e) => this.resetComponent(e)} style={{marginLeft: "15px"}} type="button">Bridge another token</a>
                         </div>
                     </div>
                 </div>
-
-                {/* Success message */} 
-                {/* <div className="success-msg">
-                    <i className="fas fa-check"></i>
-                    <h4>Token Bridged Successfully</h4>
-                    <p>Check the ledger below</p>
-                </div> */}
-            </>            
+            </>
         );
     }
 }

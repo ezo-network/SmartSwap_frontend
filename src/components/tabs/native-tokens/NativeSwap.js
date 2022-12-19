@@ -92,7 +92,7 @@ export default class NativeSwap extends PureComponent {
                         this.setState({
                             networks: response
                         });
-                        this.props.setNetworkList(response);
+                        this.props.setNetworkList(response, "native-tokens");
                     }
                 } else {
                     console.error(error)

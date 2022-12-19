@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
 import BridgeSwap from "./bridge-tokens/BridgeSwap";
 import NativeSwap from "./native-tokens/NativeSwap";
-import LedgerHistory from "../LedgerHistory/LedgerHistory";
+import {LedgerHistory as NativeTokenLedgerHistory} from "../tabs/LedgerHistory/native-tokens/LedgerHistory";
+import {LedgerHistory as BridgeTokenLedgerHistory} from "../tabs/LedgerHistory/bridge-tokens/LedgerHistory";
 
 
 export default class SmartEcoSystemTabs extends PureComponent {
@@ -50,12 +51,15 @@ export default class SmartEcoSystemTabs extends PureComponent {
                 }
             ],
             openLedger: false,
-            networks: []
+            smartswapSupportedNetworks: [],
+            bridgeSupportedNetworks: [],
+            tokens: []
         }
 
         this.changeTab = this.changeTab.bind(this);
         this.closeSideBar = this.closeSideBar.bind(this);
-        this.setNetworkList = this.setNetworkList.bind(this)
+        this.setNetworkList = this.setNetworkList.bind(this);
+        this.setTokenList = this.setTokenList.bind(this);
     }
 
     componentDidMount = async () => {
@@ -77,7 +81,12 @@ export default class SmartEcoSystemTabs extends PureComponent {
                     openLedger={() => this.openLedger()}
                     setNetworkList={this.setNetworkList}
                 ></NativeSwap>,
-            'bridge-tokens': <BridgeSwap></BridgeSwap>
+            'bridge-tokens': 
+                <BridgeSwap 
+                    setNetworkList={this.setNetworkList} 
+                    onTokenListFetched={this.setTokenList}
+                    openLedger={() => this.openLedger()}
+                ></BridgeSwap>
         }
         return tabComponentsMap[tabLink];
     }
@@ -116,10 +125,25 @@ export default class SmartEcoSystemTabs extends PureComponent {
         }
     }
 
-    setNetworkList(networkList){
+    setNetworkList(networkList, type){
+        if(this._componentMounted){ 
+            if(type === 'native-tokens'){
+                this.setState({
+                    nativeTokenSupportedNetworks: networkList
+                });
+            }
+            if(type === 'bridge-tokens'){
+                this.setState({
+                    bridgeSupportedNetworks: networkList
+                });
+            }            
+        }
+    }
+
+    setTokenList(tokenList){
         if(this._componentMounted){            
             this.setState({
-                networks: networkList
+                tokens: tokenList
             });
         }
     }
@@ -156,12 +180,22 @@ export default class SmartEcoSystemTabs extends PureComponent {
                 </div>
 
                 {this.state.activeTabLink === "native-tokens" &&
-                    <LedgerHistory 
-                        networks={this.state.networks}
+                    <NativeTokenLedgerHistory 
+                        networks={this.state.smartswapSupportedNetworks}
                         isLedgerOpen={this.state.openLedger} 
                         toggleLedger={() => this.toggleLedger()
-                    }></LedgerHistory>
+                    }></NativeTokenLedgerHistory>
                 }
+
+                {this.state.activeTabLink === "bridge-tokens" &&
+                    <BridgeTokenLedgerHistory 
+                        networks={this.state.bridgeSupportedNetworks}
+                        tokens={this.state.tokens}
+                        isLedgerOpen={this.state.openLedger} 
+                        toggleLedger={() => this.toggleLedger()
+                    }></BridgeTokenLedgerHistory>
+                }
+
             </>
         )
     }
