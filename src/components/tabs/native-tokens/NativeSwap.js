@@ -229,7 +229,7 @@ export default class NativeSwap extends PureComponent {
                             </div>
                         </div> 
                         <label className="slippage-outer">
-                            <p className="active" style={{ paddingRight: "8px" }}>Dollar amount </p>
+                            <p className={`${this.state.inputMode === INPUT_MODES[1] ? "" : "active"}`} style={{ paddingRight: "8px" }}>Dollar amount </p>
                             <Switch
                                 checked={this.state.inputMode === INPUT_MODES[1] ? true : false}
                                 onChange={(e) => this.toggleInputMode(this.state.inputMode)}
@@ -247,10 +247,10 @@ export default class NativeSwap extends PureComponent {
                                 className="react-switch"
                                 id="input-mode"
                             />
-                            <p style={{ paddingLeft: "8px" }}>Token amount</p>
+                            <p className={`${this.state.inputMode === INPUT_MODES[1] ? "active" : ""}`} style={{ paddingLeft: "8px" }}>Token amount</p>
                         </label>
                         <label className="slippage-outer">
-                            <p className="active" style={{ paddingRight: "8px" }}>Slippage free </p>
+                            <p className={`${this.state.slippageMode === SLIPPAGE_MODES[1] ? "" : "active"}`} style={{ paddingRight: "8px" }}>Slippage free </p>
                             <Switch
                                 checked={this.state.slippageMode === SLIPPAGE_MODES[1] ? true : false}
                                 onChange={(e) => this.toggleSlippageMode(this.state.slippageMode)}
@@ -268,7 +268,7 @@ export default class NativeSwap extends PureComponent {
                                 className="react-switch"
                                 id="slippage-mode"
                             />
-                            <p style={{ paddingLeft: "8px" }}>Best slippage</p>
+                            <p className={`${this.state.slippageMode === SLIPPAGE_MODES[1] ? "active" : ""}`} style={{ paddingLeft: "8px" }}>Best slippage</p>
                         </label>
                     </div>
                 </div>
