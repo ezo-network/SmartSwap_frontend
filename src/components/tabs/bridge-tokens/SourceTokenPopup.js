@@ -609,7 +609,7 @@ const Tfooter = styled.div `
 `
 const Tfootnote = styled.div `
     display: flex; align-items: center; justify-content: center; font-size: 12px; color: #aaaaaa; padding: 16px 0 0;
-    b.error {color: #ff0000}
+    b.error {color: #f23436}
 `
 const SelectCustom = styled.div `
     display: inline-block; position: relative; margin: 0 10px;
