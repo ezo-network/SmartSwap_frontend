@@ -89,7 +89,7 @@ export default class HeadFreeListing extends PureComponent {
                     <RMbox>
                         <CounterBox />
 
-                        <a href onClick={(e) => { e.preventDefault(); this.toggleSideMenu() }} className="rmDotLink02 cursor"></a>
+                        <a className={`rmDotLink02 cursor ${this.state.sideMenu ? "active" : ""}`} href onClick={(e) => { e.preventDefault(); this.toggleSideMenu() }} ></a>
                     </RMbox>
                 </LHead>
 
@@ -174,7 +174,7 @@ const FlexDiv = styled.div`
 
 
 const LHead = styled(FlexDiv)` 
-    /* padding:14px 40px; */ padding: 18px 42px; justify-content:flex-start;   width: 100%; position: relative; 
+    /* padding:14px 40px; */ padding: 18px 42px; justify-content:flex-start; z-index: 1000;   width: 100%; position: relative; 
     @media screen and (max-width: 1600px){
         padding-bottom: 50px; padding-top: 10px;
     }
@@ -193,6 +193,10 @@ const LHead = styled(FlexDiv)`
 `
 const Logo = styled(FlexDiv)` 
     margin-right:25px;
+    @media screen and (max-width: 640px){
+        width: 42px; margin: -4px 0 0 7px;
+        img {width: 100%}
+    }
 `
 const Nav = styled(FlexDiv)`
     font-size:16px; font-weight:400; 
@@ -209,7 +213,7 @@ const Nav = styled(FlexDiv)`
         font-size: 15px;
         span {margin:0 10px; font-size:15px;}
     }
-    @media screen and (max-width: 1550px){
+    @media screen and (max-width: 1390px){
         position: absolute;
         left:0; right: 0; top: 130px;
     }
@@ -229,12 +233,14 @@ const Nav = styled(FlexDiv)`
         & > a {padding: 8px 0; width: 100%; text-align: center;}
         &.showMenu {display: flex;}
     }
+    
 `
 const RMbox = styled(FlexDiv)`
     margin-left:auto; 
     .link01{ color: #fff; font-size:14px; margin-left:36px; font-weight:700; :hover{ color: #91dc27;} }
     .hideOnMobile {display: flex; align-items: center;}
     .hamburger {display: none; font-size: 30px; color: #fff; text-shadow: 0 0 12px rgba(145, 220, 39, 1);}
+    .rmDotLink02.active {opacity: 0; }
     @media screen and (max-width: 1680px){
         .rmDotLink02 {margin-right: 0;}
         .link01{ margin-left: 28px; }
@@ -247,16 +253,19 @@ const RMbox = styled(FlexDiv)`
             img {max-width: 100%;}
         }
     }
-    @media screen and (max-width: 400px){
+    @media screen and (max-width: 640px){
         flex-flow: row;
-        .jackpot { width: 120px; margin: 0 -20px 0 -60px; }
+        .rmDotLink02 {margin-right: 12px; margin-left: 24px;}
+        .jackpot { width: 120px; margin: -12px -20px -12px -60px; }
+    }
+    @media screen and (max-width: 400px){
     }
 `
 const Rtimer = styled(FlexDiv)`
     font-size:14px; font-weight:700; color: #fff; line-height:24px;
     span{ display: inline-block; background-color: #222222; border:1px solid #da9732; width:18px; text-align:center; margin:0 2px}
-    @media screen and (max-width: 450px) {
+    @media screen and (max-width: 640px) {
         font-size: 9px; margin: 0 -5px 0 0; line-height: 17px;
-        span {width:13px;}
+        span {width: 12px; line-height: 1.5; margin: 0 1px;}
     }
 `

@@ -139,7 +139,7 @@ class LedgerHistory extends PureComponent {
         return (
             <>
                 <div id="ledger-history" className="dropdown">
-                    <h4 className="dropdown-title" onClick={() => this.props.toggleLedger()}>Ledger</h4>
+                    <h4 className={`dropdown-title ${this.props.isLedgerOpen ? 'active' : ''}`} onClick={() => this.props.toggleLedger()}>Ledger</h4>
                 </div>
                 <div style={{display: this.props.isLedgerOpen ? 'block' : 'none'}}>
                     <nav className="tab-nav">
