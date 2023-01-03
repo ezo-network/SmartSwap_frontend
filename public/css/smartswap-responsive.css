@@ -1747,8 +1747,7 @@
     overflow-y: scroll;
     z-index: 999;
   }
-  .waltFix01 {margin: 58px 0 0 0;}
-  .smartSwap .msb-Waddress a.rmDotLink {position: fixed; right: 19px; top: 28px;}
+  
 
   /* Licence Form Style  */
   .smartSwap .reserve-Block {
@@ -3288,9 +3287,7 @@
     top: 32px;
   }
 
-  .smartSwap .mainBlock {
-    padding-top: 70px;
-  }
+ 
 
   .stActSbx01 {
     width: calc(33.33% - 22px);
@@ -4557,15 +4554,24 @@
   .tab-container.hasSidebar {width: 894px;}
   .btn-grp {flex-flow: wrap; gap: 15px;}
   .smartSwap .btn {width: auto; margin: 0; flex-grow: 1;}
+  .btn-grp-cm {margin: 0;}
+  .mb-135 {margin-bottom: 60px;}
+  .mt-145 {margin-top: 0;}
+  .caro-1 {margin-bottom: 70px;}
+  .stActMBX {margin-bottom: 70px;}
+  
 }
 @media(max-width: 991px) {
   .swap-Textlink {flex-flow: column;}
   .bottom-action-bar {top: 100%; bottom: auto;}
   .swap-Textlink label {margin: 13px 0 0;}
-  .dropdown {padding: 130px 0 80px;}
+  .dropdown {padding: 160px 0 50px;}
   .smartSwap .btn {font-size: 18px; padding: 16px 15px; margin: 0 0;}
   .tab-nav {padding: 0 0 65px;}
   .powertextBX {flex-flow: column; align-items: flex-start;}
+  .smartSwap .menuSideBar {width: 100%; padding: 100px 30px 0;}
+  .smartSwap .msb-Waddress a.rmDotLink {position: fixed; right: 19px; top: 53px;}
+  .leftMenu.mobile-block a {display: table;}
 }
 @media(max-width: 767px) {
   .smartSwap .mainBlock {padding-top: 30px !important;}
@@ -4618,4 +4624,11 @@
   .o-outer p.need-text {margin-bottom: 15px; line-height: 2;}
   .Box-bottom i {margin: -35px 0 0 0;}
   .Box-bottom a {line-height: 25px;}
+  .smartSwap .msb-Waddress a.rmDotLink {top: 47px;}
+}
+
+@media(max-width: 640px) {
+  .waltFix01 {margin: 58px 0 0 0;}
+  .smartSwap .msb-Waddress a.rmDotLink {top: 28px;}
+  .smartSwap .menuSideBar {padding: 0 0 46px 22px;}
 }

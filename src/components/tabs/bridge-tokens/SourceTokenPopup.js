@@ -538,6 +538,9 @@ const PopupMain = styled.div `
 `
 const ContainerPop = styled.div `
     width: 1360px; margin: 0 auto;
+    @media screen and (max-width: 1400px) {
+        max-width: calc(100% - 30px);
+    }
 `
 
 const CloseBtn = styled.a `
@@ -545,8 +548,12 @@ const CloseBtn = styled.a `
 `
 
 const PopTitle = styled.div `
-    text-align: center; padding: 90px 0 50px;
+    text-align: center; padding: 90px 0 50px; position: relative;
     h1 {font-size: 36px; color: #fff; font-weight: bold; margin: 0 0 0;}
+    @media screen and (max-width: 1400px) {
+        text-align: left; 
+        h1 {}
+    }
 `
 const PopRow = styled.div `
     display: flex; align-items: flex-start; margin: 0 -17px 48px;
@@ -645,8 +652,8 @@ const NetworkDropdownList = styled.div `
     position: absolute;
     z-index: 999999;
     background: #21232b;
-    top: 10%;
-    right: 13%;    
+    top: calc(50% - 14px);
+    right: 0;    
     gap: 10px;
     display: flex;
     justify-content: flex-start;

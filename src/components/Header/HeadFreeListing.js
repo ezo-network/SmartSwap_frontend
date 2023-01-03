@@ -174,7 +174,7 @@ const FlexDiv = styled.div`
 
 
 const LHead = styled(FlexDiv)` 
-    /* padding:14px 40px; */ padding: 18px 42px; justify-content:flex-start; z-index: 1000;   width: 100%; position: relative; 
+    /* padding:14px 40px; */ padding: 18px 42px; justify-content:flex-start;  width: 100%; position: relative; 
     @media screen and (max-width: 1600px){
         padding-bottom: 50px; padding-top: 10px;
     }
@@ -182,7 +182,7 @@ const LHead = styled(FlexDiv)`
         padding-bottom: 0;
     }
     @media screen and (max-width: 991px){
-        padding-right: 15px;  padding-left  : 15px;
+        padding-right: 15px;  padding-left  : 15px;  z-index: 1000; 
     }
     @media screen and (max-width: 767px){
         padding:14px 10px;
