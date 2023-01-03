@@ -145,7 +145,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
         if(this._componentMounted){ 
             if(type === 'native-tokens'){
                 this.setState({
-                    nativeTokenSupportedNetworks: networkList
+                    smartswapSupportedNetworks: networkList
                 });
             }
             if(type === 'bridge-tokens'){
