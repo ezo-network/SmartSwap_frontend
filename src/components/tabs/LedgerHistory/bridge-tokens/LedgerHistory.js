@@ -58,6 +58,10 @@ class LedgerHistory extends PureComponent {
         if(this.props.isLedgerOpen !== prevProps.isLedgerOpen && this.props.isLedgerOpen === true){
             await this.getDepositTokensHistoryByWalletAddress();
         }
+
+        if(this.props.isWrapTokenDeposit !== prevProps.isWrapTokenDeposit){
+            await this.getDepositTokensHistoryByWalletAddress();
+        }
     }
 
     componentWillUnmount() {
@@ -74,7 +78,7 @@ class LedgerHistory extends PureComponent {
                 await connectWallet();
             }
     
-            const {response, code, error} = await BridgeApiHelper.getDepositTokensHistoryByWalletAddress(account, chainIdNumber);
+            const {response, code, error} = await BridgeApiHelper.getDepositTokensHistoryByWalletAddress(account, chainIdNumber, this.props.isWrapTokenDeposit);
 
             if(code !== 200){
                 console.error("getDepositTokensHistoryByWalletAddress", response, code, error);
@@ -130,18 +134,18 @@ class LedgerHistory extends PureComponent {
             ));
         });
 
-        console.table(filteredDepositRequests);
+        //console.table(filteredDepositRequests);
 
         return (
             <>
                 <div id="ledger-history" className="dropdown">
-                    <h4 className="dropdown-title" onClick={() => this.props.toggleLedger()}>Ledger</h4>
+                    <h4 className={`dropdown-title ${this.props.isLedgerOpen ? 'active' : ''}`} onClick={() => this.props.toggleLedger()}>Ledger</h4>
                 </div>
                 <div style={{display: this.props.isLedgerOpen ? 'block' : 'none'}}>
                     <nav className="tab-nav">
-                        <a className={`cursor ${this.state.filterBy === 'ALL' ? 'active' : ''}`} href onClick={(e) => this.setFilterBy('ALL')}>All</a>
-                        <a className={`cursor ${this.state.filterBy === 'COMPLETED' ? 'active' : ''}`} href onClick={(e) => this.setFilterBy('COMPLETED')}>Completed</a>
-                        <a className={`cursor ${this.state.filterBy === 'PENDING' ? 'active' : ''}`} href onClick={(e) => this.setFilterBy('PENDING')}>Pending</a>
+                        <a className={`cursor ${this.state.filterBy === 'ALL' ? 'active' : ''}`} href="#" onClick={(e) => this.setFilterBy('ALL')}>All</a>
+                        <a className={`cursor ${this.state.filterBy === 'COMPLETED' ? 'active' : ''}`} href="#" onClick={(e) => this.setFilterBy('COMPLETED')}>Completed</a>
+                        <a className={`cursor ${this.state.filterBy === 'PENDING' ? 'active' : ''}`} href="#" onClick={(e) => this.setFilterBy('PENDING')}>Pending</a>
                     </nav>
                     {activeNetworkConfig !== undefined && filteredDepositRequests.map((depositRequest) => {
 
@@ -153,32 +157,45 @@ class LedgerHistory extends PureComponent {
                             chainId: depositRequest?.toChainId ?? null
                         });
 
-                        const token = _.find(this.props.tokens, {
-                            address: depositRequest.token
-                            //chainId: depositRequest.fromChainId
-                        });
+                        let token = undefined;
+                        
+                        if(depositRequest.isWrapTokenDeposit){
+                            token = _.find(this.props.wrappedTokens, {
+                                address: depositRequest.token
+                                //chainId: depositRequest.fromChainId
+                            });
+                        } else {
+                            token = _.find(this.props.tokens, {
+                                address: depositRequest.token
+                                //chainId: depositRequest.fromChainId
+                            });
+                        }
 
                         if(fromNetworkConfig !== undefined && toNetworkConfig !== undefined && token !== undefined){
                             return <div key={depositRequest.txHash} className="ledger-tab">
                                 <div className="ledger-half">
                                     <OrderInformation
-                                        tokenSymbol={token?.symbol}
+                                        title={depositRequest.isWrapTokenDeposit ? 'Derivative Token' : 'Original Token'}
+                                        tokenSymbol={depositRequest.isWrapTokenDeposit ? token.tokenSymbol : token.symbol}
                                         value={depositRequest?.value}
                                         depositOn={depositRequest?.createdAt}
                                         tranactionHash={depositRequest?.txHash}
                                         fromNetworkConfig={fromNetworkConfig}
                                         status={depositRequest?.status}
+                                        isWrapTokenDeposit={depositRequest.isWrapTokenDeposit}
                                     >
                                     </OrderInformation>
                                 </div>
                                 {depositRequest?.status === 'COMPLETED' &&
                                 <div className="ledger-half completed">
                                     <Claimed
-                                        tokenSymbol={token?.symbol}
+                                        title={depositRequest.isWrapTokenDeposit ? 'Original Token' : 'Derivative Token'}
+                                        tokenSymbol={depositRequest.isWrapTokenDeposit ? token.tokenSymbol : token.symbol}
                                         value={depositRequest?.value}
                                         claimedOn={depositRequest?.updatedAt}
                                         claimTranactionHash={depositRequest?.claimTxHash}
                                         toNetworkConfig={toNetworkConfig}
+                                        isWrapTokenDeposit={depositRequest.isWrapTokenDeposit}
                                     >
                                     </Claimed>
                                 </div>
@@ -186,12 +203,14 @@ class LedgerHistory extends PureComponent {
                                 {(depositRequest?.status === 'CLAIM_PENDING' || depositRequest?.status === 'CLAIM_FAILED') &&
                                 <div className="ledger-half">
                                     <ClaimPending
+                                        title={depositRequest.isWrapTokenDeposit ? 'Original Token' : 'Derivative Token'}
                                         networks={this.props.networks}
                                         value={depositRequest?.value}
-                                        tokenSymbol={token?.symbol}
+                                        tokenSymbol={depositRequest.isWrapTokenDeposit ? token.tokenSymbol : token.symbol}
                                         depositOn={depositRequest?.createdAt}
                                         depositRequest={depositRequest}
                                         toNetworkConfig={toNetworkConfig}
+                                        isWrapTokenDeposit={depositRequest.isWrapTokenDeposit}
                                     ></ClaimPending>
                                 </div>
                                 }

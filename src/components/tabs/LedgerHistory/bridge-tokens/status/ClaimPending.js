@@ -9,6 +9,9 @@ import AuthorityServerApiHelper from "../../../../../helper/authorityServerApiHe
 import BridgeContract from "../../../../../helper/bridgeContract";
 import errors from '../../../../../helper/errorConstantsHelper';
 
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
+const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
+
 const numberToBn = (number, decimalPoints, toString = false) => {
     const pow = bigInt(10).pow(decimalPoints);
     const regExp = new RegExp("^-?\\d+(?:\\.\\d{0," + decimalPoints + "})?", "g"); // toFixed without rounding
@@ -72,14 +75,24 @@ export default class ClaimPending extends PureComponent {
 
                     if(networkConfig !== undefined){
                         const bridgeContract = new BridgeContract(this.context.web3, this.context.account, networkConfig.bridgeContractAddress);
-    
+                        
+
+                        console.log(response.originalToken,
+                            response.originalChainID,
+                            depositTxHash,
+                            response.to,
+                            response.value,
+                            depositTokenNetwork,
+                            response.signature
+                        );
+
                         await bridgeContract.claimToken(
                             response.originalToken,
                             response.originalChainID,
                             depositTxHash,
                             response.to,
                             response.value,
-                            response.originalChainID,
+                            depositTokenNetwork,
                             response.signature,
                             async (hash) => {
                                 console.log({
@@ -267,12 +280,14 @@ export default class ClaimPending extends PureComponent {
 
     render() {
 
+        const symbol = this.props.isWrapTokenDeposit ? this.props.tokenSymbol.substring(wrapTokenSymbolPrefixLength) : this.props.tokenSymbol;
+
         return (
             <>
                 <h3>
-                    <b>Derivative Token</b>
+                    <b>{this.props.title}</b>
                 </h3>
-                <h4>{Web3.utils.fromWei(this.props.value)} {this.props.tokenSymbol} ({this.props.toNetworkConfig.chain})
+                <h4>{Web3.utils.fromWei(this.props.value)} {symbol} ({this.props.toNetworkConfig.chain})
                 </h4>
                 <p>{moment().format("MMM D[. ]YYYY[, ]h[:]mma zz")}</p>
                 <div className="ledger-box">

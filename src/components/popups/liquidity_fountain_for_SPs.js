@@ -45,7 +45,7 @@ export default class LiquidityFountainSP extends PureComponent {
 
                 </div>
 
-                <a href onClick={(e) => { e.preventDefault(); this.props.closePopup("LiquidityFountainSP") }} className="close-Icon"></a>
+                <a href="#" onClick={(e) => { e.preventDefault(); this.props.closePopup("LiquidityFountainSP") }} className="close-Icon"></a>
             </div>
         )
 

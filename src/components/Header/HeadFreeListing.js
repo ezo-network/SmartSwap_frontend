@@ -24,7 +24,7 @@ export class CounterBox extends PureComponent {
     render() {
         return (
             <>
-                <a href onClick={(e) => e.preventDefault()} className="jackpot cursor"><img src={JPico} alt='Jackpot' /> </a>
+                <a href="#" onClick={(e) => e.preventDefault()} className="jackpot cursor"><img src={JPico} alt='Jackpot' /> </a>
                 <Rtimer>
                     <span>1</span>
                     <span>1</span>:
@@ -37,7 +37,7 @@ export class CounterBox extends PureComponent {
                     <span>3</span>
                     <span>4</span>
                 </Rtimer>
-                <a href onClick={(e) => e.preventDefault()} className="link01 hideOnMobile cursor">Rewards program</a>
+                <a href="#" onClick={(e) => e.preventDefault()} className="link01 hideOnMobile cursor">Rewards program</a>
             </>
         );
     }
@@ -88,8 +88,11 @@ export default class HeadFreeListing extends PureComponent {
                     </Nav>
                     <RMbox>
                         <CounterBox />
-
-                        <a className={`rmDotLink02 cursor ${this.state.sideMenu ? "active" : ""}`} href onClick={(e) => { e.preventDefault(); this.toggleSideMenu() }} ></a>
+                        <a 
+                            href="#" 
+                            onClick={(e) => { e.preventDefault(); this.toggleSideMenu() }} 
+                            className={`rmDotLink02 cursor ${this.state.sideMenu ? "active" : ""}`}
+                        ></a>
                     </RMbox>
                 </LHead>
 
@@ -196,7 +199,7 @@ const Logo = styled(FlexDiv)`
     @media screen and (max-width: 640px){
         width: 42px; margin: -4px 0 0 7px;
         img {width: 100%}
-    }
+    }    
 `
 const Nav = styled(FlexDiv)`
     font-size:16px; font-weight:400; 
@@ -233,7 +236,6 @@ const Nav = styled(FlexDiv)`
         & > a {padding: 8px 0; width: 100%; text-align: center;}
         &.showMenu {display: flex;}
     }
-    
 `
 const RMbox = styled(FlexDiv)`
     margin-left:auto; 
@@ -255,10 +257,7 @@ const RMbox = styled(FlexDiv)`
     }
     @media screen and (max-width: 640px){
         flex-flow: row;
-        .rmDotLink02 {margin-right: 12px; margin-left: 24px;}
-        .jackpot { width: 120px; margin: -12px -20px -12px -60px; }
-    }
-    @media screen and (max-width: 400px){
+        .jackpot { width: 120px; margin: 0 -20px 0 -60px; }
     }
 `
 const Rtimer = styled(FlexDiv)`

@@ -13,6 +13,9 @@ const textMasking = (text, maskingChar = '.', noOfMaskingChar = 16, startingLett
     return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
 }
 
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
+const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
+
 export default class OrderInformation extends PureComponent {
     _componentMounted = false;
 
@@ -33,11 +36,17 @@ export default class OrderInformation extends PureComponent {
     }
 
     render() {
+
+        const symbol = this.props.isWrapTokenDeposit ? this.props.tokenSymbol.substring(wrapTokenSymbolPrefixLength) : this.props.tokenSymbol;
+
         return (
             <>
-                <h3><b>Original Token</b> <i className="fas fa-chevron-right"></i></h3>
+                <h3>
+                    <b>{this.props.title}</b>
+                    <i className="fas fa-chevron-right"></i>
+                </h3>
                 <h4>
-                    {web3.utils.fromWei(this.props.value)} {this.props.tokenSymbol} ({this.props.fromNetworkConfig.chain})
+                    {web3.utils.fromWei(this.props.value)} {symbol} ({this.props.fromNetworkConfig.chain})
                 </h4>
                 {/* <p>Feb 2. 2019, 9:21am PST</p> */}
                 <p>{moment(this.props.depositOn).format("MMM D[. ]YYYY[, ]h[:]mma zz")}</p>
@@ -46,7 +55,7 @@ export default class OrderInformation extends PureComponent {
                     Transaction Submitted </h5>
                     <p>{textMasking(this.props.tranactionHash)}</p>
                     <div className="flex">
-                        <a className="cursor" href onClick={() => checkTransactionOnExplorer(this.props.fromNetworkConfig?.explorerUrl, this.props.tranactionHash)}>View transaction</a>
+                        <a className="cursor" href="#" onClick={() => checkTransactionOnExplorer(this.props.fromNetworkConfig?.explorerUrl, this.props.tranactionHash)}>View transaction</a>
                     </div>
                 </div>
             </>

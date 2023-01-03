@@ -5,10 +5,15 @@ import _ from "lodash";
 import Web3 from 'web3';
 import { aggregate } from '@makerdao/multicall';
 import PlaceholderLoading from 'react-placeholder-loading'
+import Switch from "react-switch";
+import CONSTANT from '../../../constants';
 import notificationConfig from "../../../config/notificationConfig";
 import SourceTokenPopup from "./SourceTokenPopup";
 import DestinationTokensPopup from "./DestinationTokensPopup";
 import CheckAuthenticityPopup from "./CheckAuthenticityPopup";
+
+/** derivative token side */
+import DerivativeTokenPopup from "./derivative-side/DerivativeTokenPopup";
 
 import BridgeApiHelper from "../../../helper/bridgeApiHelper";
 import BridgeContract from "../../../helper/bridgeContract";
@@ -25,7 +30,7 @@ let source;
 const maxAprovalLimit =  Web3.utils.toBN(process.env.REACT_APP_MAX_TOKEN_APPROVE_LIMIT); // uint96 max 
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
-
+const TOKEN_SIDES = ["TOKEN", "DTOKEN"];
 
 const defaultSourceTokenData = {
     symbol:  'Choose token',
@@ -65,7 +70,8 @@ const initialState = {
     wrappedTokens: [],
     projects: [],
     customTokenBalance: null,
-    depositTokenSuccessful: false
+    depositTokenSuccessful: false,
+    currentTokenSide: TOKEN_SIDES[0]
 }
 
 export default class BridgeSwap extends PureComponent {
@@ -80,7 +86,8 @@ export default class BridgeSwap extends PureComponent {
 
         this.walletConnectCallback = this.walletConnectCallback.bind(this);
         this.setSourceToken = this.setSourceToken.bind(this);
-        this.tokenAddressCallback = this.tokenAddressCallback.bind(this)
+        this.tokenAddedCallback = this.tokenAddedCallback.bind(this);
+        //this.wrapTokenAddedCallback = this.wrapTokenAddedCallback.bind(this);
         this.refetch = this.refetch.bind(this);
     }
 
@@ -99,6 +106,7 @@ export default class BridgeSwap extends PureComponent {
                     console.log(EthereumEvents.CHAIN_CHANGED, chainId);
                     await this.resetSelectedTokens();
                     await this.walletConnectCallback();
+                    console.log('changeeeeeeeeeeee');
                 });
     
                 window.ethereum.on(EthereumEvents.ACCOUNTS_CHANGED, async(accounts) => {
@@ -159,27 +167,31 @@ export default class BridgeSwap extends PureComponent {
     resetSelectedTokens = async() => {
 		if(this._componentMounted === true){
             // if change changed and source token selected then reset source token to 
-            this.setState(prevState => {                       
-                const sourceTokenData = prevState.sourceTokenData;
-                const destinationTokenData = prevState.destinationTokenData;
+            this.setState(prevState => {          
+                const sourceTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] 
+                ? {...defaultSourceTokenData} 
+                : {...defaultDestinationTokenData};
+                const destinationTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] 
+                ? {...defaultDestinationTokenData} 
+                : {...defaultSourceTokenData};
 
-                sourceTokenData['symbol'] = defaultSourceTokenData.symbol;
-                sourceTokenData['chainId'] = defaultSourceTokenData.chainId;
-                sourceTokenData['chain'] = defaultSourceTokenData.chain;
-                sourceTokenData['amount'] = defaultSourceTokenData.amount;
-                sourceTokenData['address'] = defaultSourceTokenData.address;
-                sourceTokenData['isWrappedToken'] = defaultSourceTokenData.isWrappedToken;
-                sourceTokenData['balance'] = defaultSourceTokenData.balance;
-                sourceTokenData['decimals'] = defaultSourceTokenData.decimals;
+                // sourceTokenData['symbol'] = defaultSourceTokenData.symbol;
+                // sourceTokenData['chainId'] = defaultSourceTokenData.chainId;
+                // sourceTokenData['chain'] = defaultSourceTokenData.chain;
+                // sourceTokenData['amount'] = defaultSourceTokenData.amount;
+                // sourceTokenData['address'] = defaultSourceTokenData.address;
+                // sourceTokenData['isWrappedToken'] = defaultSourceTokenData.isWrappedToken;
+                // sourceTokenData['balance'] = defaultSourceTokenData.balance;
+                // sourceTokenData['decimals'] = defaultSourceTokenData.decimals;
 
-                destinationTokenData['symbol'] = defaultDestinationTokenData.symbol;
-                destinationTokenData['chainId'] = defaultDestinationTokenData.chainId;
-                destinationTokenData['chain'] = defaultDestinationTokenData.chain;
-                destinationTokenData['amount'] = defaultDestinationTokenData.amount;
-                destinationTokenData['address'] = defaultDestinationTokenData.address;
-                destinationTokenData['isWrappedToken'] = defaultDestinationTokenData.isWrappedToken;
-                destinationTokenData['balance'] = defaultDestinationTokenData.balance;
-                destinationTokenData['decimals'] = defaultDestinationTokenData.decimals;
+                // destinationTokenData['symbol'] = defaultDestinationTokenData.symbol;
+                // destinationTokenData['chainId'] = defaultDestinationTokenData.chainId;
+                // destinationTokenData['chain'] = defaultDestinationTokenData.chain;
+                // destinationTokenData['amount'] = defaultDestinationTokenData.amount;
+                // destinationTokenData['address'] = defaultDestinationTokenData.address;
+                // destinationTokenData['isWrappedToken'] = defaultDestinationTokenData.isWrappedToken;
+                // destinationTokenData['balance'] = defaultDestinationTokenData.balance;
+                // destinationTokenData['decimals'] = defaultDestinationTokenData.decimals;
 
                 return {
                     isSourceTokenSelected: false,
@@ -194,25 +206,50 @@ export default class BridgeSwap extends PureComponent {
 
     toggleSourceTokenPopup = async(type) => {
 		if(this._componentMounted === true){
-            if(type === 'OPEN'){
-                if(this.pendingNetworkSwitchRequest === false){
-                    if(this.context.isAuthenticated){
-                        await this.filterTokenByWalletBalance().then(() => {
-                            this.setState({
-                                toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
+            if(this.state.currentTokenSide === TOKEN_SIDES[0]){
+                if(type === 'OPEN'){
+                    if(this.pendingNetworkSwitchRequest === false){
+                        if(this.context.isAuthenticated){
+                            await this.filterTokenByWalletBalance().then(() => {
+                                this.setState({
+                                    toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
+                                });
                             });
-                        });
+                        } else {
+                            notificationConfig.info(errors.connectWalletRequestMessage);
+                        }
                     } else {
-                        notificationConfig.info(errors.connectWalletRequestMessage);
+                        notificationConfig.info(errors.switchRequestPending);
                     }
-                } else {
-                    notificationConfig.info(errors.switchRequestPending);
+                }
+                if(type === 'CLOSE'){
+                    this.setState({
+                        toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
+                    });
                 }
             }
-            if(type === 'CLOSE'){
-                this.setState({
-                    toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
-                });
+
+            if(this.state.currentTokenSide === TOKEN_SIDES[1]){
+                if(type === 'OPEN'){
+                    if(this.pendingNetworkSwitchRequest === false){
+                        if(this.context.isAuthenticated){
+                            await this.filterWrappedTokenByWalletBalance().then(() => {
+                                this.setState({
+                                    toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
+                                });
+                            });
+                        } else {
+                            notificationConfig.info(errors.connectWalletRequestMessage);
+                        }
+                    } else {
+                        notificationConfig.info(errors.switchRequestPending);
+                    }
+                }
+                if(type === 'CLOSE'){
+                    this.setState({
+                        toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
+                    });
+                }
             }
         }
     }
@@ -270,9 +307,10 @@ export default class BridgeSwap extends PureComponent {
               //toggleSourceTokenPopup: false,
               toggleDestinationTokensPopup: false,
               toggleCheckAuthenticityPopup: false
+            }, async() => {
+                await this.getAllWrappedTokens();
+                await this.getAllProjectList();
             });
-            await this.getAllWrappedTokens();
-            await this.getAllProjectList();
         }
     }
 
@@ -289,8 +327,9 @@ export default class BridgeSwap extends PureComponent {
                 if(this._componentMounted === true){
                     this.setState({
                       networks: response
+                    }, async() => {
+                        this.props.setNetworkList(response, "bridge-tokens");
                     });
-                    this.props.setNetworkList(response, "bridge-tokens");
                 }
               } else {
                 console.error(error)
@@ -314,8 +353,9 @@ export default class BridgeSwap extends PureComponent {
                     if(this._componentMounted === true){
                         this.setState({
                             tokens: response
+                        }, () => {
+                            this.props.onTokenListFetched(response);
                         });
-                        this.props.onTokenListFetched(response);
                     }
                 } else {
                     console.error(error)
@@ -339,6 +379,8 @@ export default class BridgeSwap extends PureComponent {
                 if(this._componentMounted === true){
                     this.setState({
                       wrappedTokens: response
+                    }, () => {
+                        this.props.onWrapTokenListFetched(response)
                     });
                 }
               } else {
@@ -351,16 +393,21 @@ export default class BridgeSwap extends PureComponent {
         }
     }    
 
-    getAllProjectList = async() => {
+    getAllProjectList = async(chainId = null) => {
         try {
-            if(this.context.chainIdNumber !== null){
+            if(
+                (this.context.chainIdNumber !== null && this.state.currentTokenSide === TOKEN_SIDES[0])
+                ||
+                chainId !== null && this.state.currentTokenSide === TOKEN_SIDES[1]
+            ){
+                const projectOnChainId = this.state.currentTokenSide === TOKEN_SIDES[0] ? this.context.chainIdNumber : chainId;
                 const {
                     response,
                     error,
                     code
-                } = await BridgeApiHelper.getProjects({chainId: this.context.chainIdNumber}, source.token);
+                } = await BridgeApiHelper.getProjects({chainId: projectOnChainId}, source.token);
                 console.log({
-                   'getAllProjectList':  this.context.chainIdNumber
+                   'getAllProjectList': projectOnChainId
                 })
                 if (this._componentMounted === true) {
                     if (code === 200) {
@@ -380,42 +427,59 @@ export default class BridgeSwap extends PureComponent {
         }        
     }
 
-    setSourceToken = async(tokenSymbol, chainId, chain, address, decimals) => {
+    setSourceToken = async(tokenSymbol, chainId, chain, address, decimals, projectChainId = null, projectId = null) => {
         if(this._componentMounted === true){
             this.setState(prevState => {
+                
                 const sourceTokenData = prevState.sourceTokenData;
                 sourceTokenData['symbol'] = tokenSymbol;
                 sourceTokenData['chainId'] = chainId;
                 sourceTokenData['chain'] = chain;
                 sourceTokenData['address'] = address;
                 sourceTokenData['decimals'] = decimals;
-                sourceTokenData['isWrappedToken'] = false;
+                sourceTokenData['isWrappedToken'] = this.state.currentTokenSide === TOKEN_SIDES[0]
+                ? false : true;
     
     
-                const destinationTokenData = {
-                    symbol: 'Derivative token on',
-                    chainId: undefined,
-                    chain: 'chain',
-                    amount: 0,
-                    address: null,
-                    decimals: null,
-                    isWrappedToken: false
-                };
-    
+                const destinationTokenData = this.state.currentTokenSide === TOKEN_SIDES[0]
+                ? {...defaultDestinationTokenData} : {...defaultSourceTokenData}
+
                 return {
                   sourceTokenData,
                   destinationTokenData,
                   isSourceTokenSelected: true,
                   isDestinationTokenSelected: false
                 };
+            }, async() => {
+                await this.aggregateBalanceOfMultiCall(
+                    chainId,
+                    [address],
+                    this.context.account,
+                    decimals
+                );
+
+                if(this.state.currentTokenSide === TOKEN_SIDES[1]){
+                    await this.getAllProjectList(projectChainId).then(() => {
+                        // find project and set destination token
+                        const project = _.find(this.state.projects, {
+                            _id: projectId,
+                            chainId: projectChainId
+                        });
+                        console.log({
+                            'projectprojectprojectproject': project,
+                            projectChainId: projectChainId
+                        });
+                        if(project !== undefined){
+                            this.setDestinationToken(
+                                project.token, 
+                                project.chainId, 
+                                project.chain, 
+                                project.tokenAddress
+                            );
+                        }
+                    });
+                }               
             });
-            
-            await this.aggregateBalanceOfMultiCall(
-                chainId,
-                [address],
-                this.context.account,
-                decimals
-            );
         }
     }
 
@@ -427,7 +491,8 @@ export default class BridgeSwap extends PureComponent {
             destinationTokenData['chain'] = chain;
             destinationTokenData['address'] = address;
             destinationTokenData['decimals'] = this.state.sourceTokenData.decimals;
-            destinationTokenData['isWrappedToken'] = true;            
+            destinationTokenData['isWrappedToken'] = this.state.currentTokenSide === TOKEN_SIDES[0]
+            ? true : false;
             return {
                 destinationTokenData,
                 isDestinationTokenSelected: true
@@ -453,15 +518,14 @@ export default class BridgeSwap extends PureComponent {
                 sourceTokenData,
                 destinationTokenData
             };
-        });    
-        
-        await this.aggregateBalanceOfMultiCall(
-            this.state.destinationTokenData.chainId,
-            [this.state.destinationTokenData.address],
-            this.context.account,
-            this.state.destinationTokenData.decimals
-        );
-        
+        }, async() => {
+            await this.aggregateBalanceOfMultiCall(
+                this.state.destinationTokenData.chainId,
+                [this.state.destinationTokenData.address],
+                this.context.account,
+                this.state.destinationTokenData.decimals
+            );
+        });            
     }
 
     addNetworkToWallet = async(chainId) => {
@@ -631,6 +695,9 @@ export default class BridgeSwap extends PureComponent {
                     address: tokenAddress,
                     chainId: Number(chainId)
                 });
+
+                console.log("original token set");
+
                 if (isTokenExist) {
                     console.log(`${index} ${isTokenExist.symbol}  ${isTokenExist.chainId} - ${token} - ${response.results.transformed[token]}`)
                     if (response.results.transformed[token] > 0) {
@@ -653,7 +720,76 @@ export default class BridgeSwap extends PureComponent {
             })
             console.error(error.message);
         }
-    }    
+    }
+    
+    aggregateWrapTokenBalanceWithMultiCall = async (chainId, wrapTokens = [], accountAddress) => {
+        try {
+
+            const networkConfig = _.find(this.state.networks, { chainId: Number(chainId) });            
+            const config = {
+                rpcUrl: networkConfig.rpc,
+                multicallAddress: networkConfig.multicallContractAddress
+            };
+            
+            const multicallTokensConfig = [];
+            wrapTokens.forEach(wrapToken => {
+                const wrapTokenConfig = _.find(this.state.wrappedTokens, { address: (wrapToken?.address).toLowerCase() });
+
+                // will only work with erc20 token addresses
+                var obj = {
+                    target: wrapTokenConfig?.address,
+                    call: ['balanceOf(address)(uint256)', accountAddress],
+                    returns: [['BALANCE_OF_' + wrapTokenConfig?.address, val => val / 10 ** Number(wrapTokenConfig?.decimals)]]
+                }
+                multicallTokensConfig.push(obj);
+            });
+
+            console.log(multicallTokensConfig);
+
+            const response = await aggregate(
+                multicallTokensConfig,
+                config
+            );
+
+            const tokensBalances = [];
+            await Promise.all(Object.keys(response.results.transformed).map(async (token, index) => {
+                const tokenAddress = (token.substring(11)).toLowerCase();
+                const isTokenExist = _.find(this.state.wrappedTokens, {
+                    address: tokenAddress,
+                    toChainId: Number(chainId)
+                });
+
+                console.log("wrap token set");
+
+                if (isTokenExist) {
+                    console.log(`${index} ${isTokenExist.tokenSymbol}  ${isTokenExist.toChainId} - ${token} - ${response.results.transformed[token]}`)
+                    console.log(response.results.transformed[token] > 0);
+                    if (response.results.transformed[token] > 0) {
+                        tokensBalances.push(isTokenExist);
+                        // this.setState(prevState => ({
+                        //     tokensWithBalance: [...prevState.tokensWithBalance, isTokenExist]
+                        // }))
+                    }
+                }
+            }));
+
+            
+            this.setState({
+                tokensWithBalance: tokensBalances
+            });
+
+            console.log({
+                tokensWithBalance: this.state.tokensWithBalance
+            });
+
+        } catch (error) {
+            console.log({
+                error: error,
+                chainId, wrapTokens, accountAddress
+            })
+            console.error(error.message);
+        }
+    }
 
     getCustomTokenBalance = async(tokenAddress) => {
         try {
@@ -1008,45 +1144,93 @@ export default class BridgeSwap extends PureComponent {
         try {
             this.setState({
                 tokensWithBalance: []
+            }, async() => {
+                await this.context.connectWallet();
+                
+                const groupedTokenByNetwork = this.state.tokens.reduce(function (r, token) {
+                    r[token.chainId] = r[token.chainId] || [];
+                    r[token.chainId].push(token.address);
+                    return r;
+                }, Object.create(null));
+    
+                await Promise.all(Object.keys(groupedTokenByNetwork).map(async (network) => {
+                // Object.keys(groupedTokenByNetwork).forEach(async (network) => {
+                    // only active network
+                    if(Number(this.context.chainIdNumber) === Number(network)){
+                        console.log(this.context.account);
+                        await this.aggregateTokenBalanceWithMultiCall(network, groupedTokenByNetwork[network], this.context.account);
+                    }
+                }));
             });
 
-            await this.context.connectWallet();
-            
-            const groupedTokenByNetwork = this.state.tokens.reduce(function (r, token) {
-                r[token.chainId] = r[token.chainId] || [];
-                r[token.chainId].push(token.address);
-                return r;
-            }, Object.create(null));
-
-            await Promise.all(Object.keys(groupedTokenByNetwork).map(async (network) => {
-            // Object.keys(groupedTokenByNetwork).forEach(async (network) => {
-                // only active network
-                if(Number(this.context.chainIdNumber) === Number(network)){
-                    console.log(this.context.account);
-                    await this.aggregateTokenBalanceWithMultiCall(network, groupedTokenByNetwork[network], this.context.account);
-                }
-            }));
         } catch (error) {
             console.error(error.message);
         }
     }
 
-    tokenAddressCallback = async() => {
+    filterWrappedTokenByWalletBalance = async () => {
+        try {
+            this.setState({
+                tokensWithBalance: []
+            }, async() => {
+                await this.context.connectWallet();
+                const filteredWrappedTokens = _.filter(this.state.wrappedTokens, {
+                    toChainId: this.context.chainIdNumber
+                });
+
+                console.log({
+                    wrappedTokens: this.state.wrappedTokens,
+                    filteredWrappedTokens: filteredWrappedTokens
+                });
+
+                await this.aggregateWrapTokenBalanceWithMultiCall(
+                    this.context.chainIdNumber, 
+                    filteredWrappedTokens, 
+                    this.context.account
+                );
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
+    tokenAddedCallback = async() => {
         if(this._componentMounted){
             try {
                 await this.getTokenList().then(async() => {
                     await this.filterTokenByWalletBalance();
                 });       
             } catch(error){
-                console.error("tokenAddressCallback", error.message);
+                console.error("tokenAddedCallback", error.message);
             }
         }
     }
 
-    refetch = async() => {
+    // wrapTokenAddedCallback = async() => {
+    //     if(this._componentMounted){
+    //         try {
+    //             await this.getTokenList().then(async() => {
+    //                 await this.getAllProjectList().then(async() => {
+    //                     await this.filterWrappedTokenByWalletBalance();
+    //                 });
+    //             });
+    //         } catch(error){
+    //             console.error("wrapTokenAddedCallback", error.message);
+    //         }
+    //     }
+    // }
+
+    refetch = async(tokenSideToRefetch) => {
         try {
             if(this._componentMounted){
-                await this.filterTokenByWalletBalance();
+                if(tokenSideToRefetch === TOKEN_SIDES[0]){
+                    await this.filterTokenByWalletBalance();
+                }
+
+                if(tokenSideToRefetch === TOKEN_SIDES[1]){
+                    await this.getAllWrappedTokens();
+                    await this.filterWrappedTokenByWalletBalance();
+                }
             }
         } catch(error){
             console.error("refetch", error.message);
@@ -1059,6 +1243,25 @@ export default class BridgeSwap extends PureComponent {
                 e.preventDefault();
                 await this.resetSelectedTokens();
             }
+        }
+    }
+
+    toggleTokenSide = () => {
+        if(this._componentMounted){            
+            this.setState(prevState => {
+                const sourceTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] ? {...defaultDestinationTokenData} : {...defaultSourceTokenData};
+                const destinationTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] ? {...defaultSourceTokenData} : {...defaultDestinationTokenData};
+                const newTokenSide = this.state.currentTokenSide === TOKEN_SIDES[0] ? TOKEN_SIDES[1] : TOKEN_SIDES[0];
+                this.props.toggleIsWrapTokenDeposit(newTokenSide === TOKEN_SIDES[1] ? true : false);
+                return {
+                    isSourceTokenSelected: false,
+                    isDestinationTokenSelected: false,
+                    toggleSourceTokenPopup: false,
+                    sourceTokenData,
+                    destinationTokenData,
+                    currentTokenSide: newTokenSide
+                };
+            });
         }
     }
 
@@ -1144,8 +1347,9 @@ export default class BridgeSwap extends PureComponent {
                         </div>
                         <div className="tabDivider">
                             <button
-                                className="swap"
-                            //onClick={() => this.swapDirections()}
+                                className="swap deposit-tokens"
+                                //onClick={() => this.swapDirections()}
+                                onClick={() => this.toggleTokenSide()}
                             >
                                 <img src={swapImg} alt="swap-directions-button"></img>
                             </button>
@@ -1240,7 +1444,7 @@ export default class BridgeSwap extends PureComponent {
                 </div>                
                 }
 
-                {this.state.toggleSourceTokenPopup &&
+                {this.state.toggleSourceTokenPopup && (this.state.currentTokenSide === TOKEN_SIDES[0]) &&
                     <SourceTokenPopup
                         show={this.state.toggleSourceTokenPopup}
                         closePopupCallback={this.toggleSourceTokenPopup}
@@ -1251,7 +1455,7 @@ export default class BridgeSwap extends PureComponent {
                         accountAddress={this.context.account}
                         walletConnected={this.context.isAuthenticated}
                         chainId={this.context.chainIdNumber}
-                        onTokenAddedCallback={this.tokenAddressCallback}
+                        onTokenAddedCallback={this.tokenAddedCallback}
                         onCustomTokenBalanceCheck={this.getCustomTokenBalance}
                         customTokenBalance={this.state.customTokenBalance}
                         projects={this.state.projects}
@@ -1259,7 +1463,26 @@ export default class BridgeSwap extends PureComponent {
                     ></SourceTokenPopup>
                 }
 
-                {this.state.toggleDestinationTokensPopup &&
+                {this.state.toggleSourceTokenPopup && (this.state.currentTokenSide === TOKEN_SIDES[1]) &&
+                    <DerivativeTokenPopup
+                        show={this.state.toggleSourceTokenPopup}
+                        closePopupCallback={this.toggleSourceTokenPopup}
+                        tokens={this.state.tokensWithBalance}
+                        networks={this.state.networks}
+                        wrappedTokens={this.state.wrappedTokens}
+                        sourceTokenSelectedCallback={this.setSourceToken}
+                        accountAddress={this.context.account}
+                        walletConnected={this.context.isAuthenticated}
+                        chainId={this.context.chainIdNumber}
+                        // onTokenAddedCallback={this.wrapTokenAddedCallback}
+                        onCustomTokenBalanceCheck={this.getCustomTokenBalance}
+                        customTokenBalance={this.state.customTokenBalance}
+                        projects={this.state.projects}
+                        refetch={this.refetch}
+                    ></DerivativeTokenPopup>                
+                }
+
+                {this.state.toggleDestinationTokensPopup && (this.state.currentTokenSide === TOKEN_SIDES[0]) &&
                     <DestinationTokensPopup
                         chainId={this.context.chainIdNumber}
                         show={this.state.toggleDestinationTokensPopup}
@@ -1293,10 +1516,31 @@ export default class BridgeSwap extends PureComponent {
                             {/* <a href="#">Start new swap</a> */}
                         </p>
                         <div className="powertextBX-links">
+                            <label className="switch-container token-side-switcher">
+                                <p className={`${this.state.currentTokenSide === TOKEN_SIDES[0] ? "active" : ""}`} style={{ paddingRight: "8px" }}>Orignal Token</p>
+                                <Switch
+                                    checked={this.state.currentTokenSide === TOKEN_SIDES[1] ? true : false}
+                                    onChange={(e) => this.toggleTokenSide()}
+                                    handleDiameter={14}
+                                    offColor="#2e303a"
+                                    onColor="#2e303a"
+                                    offHandleColor="#91dc27"
+                                    onHandleColor="#91dc27"
+                                    height={18}
+                                    width={32}
+                                    borderRadius={0}
+                                    activeBoxShadow="0px 0px 0px 0px #fffc35"
+                                    uncheckedIcon={false}
+                                    checkedIcon={false}
+                                    className="react-switch"
+                                    id="input-mode"
+                                />
+                                <p className={`${this.state.currentTokenSide === TOKEN_SIDES[1] ? "active" : ""}`} style={{ paddingLeft: "8px" }}>Derivative Token</p>
+                            </label>                            
                             <Link to='/freelisting'>Free listing</Link>
                             <span>|</span>
                             {/* <a href="">Free license</a> */}
-                            <a href="">Apply for licensing</a>
+                            <a href={CONSTANT.APPLY_FOR_LICENSING_ACTION} target="_blank">Apply for licensing</a>
                             <a href="" onClick={(e) => this.resetComponent(e)} style={{marginLeft: "15px"}} type="button">Bridge another token</a>
                         </div>
                     </div>

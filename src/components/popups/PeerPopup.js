@@ -46,9 +46,9 @@ export default class PeerPopup extends PureComponent {
                 <div className="container-Grid"> 
                 <div className="MainTabBox">
                     <div className="tab-Nav">
-                        <a href className="tab-Link" onClick={(e) => {e.preventDefault();}} data-id="tab-1">Peer to Contract</a>
-                        <a href className="tab-Link" onClick={(e) =>{e.preventDefault();}} data-id="tab-2">Peer to Peer</a>
-                        <a href className="tab-Link" onClick={(e) =>{e.preventDefault();}} data-id="tab-3">Peer to Contract and Group</a>
+                        <a href="#" className="tab-Link" onClick={(e) => {e.preventDefault();}} data-id="tab-1">Peer to Contract</a>
+                        <a href="#" className="tab-Link" onClick={(e) =>{e.preventDefault();}} data-id="tab-2">Peer to Peer</a>
+                        <a href="#" className="tab-Link" onClick={(e) =>{e.preventDefault();}} data-id="tab-3">Peer to Contract and Group</a>
                     </div> 
 
 
@@ -82,7 +82,7 @@ export default class PeerPopup extends PureComponent {
                
                
                
-                <a href  onClick={(e) => { e.preventDefault(); this.props.closePopup("PeerPopup") }} className="close-Icon"></a>
+                <a href="#"  onClick={(e) => { e.preventDefault(); this.props.closePopup("PeerPopup") }} className="close-Icon"></a>
             </div>
         )
 

@@ -1,5 +1,7 @@
 import axios from 'axios';
 import CONSTANT from "../constants";
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
 
 export default class axiosRequest {
 
@@ -15,7 +17,7 @@ export default class axiosRequest {
                     'Accept': 'application/json'
                 },
                 data: null,
-                cancelToken: args.cancelToken
+                cancelToken: source.token
             };
             for (let k in args.headers) {
                 options.headers[k] = args.headers[k];

@@ -46,10 +46,10 @@ export default class CefiToDefi extends PureComponent {
                 <div className="container-Grid">
                     <div className="MainTabBox">
                         <div className="tab-Nav">
-                            <a href className="tab-Link" onClick={ev => { ev.preventDefault(); }} data-id="tab-7">
+                            <a href="#" className="tab-Link" onClick={ev => { ev.preventDefault(); }} data-id="tab-7">
                                 CeFi to DeFi</a>
-                            <a href className="tab-Link hideMobile" onClick={ev => { ev.preventDefault(); }} data-id="tab-8">What is a Swap Provider</a>
-                            <a href className="tab-Link hideMobile" onClick={ev => { ev.preventDefault(); }} data-id="tab-9">SmartSwap Liquidity Process</a>
+                            <a href="#" className="tab-Link hideMobile" onClick={ev => { ev.preventDefault(); }} data-id="tab-8">What is a Swap Provider</a>
+                            <a href="#" className="tab-Link hideMobile" onClick={ev => { ev.preventDefault(); }} data-id="tab-9">SmartSwap Liquidity Process</a>
                         </div>
 
                         <div className={"tab-Content " + this.props.popId} id="tab-7">
@@ -58,7 +58,7 @@ export default class CefiToDefi extends PureComponent {
                         </div>
 
                         <div className="tab-Nav showMobile " style={{ width: '100%' }} >
-                            <a href className="tab-Link" onClick={ev => { ev.preventDefault(); }} data-id="tab-8">
+                            <a href="#" className="tab-Link" onClick={ev => { ev.preventDefault(); }} data-id="tab-8">
                                 What is a Swap Provider</a>
                         </div>
 
@@ -88,7 +88,7 @@ export default class CefiToDefi extends PureComponent {
                     </div>
 
                 </div>
-                <a href onClick={(e) => { e.preventDefault(); this.props.closePopup("CefiToDefi") }} className="close-Icon"></a>
+                <a href="#" onClick={(e) => { e.preventDefault(); this.props.closePopup("CefiToDefi") }} className="close-Icon"></a>
             </div>
         )
 

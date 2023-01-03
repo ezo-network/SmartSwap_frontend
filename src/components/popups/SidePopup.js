@@ -172,7 +172,7 @@ export default class SidePopup extends PureComponent {
 
 
 
-                    <a href className="close-Icon" onClick={(e) => { e.preventDefault(); this.props.closePopup}}><img src="images/close-btn.png" alt=""/></a>
+                    <a href="#" className="close-Icon" onClick={(e) => { e.preventDefault(); this.props.closePopup}}><img src="images/close-btn.png" alt=""/></a>
 
                 </div>
             </div>       

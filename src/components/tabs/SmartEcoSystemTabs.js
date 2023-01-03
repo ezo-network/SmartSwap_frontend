@@ -3,6 +3,7 @@ import BridgeSwap from "./bridge-tokens/BridgeSwap";
 import NativeSwap from "./native-tokens/NativeSwap";
 import {LedgerHistory as NativeTokenLedgerHistory} from "../tabs/LedgerHistory/native-tokens/LedgerHistory";
 import {LedgerHistory as BridgeTokenLedgerHistory} from "../tabs/LedgerHistory/bridge-tokens/LedgerHistory";
+import {TokensUsdPriceContext} from "../../context/TokensUsdPriceProvider";
 
 
 export default class SmartEcoSystemTabs extends PureComponent {
@@ -53,13 +54,17 @@ export default class SmartEcoSystemTabs extends PureComponent {
             openLedger: false,
             smartswapSupportedNetworks: [],
             bridgeSupportedNetworks: [],
-            tokens: []
+            tokens: [],
+            wrappedTokens: [],
+            isWrapTokenDeposit: false
         }
 
         this.changeTab = this.changeTab.bind(this);
         this.closeSideBar = this.closeSideBar.bind(this);
         this.setNetworkList = this.setNetworkList.bind(this);
         this.setTokenList = this.setTokenList.bind(this);
+        this.setWrappedTokenList = this.setWrappedTokenList.bind(this);
+        this.toggleIsWrapTokenDeposit = this.toggleIsWrapTokenDeposit.bind(this);
     }
 
     componentDidMount = async () => {
@@ -76,6 +81,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
         const tabComponentsMap = {
             'native-tokens': 
                 <NativeSwap 
+                    tokensUsdPrice={this.context.tokensUsdPrice}
                     showSidebar={this.state.showSidebar}
                     closeSideBar={() => this.closeSideBar()}
                     openLedger={() => this.openLedger()}
@@ -85,7 +91,9 @@ export default class SmartEcoSystemTabs extends PureComponent {
                 <BridgeSwap 
                     setNetworkList={this.setNetworkList} 
                     onTokenListFetched={this.setTokenList}
+                    onWrapTokenListFetched={this.setWrappedTokenList}
                     openLedger={() => this.openLedger()}
+                    toggleIsWrapTokenDeposit={this.toggleIsWrapTokenDeposit}
                 ></BridgeSwap>
         }
         return tabComponentsMap[tabLink];
@@ -125,6 +133,14 @@ export default class SmartEcoSystemTabs extends PureComponent {
         }
     }
 
+    toggleIsWrapTokenDeposit(isWrapTokenDeposit){
+        if(this._componentMounted){            
+            this.setState({
+                isWrapTokenDeposit: isWrapTokenDeposit
+            });
+        }        
+    }
+
     setNetworkList(networkList, type){
         if(this._componentMounted){ 
             if(type === 'native-tokens'){
@@ -148,6 +164,14 @@ export default class SmartEcoSystemTabs extends PureComponent {
         }
     }
 
+    setWrappedTokenList(wrappedTokensList){
+        if(this._componentMounted){            
+            this.setState({
+                wrappedTokens: wrappedTokensList
+            });
+        }        
+    }
+
     scroll = () => {
         const section = document.querySelector( '#ledger-history' );
         section.scrollIntoView( { behavior: 'smooth', block: 'start' } );
@@ -169,7 +193,6 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                     </div>
                                 </li>
                             })}
-                            
                         </ul>
 
                         <div className="tab-content-n-main">
@@ -184,6 +207,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
                             {this.state.activeTabLink === this.state.tabs[0].link && (
                             <div id={`${this.state.activeTabLink}`} className="tabMain">
                                 <NativeSwap 
+                                    tokensUsdPrice={this.context.tokensUsdPrice}
                                     showSidebar={this.state.showSidebar}
                                     closeSideBar={() => this.closeSideBar()}
                                     openLedger={() => this.openLedger()}
@@ -206,7 +230,9 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                     <BridgeSwap 
                                         setNetworkList={this.setNetworkList} 
                                         onTokenListFetched={this.setTokenList}
+                                        onWrapTokenListFetched={this.setWrappedTokenList}
                                         openLedger={() => this.openLedger()}
+                                        toggleIsWrapTokenDeposit={this.toggleIsWrapTokenDeposit}
                                     ></BridgeSwap>
                                 </div>
                             )}
@@ -249,18 +275,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
                         </div>
                     </div>
                 </div>
-                {/* <div className="tab-container mobile">
-                    <div className="tab-main-wrapper">
-                        <div className="tab-content-n-main">
-                            <NativeSwap 
-                                showSidebar={this.state.showSidebar}
-                                closeSideBar={() => this.closeSideBar()}
-                                openLedger={() => this.openLedger()}
-                                setNetworkList={this.setNetworkList}
-                            ></NativeSwap>
-                        </div>
-                    </div>
-                </div> */}
+
                 {this.state.activeTabLink === "native-tokens" &&
                     <NativeTokenLedgerHistory 
                         networks={this.state.smartswapSupportedNetworks}
@@ -273,12 +288,16 @@ export default class SmartEcoSystemTabs extends PureComponent {
                     <BridgeTokenLedgerHistory 
                         networks={this.state.bridgeSupportedNetworks}
                         tokens={this.state.tokens}
-                        isLedgerOpen={this.state.openLedger} 
+                        wrappedTokens={this.state.wrappedTokens}
+                        isLedgerOpen={this.state.openLedger}
+                        isWrapTokenDeposit={this.state.isWrapTokenDeposit}
                         toggleLedger={() => this.toggleLedger()
                     }></BridgeTokenLedgerHistory>
                 }
-                
+
             </>
         )
     }
 }
+
+SmartEcoSystemTabs.contextType = TokensUsdPriceContext;

@@ -37,7 +37,7 @@ const WalletProvider = React.memo((args) => {
     const [isAuthenticated, setAuthenticated] = React.useState(false);
     const [appLoading, setAppLoading] = React.useState(false);
 
-    console.log({ chainId, account, web3, isAuthenticated });
+    //console.log({ chainId, account, web3, isAuthenticated });
 
     React.useEffect(() => {
         connectEagerly();
@@ -71,7 +71,6 @@ const WalletProvider = React.memo((args) => {
 
     const getProvider = () => {
         if (window.ethereum) {
-            console.log('found window.ethereum>>');
             const provider = new providers.Web3Provider(window.ethereum, "any");
             setWeb3(provider);
             return window.ethereum;
@@ -104,14 +103,9 @@ const WalletProvider = React.memo((args) => {
     }
 
     const connectWallet = async () => {
-        console.log("connectWallet runs....")
         let connected = false;
         try {
             const provider = getProvider();
-
-            console.log({
-                provider: provider
-            });
 
             const [accounts, chainId] = await getAccounts(provider);
             if (accounts && chainId) {
@@ -137,7 +131,6 @@ const WalletProvider = React.memo((args) => {
     }
 
     const disconnectWallet = () => {
-        console.log("disconnectWallet runs")
         try {
             setAccount(null);
             setChainId(null);

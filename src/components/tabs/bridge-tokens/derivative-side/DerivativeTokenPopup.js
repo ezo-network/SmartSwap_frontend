@@ -1,19 +1,22 @@
 
-import {WalletContext, EthereumEvents} from '../../../context/WalletProvider';
+import {WalletContext, EthereumEvents} from '../../../../context/WalletProvider';
 import React, { PureComponent } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import _ from "lodash";
-import pinAct from "../../../assets/images/pin.png";
-import pin from "../../../assets/images/pin-u.png";
-import close from "../../../assets/images/close.png";
 import Web3 from 'web3';
-import BridgeApiHelper from "../../../helper/bridgeApiHelper";
-import notificationConfig from "../../../config/notificationConfig";
-import errors from "../../../helper/errorConstantsHelper";
+import BridgeApiHelper from "../../../../helper/bridgeApiHelper";
+import notificationConfig from "../../../../config/notificationConfig";
+import errors from "../../../../helper/errorConstantsHelper";
+
+// images
+import pinAct from "../../../../assets/images/pin.png";
+import pin from "../../../../assets/images/pin-u.png";
+import close from "../../../../assets/images/close.png";
 
 const visibleBridgesNumber = process.env.REACT_APP_VISIBLE_BRIDGES_NUMBER;
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
+const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
 
 const textMasking = (text, maskingChar = '.', noOfMaskingChar = 3, startingLettersLength = 5, endingLettersLength = 5) => {
     return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
@@ -25,7 +28,7 @@ const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
     }
 }
 
-export default class SourceTokenPopup extends PureComponent {
+export default class DerivativeTokenPopup extends PureComponent {
     _componentMounted = false;
     constructor(props) {
         super();
@@ -34,22 +37,21 @@ export default class SourceTokenPopup extends PureComponent {
             filteredToken: "",
             symbolSortOrder: 'asc',
             pinnedTokens: [],
-            networkDropdownToggle: false
+            networkDropdownToggle: false            
         };
     }
 
     componentDidMount() {
-        console.log('SourceTokenPopup mounted');
+        console.log('DerivativeTokenPopup mounted');
         this._componentMounted = true;
-		if(this._componentMounted === true){
+        if(this._componentMounted === true){
             if(window?.ethereum !== undefined){
-
                 window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async(chainId) => {
                     console.log(EthereumEvents.CHAIN_CHANGED, chainId);
                     this.setState({
                         pinnedTokens: []
                     });
-                    await this.props.onTokenAddedCallback();
+                    await this.props.refetch("DTOKEN");
                 });
 
                 window.ethereum.on(EthereumEvents.ACCOUNTS_CHANGED, async(accounts) => {
@@ -57,7 +59,7 @@ export default class SourceTokenPopup extends PureComponent {
                     this.setState({
                         pinnedTokens: []
                     });
-                    await this.props.refetch("TOKEN");
+                    await this.props.refetch("DTOKEN");
                 });
     
                 window.ethereum.on(EthereumEvents.CONNECT, async (error) => {
@@ -66,14 +68,13 @@ export default class SourceTokenPopup extends PureComponent {
     
                 window.ethereum.on(EthereumEvents.DISCONNECT, async (error) => {
                     console.log(EthereumEvents.DISCONNECT);
-                });
-
+                });                
             }
         }
     }
 
     componentWillUnmount() {
-        console.log('SourceTokenPopup unmounted');
+        console.log('DerivativeTokenPopup unmounted');
         this._componentMounted = false;
     }
 
@@ -92,7 +93,7 @@ export default class SourceTokenPopup extends PureComponent {
                 currentPageNumber: 1
             });
         }
-    };
+    }
 
     sortTokenBySymbol = (order) => {
         if(this._componentMounted === true){
@@ -103,9 +104,9 @@ export default class SourceTokenPopup extends PureComponent {
         }
     }
 
-    setSourceToken = (tokenSymbol, chainId, chain, address, decimals) => {
+    setSourceToken = (tokenSymbol, chainId, chain, address, decimals, projectChainId, projectId) => {
         if(this._componentMounted === true){
-            this.props.sourceTokenSelectedCallback(tokenSymbol, chainId, chain, address, decimals);
+            this.props.sourceTokenSelectedCallback(tokenSymbol, chainId, chain, address, decimals, projectChainId, projectId);
             this.props.closePopupCallback('CLOSE');
         }
     }
@@ -135,43 +136,6 @@ export default class SourceTokenPopup extends PureComponent {
                 }
             }
         }
-    }
-
-    searchAndAddToken = async() => {
-        // check balance first
-        const {response, code, error} = await BridgeApiHelper.addErc20Token(this.props.chainId, this.state.filteredToken);
-        console.log(response, code, error);
-        if(code === 201){
-            if(this._componentMounted === true){
-                await this.props.onTokenAddedCallback().then(async() => {
-                    notificationConfig.success(errors.tokenImported);
-                    if(this._componentMounted === true){
-                        await this.props.onCustomTokenBalanceCheck(this.state.filteredToken).then(async() => {
-                            if(this.props.customTokenBalance === 0 || this.props.customTokenBalance === null){
-                                notificationConfig.error(errors.tokenCouldNotList);
-                            }
-                        });
-                    }
-                });
-            }
-        }
-        
-        if(error === 'A TOKEN ALREADY EXIST'){
-            if(this._componentMounted === true){
-                await this.props.onCustomTokenBalanceCheck(this.state.filteredToken).then(async() => {
-                    if(this.props.customTokenBalance === 0 || this.props.customTokenBalance === null){
-                        notificationConfig.error(errors.tokenCouldNotList);
-                    }
-                });
-            }
-        }
-
-        if(error === 'PROVIDED ADDRESS IS NOT A VALID CONTRACT ADDRESS'){
-            if(this._componentMounted === true){
-                notificationConfig.error(`${error}. PLEASE CHECK CONNECTED NETWORK OR USE CORRECT ADDRESS.`);
-            }
-        }
-
     }
 
     addNetworkToWallet = async(chainId) => {
@@ -248,7 +212,7 @@ export default class SourceTokenPopup extends PureComponent {
         } catch (err) {
             console.error("switchNetwork", err.message);
         }
-    }    
+    }        
 
     render() {
         const pageSize = 10;
@@ -256,23 +220,20 @@ export default class SourceTokenPopup extends PureComponent {
         let pageIndex = currentPageNumber - 1;
         let filteredTokens = this.props?.tokens.filter(token => {
             if(
-              token.symbol.match(new RegExp(this.state.filteredToken, "i"))
+              token?.tokenSymbol.match(new RegExp(this.state.filteredToken, "i"))
               ||
-              token.address.match(new RegExp(this.state.filteredToken, "i"))
+              token?.address.match(new RegExp(this.state.filteredToken, "i"))
             ){
               return token;
             }
         });
-
-        filteredTokens = _.orderBy(filteredTokens, ['symbol'],[this.state.symbolSortOrder]);
+        filteredTokens = _.orderBy(filteredTokens, ['tokenSymbol'],[this.state.symbolSortOrder]);
         this.state.pinnedTokens.forEach(function(pinnedTokenAddress){
             filteredTokens = _.sortBy(filteredTokens, ({address}) => address === (pinnedTokenAddress).toLowerCase() ? 0 : 1);
         });
-        
         const totalTokens = filteredTokens.length;
         const tokensGroupList = _.chunk(filteredTokens, pageSize);
         let tokens = tokensGroupList[pageIndex <= 0 ? 0 : pageIndex];
-
         const activeNetworkConfig = _.find(this.props.networks, {chainId: this.context.chainIdNumber});
 
         return (
@@ -282,67 +243,41 @@ export default class SourceTokenPopup extends PureComponent {
                     <CloseBtn onClick={() => this.props.closePopupCallback('CLOSE')}><img src={close}></img></CloseBtn>
                     <ContainerPop>
                         <PopTitle>
-                            <h1>Select a token to bridge</h1> 
-                            <NetworkDropdownList>   
-
-                                    <NetworkListItem key={activeNetworkConfig?.chainId && "UNSUPPORTED"}>
-                                        <img 
-                                            src={`/images/free-listing/chains/${(activeNetworkConfig?.chain ?? "UNSUPPORTED").toLowerCase()}.png`}
-                                            onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
-                                        ></img>
-                                        <span>{activeNetworkConfig?.chain ?? "UNSUPPORTED"}</span>
-                                        <div onClick={(e) => this.setState({networkDropdownToggle: !this.state.networkDropdownToggle})} className="toggle-icon-container">
-                                            <i className={`fa fa-caret-${this.state.networkDropdownToggle ? 'up' : 'down'}`}></i>
-                                        </div>
-                                    </NetworkListItem>                                                                                
-                                    {this.props.networks.map((network, index) => {
-                                        if(this.state.networkDropdownToggle){
-                                            if(this.context.chainIdNumber !== network.chainId){
-                                                return (<>
-                                                    <NetworkListItem onClick={(e) => this.switchNetwork(network.chainId)} className='cursor' key={network.chainId}>
-                                                        <img 
-                                                            src={`/images/free-listing/chains/${(network.chain).toLowerCase()}.png`}
-                                                            onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
-                                                        ></img>
-                                                        <span>{network.chain}</span>
-                                                    </NetworkListItem>                                        
-                                                </>)
-                                            }
+                            <h1>Select a Derivative token on bridge</h1> 
+                            <NetworkDropdownList>
+                                <NetworkListItem key={activeNetworkConfig?.chainId && "UNSUPPORTED"}>
+                                    <img 
+                                        src={`/images/free-listing/chains/${(activeNetworkConfig?.chain ?? "UNSUPPORTED").toLowerCase()}.png`}
+                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
+                                    ></img>
+                                    <span>{activeNetworkConfig?.chain ?? "UNSUPPORTED"}</span>
+                                    <div onClick={(e) => this.setState({networkDropdownToggle: !this.state.networkDropdownToggle})} className="toggle-icon-container">
+                                        <i className={`fa fa-caret-${this.state.networkDropdownToggle ? 'up' : 'down'}`}></i>
+                                    </div>
+                                </NetworkListItem>                                                                                
+                                {this.props.networks.map((network, index) => {
+                                    if(this.state.networkDropdownToggle){
+                                        if(this.context.chainIdNumber !== network.chainId){
+                                            return (<>
+                                                <NetworkListItem onClick={(e) => this.switchNetwork(network.chainId)} className='cursor' key={network.chainId}>
+                                                    <img 
+                                                        src={`/images/free-listing/chains/${(network.chain).toLowerCase()}.png`}
+                                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
+                                                    ></img>
+                                                    <span>{network.chain}</span>
+                                                </NetworkListItem>                                        
+                                            </>)
                                         }
-                                    })}
+                                    }
+                                })}
                             </NetworkDropdownList>
                         </PopTitle>
                         <PopRow>
-                            {/* <Popcol>
-                                <Search><input placeholder="Search chains" type="search" value=""></input><i className="fa fa-search" aria-hidden="true"></i></Search>
-                                <SelectList>
-                                    <Selected>
-                                        <Token>
-                                            <img 
-                                                src="" 
-                                                alt=""
-                                                onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                            ></img> WBNB
-                                        </Token> 
-                                        <i className="fa fa-times" aria-hidden="true"></i>
-                                    </Selected>
-                                    <Selected>
-                                        <Token>
-                                            <img 
-                                                src="" 
-                                                alt=""
-                                                onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                            ></img> WBNB
-                                        </Token> 
-                                        <i className="fa fa-times" aria-hidden="true"></i>
-                                    </Selected>
-                                </SelectList>
-                            </Popcol> */}
                             <Popcol>
                                 <Search>
                                     <input 
                                         onChange={e => this.filterTokens(e.target.value)}
-                                        placeholder="Search token or paste address" 
+                                        placeholder="Search derivative token or paste address" 
                                         type="search"
                                         value={this.state.filteredToken}>
                                     </input>
@@ -351,7 +286,7 @@ export default class SourceTokenPopup extends PureComponent {
                                     }
                                     {this.state.filteredToken.length > 0 && 
                                         <i className="fa fa-remove" aria-hidden="true"></i>                                
-                                    }                                    
+                                    }
                                 </Search>
                                 {totalTokens === 0 && Web3.utils.isAddress(this.state.filteredToken) && 
                                 <SelectList>
@@ -384,7 +319,7 @@ export default class SourceTokenPopup extends PureComponent {
                                         }
                                     }.bind(this))}
                                 </SelectList>                                
-                            </Popcol>
+                            </Popcol>                            
                         </PopRow>
                         <Table>
                             <thead>
@@ -394,104 +329,84 @@ export default class SourceTokenPopup extends PureComponent {
                                         <i className={`fa fa-caret-${this.state.symbolSortOrder === 'asc' ? 'down' : 'up'}`} aria-hidden="true"></i>
                                     </Thd>
                                     <Thd>Smart contract</Thd>
-                                    <Thd>Original chain</Thd>
-                                    <Thd>Existing bridges</Thd>
+                                    <Thd>Bridge From</Thd>
+                                    <Thd>Bridge To</Thd>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {tokens !== undefined && tokens.length > 0 && tokens.map(function (token, i) {
-                                    
-                                    const networkConfig = _.find(this.props.networks, {
-                                        chainId: Number(token.chainId)
+                                    const fromNetworkConfig = _.find(this.props.networks, {
+                                        chainId: Number(token.fromChainId)
+                                    });
+                                    const toNetworkConfig = _.find(this.props.networks, {
+                                        chainId: Number(token.toChainId)
                                     });
 
-                                    const project = _.find(this.props.projects, {
-                                        tokenAddress: token?.address
-                                    });
 
-                                    const wrappedTokens = _.filter(this.props.wrappedTokens, {                                        
-                                        projectId: project?._id
-                                    });
-
-                                    const totalWrappedTokens = wrappedTokens.length;
-
-                                    return <tr 
-                                            key={token._id}
-                                        >
+                                    return (
+                                        <tr key={token._id}>
                                             <Tcell>
                                                 <Token>
                                                     <img 
                                                         className="cursor"
-                                                        src={'/images/free-listing/tokens/' + (token.symbol).toLowerCase() + '.png'}
+                                                        src={'/images/free-listing/tokens/' + ((token.tokenSymbol.substring(wrapTokenSymbolPrefixLength)).toLowerCase()).toString() + '.png'}
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                         alt="to-token-input-icon"
                                                         onClick={(e) => this.setSourceToken(
-                                                            token.symbol,
-                                                            Number(token.chainId),
-                                                            networkConfig.chain,
+                                                            token.tokenSymbol,
+                                                            Number(token.toChainId),
+                                                            toNetworkConfig.chain,
                                                             token.address,
-                                                            token.decimals
-                                                        )}                                                        
-                                                    ></img> 
+                                                            token.decimals,
+                                                            Number(token.fromChainId),
+                                                            token.projectId
+                                                        )} 
+                                                    ></img>
                                                     <span
                                                         className="cursor"                                                    
                                                         onClick={(e) => this.setSourceToken(
-                                                            token.symbol,
-                                                            Number(token.chainId),
-                                                            networkConfig.chain,
+                                                            token.tokenSymbol,
+                                                            Number(token.toChainId),
+                                                            toNetworkConfig.chain,
                                                             token.address,
-                                                            token.decimals
+                                                            token.decimals,
+                                                            Number(token.fromChainId),
+                                                            token.projectId
                                                         )}
-                                                    >{token.symbol}</span>
+                                                    >{token.tokenSymbol}</span>
                                                 </Token>
-                                                <Pin 
-                                                    onClick={(e) => this.addToPinnedToken(token.address)}
-                                                    className={this.state.pinnedTokens.includes((token.address).toUpperCase()) ? 'cursor selected' : 'cursor'}
-                                                ></Pin>
                                             </Tcell>
                                             <Tcell
                                                 className="cursor"
-                                                onClick={(e) => goToContractOnExplorer(networkConfig.explorerUrl, token.address)}
+                                                onClick={(e) => goToContractOnExplorer(toNetworkConfig.explorerUrl, token.address)}
                                             >
                                                 <TDLink>{textMasking(token.address)}</TDLink>
                                             </Tcell>
                                             <Tcell>
                                                 <Token>
                                                     <img 
-                                                        src={'/images/free-listing/chains/' + (networkConfig.chain).toLowerCase() + '.png'}
+                                                        src={'/images/free-listing/chains/' + (fromNetworkConfig.chain).toLowerCase() + '.png'}
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                                        alt="to-token-input-icon"
+                                                        alt="from-network-icon"
                                                     >
-                                                    </img> {networkConfig.chain}
+                                                    </img> {fromNetworkConfig.chain}
                                                 </Token>
                                                 {/* <Pin className="selected"></Pin> */}
-                                            </Tcell>                                            
+                                            </Tcell>    
                                             <Tcell>
-                                                <BridgeGrp>
-                                                    <b>
-                                                        {
-                                                            wrappedTokens !== undefined && wrappedTokens.map(function(wrappedToken, i){
-                                                                if(visibleBridgesNumber > (i++)){
-                                                                    const destinationNetworkConfig = _.find(this.props.networks, {
-                                                                        chainId: Number(wrappedToken.toChainId)
-                                                                    });
-                                                                    
-                                                                    return <img 
-                                                                        key={wrappedToken._id} 
-                                                                        src={'/images/free-listing/chains/' + (destinationNetworkConfig.chain).toLowerCase() + '.png'}
-                                                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                                                                        alt={destinationNetworkConfig.chain}>
-                                                                    </img>
-                                                                }
-                                                            }.bind(this))
-                                                        }
-                                                    </b>
-                                                    <span>{totalWrappedTokens > visibleBridgesNumber ? '+ ' + (totalWrappedTokens - visibleBridgesNumber) : ''}</span>
-                                                </BridgeGrp>
-                                            </Tcell>
-                                    </tr>
-                                
+                                                <Token>
+                                                    <img 
+                                                        src={'/images/free-listing/chains/' + (toNetworkConfig.chain).toLowerCase() + '.png'}
+                                                        onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
+                                                        alt="from-network-icon"
+                                                    >
+                                                    </img> {toNetworkConfig.chain}
+                                                </Token>
+                                                {/* <Pin className="selected"></Pin> */}
+                                            </Tcell>                                               
+                                        </tr>
+                                    )
+
                                 }.bind(this))}
                             </tbody>
                         </Table>
@@ -510,19 +425,19 @@ export default class SourceTokenPopup extends PureComponent {
                                 </SelectCustom>
                                 result { totalTokens > 0 ? (pageSize * this.state.currentPageNumber) - (pageSize - 1) : 0} - {this.state.currentPageNumber * pageSize > totalTokens ? totalTokens : this.state.currentPageNumber * pageSize} of {totalTokens}
                             </Tnav>   
-                            <p>
+                            {/* <p>
                                 <Link to="/freelisting">
                                     <b>
                                         If you can't find your destination chain under existing bridges, you can create one in a few second
                                     </b>
                                 </Link>
-                            </p>
-                        </Tfooter>
-                        <Tfootnote>
+                            </p> */}
+                        </Tfooter>                        
+                        {/* <Tfootnote>
                             <b className="error">
                                 Can't see your token? Paste token smart contract address to the search field to import new token
                             </b>                                
-                        </Tfootnote>
+                        </Tfootnote> */}
                     </ContainerPop>
                 </PopupMain>
                 }
@@ -531,7 +446,7 @@ export default class SourceTokenPopup extends PureComponent {
     }
 }
 
-SourceTokenPopup.contextType = WalletContext;
+DerivativeTokenPopup.contextType = WalletContext;
 
 const PopupMain = styled.div `
     position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(13, 14, 19, 0.95); overflow: auto; padding: 0 0 90px;
@@ -545,7 +460,7 @@ const CloseBtn = styled.a `
 `
 
 const PopTitle = styled.div `
-    text-align: center; padding: 90px 0 50px; position: relative;
+    text-align: center; padding: 90px 0 50px;
     h1 {font-size: 36px; color: #fff; font-weight: bold; margin: 0 0 0;}
 `
 const PopRow = styled.div `
@@ -645,8 +560,8 @@ const NetworkDropdownList = styled.div `
     position: absolute;
     z-index: 999999;
     background: #21232b;
-    top: calc(50% - 14px);
-    right: 0;  
+    top: 10%;
+    right: 13%;    
     gap: 10px;
     display: flex;
     justify-content: flex-start;

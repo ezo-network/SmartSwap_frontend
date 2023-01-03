@@ -68,12 +68,15 @@ CONSTANT.API_ENDPOINTS = {
             'getValidator': 'customer/get-validator',
             'getOwnershipRequests': 'public/ownership-requests',
             'addErc20Token': 'customer/add-erc20-token',
-            getDepositTokensHistoryByWalletAddress: (walletAddress, fromChainId) =>  {
-                return `ledgers/depositTokenHistory?walletAddress=${walletAddress}&fromChainId=${fromChainId}`
+            getDepositTokensHistoryByWalletAddress: (walletAddress, fromChainId, isWrapTokenDeposit) =>  {
+                return `ledgers/depositTokenHistory?walletAddress=${walletAddress}&fromChainId=${fromChainId}&isWrapTokenDeposit=${isWrapTokenDeposit}`
             }
         }, 
         'NATIVE_TOKENS': {
-            'networks': 'public/active-smartswap-networks'           
+            'networks': 'public/active-smartswap-networks',
+            chainHopPriceQuoteApi: (fromChainId, toChainId, amountToSwap) => {
+                return `chainHopPriceQuoteApi?fromChainId=${fromChainId}&toChainId=${toChainId}&amountToSwap=${amountToSwap}`
+            }
         }
     },
     'SMARTSWAP_API_INSTANCE': (type, args = {}) =>  {
@@ -103,5 +106,6 @@ CONSTANT.API_ENDPOINTS = {
 
 CONSTANT.DEFAULT_AUTHORITY_SERVER = process.env.REACT_APP_DEFAULT_AUTHORITY_SERVER;
 
+CONSTANT.APPLY_FOR_LICENSING_ACTION="https://docs.google.com/forms/d/e/1FAIpQLSc3A05HDv7ORapGdTFPwzKJ84KfKfPxLw3GDPHTzSmqnr7tHw/viewform";
 
 export default CONSTANT;

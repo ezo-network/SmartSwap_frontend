@@ -6,14 +6,13 @@ import Switch from "react-switch";
 import SmartswapApiHelper from "../../../helper/smartswapApiHelper";
 import SmartSwap from "./SmartSwap";
 import DagenSwap from "./DagenSwap";
+import Sidebar from "./components/Sidebar";
 
 // images
 import Filter from "../../../../src/assets/images/filter.png";
 import Doller from "../../../../src/assets/images/doller.png";
-import SSIco from "../../../../src/assets/images/ss.png";
-import SUSIco from "../../../../src/assets/images/sus.png";
-import MUCIco from "../../../../src/assets/images/muc.png";
 import SmartExchange from "../../../../src/assets/images/smart-exchange.png";
+import CONSTANT from '../../../constants';
 
 const SLIPPAGE_MODES = ["SMARTSWAP", "DAGENSWAP"];
 const INPUT_MODES = ["FIAT", "TOKEN"];
@@ -32,10 +31,20 @@ export default class NativeSwap extends PureComponent {
             inputMode: INPUT_MODES[0],
             estimateGasAndFeesData: {},
             activeNetworkNativeTokenSymbol: 'UNSUPPORTED',
-            activeNetworkNativeTokenDecimals: 0
+            activeNetworkNativeTokenDecimals: 0,
+            smartSwapQuoteData: {
+                quotePrice: 0,
+                quotePriceInUsd: 0,
+                quoteEstimatedFee: 0                
+            },
+            fromChainId: null,
+            toChainId: null,
+            toChainNativeTokenSymbol: "",
+            amountToSwap: 0
         }
 
         axiosSource = axios.CancelToken.source();
+        this.updateCrossChainQuotePrice = this.updateCrossChainQuotePrice.bind(this);
     }
 
     componentDidMount = async () => {
@@ -67,9 +76,7 @@ export default class NativeSwap extends PureComponent {
         }
     }
 
-    componentDidUpdate() {
-
-    }
+    componentDidUpdate() {}
 
     componentWillUnmount() {
         this._componentMounted = false;
@@ -153,17 +160,30 @@ export default class NativeSwap extends PureComponent {
         }
     }
 
+    updateCrossChainQuotePrice = (fromChainId, toChainId, toChainNativeTokenSymbol, amountToSwap, smartSwapQuoteData) => {
+        if(this._componentMounted){
+            this.setState({
+                fromChainId: fromChainId,
+                toChainId: toChainId,
+                toChainNativeTokenSymbol: toChainNativeTokenSymbol,
+                amountToSwap: amountToSwap,
+                smartSwapQuoteData: smartSwapQuoteData,
+            });
+        }
+    }
+
     render() {
 
         return (
             <>
                 <div className="native-icons">
-                    <a href onClick={(e) => e.preventDefault()}><img height="13" alt="filters" src={Filter} /></a>
-                    <a className='nativeToggle' href onClick={() => this.props.closeSideBar()}><img height="14" src={Doller} alt="3rd-parties-rates" /></a>
+                    <a href="#" onClick={(e) => e.preventDefault()}><img height="13" alt="filters" src={Filter} /></a>
+                    <a href="#" className='nativeToggle' onClick={() => this.props.closeSideBar()}><img height="14" src={Doller} alt="3rd-parties-rates" /></a>
                 </div>
                 <div id="slippage-mode">
                     {this.state.slippageMode === SLIPPAGE_MODES[0] && 
                         <SmartSwap
+                            tokensUsdPrice={this.props.tokensUsdPrice}
                             networks={this.state.networks}
                             slippageModes={SLIPPAGE_MODES}
                             inputModes={INPUT_MODES}
@@ -171,6 +191,7 @@ export default class NativeSwap extends PureComponent {
                             selectedInputMode={this.state.inputMode}
                             onGasFeeUpdate={this.updateEstimatedGasAndFees}
                             openLedger={this.props.openLedger}
+                            updateCrossChainQuotePrice={this.updateCrossChainQuotePrice}
                         ></SmartSwap>                
                     }
 
@@ -186,24 +207,14 @@ export default class NativeSwap extends PureComponent {
                 </div>
 
                 { /** sidebar */}
-                <div className={`side-pannel ${this.props.showSidebar ? '' : 'hidden'}`}>
-                    <h4>Best cross chain prices</h4>
-                    <div className="">
-                        <h5><span>1. <img alt="SmartSwap" src={SSIco} /></span>SmartSwap
-                            <b><strong>0.06015 ETH</strong> [$1662.44]</b>
-                            <p>Estimated fees: $0 <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options" aria-hidden="true"></i></i></p>
-                            <p className="color-green mt-1">Super bonus 145.37% <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options" aria-hidden="true"></i></i></p>
-                        </h5>
-                        <h5><span>2. <img alt="Sushiswap" src={SUSIco} /></span>Sushiswap
-                            <b><strong>0.05892 ETH</strong> [$1599.78]</b>
-                            <p>Estimated fees: <span className="color-red">-$5.37</span></p>
-                        </h5>
-                        <h5><span>3. <img alt="Multichain" src={MUCIco} /></span>Multichain
-                            <b><strong>0.05882 ETH</strong> [$1593.78]</b>
-                            <p>Estimated fees: <span className="color-red">-$5.37</span></p>
-                        </h5>
-                    </div>
-                </div>
+                <Sidebar 
+                    showSidebar={this.props.showSidebar} 
+                    smartSwapQuoteData={this.state.smartSwapQuoteData} 
+                    fromChainId={this.state.fromChainId}
+                    toChainId={this.state.toChainId}
+                    toChainNativeTokenSymbol={this.state.toChainNativeTokenSymbol}
+                    amountToSwap={this.state.amountToSwap}
+                ></Sidebar>
 
                 { /** Bottom bar */}
                 <div className="bottom-action-bar">
@@ -213,7 +224,7 @@ export default class NativeSwap extends PureComponent {
                             <div className="powertextBX-links">
                                 <Link to='/freelisting'>Free listing</Link>
                                 <span>|</span>
-                                <a href onClick={(e) => {e.preventDefault();}}>Apply for licensing</a>
+                                <a href={CONSTANT.APPLY_FOR_LICENSING_ACTION} target="_blank">Apply for licensing</a>
                             </div>
                             <div className='powertextBX-links estimated'>
                                 <p>
@@ -228,7 +239,7 @@ export default class NativeSwap extends PureComponent {
                                 </p>
                             </div>
                         </div> 
-                        <label className="slippage-outer">
+                        <label className="switch-container input-mode-switcher">
                             <p className={`${this.state.inputMode === INPUT_MODES[1] ? "" : "active"}`} style={{ paddingRight: "8px" }}>Dollar amount </p>
                             <Switch
                                 checked={this.state.inputMode === INPUT_MODES[1] ? true : false}
@@ -249,7 +260,7 @@ export default class NativeSwap extends PureComponent {
                             />
                             <p className={`${this.state.inputMode === INPUT_MODES[1] ? "active" : ""}`} style={{ paddingLeft: "8px" }}>Token amount</p>
                         </label>
-                        <label className="slippage-outer">
+                        <label className="switch-container slippage-switcher">
                             <p className={`${this.state.slippageMode === SLIPPAGE_MODES[1] ? "" : "active"}`} style={{ paddingRight: "8px" }}>Slippage free </p>
                             <Switch
                                 checked={this.state.slippageMode === SLIPPAGE_MODES[1] ? true : false}

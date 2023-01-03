@@ -165,7 +165,46 @@ const SmartSwapApiHelper = {
             error,
             code
         }
-    },    
+    },  
+    
+    chainHopPriceQuoteApi: async(fromChainId, toChainId, amountToSwap, cancelToken) => {
+        let response, error, code;
+        try {
+
+            const result = await axiosRequest.request({
+                hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.NATIVE_TOKENS.chainHopPriceQuoteApi(fromChainId, toChainId, amountToSwap),
+                cancelToken: cancelToken
+            });
+
+            if(result !== undefined){
+                if(result?.status === 200 && result?.data){
+                    return {
+                        response: result?.data,
+                        code: result.status,
+                        error: undefined
+                    }
+                } else {
+                    return {
+                        response: undefined,
+                        code: 422,
+                        error: result?.data?.message
+                    }
+                }
+            }
+
+
+        } catch(err){
+            error = err;
+            code = 500;
+        }
+
+        return {
+            response, 
+            error,
+            code
+        }
+    },  
 
 }
 
