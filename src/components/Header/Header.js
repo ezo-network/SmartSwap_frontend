@@ -198,7 +198,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon05"></i>
                 </div>
@@ -207,7 +207,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon06"></i>
                 </div>
@@ -216,7 +216,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon07"></i>
                 </div>
@@ -225,7 +225,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon08"></i>
                 </div>
@@ -234,7 +234,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon09"></i>
                 </div>
@@ -243,7 +243,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon010"></i>
                 </div>
@@ -252,7 +252,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon011"></i>
                 </div>
@@ -261,7 +261,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon012"></i>
                 </div>
@@ -270,7 +270,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon013"></i>
                 </div>
@@ -279,7 +279,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon014"></i>
                 </div>
@@ -288,7 +288,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 disableBTN">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon015"></i>
                 </div>
@@ -297,7 +297,7 @@ export default class Header extends PureComponent {
             </div>
             <div className="lanbox01 ani-1">
               {" "}
-              <a href onClick={(e) => {e.preventDefault();}}>
+              <a href="#"onClick={(e) => {e.preventDefault();}}>
                 <div className="lanIconbox">
                   <i className="lanicon015 translateLanguage"></i>
                 </div>

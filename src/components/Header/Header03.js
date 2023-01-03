@@ -24,8 +24,8 @@ export default class Header03 extends PureComponent {
             <img className="logo2" src={Logo2} alt="logo" /></Logo>
 
             <RMbox>
-                <a href onClick={(e) => e.preventDefault()} class="link01" >Rewards program</a>
-                <a href onClick={(e) => e.preventDefault()} class="headerBtn">LAUNCH APP</a>
+                <a href="#" onClick={(e) => e.preventDefault()} class="link01" >Rewards program</a>
+                <a href="#" onClick={(e) => e.preventDefault()} class="headerBtn">LAUNCH APP</a>
             </RMbox>
         </LHead>
         </>

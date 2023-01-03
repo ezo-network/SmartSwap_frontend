@@ -5,7 +5,7 @@ import "react-multi-carousel/lib/styles.css";
 import img02 from "../assets/images/se.png";
 import HeroSectionVideoOverlay from "../components/sections/HeroSectionVideoOverlay";
 
-export default class SmartBridge extends PureComponent {
+export default class SmartExtension extends PureComponent {
     render() {
     return (
     <>

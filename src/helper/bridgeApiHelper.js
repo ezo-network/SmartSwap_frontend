@@ -934,18 +934,18 @@ const BridgeApiHelper = {
     },
 
     /** ledger */
-    getDepositTokensHistoryByWalletAddress: async (walletAddress, fromChainId) => {
+    getDepositTokensHistoryByWalletAddress: async (walletAddress, fromChainId, isWrapTokenDeposit) => {
         let response, error, code;
         try {
 
             const result = await axiosRequest.request({
                 hostType: CONSTANT.HOST_TYPES.SMARTEXCHANGE_DATABASE_INSTANCE,
-                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.getDepositTokensHistoryByWalletAddress(walletAddress, fromChainId),
+                path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.getDepositTokensHistoryByWalletAddress(walletAddress, fromChainId, isWrapTokenDeposit),
             });
 
-            console.log({
-                result: result
-            });
+            // console.log({
+            //     result: result
+            // });
 
             if (result.status === 200) {
                 return {

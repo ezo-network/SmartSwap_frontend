@@ -18,7 +18,6 @@ export default class Projects extends PureComponent {
                 <h2>Boost your web3 dApp sales by giving your customers the best payment experience</h2>
                 <p>Super easy one-click cross-chain solution allowing customers to pay with any token or blockchain while you get the token on the blockchain you need.</p>
                 <p className="green">Instead of Deploying Your Project on Multiple Blockchains, integrate one smartpayment to Welcome All Type of Users</p>
-                
               </div>
               <div className="boost-right">
                 <img src="images/mobile-frame.png" alt="" />
@@ -28,7 +27,7 @@ export default class Projects extends PureComponent {
               <div className="o-left">
                 <div className="down-block">
                   <img src="images/down-arrow.png" alt="" />
-                </div>
+                </div>                
                 {/* <p className="option">OPTION 1</p> */}
                 <h3>ONE-CLICK SMARTPAYMENT</h3>
                 <p>This code will allow users to push by ONE click any token from any network, and receive the final assets that the project is offering. The One-Click SmartPayment allows users one-click access from any token on any network to the final asset the project offers.</p>

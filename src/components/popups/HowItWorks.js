@@ -46,8 +46,8 @@ export default class HowItWorks extends PureComponent {
                 <div className="container-Grid">
                     <div className="MainTabBox" style={{ paddingTop: '80px' }}>
                         <div className="tab-Nav">
-                            <a href className="tab-Link" onClick={ev => { ev.preventDefault(); }} data-id="tab-4">How it Works</a>
-                            <a href className="tab-Link hideMobile" onClick={ev => { ev.preventDefault(); }} data-id="tab-5">SmartSwap vs Atomic Swap & Other Swaps</a>
+                            <a href="#" className="tab-Link" onClick={ev => { ev.preventDefault(); }} data-id="tab-4">How it Works</a>
+                            <a href="#" className="tab-Link hideMobile" onClick={ev => { ev.preventDefault(); }} data-id="tab-5">SmartSwap vs Atomic Swap & Other Swaps</a>
                         </div>
 
 
@@ -66,7 +66,7 @@ export default class HowItWorks extends PureComponent {
                         </div>
 
                         <div className="tab-Nav showMobile " style={{ width: '100%' }}>
-                            <a href className="tab-Link " onClick={ev => { ev.preventDefault(); }} data-id="tab-5">SmartSwap vs Atomic Swap & Other Swaps</a>
+                            <a href="#" className="tab-Link " onClick={ev => { ev.preventDefault(); }} data-id="tab-5">SmartSwap vs Atomic Swap & Other Swaps</a>
                         </div>
                         <div className={"tab-Content " + this.props.popId} id="tab-5">
                             <div className="peerTitle01">SmartSwap vs Atomic Swap</div>
@@ -154,7 +154,7 @@ export default class HowItWorks extends PureComponent {
 
 
 
-                <a href onClick={(e) => { e.preventDefault(); this.props.closePopup("HowItWorks") }} className="close-Icon"></a>
+                <a href="#" onClick={(e) => { e.preventDefault(); this.props.closePopup("HowItWorks") }} className="close-Icon"></a>
             </div>
         )
 

@@ -49,7 +49,7 @@ export default class OrderInformation extends PureComponent {
                     Transaction Submitted </h5>
                     <p>{textMasking(this.props.tranactionHash)}</p>
                     <div className="flex">
-                        <a className="cursor" href onClick={() => checkTransactionOnExplorer(this.props.sentFromNetworkConfig?.explorerUrl, this.props.tranactionHash)}>View transaction</a>
+                        <a className="cursor" href="#" onClick={() => checkTransactionOnExplorer(this.props.sentFromNetworkConfig?.explorerUrl, this.props.tranactionHash)}>View transaction</a>
                     </div>
                 </div>
             </>

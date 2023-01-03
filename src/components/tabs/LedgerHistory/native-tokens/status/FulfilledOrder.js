@@ -51,7 +51,7 @@ export default class FulfilledOrder extends PureComponent {
                     <h5><i><img src="../images/tick.png" width="18px"></img></i>Funds wired to your wallet </h5>
                     <p>{textMasking(this.props.claimApprovedTranactionHash)}</p>
                     <div className="flex">
-                        <a className="cursor" href onClick={() => checkTransactionOnExplorer(this.props.receivingToNetworkConfig?.explorerUrl, this.props.claimApprovedTranactionHash)}>View transaction</a>
+                        <a className="cursor" href="#" onClick={() => checkTransactionOnExplorer(this.props.receivingToNetworkConfig?.explorerUrl, this.props.claimApprovedTranactionHash)}>View transaction</a>
                         {/* <a className="color-green" href="#">Fees breakdown <i className="fas fa-caret-up ml-2"></i></a> */}
                     </div>
                     {/* <table className="ledger-table">

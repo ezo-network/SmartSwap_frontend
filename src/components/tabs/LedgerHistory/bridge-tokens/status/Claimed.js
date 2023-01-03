@@ -13,6 +13,9 @@ const textMasking = (text, maskingChar = '.', noOfMaskingChar = 16, startingLett
     return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
 }
 
+const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
+const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
+
 export default class Claimed extends PureComponent {
     _componentMounted = false;
 
@@ -33,16 +36,17 @@ export default class Claimed extends PureComponent {
     }
 
     render() {
+
+        const symbol = this.props.isWrapTokenDeposit ? this.props.tokenSymbol.substring(wrapTokenSymbolPrefixLength) : this.props.tokenSymbol;
+
         return (
             <>
                 <h3>
-                    <b>
-                        
-                        {/* <span>(73.69%)</span> */}
-                    </b>
+                    <b>{this.props.title}</b>
+                    <i className="fas fa-chevron-right"></i>
                 </h3>
                 <h4>
-                    {web3.utils.fromWei(this.props.value)} {this.props.tokenSymbol} ({this.props.toNetworkConfig.chain})
+                    {web3.utils.fromWei(this.props.value)} {symbol} ({this.props.toNetworkConfig.chain})
                 </h4>
                 {/* <p>Feb 2. 2019, 9:21am PST</p> */}
                 <p>{moment(this.props.claimedOn).format("MMM D[. ]YYYY[, ]h[:]mma zz")}</p>
@@ -51,7 +55,7 @@ export default class Claimed extends PureComponent {
                     <p>{this.props.claimTranactionHash !== null ? textMasking(this.props.claimTranactionHash) : ""}</p>
                     <div className="flex">
                         {this.props.claimTranactionHash !== null &&
-                        <a className="cursor" href onClick={() => checkTransactionOnExplorer(this.props.toNetworkConfig?.explorerUrl, this.props.claimTranactionHash)}>View transaction</a>
+                        <a className="cursor" href="#" onClick={() => checkTransactionOnExplorer(this.props.toNetworkConfig?.explorerUrl, this.props.claimTranactionHash)}>View transaction</a>
                         }
                     </div>
                 </div>

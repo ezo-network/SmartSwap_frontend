@@ -131,10 +131,7 @@ class LedgerHistory extends PureComponent {
             ));
         });
 
-        let pendingOrdersCount = 0; 
-
-
-        console.table(filteredSwapRequests);
+        let pendingOrdersCount = 0;
 
         return (
             <>
@@ -143,9 +140,9 @@ class LedgerHistory extends PureComponent {
                 </div>
                 <div style={{display: this.props.isLedgerOpen ? 'block' : 'none'}}>
                     <nav className="tab-nav">
-                        <a className={`cursor ${this.state.filterBy === 'ALL' ? 'active' : ''}`} href onClick={(e) => this.setFilterBy('ALL')}>All</a>
-                        <a className={`cursor ${this.state.filterBy === 'COMPLETED' ? 'active' : ''}`} href onClick={(e) => this.setFilterBy('COMPLETED')}>Completed</a>
-                        <a className={`cursor ${this.state.filterBy === 'PENDING' ? 'active' : ''}`} href onClick={(e) => this.setFilterBy('PENDING')}>Pending</a>
+                        <a className={`cursor ${this.state.filterBy === 'ALL' ? 'active' : ''}`} href="#" onClick={(e) => this.setFilterBy('ALL')}>All</a>
+                        <a className={`cursor ${this.state.filterBy === 'COMPLETED' ? 'active' : ''}`} href="#" onClick={(e) => this.setFilterBy('COMPLETED')}>Completed</a>
+                        <a className={`cursor ${this.state.filterBy === 'PENDING' ? 'active' : ''}`} href="#" onClick={(e) => this.setFilterBy('PENDING')}>Pending</a>
                     </nav>
                     {activeNetworkConfig !== undefined && filteredSwapRequests.map((swapRequest) => {
                         

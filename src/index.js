@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import WalletProvider from './context/WalletProvider';
+import TokensUsdPriceProvider from "./context/TokensUsdPriceProvider";
 
 ReactDOM.render(
   <React.StrictMode>
     <WalletProvider>
-      <App />
+      <TokensUsdPriceProvider>
+        <App />
+      </TokensUsdPriceProvider>
     </WalletProvider>
   </React.StrictMode>,
   document.getElementById('root')
