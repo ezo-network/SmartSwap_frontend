@@ -169,16 +169,98 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                     </div>
                                 </li>
                             })}
+                            
                         </ul>
 
                         <div className="tab-content-n-main">
-                            <div id={`${this.state.activeTabLink}`}>
-                                {this.activeComponent(this.state.activeTabLink)}
+                            <button key={this.state.tabs[0].link} onClick={(e) => this.changeTab(this.state.tabs[0])} className={`tab-link ${this.state.activeTabLink === this.state.tabs[0].link ? 'current-n' : ''} ${this.state.tabs[0].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[0].link}>
+                                <div>
+                                    {this.state.tabs[0].title}
+                                    {this.state.tabs[0].inBeta && !this.state.tabs[0].disabled &&
+                                        <span className="text-sm-n color-green">BETA</span>
+                                    }
+                                </div>
+                            </button>
+                            {this.state.activeTabLink === this.state.tabs[0].link && (
+                            <div id={`${this.state.activeTabLink}`} className="tabMain">
+                                <NativeSwap 
+                                    showSidebar={this.state.showSidebar}
+                                    closeSideBar={() => this.closeSideBar()}
+                                    openLedger={() => this.openLedger()}
+                                    setNetworkList={this.setNetworkList}
+                                ></NativeSwap>
                             </div>
+                            )}
+
+
+                            <button key={this.state.tabs[1].link} onClick={(e) => this.changeTab(this.state.tabs[1])} className={`tab-link ${this.state.activeTabLink === this.state.tabs[1].link ? 'current-n' : ''} ${this.state.tabs[1].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[1].link}>
+                                <div>
+                                    {this.state.tabs[1].title}
+                                    {this.state.tabs[1].inBeta && !this.state.tabs[1].disabled &&
+                                        <span className="text-sm-n color-green">BETA</span>
+                                    }
+                                </div>
+                            </button>
+                            {this.state.activeTabLink === this.state.tabs[1].link && (
+                                <div id={`${this.state.activeTabLink}`} className="tabMain">
+                                    <BridgeSwap 
+                                        setNetworkList={this.setNetworkList} 
+                                        onTokenListFetched={this.setTokenList}
+                                        openLedger={() => this.openLedger()}
+                                    ></BridgeSwap>
+                                </div>
+                            )}
+
+                            <button className={`tab-link ${this.state.activeTabLink === this.state.tabs[2].link ? 'current-n' : ''} ${this.state.tabs[2].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[2].link}>
+                                <div>
+                                    {this.state.tabs[2].title}
+                                    {this.state.tabs[2].inBeta && !this.state.tabs[2].disabled &&
+                                        <span className="text-sm-n color-green">BETA</span>
+                                    }
+                                </div>
+                            </button>
+                            <button className={`tab-link ${this.state.activeTabLink === this.state.tabs[3].link ? 'current-n' : ''} ${this.state.tabs[3].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[3].link}>
+                                <div>
+                                    {this.state.tabs[3].title}
+                                    {this.state.tabs[3].inBeta && !this.state.tabs[3].disabled &&
+                                        <span className="text-sm-n color-green">BETA</span>
+                                    }
+                                </div>
+                            </button>
+                            <button className={`tab-link ${this.state.activeTabLink === this.state.tabs[4].link ? 'current-n' : ''} ${this.state.tabs[4].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[4].link}>
+                                <div>
+                                    {this.state.tabs[4].title}
+                                    {this.state.tabs[4].inBeta && !this.state.tabs[4].disabled &&
+                                        <span className="text-sm-n color-green">BETA</span>
+                                    }
+                                </div>
+                            </button>
+                            <button className={`tab-link ${this.state.activeTabLink === this.state.tabs[5].link ? 'current-n' : ''} ${this.state.tabs[5].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[5].link}>
+                                <div>
+                                    {this.state.tabs[5].title}
+                                    {this.state.tabs[5].inBeta && !this.state.tabs[5].disabled &&
+                                        <span className="text-sm-n color-green">BETA</span>
+                                    }
+                                </div>
+                            </button>
+                            {/* <div id={`${this.state.activeTabLink}`}>
+                                {this.activeComponent(this.state.activeTabLink)}
+                            </div> */}
                         </div>
                     </div>
                 </div>
-
+                {/* <div className="tab-container mobile">
+                    <div className="tab-main-wrapper">
+                        <div className="tab-content-n-main">
+                            <NativeSwap 
+                                showSidebar={this.state.showSidebar}
+                                closeSideBar={() => this.closeSideBar()}
+                                openLedger={() => this.openLedger()}
+                                setNetworkList={this.setNetworkList}
+                            ></NativeSwap>
+                        </div>
+                    </div>
+                </div> */}
                 {this.state.activeTabLink === "native-tokens" &&
                     <NativeTokenLedgerHistory 
                         networks={this.state.smartswapSupportedNetworks}
@@ -195,7 +277,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
                         toggleLedger={() => this.toggleLedger()
                     }></BridgeTokenLedgerHistory>
                 }
-
+                
             </>
         )
     }

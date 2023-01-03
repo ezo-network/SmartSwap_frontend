@@ -33,7 +33,7 @@ export default class Welcome extends PureComponent {
                 </video>
               </div>
             </div>
-            <HeadFreeListing />
+            {/* <HeadFreeListing /> */}
 
             <SecImgTxt>
                 <Container>
@@ -79,9 +79,10 @@ const BtnPrimary = styled.a `
         min-width: 200px;
     }
     @media (max-width: 767px){
-        min-width: 200px;
-        padding: 18px 24px;
-        font-size: 16px;
+        min-width: 100%;
+        padding: 23px 24px;
+        font-size: 18px;
+        text-transform: uppercase;
     }
     &.btnLg {min-width: 428px; padding: 26px 50px; font-size: 24px;
         @media (max-width: 767px){
@@ -124,13 +125,13 @@ const SecTxt = styled.div `
         .help-circle {top: -9px;}
     }
     @media (max-width: 767px){
-        order: 2;  text-align: center; width: 100%; padding: 0;
-        p {margin-bottom: 20px;}
-        h3 {margin-bottom: 20px; font-size: 30px;}
+        /* order: 2;  text-align: center;*/  width: 100%; padding: 30px 0 50px 0;
+        p {margin-bottom: 20px; line-height: 1.6;}
+        h3 {margin-bottom: 13px; font-size: 30px; line-height: 1.5;}
     }
     @media (max-width: 480px){
-        h3 {font-size: 28px;}
-        p {font-size: 16px;}
+        h3 {font-size: 24px;}
+        p {font-size: 18px;}
     }
 `
 const TotalNumb = styled.div `
@@ -141,10 +142,17 @@ const TotalNumb = styled.div `
             content:""; border-left: 1px solid #323232; height: 30px; width: 1px; display: inline-block; vertical-align: top; margin: 0 22px;
         }
     }
+    @media (max-width: 767px){
+        flex-flow: column; margin: 21px 0 29px;
+        strong {font-size: 16px; margin: 0 0 6px 0;}
+    }
 `
 const TextContainer = styled.div `
     display: table; 
     width: 350px; text-align: center;
     a {width: 100%}
     span {display: block; font-size: 12px; color: #aaaaaa; margin-top: 12px;}
+    @media (max-width: 767px){
+        width: 100%; 
+    }
 `

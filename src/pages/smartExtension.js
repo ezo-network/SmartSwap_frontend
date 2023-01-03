@@ -5,10 +5,10 @@ import "react-multi-carousel/lib/styles.css";
 import img02 from "../assets/images/se.png";
 import HeroSectionVideoOverlay from "../components/sections/HeroSectionVideoOverlay";
 
-export default class Welcome extends PureComponent {
-  render() {
+export default class SmartBridge extends PureComponent {
+    render() {
     return (
-      <>
+    <>
         <HeroSectionVideoOverlay></HeroSectionVideoOverlay>
         <WelcomeMain id="main" className="welcome-page">
             <SecImgTxt>
@@ -53,9 +53,10 @@ const BtnPrimary = styled.a `
         min-width: 200px;
     }
     @media (max-width: 767px){
-        min-width: 200px;
-        padding: 18px 24px;
-        font-size: 16px;
+        min-width: 100%;
+        padding: 23px 24px;
+        font-size: 18px;
+        text-transform: uppercase;
     }
     &.btnLg {min-width: 428px; padding: 26px 50px; font-size: 24px;
         @media (max-width: 767px){
@@ -86,7 +87,7 @@ const SecImg = styled.div `
     & + div {padding: 0 0 0 26px;}
     img {max-width: 100%;}
     @media (max-width: 767px){
-        order: 1; max-width: 100%;
+        /* order: 1; */ max-width: 100%;
         width: 100%; text-align: center; padding-bottom: 20px;
         & + div {padding: 0;}
     }
@@ -98,17 +99,24 @@ const SecTxt = styled.div `
         .help-circle {top: -9px;}
     }
     @media (max-width: 767px){
-        order: 2;  text-align: center; width: 100%; padding: 0;
+        /* order: 2;  text-align: center;*/  width: 100%; padding: 30px 0 50px 0;
         p {margin-bottom: 20px;}
-        h3 {margin-bottom: 20px; font-size: 30px;}
+        h3 {margin-bottom: 13px; font-size: 30px; line-height: 1.5;}
     }
     @media (max-width: 480px){
-        h3 {font-size: 28px;}
-        p {font-size: 16px;}
+        h3 {font-size: 24px;}
+        p {font-size: 18px;}
     }
 `
 const TextContainer = styled.div `
     display: table; 
     width: 350px; text-align: center;
     span {display: block; font-size: 12px; color: #aaaaaa; margin-top: 12px;}
+    @media (max-width: 767px){
+        width: 100%; padding: 11px 0 0 0;
+        span {
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+    }
 `
