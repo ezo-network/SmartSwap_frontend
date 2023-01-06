@@ -129,6 +129,14 @@ export default class FreeListing extends PureComponent {
 
       }
     }
+
+    if(this.props.location.state?.claimDeployerOwnerShip && this.props.location.state.claimDeployerOwnerShip === true){
+      if (this._isMounted) {
+        this.setState({
+          claimDeployerOwnerShip: true
+        })
+      }
+    }
   }
 
   componentDidUpdate(newProps) {

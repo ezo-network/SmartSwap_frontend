@@ -39,12 +39,16 @@ export default class DerivativeTokenPopup extends PureComponent {
             pinnedTokens: [],
             networkDropdownToggle: false            
         };
+
+        this.ref = React.createRef();
+        this.handleClickOutside = this.handleClickOutside.bind(this);
     }
 
     componentDidMount() {
         console.log('DerivativeTokenPopup mounted');
         this._componentMounted = true;
         if(this._componentMounted === true){
+            document.addEventListener('click', this.handleClickOutside, true);
             if(window?.ethereum !== undefined){
                 window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async(chainId) => {
                     console.log(EthereumEvents.CHAIN_CHANGED, chainId);
@@ -76,6 +80,7 @@ export default class DerivativeTokenPopup extends PureComponent {
     componentWillUnmount() {
         console.log('DerivativeTokenPopup unmounted');
         this._componentMounted = false;
+        document.removeEventListener('click', this.handleClickOutside, true);
     }
 
     changeCurrentPage = (page) => {
@@ -212,7 +217,19 @@ export default class DerivativeTokenPopup extends PureComponent {
         } catch (err) {
             console.error("switchNetwork", err.message);
         }
-    }        
+    } 
+    
+    handleClickOutside(event) {
+        if (this.ref.current && !this.ref.current.contains(event.target)) {
+            if(this.state.networkDropdownToggle === true){
+                if(this._componentMounted === true){
+                    this.setState({
+                        networkDropdownToggle: false
+                    });
+                }
+            }
+        }
+    };
 
     render() {
         const pageSize = 10;
@@ -244,29 +261,31 @@ export default class DerivativeTokenPopup extends PureComponent {
                     <ContainerPop>
                         <PopTitle>
                             <h1>Select a Derivative token on bridge</h1> 
-                            <NetworkDropdownList>
-                                <NetworkListItem key={activeNetworkConfig?.chainId && "UNSUPPORTED"}>
+                            <NetworkDropdownList ref={this.ref}>
+                                <NetworkListItem 
+                                    onClick={(e) => this.setState({networkDropdownToggle: !this.state.networkDropdownToggle})}
+                                    key={activeNetworkConfig?.chainId && "UNSUPPORTED"
+                                }>
                                     <img 
                                         src={`/images/free-listing/chains/${(activeNetworkConfig?.chain ?? "UNSUPPORTED").toLowerCase()}.png`}
                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
                                     ></img>
                                     <span>{activeNetworkConfig?.chain ?? "UNSUPPORTED"}</span>
-                                    <div onClick={(e) => this.setState({networkDropdownToggle: !this.state.networkDropdownToggle})} className="toggle-icon-container">
+                                    <div className="toggle-icon-container">
                                         <i className={`fa fa-caret-${this.state.networkDropdownToggle ? 'up' : 'down'}`}></i>
                                     </div>
                                 </NetworkListItem>                                                                                
                                 {this.props.networks.map((network, index) => {
                                     if(this.state.networkDropdownToggle){
                                         if(this.context.chainIdNumber !== network.chainId){
-                                            return (<>
+                                            return (
                                                 <NetworkListItem onClick={(e) => this.switchNetwork(network.chainId)} className='cursor' key={network.chainId}>
                                                     <img 
                                                         src={`/images/free-listing/chains/${(network.chain).toLowerCase()}.png`}
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
                                                     ></img>
                                                     <span>{network.chain}</span>
-                                                </NetworkListItem>                                        
-                                            </>)
+                                                </NetworkListItem>)
                                         }
                                     }
                                 })}

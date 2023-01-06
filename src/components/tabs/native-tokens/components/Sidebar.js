@@ -81,7 +81,7 @@ export default class Sidebar extends PureComponent {
                     </h5>
                     
 
-                    {this.state.crossChainQuoteResult?.paths?.map((path, index) => {
+                    {this.state.crossChainQuoteResult?.paths?.slice(0, 2).map((path, index) => {
                         const bridge = _.find(path.steps, {
                             type: "STEP_BRIDGE"
                         });
@@ -100,9 +100,23 @@ export default class Sidebar extends PureComponent {
                             }
 
                             return (
-                                <h5 key={index+1}><span>{index+2}. <img alt={bridge.provider_name} src={bridge.provider_icon_url} /></span>{bridge.provider_name}
-                                    <b><strong>{Number(quoteAmount).toFixed(5)} {this.props.toChainNativeTokenSymbol}</strong> [${Number(quoteAmount * toTokenIdUsdValue).toFixed(2)}]</b>
-                                    <p>Estimated fees: <span className="color-red">-${quote.src_gas_fee_usd}</span></p>
+                                <h5 key={index+1}>
+                                    <span>{index+2}.</span>
+                                    <span className="provider-image">
+                                        <img alt={bridge.provider_name} src={bridge.provider_icon_url} />
+                                    </span>
+                                    <span className="provider-name">
+                                        {bridge.provider_name === 'anyswap' ? 'Multichain' : bridge.provider_name}   
+                                    </span>
+                                    <b>
+                                        <span className="provider-quote-qty">
+                                                <strong>{Number(quoteAmount).toFixed(5)} {this.props.toChainNativeTokenSymbol}</strong> 
+                                        </span>
+                                        <span className="provider-quote-usd">
+                                            [${Number(quoteAmount * toTokenIdUsdValue).toFixed(2)}]
+                                        </span>
+                                    </b>
+                                    <p className="provider-fee">Estimated fees: <span className="color-red">-${quote.src_gas_fee_usd}</span></p>
                                 </h5>
                             )
                         }

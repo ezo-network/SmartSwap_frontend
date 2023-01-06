@@ -130,11 +130,18 @@ export default class SmartSwap extends PureComponent {
         this._componentMounted = true;
         if(this._componentMounted){
             console.log('Smartswap Component mounted');
-            //await this.fetchCoingeckoMarketPrice();
             await this.connectWallet();
-            await this.getBalance();
-            await this.setChainIds();
-            //await this.reFetch();
+
+            const isSupportedNetwork = _.find(this.props.networks, {
+                chainId: this.context.chainIdNumber
+            });
+
+            if(isSupportedNetwork === undefined){
+                await this.setDefaultChainIds();                
+            } else {
+                await this.setChainIds();
+            }
+
             this.interval = setInterval(async() => {
                 await this.estimateGasAndFees();
             }, 30000);
@@ -143,8 +150,12 @@ export default class SmartSwap extends PureComponent {
                 // detect Network account change
                 window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async (chainId) => {
                     console.log(EthereumEvents.CHAIN_CHANGED, chainId);
-                    await this.estimateGasAndFees();
-                    await this.smartswapPriceQuote();
+                    const networkConfig = _.find(this.props.networks, {chainId: web3.utils.hexToNumber(chainId)});
+                    if(networkConfig !== undefined){
+                        await this.setChainIds();
+                    } else {
+                        await this.setDefaultChainIds();
+                    }
                 });
     
                 window.ethereum.on(EthereumEvents.ACCOUNTS_CHANGED, async (accounts) => {
@@ -178,7 +189,15 @@ export default class SmartSwap extends PureComponent {
         }
 
         if(this.props.networks !== prevProps.networks){
-            await this.setChainIds();
+            const isSupportedNetwork = _.find(this.props.networks, {
+                chainId: this.context.chainIdNumber
+            });
+
+            if(isSupportedNetwork === undefined){
+                await this.setDefaultChainIds();                
+            } else {
+                await this.setChainIds();
+            }
         }
     }
 
@@ -203,27 +222,46 @@ export default class SmartSwap extends PureComponent {
     }
 
     setChainIds = async() => {
-        // To network config - filter out from network then choose first element
-        if(this.state.toChainId === null){
-            if(this.context.chainIdNumber === null || this.context.chainIdNumber === undefined){
-                await this.context.connectWallet();
-            }
-            const toNetworkConfig = (_.filter(this.props.networks, function(network) {
-                return network.chainId !== this.context.chainIdNumber;
-            }.bind(this)))[1];
+         // To network config - filter out from network then choose first element
+        await this.context.connectWallet();
+        
+        const toNetworkConfig = (_.filter(this.props.networks, function(network) {
+            return network.chainId !== this.context.chainIdNumber;
+        }.bind(this)))[0];
 
-            if(toNetworkConfig !== undefined){
-                if(this._componentMounted){
-                    this.setState({
-                        fromChainId: this.context.chainIdNumber,
-                        toChainId: toNetworkConfig.chainId ?? null
-                    }, async() => {
-                        await this.smartswapPriceQuote();
-                        await this.estimateGasAndFees();
-                    });
-                }
+        if(toNetworkConfig !== undefined){
+            if(this._componentMounted){
+                this.setState({
+                    amountToSwap: '',
+                    fromChainId: this.context.chainIdNumber,
+                    toChainId: toNetworkConfig.chainId ?? null
+                }, async() => {
+                    await this.getBalance();
+                    await this.smartswapPriceQuote();
+                    await this.estimateGasAndFees();
+                });
             }
-        }   
+        } 
+    }
+
+    setDefaultChainIds = async() => {
+        const fromNetworkConfig = _.find(this.props.networks, {chain: "ETH"});
+        const toNetworkConfig = _.find(this.props.networks, {chain: "BSC"});
+        if(this._componentMounted){
+            if(fromNetworkConfig !== undefined && toNetworkConfig !== undefined){
+                this.userBalance = 0;
+                this.setState({
+                    amountToSwap: 1,
+                    userBalance: 0,
+                    fromChainId: fromNetworkConfig.chainId,
+                    toChainId: toNetworkConfig.chainId
+                }, async() => {
+                    await this.smartswapPriceQuote();
+                    await this.estimateGasAndFees();
+                    await this.switchNetwork(fromNetworkConfig.chainId, toNetworkConfig.chainId);
+                });
+            }
+        }
     }
 
     switchNetwork = async(newfromChainId, newToChainId) => {
@@ -348,19 +386,22 @@ export default class SmartSwap extends PureComponent {
 
     setMaxAmount = async() => {
         if(this.props.selectedInputMode === this.props.inputModes[0]){
-            const rate = _.find(this.props.tokensUsdPrice, {chainId: this.context.chainIdNumber});
-            if(rate !== undefined){
-                // console.log({
-                //     calc: "setMaxAmount dollar mode",
-                //     amountToSwap: this.userBalance * rate.value,
-                //     estimatedAmountToSwap: this.userBalance
-                // });
-                this.setState({
-                    amountToSwap: toFixedWithoutRounding(numberExponentToLarge(this.userBalance * rate.value), 2),
-                    estimatedAmountToSwap: this.userBalance
-                }, async() => {
-                    this.debouncedSmartswapPriceQuote();
-                });
+            const networkConfig = _.find(this.props.networks, { chainId: Number(this.context.chainIdNumber) });
+            if(networkConfig !== undefined){
+                const rate = _.find(this.props.tokensUsdPrice, {chain: networkConfig.chain});
+                if(rate !== undefined){
+                    // console.log({
+                    //     calc: "setMaxAmount dollar mode",
+                    //     amountToSwap: this.userBalance * rate.value,
+                    //     estimatedAmountToSwap: this.userBalance
+                    // });
+                    this.setState({
+                        amountToSwap: toFixedWithoutRounding(numberExponentToLarge(this.userBalance * rate.value), 2),
+                        estimatedAmountToSwap: this.userBalance
+                    }, async() => {
+                        this.debouncedSmartswapPriceQuote();
+                    });
+                }
             }
         }
 
@@ -403,24 +444,29 @@ export default class SmartSwap extends PureComponent {
                 if(this.decimalPointsFilter(inputValue) === false){
                     return;
                 }
-                const rate = _.find(this.props.tokensUsdPrice, {chainId: this.context.chainIdNumber});
-                if(rate !== undefined){
-                    inputValue = toFixedWithoutRounding(inputValue, 2);
-                    const amountToSwapInUsd = inputValue / rate.value;
-                    // console.log({
-                    //     calc: "setAmount dollar mode",
-                    //     estimatedAmountToSwap: amountToSwapInUsd,
-                    //     amountToSwap: Number(inputValue)
-                    // });                                
 
-                    if(this._componentMounted){
-                        this.setState({
-                            estimatedAmountToSwap: amountToSwapInUsd,
-                            amountToSwap: Number(inputValue)
-                        }, async() => {
-                            //await this.smartswapPriceQuote();
-                            this.debouncedSmartswapPriceQuote();
-                        });
+                const networkConfig = _.find(this.props.networks, { chainId: Number(this.context.chainIdNumber) });                
+
+                if(networkConfig !== undefined){
+                    const rate = _.find(this.props.tokensUsdPrice, {chain: networkConfig.chain});
+                    if(rate !== undefined){
+                        inputValue = toFixedWithoutRounding(inputValue, 2);
+                        const amountToSwapInUsd = inputValue / rate.value;
+                        // console.log({
+                        //     calc: "setAmount dollar mode",
+                        //     estimatedAmountToSwap: amountToSwapInUsd,
+                        //     amountToSwap: Number(inputValue)
+                        // });                                
+    
+                        if(this._componentMounted){
+                            this.setState({
+                                estimatedAmountToSwap: amountToSwapInUsd,
+                                amountToSwap: Number(inputValue)
+                            }, async() => {
+                                //await this.smartswapPriceQuote();
+                                this.debouncedSmartswapPriceQuote();
+                            });
+                        }
                     }
                 }
             }
@@ -458,6 +504,14 @@ export default class SmartSwap extends PureComponent {
         const fromNetworkConfig = _.find(this.props.networks, {
             chainId: this.context.chainIdNumber
         });
+
+        const toNetworkConfig = _.find(this.props.networks, {
+            chainId: toChainId
+        });
+
+        if(toNetworkConfig === undefined || fromNetworkConfig === undefined){
+            return;
+        }
 
         const {response, code, error} = await SmartSwapApiHelper.getEstimateGasAndFees(fromChainId, toChainId);
         if(code !== 200){
@@ -693,11 +747,12 @@ export default class SmartSwap extends PureComponent {
         try {
             const {networks, selectedInputMode, inputModes, tokensUsdPrice} = this.props;
             const {toChainId, fromChainId, amountToSwap} = this.state;
-            const fromTokeUsdValue = _.find(tokensUsdPrice, {chainId: fromChainId});
-            const toTokeUsdValue = _.find(tokensUsdPrice, {chainId: toChainId});
-            const toNetworkConfig = _.find(networks, {chainId: toChainId});
+            const fromNetworkConfig = _.find(this.props.networks, {chainId: fromChainId});
+            const toNetworkConfig = _.find(this.props.networks, {chainId: toChainId});
+            const fromTokeUsdValue = _.find(tokensUsdPrice, {chain: fromNetworkConfig?.chain});
+            const toTokeUsdValue = _.find(tokensUsdPrice, {chain: toNetworkConfig?.chain});
 
-            if(toNetworkConfig !== undefined && fromTokeUsdValue !== undefined && toTokeUsdValue !== undefined){
+            if(fromNetworkConfig !== undefined && toNetworkConfig !== undefined && fromTokeUsdValue !== undefined && toTokeUsdValue !== undefined){
                 const amountToReceiveInUsd = () => {
                     if(selectedInputMode === inputModes[0]){
                         return toFixedWithoutRounding(Number(amountToSwap).toFixed(2), 2);
@@ -759,8 +814,8 @@ export default class SmartSwap extends PureComponent {
     render() {
 
         // active network
-        const activeNetworkConfig = _.find(this.props.networks, { chainId: this.context.chainIdNumber });
-        const activeNetworkTokenUsdValue = _.find(this.props.tokensUsdPrice, {chainId: this.context.chainIdNumber});
+        const activeNetworkConfig = _.find(this.props.networks, { chainId: this.state.fromChainId });
+        const activeNetworkTokenUsdValue = _.find(this.props.tokensUsdPrice, {chain: activeNetworkConfig?.chain});
 
         // console.log({
         //     activeNetworkTokenUsdValue: activeNetworkTokenUsdValue,
@@ -769,17 +824,17 @@ export default class SmartSwap extends PureComponent {
 
         // To network config - filter out from network then choose first element
         let toNetworkConfig = null;
-        if(this.state.toChainId === null){
+        if(this.state.toChainId === null || (this.state.toChainId === this.state.fromChainId)){
             toNetworkConfig = (_.filter(this.props.networks, function(network) {
-                return network.chainId !== this.context.chainIdNumber;
-            }.bind(this)))[1];
+                return network.chainId !== activeNetworkConfig?.chainId;
+            }.bind(this)))[0];
         } else {
             toNetworkConfig = _.find(this.props.networks, {
                 chainId: this.state.toChainId
             });
         }
 
-        const toNetworkTokenUsdValue = _.find(this.props.tokensUsdPrice, {chainId: toNetworkConfig?.chainId});
+        const toNetworkTokenUsdValue = _.find(this.props.tokensUsdPrice, {chain: toNetworkConfig?.chain});
 
         // all options array
         const supportedChainSelectOptions = [];
@@ -864,17 +919,20 @@ export default class SmartSwap extends PureComponent {
                                 &nbsp;of {defaultFromSelectOption.nativeTokenSymbol} to&nbsp;
                                 <span className="color-white">{this.props.selectedInputMode === this.props.inputModes[0] ? '$' : ''}{defaultToSelectOption.amountToReceive()}</span> 
                                 &nbsp;of {defaultToSelectOption.nativeTokenSymbol}  |  Estimated swap time:&nbsp;
-                                <span className="color-red">1-15 minutes</span>
+                                <span className="color-green">~30 seconds</span>
                                 &nbsp;
                                 <i className="help-circle">
                                     <i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i>
                                 </i>
                             </p>
-                            <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p>
-                            <p className="font-11 color-light-n">26.31% still pending 
+                            {/* <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p> */}
+                            <p className="font-11 color-light-n">
+                                {/* 26.31% still pending 
                                 <i className="help-circle">
                                     &nbsp;<i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i>&nbsp;
-                                </i> | &nbsp;&nbsp;
+                                </i> 
+                                | &nbsp;&nbsp; */}
+
                                 <a href="/" className="color-light-n">Start new swap</a>
                             </p>
                             </>
@@ -970,7 +1028,7 @@ export default class SmartSwap extends PureComponent {
                                                 onChange={(e) => this.setAmount(e)}
                                                 autoComplete="off"
                                             />
-                                            <span className="currency-ic-n">
+                                            {/* <span className="currency-ic-n">
                                                 {
                                                     this.props.selectedInputMode === this.props.inputModes[0]
                                                         ? '$'
@@ -980,7 +1038,7 @@ export default class SmartSwap extends PureComponent {
                                                             src={defaultFromSelectOption.nativeTokenIcon}
                                                         ></img>
                                                 }
-                                            </span>
+                                            </span> */}
                                         </div>
                                     </div>
                                     <div className="input-box2">
@@ -1050,7 +1108,7 @@ export default class SmartSwap extends PureComponent {
                                                 readOnly={true}
                                                 value={defaultToSelectOption.amountToReceive()}
                                             />
-                                            <span className="currency-ic-n ver2">
+                                            {/* <span className="currency-ic-n ver2">
                                                 {
                                                     this.props.selectedInputMode === this.props.inputModes[0]
                                                         ? '$'
@@ -1060,7 +1118,7 @@ export default class SmartSwap extends PureComponent {
                                                             src={defaultToSelectOption.nativeTokenIcon}
                                                         ></img>
                                                 }
-                                            </span>
+                                            </span> */}
                                         </div>
                                     </div>
                                     <div className="input-box2 ver2">
@@ -1152,7 +1210,7 @@ export default class SmartSwap extends PureComponent {
                     <div className="success-msg">
                         <i className="fas fa-check"></i>
                         <h4>Swap sent successfully</h4>
-                        <p>Check the ledger below</p>
+                        <p className="cursor" onClick={() => this.props.openLedger()}>Check the ledger below</p>
                     </div>
                 }
             </>
