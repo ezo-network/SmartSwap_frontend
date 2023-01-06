@@ -1508,40 +1508,22 @@ export default class BridgeSwap extends PureComponent {
 
 
                 {/** Bottom bar */}
-                <div className="bottom-action-bar swap-Textlink bridge-Textlink">
-                    <div className="powertextBX">
-                        <p className="poweredBy">
-                            Powered by
-                            <img alt="smart exchange" src={SmartExchange} />
-                            {/* <a href="#">Start new swap</a> */}
-                        </p>
-                        <div className="powertextBX-links">
-                            <label className="switch-container token-side-switcher">
-                                <p className={`${this.state.currentTokenSide === TOKEN_SIDES[0] ? "active" : ""}`} style={{ paddingRight: "8px" }}>Orignal Token</p>
-                                <Switch
-                                    checked={this.state.currentTokenSide === TOKEN_SIDES[1] ? true : false}
-                                    onChange={(e) => this.toggleTokenSide()}
-                                    handleDiameter={14}
-                                    offColor="#2e303a"
-                                    onColor="#2e303a"
-                                    offHandleColor="#91dc27"
-                                    onHandleColor="#91dc27"
-                                    height={18}
-                                    width={32}
-                                    borderRadius={0}
-                                    activeBoxShadow="0px 0px 0px 0px #fffc35"
-                                    uncheckedIcon={false}
-                                    checkedIcon={false}
-                                    className="react-switch"
-                                    id="input-mode"
-                                />
-                                <p className={`${this.state.currentTokenSide === TOKEN_SIDES[1] ? "active" : ""}`} style={{ paddingLeft: "8px" }}>Derivative Token</p>
-                            </label>                            
-                            <Link to='/freelisting'>Free listing</Link>
-                            <span>|</span>
-                            {/* <a href="">Free license</a> */}
-                            <a href={CONSTANT.APPLY_FOR_LICENSING_ACTION} target="_blank">Apply for licensing</a>
-                            <a href="" onClick={(e) => this.resetComponent(e)} style={{marginLeft: "15px"}} type="button">Bridge another token</a>
+                <div className="bottom-action-bar">
+                    <div className="swap-Textlink bridge-Textlink">
+                        <div className="powertextBX">
+                            <p className="poweredBy">
+                                Powered by
+                                <img alt="smart exchange" src={SmartExchange} />
+                                {/* <a href="#">Start new swap</a> */}
+                            </p>
+                            <div className="powertextBX-links">
+                                <Link to='/freelisting'>Free listing</Link>
+                                <span>|</span>
+                                {/* <a href="">Free license</a> */}
+                                <a href={CONSTANT.APPLY_FOR_LICENSING_ACTION} target="_blank">Apply for licensing</a>
+                                <span>|</span>
+                                <a href="" onClick={(e) => this.resetComponent(e)} type="button">Bridge another token</a>                        
+                            </div>
                         </div>
                     </div>
                 </div>

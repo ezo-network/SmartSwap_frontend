@@ -30,25 +30,15 @@ const TokensUsdPriceProvider = React.memo((args) => {
             await axios.get(CONSTANT.API_ENDPOINTS['3RD_PARTY_APPS'].COIN_GECKO_API.tokensUsdPrice).then(async(res) => {
                 const response = res.data;
     
-                let tokens = [];            
+                let tokens = [];
                 tokens.push({
-                    chainId: 5,
+                    chain: 'ETH',
                     value: response["ethereum"]["usd"]
-                },{
-                    chainId: 1,
-                    value: response["ethereum"]["usd"]
-                }
-                , {
-                    chainId: 97,
-                    value: response["binancecoin"]["usd"]
-                },{
-                    chainId: 56,
+                }, {
+                    chain: 'BSC',
                     value: response["binancecoin"]["usd"]
                 }, {
-                    chainId: 80001,
-                    value: response["matic-network"]["usd"]
-                }, {
-                    chainId: 137,
+                    chain: 'POLYGON',
                     value: response["matic-network"]["usd"]
                 });
     

@@ -1,3 +1,4 @@
+import {WalletContext, EthereumEvents} from '../../../context/WalletProvider';
 import _ from "lodash";
 import React, { PureComponent } from "react";
 import { Link } from "react-router-dom";
@@ -139,6 +140,7 @@ export default class DestinationTokensPopup extends PureComponent {
                 network['isBridgeExistOnChain'] = wrappedToken === undefined ? false : true;
                 network['wrappedTokenAddress'] = wrappedToken !== undefined ? wrappedToken.address : undefined;
                 network['wrappedTokenSymbol'] = wrappedToken !== undefined ? wrappedToken.tokenSymbol : undefined;
+                network['isSmartContractOwner'] = wrappedToken !== undefined ? (wrappedToken.creatorAddress === (this.context.account).toLowerCase() ? true : false) : false;
                 finalFilteredNetworks.push(network);
             }
         });
@@ -321,8 +323,20 @@ export default class DestinationTokensPopup extends PureComponent {
                                                             </Link>
                                                         }
                                                     </Tcell>
-                                                    <Tcell>
-                                                        -
+                                                    <Tcell className="text-center">
+                                                        {network['isSmartContractOwner'] === true && 
+                                                            <Link to={{
+                                                                pathname: "/freelisting",
+                                                                state: {
+                                                                    claimDeployerOwnerShip: true
+                                                                }
+                                                            }}>
+                                                                <ButtonPrimary className='claim-depolyment-ownership'>Claim Ownership</ButtonPrimary>
+                                                            </Link>
+                                                        }
+                                                        {network['isSmartContractOwner'] === false && 
+                                                            <>-</>
+                                                        }
                                                     </Tcell>
                                                 </tr>
                                             )
@@ -351,6 +365,9 @@ export default class DestinationTokensPopup extends PureComponent {
         )
     }
 }
+
+DestinationTokensPopup.contextType = WalletContext;
+
 const PopupMain = styled.div`
     position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(13, 14, 19, 0.95); overflow: auto; padding: 0 0 90px;
 `

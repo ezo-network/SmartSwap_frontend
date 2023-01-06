@@ -19,8 +19,6 @@ export default class DagenSwap extends PureComponent {
         super();
         this.state = {
             networks: [],
-
-
             swapLoading: false,
             approveLoading: false,
             showSidebar: false,
@@ -156,16 +154,22 @@ export default class DagenSwap extends PureComponent {
                                             onChange={(e) => this.receivedToken(e)}
                                             autoComplete="off"
                                         />
-                                        <span className="currency-ic-n">
-                                            $
-                                        </span>
+                                        {/* <span className="currency-ic-n">
+                                            {
+                                                this.props.selectedInputMode === this.props.inputModes[0]
+                                                    ? '$'
+                                                    : <img width={20} src="/images/free-listing/chains/eth.png"></img>
+                                            }
+                                        </span> */}
                                     </div>
                                 </div>
 
                                 <div className="input-box2">
                                     <label htmlFor="" className="form-label">BLOCKCHAIN</label>
                                     {/* <button className="ani-1"><img src="images/bnb.png" alt="" /> BSC</button> */}
-                                    <button><img src="../images/coin-icon03.png"></img>BSC</button>
+                                    <button>
+                                        <img width={20} src="/images/free-listing/chains/eth.png"></img>ETH
+                                    </button>
                                     {/* <Select
                     value={this.state.selectedNetworkOptionSend}
                     onChange={this.handleChange.bind(this, "sendNetwork")}
@@ -202,7 +206,9 @@ export default class DagenSwap extends PureComponent {
                                 <div className="input-box2">
                                     <label htmlFor="" className="form-label">TOKEN</label>
                                     {/* <button className="border-left-0 ani-1"><img src="images/bnb.png" alt="" /> BNB</button> */}
-                                    <button><img src="../../images/coin-icon03.png"></img>BNB</button>
+                                    <button>
+                                        <img width={20} src="/images/free-listing/tokens/eth.png"></img>ETH
+                                    </button>
                                     {/* <Select
                     value={this.state.selectedOptionSend}
                     onChange={this.handleChange.bind(this, "send")}
@@ -323,15 +329,21 @@ export default class DagenSwap extends PureComponent {
                                             disabled
                                             value={this.state.sendFundAmount}
                                         />
-                                        <span className="currency-ic-n ver2">
-                                            $
-                                        </span>
+                                        {/* <span className="currency-ic-n ver2">
+                                            {
+                                                this.props.selectedInputMode === this.props.inputModes[0]
+                                                    ? '$'
+                                                    : <img width={20} src="/images/free-listing/chains/bsc.png"></img>
+                                            }
+                                        </span> */}
                                     </div>
                                 </div>
                                 <div className="input-box2 ver2">
                                     <label htmlFor="" className="form-label">BLOCKCHAIN</label>
                                     {/* <button className="ani-1"><img src="images/eth-icon.png" alt="" /> Ethereum</button> */}
-                                    <button><img src="../images/coin-icon13.png"></img>Ethereum</button>
+                                    <button>
+                                        <img width={20} src="/images/free-listing/chains/bsc.png"></img>BSC
+                                    </button>
                                     {/* <Select
                     value={this.state.selectedNetworkOptionReceive}
                     onChange={this.handleChange.bind(this, "receiveNetwork")}
@@ -361,7 +373,9 @@ export default class DagenSwap extends PureComponent {
                                 <div className="input-box2 ver2">
                                     <label htmlFor="" className="form-label">TOKEN</label>
                                     {/* <button className="border-left-0 ani-1"><img src="images/eth-icon.png" alt="" /> ETH</button> */}
-                                    <button><img src="../images/coin-icon13.png"></img>ETH</button>
+                                    <button>
+                                        <img width={20} src="/images/free-listing/tokens/bnb.png"></img>BNB
+                                    </button>
                                     {/* <Select
                     value={this.state.selectedOptionReceive}
                     onChange={this.handleChange.bind(this, "receive")}
@@ -428,52 +442,9 @@ export default class DagenSwap extends PureComponent {
                     </div>
                 </div>
                 <div className="text-center ">
-                    {this.state.web3 === null ||
-                        constantConfig.tokenDetails[
-                            this.state.selectedSendCurrency
-                        ].networkId !== web3Config.getNetworkId() ? (
-                        <button className="native-btn ani-1 connect" onClick={(e) => this.connectWallet()}><span>
-                            <i
-                                className={
-                                    data.tokenDetails[
-                                        this.state.selectedSendCurrency
-                                    ].networkId ===
-                                        CONSTANT.NETWORK_ID.ETHEREUM
-                                        ? "ETH"
-                                        : "BNB"
-                                }
-                            ></i>
-                        </span>
-                            <span className="currency"><img src={"images/receiveCurrencies/" + this.state.selectedSendCurrency + ".png"} alt="" /></span> CONNECT YOUR WALLET - DAGENSWAP</button>
-
-                    ) : constantConfig.tokenDetails[
-                        this.state.selectedSendCurrency
-                    ].approveRequire &&
-                        this.state.tokenBalances[
-                        this.state.selectedSendCurrency + "_APPROVED"
-                        ] <= this.state.actualSendFundAmount ? (
-                        this.state.approveLoading ? (
-                            <button className="btn-primary-n ani-1 connect swap"><LoopCircleLoading
-                                height={"20px"}
-                                width={"20px"}
-                                color={"#ffffff"}
-                            /></button>
-                        ) : (
-                            <button className="btn-primary-n ani-1 connect swap" onClick={() => {
-                                this.approve();
-                            }}>Approve</button>
-                        )
-                    ) : this.state.swapLoading ? (
-                        <button className="btn-primary-n ani-1 connect swap"><LoopCircleLoading
-                            height={"20px"}
-                            width={"20px"}
-                            color={"#ffffff"}
-                        /></button>
-                    ) : (
-                        <button className="btn-primary-n ani-1 connect swap swapBtn" onClick={() => {
-                            this.swap();
-                        }}>SWAP</button>
-                    )}
+                    <button className="native-btn ani-1 connect-wallet" onClick={(e) => e.preventDefault()}>
+                        CONNECT YOUR WALLET
+                    </button>
                     <div className="swap-outer">
                         {this.state.sendFundAmount > 0 && this.state.sendFundAmount !== "" ?
                             <p className="font-11 color-light-n">You are swapping ${this.state.sendFundAmount} of {this.state.selectedSendCurrency} to ${this.state.sendFundAmount} of {this.state.selectedReceiveCurrency}

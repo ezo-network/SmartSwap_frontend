@@ -2134,7 +2134,7 @@ select:focus { border-color: #fff !important; box-shadow: none; }
  .reserve-Block .form-Block .email-Box { margin-bottom: 50px; } 
  }
 
-.powertextBX { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #aaaaaa; margin-right: auto; } 
+.powertextBX { display: flex; align-items: center; /*justify-content: space-between;*/ font-size: 11px; color: #aaaaaa; margin-right: auto; } 
 
 .powertextBX p.poweredBy { width: 198px; } 
 .powertextBX p,
@@ -2882,7 +2882,7 @@ a.color-light-n:hover { color: #ccc; }
 
 .input-box2.ver2 button:hover { background-color: #0d0e13; opacity: 1; } 
 
-.input-box2.ver2 button img { filter: grayscale(1) brightness(0.7); } 
+/* .input-box2.ver2 button img { filter: grayscale(1) brightness(0.7); }  */
 
 .input-box2.ver2 button:after { border-top: 5px solid #fff; } 
 .input-box2.ver2 div > div[class$="control"] { border: 2px solid #0d0e13; } 
@@ -2895,7 +2895,7 @@ a.color-light-n:hover { color: #ccc; }
 
 .i-outer { position: relative; } 
 
-.i-outer input { padding-left: 65px; } 
+/* .i-outer input { padding-left: 65px; }  */
 
 .currency-ic-n { display: inline-flex; height: 50px; width: 50px; justify-content: center; align-items: center; background-color: #ededed; border: 2px solid #fff; min-width: 50px; font-weight: bold; color: #130929; font-size: 16px; font-weight: bold; position: absolute; top: 0px; left: 0px; } 
 
@@ -3327,4 +3327,37 @@ a.dc-file:hover { color: #0303ff; }
 .tab-content-n-main .tab-link.disable { position: relative; } 
 .tab-content-n-main .tab-link.disable:after { content: "Coming Soon"; position: absolute; display: flex; padding: 0px 18px; align-items: center; top: 0; bottom: 0; left: 0; right: 0; opacity: 0; } 
 .tab-content-n-main .tab-link.disable:hover { color: transparent; } 
-.tab-content-n-main .tab-link.disable:hover:after { opacity: 1; color: #91dc27; } 
+.tab-content-n-main .tab-link.disable:hover:after { opacity: 1; color: #91dc27; }
+.cross-chain-price-quote-results .provider-name {text-transform: capitalize;}
+.cross-chain-price-quote-results {
+    overflow-y: auto;
+    height: 370px;
+    -ms-overflow-style: none;  /* IE and Edge */
+     scrollbar-width: none;  /* Firefox */
+}
+.cross-chain-price-quote-results::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+}
+#native-token-input::-webkit-input-placeholder { 
+    color: #999;
+}
+
+#native-token-input:-moz-placeholder { 
+    color: #999;
+} 
+#native-token-input::-moz-placeholder { 
+    color: #999;
+} 
+#native-token-input:-ms-input-placeholder { 
+    color: #999;
+} 
+#native-token-input::-ms-input-placeholder { 
+    color: #999;
+} 
+#native-token-input::placeholder { 
+    color: #999;
+}
+
+#native-token-input:active, #native-token-input:focus {
+    color: black;
+}

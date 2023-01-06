@@ -28,9 +28,9 @@ export default class NativeSwap extends PureComponent {
         this.state = {
             networks: [],
             slippageMode: SLIPPAGE_MODES[0],
-            inputMode: INPUT_MODES[0],
+            inputMode: INPUT_MODES[1],
             estimateGasAndFeesData: {},
-            activeNetworkNativeTokenSymbol: 'UNSUPPORTED',
+            activeNetworkNativeTokenSymbol: '',
             activeNetworkNativeTokenDecimals: 0,
             smartSwapQuoteData: {
                 quotePrice: 0,
