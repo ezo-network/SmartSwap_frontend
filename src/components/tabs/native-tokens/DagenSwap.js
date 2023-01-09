@@ -150,8 +150,8 @@ export default class DagenSwap extends PureComponent {
                                             placeholder="0"
                                             id="input04"
                                             value={this.state.sendFundAmount}
-                                            onKeyDown={(e) => Validation.floatOnly(e)}
-                                            onChange={(e) => this.receivedToken(e)}
+                                            //onKeyDown={(e) => Validation.floatOnly(e)}
+                                            //onChange={(e) => this.receivedToken(e)}
                                             autoComplete="off"
                                         />
                                         {/* <span className="currency-ic-n">
@@ -161,6 +161,15 @@ export default class DagenSwap extends PureComponent {
                                                     : <img width={20} src="/images/free-listing/chains/eth.png"></img>
                                             }
                                         </span> */}
+                                        {                                                
+                                        this.props.selectedInputMode === this.props.inputModes[0] && 
+                                            <span className="currency-ic-n">$</span>                                                
+                                        }
+
+                                        {                                                
+                                        this.props.selectedInputMode !== this.props.inputModes[0] && 
+                                            <></>
+                                        }                                                
                                     </div>
                                 </div>
 
@@ -336,6 +345,15 @@ export default class DagenSwap extends PureComponent {
                                                     : <img width={20} src="/images/free-listing/chains/bsc.png"></img>
                                             }
                                         </span> */}
+                                        {                                                
+                                        this.props.selectedInputMode === this.props.inputModes[0] && 
+                                            <span className="currency-ic-n ver2">$</span>                                                
+                                        }
+
+                                        {                                                
+                                        this.props.selectedInputMode !== this.props.inputModes[0] && 
+                                            <></>
+                                        }                                                
                                     </div>
                                 </div>
                                 <div className="input-box2 ver2">

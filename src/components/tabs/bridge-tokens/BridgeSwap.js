@@ -1520,7 +1520,7 @@ export default class BridgeSwap extends PureComponent {
                                 <Link to='/freelisting'>Free listing</Link>
                                 <span>|</span>
                                 {/* <a href="">Free license</a> */}
-                                <a href={CONSTANT.APPLY_FOR_LICENSING_ACTION} target="_blank">Apply for licensing</a>
+                                <a href={CONSTANT.APPLY_FOR_LICENSING_ACTION} target="_blank" rel="noreferrer">Apply for licensing</a>
                                 <span>|</span>
                                 <a href="" onClick={(e) => this.resetComponent(e)} type="button">Bridge another token</a>                        
                             </div>

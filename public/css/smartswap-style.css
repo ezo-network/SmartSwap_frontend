@@ -3361,3 +3361,7 @@ a.dc-file:hover { color: #0303ff; }
 #native-token-input:active, #native-token-input:focus {
     color: black;
 }
+
+.dollar-amount-mode {
+    padding-left: 65px;
+}

@@ -130,23 +130,26 @@ export default class SmartSwap extends PureComponent {
         this._componentMounted = true;
         if(this._componentMounted){
             console.log('Smartswap Component mounted');
-            await this.connectWallet();
-
-            const isSupportedNetwork = _.find(this.props.networks, {
-                chainId: this.context.chainIdNumber
-            });
-
-            if(isSupportedNetwork === undefined){
-                await this.setDefaultChainIds();                
-            } else {
-                await this.setChainIds();
-            }
-
-            this.interval = setInterval(async() => {
-                await this.estimateGasAndFees();
-            }, 30000);
-
+            
             if(window?.ethereum !== undefined){
+
+                await this.connectWallet();
+    
+                const isSupportedNetwork = _.find(this.props.networks, {
+                    chainId: this.context.chainIdNumber
+                });
+    
+                if(isSupportedNetwork === undefined){
+                    await this.setDefaultChainIds();                
+                } else {
+                    await this.setChainIds();
+                }
+                
+                // set interval one time - runs every 30 secs
+                this.interval = setInterval(async() => {
+                    await this.estimateGasAndFees();
+                }, 30000);
+
                 // detect Network account change
                 window.ethereum.on(EthereumEvents.CHAIN_CHANGED, async (chainId) => {
                     console.log(EthereumEvents.CHAIN_CHANGED, chainId);
@@ -172,6 +175,7 @@ export default class SmartSwap extends PureComponent {
                     console.log(EthereumEvents.DISCONNECT);
                 });
             } else {
+                await this.setDefaultChainIds();
                 console.error('Metamask is not installed');
             }
 
@@ -203,6 +207,7 @@ export default class SmartSwap extends PureComponent {
 
     componentWillUnmount() {
         this._componentMounted = false;
+        // clear interval when component unmounted
         clearInterval(this.interval);
         console.log("SmartSwap Component unmounted");
     }
@@ -265,31 +270,35 @@ export default class SmartSwap extends PureComponent {
     }
 
     switchNetwork = async(newfromChainId, newToChainId) => {
-        if (Number(this.context.chainIdNumber) !== Number(newfromChainId)) {
-            if(this._componentMounted){
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: web3.utils.toHex(newfromChainId) }],
-                }).then(async(response) => {
-                    if(this._componentMounted){
-                        this.setState({
-                            fromChainId: newfromChainId,
-                            toChainId: newToChainId
-                        });
-                        await this.getBalance();
-                    }
-                }).catch(async (error) => {
-                    console.error(error);
-                    if (error.code === -32002) {
-                        //notificationConfig.info(errors.switchRequestPending);
-                    }
-    
-                    if (error.code === 4902) {
-                        notificationConfig.error(errors.metamask.networkNotFound);
-                        await this.addNetworkToWallet(newfromChainId);
-                    }
-                });
+        if(window?.ethereum !== undefined){
+            if (Number(this.context.chainIdNumber) !== Number(newfromChainId)) {
+                if(this._componentMounted){
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: web3.utils.toHex(newfromChainId) }],
+                    }).then(async(response) => {
+                        if(this._componentMounted){
+                            this.setState({
+                                fromChainId: newfromChainId,
+                                toChainId: newToChainId
+                            });
+                            await this.getBalance();
+                        }
+                    }).catch(async (error) => {
+                        console.error(error);
+                        if (error.code === -32002) {
+                            //notificationConfig.info(errors.switchRequestPending);
+                        }
+        
+                        if (error.code === 4902) {
+                            notificationConfig.error(errors.metamask.networkNotFound);
+                            await this.addNetworkToWallet(newfromChainId);
+                        }
+                    });
+                }
             }
+        } else {
+            notificationConfig.error('Matamask wallet not connected');
         }
     }
 
@@ -300,28 +309,32 @@ export default class SmartSwap extends PureComponent {
 
             if (networkConfig !== undefined) {
                 if(this._componentMounted){
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: web3.utils.toHex(networkConfig.chainId),
-                            chainName: networkConfig.name,
-                            nativeCurrency: {
-                                name: networkConfig.nativeCurrencyName,
-                                symbol: networkConfig.nativeCurrencySymbol,
-                                decimals: networkConfig.nativeCurrencyDecimals
-                            },
-                            rpcUrls: [networkConfig.rpc],
-                            blockExplorerUrls: [networkConfig.explorerUrl]
-                        }]
-                    }).then((response) => {
-                        console.log({
-                            addNetworkToWalletResponse: response
-                        })
-                    }).catch((error) => {
-                        console.error({
-                            addNetworkToWalletError: error
+                    if(window?.ethereum !== undefined){
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: web3.utils.toHex(networkConfig.chainId),
+                                chainName: networkConfig.name,
+                                nativeCurrency: {
+                                    name: networkConfig.nativeCurrencyName,
+                                    symbol: networkConfig.nativeCurrencySymbol,
+                                    decimals: networkConfig.nativeCurrencyDecimals
+                                },
+                                rpcUrls: [networkConfig.rpc],
+                                blockExplorerUrls: [networkConfig.explorerUrl]
+                            }]
+                        }).then((response) => {
+                            console.log({
+                                addNetworkToWalletResponse: response
+                            })
+                        }).catch((error) => {
+                            console.error({
+                                addNetworkToWalletError: error
+                            });
                         });
-                    });
+                    } else {
+                        notificationConfig.error('Matamask wallet not connected');
+                    }
                 }
             } else {
                 console.error({
@@ -827,7 +840,7 @@ export default class SmartSwap extends PureComponent {
         if(this.state.toChainId === null || (this.state.toChainId === this.state.fromChainId)){
             toNetworkConfig = (_.filter(this.props.networks, function(network) {
                 return network.chainId !== activeNetworkConfig?.chainId;
-            }.bind(this)))[0];
+            }))[0];
         } else {
             toNetworkConfig = _.find(this.props.networks, {
                 chainId: this.state.toChainId
@@ -1021,18 +1034,28 @@ export default class SmartSwap extends PureComponent {
                                             <input
                                                 type="number"
                                                 step="any"
-                                                className="form-control-n"
+                                                className={`form-control-n ${this.props.selectedInputMode === this.props.inputModes[0] ? 'dollar-amount-mode' : ''}`}
                                                 placeholder={this.state.amountToSwap.length === 0 ? 0 : this.state.amountToSwap}
                                                 id="native-token-input"
                                                 value={this.state.amountToSwap.length === 0 ? '' : this.state.amountToSwap}
                                                 onChange={(e) => this.setAmount(e)}
                                                 autoComplete="off"
                                             />
+                                            {                                                
+                                            this.props.selectedInputMode === this.props.inputModes[0] && 
+                                                <span className="currency-ic-n">$</span>                                                
+                                            }
+
+                                            {                                                
+                                            this.props.selectedInputMode !== this.props.inputModes[0] && 
+                                                <></>
+                                            }                                           
                                             {/* <span className="currency-ic-n">
                                                 {
                                                     this.props.selectedInputMode === this.props.inputModes[0]
                                                         ? '$'
-                                                        : <img
+                                                        : 
+                                                        <img
                                                             alt={defaultFromSelectOption.nativeTokenSymbol}
                                                             style={{ width: '20px' }}
                                                             src={defaultFromSelectOption.nativeTokenIcon}
@@ -1102,17 +1125,29 @@ export default class SmartSwap extends PureComponent {
                                         <div className="i-outer">
                                             <input
                                                 type="text"
-                                                className="form-control-n"
+                                                className={`form-control-n ${this.props.selectedInputMode === this.props.inputModes[0] ? 'dollar-amount-mode' : ''}`}
                                                 placeholder="0"
                                                 disabled={true}
                                                 readOnly={true}
                                                 value={defaultToSelectOption.amountToReceive()}
                                             />
+
+                                            {                                                
+                                            this.props.selectedInputMode === this.props.inputModes[0] && 
+                                                <span className="currency-ic-n ver2">$</span>                                                
+                                            }
+
+                                            {                                                
+                                            this.props.selectedInputMode !== this.props.inputModes[0] && 
+                                                <></>
+                                            }
+
                                             {/* <span className="currency-ic-n ver2">
                                                 {
                                                     this.props.selectedInputMode === this.props.inputModes[0]
                                                         ? '$'
-                                                        : <img
+                                                        : 
+                                                        <img
                                                             alt={defaultToSelectOption.nativeTokenSymbol}
                                                             style={{ width: '20px' }}
                                                             src={defaultToSelectOption.nativeTokenIcon}
