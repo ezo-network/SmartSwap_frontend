@@ -2760,7 +2760,7 @@ ul.tabs-n li.disable:hover:after { opacity: 1; color: #91dc27; }
     to { opacity: 1; } 
 }
 
-.tab-content-n-main { background-color: rgb(54 56 64 / 50%); padding: 15px 40px 15px 40px; width: -webkit-fill-available; min-height: 475px; /* position: relative; */ } 
+.tab-content-n-main { background-color: rgb(54 56 64 / 50%); padding: 15px 40px 15px 40px; width: 100%; min-height: 475px; /* position: relative; */ } 
 
 .form-control-n { font-size: 16px; font-weight: bold; border: 0; background-color: #fff; height: 50px; padding: 0 20px; width: 100%; color: #130929; } 
 
@@ -3331,7 +3331,7 @@ a.dc-file:hover { color: #0303ff; }
 .cross-chain-price-quote-results .provider-name {text-transform: capitalize;}
 .cross-chain-price-quote-results {
     overflow-y: auto;
-    height: 370px;
+    height: 395px; display: flex; flex-flow: column;
     -ms-overflow-style: none;  /* IE and Edge */
      scrollbar-width: none;  /* Firefox */
 }
@@ -3341,6 +3341,7 @@ a.dc-file:hover { color: #0303ff; }
 #native-token-input::-webkit-input-placeholder { 
     color: #999;
 }
+.side-pannel h5 {flex-grow: 1;}
 
 #native-token-input:-moz-placeholder { 
     color: #999;
