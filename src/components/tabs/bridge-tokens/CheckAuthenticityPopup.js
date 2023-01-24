@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import _ from "lodash";
 import swap from "../../../assets/images/swap.png";
 import close from "../../../assets/images/close.png";
+import {goToExplorer} from "../../../helper/utils";
 
 export default class CheckAuthenticityPopup extends PureComponent {
     _componentMounted = false;
@@ -28,7 +29,7 @@ export default class CheckAuthenticityPopup extends PureComponent {
     goToContractOnExplorer(chainId, tokenAddress) {
         const networkConfig = _.find(this.props.networks, {chainId: Number(chainId)});
         if(networkConfig !== undefined){
-            window.open(networkConfig.explorerUrl + '/address/' + tokenAddress, "_blank");
+            goToExplorer(networkConfig.explorerUrl, tokenAddress)
         }
     }
 
@@ -50,7 +51,7 @@ export default class CheckAuthenticityPopup extends PureComponent {
                                     <img 
                                         src={'/images/free-listing/chains/' + (this.props.selectedSourceToken.chain + '.png').toLowerCase()}
                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
-                                    ></img> {this.props.selectedSourceToken.chain}</Token>
+                                    ></img> {this.props.selectedSourceToken.name}</Token>
                                 <PopPera>Smart contract token address</PopPera>
                                 <PopLink
                                     onClick={(e) => this.goToContractOnExplorer(
@@ -67,7 +68,7 @@ export default class CheckAuthenticityPopup extends PureComponent {
                                     <img 
                                         src={'/images/free-listing/chains/' + (this.props.selectedDestinationToken.chain + '.png').toLowerCase()}
                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
-                                    ></img> {this.props.selectedDestinationToken.chain}</Token>
+                                    ></img> {this.props.selectedDestinationToken.name}</Token>
                                 <PopPera>Smart contract token address</PopPera>
                                 <PopLink 
                                     onClick={(e) => this.goToContractOnExplorer(

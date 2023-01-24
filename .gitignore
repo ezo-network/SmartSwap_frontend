@@ -59,3 +59,5 @@ testing
 .eslintcache
 yarn.lock
 package-lock.json
+
+.env*

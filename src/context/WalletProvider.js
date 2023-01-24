@@ -1,6 +1,7 @@
 import React from 'react';
 import { providers } from "ethers";
 import Web3 from "web3";
+import { textMasking } from '../helper/utils';
 
 export const WalletContext = React.createContext(null);
 export const useWallet = () => React.useContext(WalletContext);
@@ -23,10 +24,6 @@ export const EthereumEvents = Object.freeze({
 
 export const getNormalizeAddress = (accounts) => {
     return accounts[0] ? accounts[0].toLowerCase() : null
-}
-
-export const textMasking = (text, maskingChar = '.', noOfMaskingChar = 4, startingLettersLength = 5, endingLettersLength = 4) => {
-    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
 }
 
 const WalletProvider = React.memo((args) => {
@@ -99,7 +96,7 @@ const WalletProvider = React.memo((args) => {
     }
 
     const getMaskedAccountAddress = () => {
-        return account !== null ? textMasking(account) : account;
+        return account !== null ? textMasking(account, '.', 4, 5, 4) : account;
     }
 
     const connectWallet = async () => {

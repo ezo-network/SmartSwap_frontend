@@ -11,19 +11,10 @@ import Web3 from 'web3';
 import BridgeApiHelper from "../../../helper/bridgeApiHelper";
 import notificationConfig from "../../../config/notificationConfig";
 import errors from "../../../helper/errorConstantsHelper";
+import {textMasking, goToExplorer} from "../../../helper/utils";
 
 const visibleBridgesNumber = process.env.REACT_APP_VISIBLE_BRIDGES_NUMBER;
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
-
-const textMasking = (text, maskingChar = '.', noOfMaskingChar = 3, startingLettersLength = 5, endingLettersLength = 5) => {
-    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
-}
-
-const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
-    if(explorerUrl !== undefined){
-        window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
-    }
-}
 
 export default class SourceTokenPopup extends PureComponent {
     _componentMounted = false;
@@ -108,9 +99,9 @@ export default class SourceTokenPopup extends PureComponent {
         }
     }
 
-    setSourceToken = (tokenSymbol, chainId, chain, address, decimals) => {
+    setSourceToken = (tokenSymbol, chainId, chain, address, decimals, name) => {
         if(this._componentMounted === true){
-            this.props.sourceTokenSelectedCallback(tokenSymbol, chainId, chain, address, decimals);
+            this.props.sourceTokenSelectedCallback(tokenSymbol, chainId, chain, address, decimals, name);
             this.props.closePopupCallback('CLOSE');
         }
     }
@@ -174,6 +165,12 @@ export default class SourceTokenPopup extends PureComponent {
         if(error === 'PROVIDED ADDRESS IS NOT A VALID CONTRACT ADDRESS'){
             if(this._componentMounted === true){
                 notificationConfig.error(`${error}. PLEASE CHECK CONNECTED NETWORK OR USE CORRECT ADDRESS.`);
+            }
+        }
+
+        if(error === "WRAP TOKEN CAN'T BE ADDED"){
+            if(this._componentMounted === true){
+                notificationConfig.error("WRAP TOKEN CAN'T BE ADDED");
             }
         }
 
@@ -309,7 +306,7 @@ export default class SourceTokenPopup extends PureComponent {
                                             src={`/images/free-listing/chains/${(activeNetworkConfig?.chain ?? "UNSUPPORTED").toLowerCase()}.png`}
                                             onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
                                         ></img>
-                                        <span>{activeNetworkConfig?.chain ?? "UNSUPPORTED"}</span>
+                                        <span>{activeNetworkConfig?.name ?? "UNSUPPORTED"}</span>
                                         <div className="toggle-icon-container">
                                             <i className={`fa fa-caret-${this.state.networkDropdownToggle ? 'up' : 'down'}`}></i>
                                         </div>
@@ -323,7 +320,7 @@ export default class SourceTokenPopup extends PureComponent {
                                                             src={`/images/free-listing/chains/${(network.chain).toLowerCase()}.png`}
                                                             onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
                                                         ></img>
-                                                        <span>{network.chain}</span>
+                                                        <span>{network.name}</span>
                                                     </NetworkListItem>                                        
                                                 )
                                             }
@@ -450,7 +447,8 @@ export default class SourceTokenPopup extends PureComponent {
                                                             Number(token.chainId),
                                                             networkConfig.chain,
                                                             token.address,
-                                                            token.decimals
+                                                            token.decimals,
+                                                            networkConfig.name
                                                         )}                                                        
                                                     ></img> 
                                                     <span
@@ -460,7 +458,8 @@ export default class SourceTokenPopup extends PureComponent {
                                                             Number(token.chainId),
                                                             networkConfig.chain,
                                                             token.address,
-                                                            token.decimals
+                                                            token.decimals,
+                                                            networkConfig.name
                                                         )}
                                                     >{token.symbol}</span>
                                                 </Token>
@@ -471,9 +470,9 @@ export default class SourceTokenPopup extends PureComponent {
                                             </Tcell>
                                             <Tcell
                                                 className="cursor"
-                                                onClick={(e) => goToContractOnExplorer(networkConfig.explorerUrl, token.address)}
+                                                onClick={(e) => goToExplorer(networkConfig.explorerUrl, token.address)}
                                             >
-                                                <TDLink>{textMasking(token.address)}</TDLink>
+                                                <TDLink>{textMasking(token.address, '.', 3, 5, 5)}</TDLink>
                                             </Tcell>
                                             <Tcell>
                                                 <Token>
@@ -482,7 +481,7 @@ export default class SourceTokenPopup extends PureComponent {
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                         alt="to-token-input-icon"
                                                     >
-                                                    </img> {networkConfig.chain}
+                                                    </img> {networkConfig.name}
                                                 </Token>
                                                 {/* <Pin className="selected"></Pin> */}
                                             </Tcell>                                            

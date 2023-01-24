@@ -12,64 +12,9 @@ import NewReimbursementContract from "../../../helper/newReimbursementContract";
 import SmartSwapContract from "../../../helper/smartSwapContract";
 import SmartSwapApiHelper from "../../../helper/smartswapApiHelper";
 import errors from "../../../helper/errorConstantsHelper";
-import { debounce } from "../../../helper/utils";
+import { debounce, numberExponentToLarge, toFixedWithoutRounding, numberToBn} from "../../../helper/utils";
 const { Option, SingleValue } = components;
 
-/********************************************************
- * Converts Exponential (e-Notation) Numbers to Decimals
- ********************************************************
- * @function numberExponentToLarge()
- * @version  1.00
- * @param   {string}  Number in exponent format.
- *                   (other formats returned as is).
- * @return  {string}  Returns a decimal number string.
- *
- * Notes: No check is made for NaN or undefined inputs
- *
- *******************************************************/
-
-function numberExponentToLarge(numIn) {
-    numIn += "";                                            // To cater to numric entries
-    var sign = "";                                           // To remember the number sign
-    numIn.charAt(0) == "-" && (numIn = numIn.substring(1), sign = "-"); // remove - sign & remember it
-    var str = numIn.split(/[eE]/g);                        // Split numberic string at e or E
-    if (str.length < 2) return sign + numIn;                   // Not an Exponent Number? Exit with orginal Num back
-    var power = str[1];                                    // Get Exponent (Power) (could be + or -)
-    if (power === '0' || power == '-0') return sign + str[0];       // If 0 exponents (i.e. 0|-0|+0) then That's any easy one
-
-    var deciSp = 1.1.toLocaleString().substring(1, 2);  // Get Deciaml Separator
-    str = str[0].split(deciSp);                        // Split the Base Number into LH and RH at the decimal point
-    var baseRH = str[1] || "",                         // RH Base part. Make sure we have a RH fraction else ""
-        baseLH = str[0];                               // LH base part.
-
-    if (power > 0) {   // ------- Positive Exponents (Process the RH Base Part)
-        if (power > baseRH.length) baseRH += "0".repeat(power - baseRH.length); // Pad with "0" at RH
-        baseRH = baseRH.slice(0, power) + deciSp + baseRH.slice(power);      // Insert decSep at the correct place into RH base
-        if (baseRH.charAt(baseRH.length - 1) == deciSp) baseRH = baseRH.slice(0, -1); // If decSep at RH end? => remove it
-
-    } else {         // ------- Negative Exponents (Process the LH Base Part)
-        let num = Math.abs(power) - baseLH.length;                               // Delta necessary 0's
-        if (num > 0) baseLH = "0".repeat(num) + baseLH;                       // Pad with "0" at LH
-        baseLH = baseLH.slice(0, power) + deciSp + baseLH.slice(power);     // Insert "." at the correct place into LH base
-        if (baseLH.charAt(0) == deciSp) baseLH = "0" + baseLH;                // If decSep at LH most? => add "0"
-    }
-    return sign + baseLH + baseRH;                                          // Return the long number (with sign)
-}
-
-const toFixedWithoutRounding = (input, decimalPoints) => {
-    let regExp = new RegExp("^-?\\d+(?:\\.\\d{0," + decimalPoints + "})?", "g"); // toFixed without rounding
-    return regExp.test(input.toString()) ? input.toString().match(regExp) : Number('0.00000').toFixed(decimalPoints);
-}   
-
-const numberToBn = (number, decimalPoints, toString = false) => {
-    const pow = bigInt(10).pow(decimalPoints);
-    const regExp = new RegExp("^-?\\d+(?:\\.\\d{0," + decimalPoints + "})?", "g"); // toFixed without rounding
-    number = number.toString().match(regExp)[0];
-    number = Number(number * pow.toJSNumber()).toFixed(0);
-    number = bigInt(number).toString();
-    number = web3.utils.toBN(number);
-    return toString ? number.toString() : number;
-}
 
 const selectElementStyleOptions = (mode) => {
     const backgroundColor = mode === 'dark' ? '#21232b' : '#EDECEF';
@@ -98,7 +43,15 @@ const selectElementStyleOptions = (mode) => {
                 gap: '5px'
             };
         },
-        indicatorSeparator: (styles) => ({ display: 'none' })
+        indicatorSeparator: (styles) => ({ display: 'none' }),
+        input: (provided, styles) => ({
+            ...provided,
+            color: color,
+            display: 'flex',
+            //justifyContent: 'center',
+            alignItems: 'center',
+            gap: '9px'
+        })
     }
 }
 
@@ -237,7 +190,7 @@ export default class SmartSwap extends PureComponent {
         if(toNetworkConfig !== undefined){
             if(this._componentMounted){
                 this.setState({
-                    amountToSwap: '',
+                    amountToSwap: 1,
                     fromChainId: this.context.chainIdNumber,
                     toChainId: toNetworkConfig.chainId ?? null
                 }, async() => {
@@ -851,6 +804,7 @@ export default class SmartSwap extends PureComponent {
 
         // all options array
         const supportedChainSelectOptions = [];
+        const supportedNativeTokenSelectOptions = [];
 
         // fallback option
         supportedChainSelectOptions.push({
@@ -858,24 +812,37 @@ export default class SmartSwap extends PureComponent {
             label: 'UNSUPPORTED',
             icon: '/images/free-listing/chains/default.png',
             nativeTokenIcon: '/images/free-listing/tokens/default.png',
-            nativeTokenSymbol: 'UNSUPPORTED'
+            nativeTokenSymbol: 'UNSUPPORTED',
+            nativeTokenUsdValue: 0
         });
 
-        // by default from select option
+        supportedNativeTokenSelectOptions.push({
+            value: null,
+            label: 'UNSUPPORTED',
+            icon: '/images/free-listing/chains/default.png'
+        });
+
+        // by default from blockchain select option
         const defaultFromSelectOption = {
             value: activeNetworkConfig?.chainId ?? null,
-            label: activeNetworkConfig?.chain ?? 'UNSUPPORTED',
+            label: activeNetworkConfig?.name ?? 'UNSUPPORTED',
             icon: '/images/free-listing/chains/' + (activeNetworkConfig?.chain ?? 'default').toLowerCase() + '.png',
             nativeTokenIcon: '/images/free-listing/tokens/' + (activeNetworkConfig?.nativeCurrencySymbol ?? 'default').toLowerCase() + '.png',
             nativeTokenSymbol: activeNetworkConfig?.nativeCurrencySymbol ?? 'UNSUPPORTED',
-            nativeTokenUsdValue: activeNetworkTokenUsdValue?.value ?? 0,
-
+            nativeTokenUsdValue: activeNetworkTokenUsdValue?.value ?? 0
+        }
+        
+        // by default from token select option
+        const defaultFromTokenSelectOption = {
+            value: activeNetworkConfig?.chainId ?? null,
+            label: activeNetworkConfig?.nativeCurrencySymbol ?? 'UNSUPPORTED',
+            icon: '/images/free-listing/tokens/' + (activeNetworkConfig?.nativeCurrencySymbol ?? 'default').toLowerCase() + '.png'
         }
 
-        // by default to select option
+        // by default to blockchain select option
         const defaultToSelectOption = {
             value: toNetworkConfig?.chainId ?? null,
-            label: toNetworkConfig?.chain ?? 'UNSUPPORTED',
+            label: toNetworkConfig?.name ?? 'UNSUPPORTED',
             icon: '/images/free-listing/chains/' + (toNetworkConfig?.chain ?? 'default').toLowerCase() + '.png',
             nativeTokenIcon: '/images/free-listing/tokens/' + (toNetworkConfig?.nativeCurrencySymbol ?? 'default').toLowerCase() + '.png',
             nativeTokenSymbol: toNetworkConfig?.nativeCurrencySymbol ?? 'UNSUPPORTED',
@@ -955,14 +922,29 @@ export default class SmartSwap extends PureComponent {
             }
         }        
 
+        // by default to token select option
+        const defaultToTokenSelectOption = {
+            value: toNetworkConfig?.chainId ?? null,
+            label: toNetworkConfig?.nativeCurrencySymbol ?? 'UNSUPPORTED',
+            icon: '/images/free-listing/tokens/' + (toNetworkConfig?.nativeCurrencySymbol ?? 'default').toLowerCase() + '.png'            
+        }
+
         // supported chains Options
         this.props.networks.forEach(chainConfig => {
             supportedChainSelectOptions.push({
                 value: chainConfig.chainId,
-                label: chainConfig.chain,
+                label: chainConfig.name,
                 icon: '/images/free-listing/chains/' + (chainConfig.chain).toLowerCase() + '.png',
                 nativeTokenIcon: '/images/free-listing/tokens/' + (chainConfig.nativeCurrencySymbol).toLowerCase() + '.png',
                 nativeTokenSymbol: chainConfig.nativeCurrencySymbol
+            });
+        });
+
+        this.props.networks.forEach(chainConfig => {
+            supportedNativeTokenSelectOptions.push({
+                value: chainConfig.chainId,
+                label: chainConfig.nativeCurrencySymbol,
+                icon: '/images/free-listing/tokens/' + (chainConfig.nativeCurrencySymbol).toLowerCase() + '.png',
             });
         });
 
@@ -973,7 +955,7 @@ export default class SmartSwap extends PureComponent {
         // });
 
         const chainOptions = ({ children, ...props }) => (
-            <Option {...props} value={props.data.value}>
+            <Option className={props.data.label === 'UNSUPPORTED' ? "hidden-option" : ""} {...props} value={props.data.value}>
                 <img
                     src={props.data.icon}
                     style={{ width: 15 }}
@@ -992,31 +974,31 @@ export default class SmartSwap extends PureComponent {
                     alt={props.data.label}
                     onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
                 />
-                {children}
+                {props?.data.label}
             </SingleValue>
         );
         
         const tokenOptions = ({ children, ...props }) => (
-            <Option {...props} value={props.data.value}>
+            <Option className={props.data.label === 'UNSUPPORTED' ? "hidden-option" : ""} {...props} value={props.data.value}>
                 <img
-                    src={props.data.nativeTokenIcon}
+                    src={props.data.icon}
                     style={{ width: 15 }}
-                    alt={props.data.nativeTokenSymbol}
+                    alt={props.data.label}
                     onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                 />
-                {props.data.nativeTokenSymbol}
+                {props.data.label}
             </Option>
         );
         
         const singleToken = ({ children, ...props }) => (
-            <SingleValue {...props}>
+            <SingleValue {...props} value={props.data.value}>
                 <img
-                    src={props.data.nativeTokenIcon}
+                    src={props.data.icon}
                     style={{ width: 20 }}
-                    alt={props.data.nativeTokenSymbol}
+                    alt={props.data.label}
                     onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                 />
-                {props.data.nativeTokenSymbol}
+                {props.data.label}
             </SingleValue>
         );
 
@@ -1070,7 +1052,7 @@ export default class SmartSwap extends PureComponent {
                                             value={defaultFromSelectOption}
                                             onChange={(e) => this.swapDirection(e.value)}
                                             options={supportedChainSelectOptions}
-                                            filterOption={(option) => option.value !== null && option.value !== this.context.chainIdNumber}
+                                            //filterOption={(option) => option.value !== null && option.value !== this.context.chainIdNumber}
                                             components={{ Option: chainOptions, SingleValue: singleChain }}
                                             styles={selectElementStyleOptions("light")}
                                         />
@@ -1078,10 +1060,9 @@ export default class SmartSwap extends PureComponent {
                                     <div className="input-box2">
                                         <label htmlFor="" className="form-label">TOKEN</label>
                                         <Select
-                                            value={defaultFromSelectOption}
+                                            value={defaultFromTokenSelectOption}
                                             onChange={(e) => this.swapDirection(e.value)}
-                                            options={supportedChainSelectOptions}
-                                            filterOption={(option) => option.value !== null && option.value !== this.context.chainIdNumber}
+                                            options={supportedNativeTokenSelectOptions}
                                             components={{ Option: tokenOptions, SingleValue: singleToken }}
                                             styles={selectElementStyleOptions("light")}
                                         />
@@ -1162,7 +1143,7 @@ export default class SmartSwap extends PureComponent {
                                             value={defaultToSelectOption}
                                             onChange={(e) => this.changeToDirection(e.value)}
                                             options={supportedChainSelectOptions}
-                                            filterOption={(option) => ((option.value !== null) && (option.value !== defaultFromSelectOption.value)) }
+                                            //filterOption={(option) => ((option.value !== null) && (option.value !== defaultFromSelectOption.value)) }
                                             components={{ Option: chainOptions, SingleValue: singleChain }}
                                             styles={selectElementStyleOptions("dark")}
                                         />
@@ -1170,10 +1151,10 @@ export default class SmartSwap extends PureComponent {
                                     <div className="input-box2 ver2">
                                         <label htmlFor="" className="form-label">TOKEN</label>
                                         <Select
-                                            value={defaultToSelectOption}
+                                            value={defaultToTokenSelectOption}
                                             onChange={(e) => this.changeToDirection(e.value)}
-                                            options={supportedChainSelectOptions}
-                                            filterOption={(option) => ((option.value !== null) && (option.value !== defaultFromSelectOption.value)) }
+                                            options={supportedNativeTokenSelectOptions}
+                                            //filterOption={(option) => ((option.value !== null) && (option.value !== defaultFromSelectOption.value)) }
                                             components={{ Option: tokenOptions, SingleValue: singleToken }}
                                             styles={selectElementStyleOptions("dark")}
                                         />

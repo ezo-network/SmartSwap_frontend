@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { LoopCircleLoading } from 'react-loadingg';
 import BridgeContract from "../../helper/bridgeContract";
 import errors from "../../helper/errorConstantsHelper";
+import { goToExplorer } from '../../helper/utils';
 const $ = window.$;
 
 export default class VerifyAndAddToken extends PureComponent {
@@ -158,10 +159,6 @@ export default class VerifyAndAddToken extends PureComponent {
     }
   }
 
-  goToContractOnExplorer(explorerUrl, tokenAddress) {
-    window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
-  }
-
   render() {
     return (
       <>
@@ -181,9 +178,9 @@ export default class VerifyAndAddToken extends PureComponent {
                 </ProInputbx>
                 <BtnMbox02>
                   <div>
-                    <button disabled={true} className="Btn03 no-effect">{this.props.selectedSourceTokenData.name} </button> | <button disabled={true} className="Btn03 no-effect">{this.props.selectedSourceTokenData.chain}</button>
+                    <button disabled={true} className="Btn03 no-effect">{this.props.selectedSourceTokenData.name} </button> | <button disabled={true} className="Btn03 no-effect">{this.props.selectedSourceTokenData.chainName}</button>
                   </div>
-                  <button onClick={() => this.goToContractOnExplorer(this.props.selectedSourceTokenData.explorerUrl, this.props.selectedSourceTokenData.address)} className="Btn04">Check the contract  <i className="fas fa-external-link-alt"></i></button>
+                  <button onClick={() => goToExplorer(this.props.selectedSourceTokenData.explorerUrl, this.props.selectedSourceTokenData.address)} className="Btn04">Check the contract  <i className="fas fa-external-link-alt"></i></button>
                 </BtnMbox02>
                 <BtnMbox>
                   <button disabled={this.state.btnClicked} onClick={() => this.props.onBackButtonClicked(3)} className="Btn02"> <i className="fas fa-chevron-left"></i> Back</button>

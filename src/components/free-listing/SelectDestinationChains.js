@@ -74,9 +74,13 @@ export default class SelectDestinationChains extends PureComponent {
     let availableChainsCount = 0;
     let notAvailableChainsCount = 0;
     const filteredNetworks = this.props.networks.filter(network => {
-      if(network.chain.match(new RegExp(this.state.filteredNetwork, "i"))){
+      if(network.name.match(new RegExp(this.state.filteredNetwork, "i"))){
         return network;
       }
+
+      if(network.chain.match(new RegExp(this.state.filteredNetwork, "i"))){
+        return network;
+      }     
     });
 
     filteredNetworks.forEach(network => {
@@ -169,7 +173,7 @@ export default class SelectDestinationChains extends PureComponent {
                               className="disable"
                               src={'/images/free-listing/chains/' + (((network.chain).toLowerCase()).toString() + '.png').toLowerCase()}
                               onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
-                            /> {network.chain}
+                            /> {network.name}
                           </ProICOSbx02>
                       }
                     }.bind(this) )}                    

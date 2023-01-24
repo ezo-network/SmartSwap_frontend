@@ -8,6 +8,7 @@ import Web3 from 'web3';
 import BridgeApiHelper from "../../../../helper/bridgeApiHelper";
 import notificationConfig from "../../../../config/notificationConfig";
 import errors from "../../../../helper/errorConstantsHelper";
+import {textMasking, goToExplorer} from "../../../../helper/utils";
 
 // images
 import pinAct from "../../../../assets/images/pin.png";
@@ -17,16 +18,6 @@ import close from "../../../../assets/images/close.png";
 const visibleBridgesNumber = process.env.REACT_APP_VISIBLE_BRIDGES_NUMBER;
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
-
-const textMasking = (text, maskingChar = '.', noOfMaskingChar = 3, startingLettersLength = 5, endingLettersLength = 5) => {
-    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
-}
-
-const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
-    if(explorerUrl !== undefined){
-        window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
-    }
-}
 
 export default class DerivativeTokenPopup extends PureComponent {
     _componentMounted = false;
@@ -109,9 +100,9 @@ export default class DerivativeTokenPopup extends PureComponent {
         }
     }
 
-    setSourceToken = (tokenSymbol, chainId, chain, address, decimals, projectChainId, projectId) => {
+    setSourceToken = (tokenSymbol, chainId, chain, address, decimals, name, projectChainId, projectId) => {
         if(this._componentMounted === true){
-            this.props.sourceTokenSelectedCallback(tokenSymbol, chainId, chain, address, decimals, projectChainId, projectId);
+            this.props.sourceTokenSelectedCallback(tokenSymbol, chainId, chain, address, decimals, name, projectChainId, projectId);
             this.props.closePopupCallback('CLOSE');
         }
     }
@@ -270,7 +261,7 @@ export default class DerivativeTokenPopup extends PureComponent {
                                         src={`/images/free-listing/chains/${(activeNetworkConfig?.chain ?? "UNSUPPORTED").toLowerCase()}.png`}
                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
                                     ></img>
-                                    <span>{activeNetworkConfig?.chain ?? "UNSUPPORTED"}</span>
+                                    <span>{activeNetworkConfig?.name ?? "UNSUPPORTED"}</span>
                                     <div className="toggle-icon-container">
                                         <i className={`fa fa-caret-${this.state.networkDropdownToggle ? 'up' : 'down'}`}></i>
                                     </div>
@@ -284,7 +275,7 @@ export default class DerivativeTokenPopup extends PureComponent {
                                                         src={`/images/free-listing/chains/${(network.chain).toLowerCase()}.png`}
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image 
                                                     ></img>
-                                                    <span>{network.chain}</span>
+                                                    <span>{network.name}</span>
                                                 </NetworkListItem>)
                                         }
                                     }
@@ -377,6 +368,7 @@ export default class DerivativeTokenPopup extends PureComponent {
                                                             toNetworkConfig.chain,
                                                             token.address,
                                                             token.decimals,
+                                                            toNetworkConfig?.name,
                                                             Number(token.fromChainId),
                                                             token.projectId
                                                         )} 
@@ -389,17 +381,18 @@ export default class DerivativeTokenPopup extends PureComponent {
                                                             toNetworkConfig.chain,
                                                             token.address,
                                                             token.decimals,
+                                                            toNetworkConfig?.name,
                                                             Number(token.fromChainId),
                                                             token.projectId
                                                         )}
-                                                    >{token.tokenSymbol}</span>
+                                                    >{token.tokenSymbol.charAt(0).toLowerCase() + token.tokenSymbol.slice(1)}</span>
                                                 </Token>
                                             </Tcell>
                                             <Tcell
                                                 className="cursor"
-                                                onClick={(e) => goToContractOnExplorer(toNetworkConfig.explorerUrl, token.address)}
+                                                onClick={(e) => goToExplorer(toNetworkConfig.explorerUrl, token.address)}
                                             >
-                                                <TDLink>{textMasking(token.address)}</TDLink>
+                                                <TDLink>{textMasking(token.address, '.', 3, 5, 5)}</TDLink>
                                             </Tcell>
                                             <Tcell>
                                                 <Token>
@@ -408,7 +401,7 @@ export default class DerivativeTokenPopup extends PureComponent {
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                         alt="from-network-icon"
                                                     >
-                                                    </img> {fromNetworkConfig.chain}
+                                                    </img> {fromNetworkConfig.name}
                                                 </Token>
                                                 {/* <Pin className="selected"></Pin> */}
                                             </Tcell>    
@@ -419,7 +412,7 @@ export default class DerivativeTokenPopup extends PureComponent {
                                                         onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                         alt="from-network-icon"
                                                     >
-                                                    </img> {toNetworkConfig.chain}
+                                                    </img> {toNetworkConfig.name}
                                                 </Token>
                                                 {/* <Pin className="selected"></Pin> */}
                                             </Tcell>                                               

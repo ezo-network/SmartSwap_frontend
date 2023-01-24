@@ -7,18 +7,8 @@ import close from "../../../assets/images/close.png";
 import pinAct from "../../../assets/images/pin.png";
 import pin from "../../../assets/images/pin-u.png";
 import pinDeact from "../../../assets/images/pind-d.png";
-
+import {textMasking, goToExplorer} from "../../../helper/utils";
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
-
-const textMasking = (text, maskingChar = '.', noOfMaskingChar = 3, startingLettersLength = 5, endingLettersLength = 5) => {
-    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
-}
-
-const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
-    if(explorerUrl !== undefined){
-        window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
-    }
-}
 
 export default class DestinationTokensPopup extends PureComponent {
     _componentMounted = false;
@@ -81,7 +71,7 @@ export default class DestinationTokensPopup extends PureComponent {
     goToContractOnExplorer(chainId, tokenAddress) {
         const networkConfig = _.find(this.props.networks, {chainId: Number(chainId)});
         if(networkConfig !== undefined){
-            window.open(networkConfig.explorerUrl + '/address/' + tokenAddress, "_blank");
+            goToExplorer(networkConfig.explorerUrl, tokenAddress)
         }
     }
 
@@ -195,7 +185,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                 src={`/images/free-listing/chains/${(network.chain).toLowerCase()}.png`}
                                                 alt={`pinned-network-${chainId}`}
                                                 onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
-                                            ></img> {network.chain}
+                                            ></img> {network.name}
                                         </Token>
                                         <i className="fa fa-times" aria-hidden="true"></i>
                                     </Selected>
@@ -239,7 +229,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                     src={'/images/free-listing/chains/' + (this.props.selectedSourceToken.chain).toLowerCase() + '.png'}
                                                     onError={(e) => (e.currentTarget.src = '/images/free-listing/tokens/default.png')} // fallback image
                                                     alt="source-chain-icon"
-                                                ></img> {this.props.selectedSourceToken.chain}
+                                                ></img> {this.props.selectedSourceToken.name}
                                             </Token>
                                             <Pin className="disabled"></Pin>
                                         </Tcell>
@@ -249,7 +239,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                 (e) => this.goToContractOnExplorer(this.props.selectedSourceToken.chainId, this.props.selectedSourceToken.address)
                                             }
                                         >
-                                            <TDLink>{textMasking(this.props.selectedSourceToken.address)}</TDLink>
+                                            <TDLink>{textMasking(this.props.selectedSourceToken.address, '.', 3, 5, 5)}</TDLink>
                                         </Tcell>
                                         <Tcell>
                                             <ButtonDone>ORIGNAL CHAIN</ButtonDone>
@@ -285,7 +275,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                                     network['wrappedTokenAddress']
                                                                 ) : e.preventDefault()}                                                            
                                                             >
-                                                            {network.chain}
+                                                            {network.name}
                                                             </span>
                                                         </Token>
                                                         <Pin
@@ -297,11 +287,11 @@ export default class DestinationTokensPopup extends PureComponent {
                                                         className="cursor"
                                                         onClick={
                                                             (e) => network['wrappedTokenAddress'] !== undefined 
-                                                            ? goToContractOnExplorer(network.explorerUrl, network['wrappedTokenAddress'])
+                                                            ? goToExplorer(network.explorerUrl, network['wrappedTokenAddress'])
                                                             : e.preventDefault()
                                                         }
                                                     >
-                                                        {network['wrappedTokenAddress'] === undefined ? '-' : <TDLink>{textMasking(network['wrappedTokenAddress'])}</TDLink>}
+                                                        {network['wrappedTokenAddress'] === undefined ? '-' : <TDLink>{textMasking(network['wrappedTokenAddress'], '.', 3, 5, 5)}</TDLink>}
                                                     </Tcell>
                                                     <Tcell>
                                                         {network['isBridgeExistOnChain'] === true &&

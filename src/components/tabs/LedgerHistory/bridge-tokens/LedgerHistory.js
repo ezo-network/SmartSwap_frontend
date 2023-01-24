@@ -177,6 +177,7 @@ class LedgerHistory extends PureComponent {
                                     <OrderInformation
                                         title={depositRequest.isWrapTokenDeposit ? 'Derivative Token' : 'Original Token'}
                                         tokenSymbol={depositRequest.isWrapTokenDeposit ? token.tokenSymbol : token.symbol}
+                                        decimals={token.decimals}
                                         value={depositRequest?.value}
                                         depositOn={depositRequest?.createdAt}
                                         tranactionHash={depositRequest?.txHash}
@@ -191,6 +192,7 @@ class LedgerHistory extends PureComponent {
                                     <Claimed
                                         title={depositRequest.isWrapTokenDeposit ? 'Original Token' : 'Derivative Token'}
                                         tokenSymbol={depositRequest.isWrapTokenDeposit ? token.tokenSymbol : token.symbol}
+                                        decimals={token.decimals}
                                         value={depositRequest?.value}
                                         claimedOn={depositRequest?.updatedAt}
                                         claimTranactionHash={depositRequest?.claimTxHash}
@@ -207,6 +209,7 @@ class LedgerHistory extends PureComponent {
                                         networks={this.props.networks}
                                         value={depositRequest?.value}
                                         tokenSymbol={depositRequest.isWrapTokenDeposit ? token.tokenSymbol : token.symbol}
+                                        decimals={token.decimals}
                                         depositOn={depositRequest?.createdAt}
                                         depositRequest={depositRequest}
                                         toNetworkConfig={toNetworkConfig}

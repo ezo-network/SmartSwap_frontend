@@ -2,16 +2,7 @@ import { PureComponent } from "react";
 import web3 from "web3";
 import moment from 'moment';
 import _ from "lodash";
-
-const checkTransactionOnExplorer = (explorerUrl, txHash) => {
-    if(explorerUrl !== undefined){
-        window.open(explorerUrl + '/tx/' + txHash, "_blank");
-    }
-}
-
-const textMasking = (text, maskingChar = '.', noOfMaskingChar = 16, startingLettersLength = 25, endingLettersLength = 25) => {
-    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
-}
+import { textMasking, checkTransactionOnExplorer } from "../../../../helper/utils";
 
 export default class OrderInformation extends PureComponent {
     _componentMounted = false;
@@ -47,7 +38,7 @@ export default class OrderInformation extends PureComponent {
                 <div className="ledger-box">
                     <h5><i><img src="../images/tick.png" width="18px"></img></i>
                     Transaction Submitted </h5>
-                    <p>{textMasking(this.props.tranactionHash)}</p>
+                    <p>{textMasking(this.props.tranactionHash, '.', 16, 25, 25)}</p>
                     <div className="flex">
                         <a className="cursor" href="#" onClick={() => checkTransactionOnExplorer(this.props.sentFromNetworkConfig?.explorerUrl, this.props.tranactionHash)}>View transaction</a>
                     </div>

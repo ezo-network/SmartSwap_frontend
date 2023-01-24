@@ -24,6 +24,7 @@ export default class SelectToken extends PureComponent {
         tokenAddress: null,
         tokenIcon: null,
         chain: null,
+        chainName: null,
         chainId: null,
         chainIcon: null,
         explorerUrl: null,
@@ -162,7 +163,7 @@ export default class SelectToken extends PureComponent {
     }
   }
 
-  async switchNetwork(token, tokenAddress, tokenIcon, chain, chainId, chainIcon, explorerUrl, decimals) {
+  async switchNetwork(token, tokenAddress, tokenIcon, chain, chainName, chainId, chainIcon, explorerUrl, decimals) {
     if(this.pendingNetworkSwitchRequest === false){
       const sourceObject = {
         selectedSource: {
@@ -170,6 +171,7 @@ export default class SelectToken extends PureComponent {
           tokenAddress: tokenAddress,
           tokenIcon: tokenIcon,
           chain: chain,
+          chainName: chainName,
           chainId: chainId,
           chainIcon: chainIcon,
           explorerUrl: explorerUrl,
@@ -228,6 +230,8 @@ export default class SelectToken extends PureComponent {
           ||
           this.state.selectedSource.chain == null
           ||
+          this.state.selectedSource.chainName == null          
+          ||
           this.state.selectedSource.chainId == null
           ||
           this.state.selectedSource.chainIcon == null
@@ -245,6 +249,7 @@ export default class SelectToken extends PureComponent {
           this.state.selectedSource.tokenAddress, 
           this.state.selectedSource.tokenIcon, 
           this.state.selectedSource.chain,
+          this.state.selectedSource.chainName,
           this.state.selectedSource.chainId,
           this.state.selectedSource.chainIcon,
           this.state.selectedSource.explorerUrl,
@@ -277,7 +282,7 @@ export default class SelectToken extends PureComponent {
   getNetworkName = (chainId) => {
     const networkConfig = _.find(this.props.networks, {chainId: chainId});
     if(networkConfig !== undefined){
-      return networkConfig.chain
+      return networkConfig.name
     } else {
       return 'CUSTOM'
     }
@@ -335,6 +340,7 @@ export default class SelectToken extends PureComponent {
                     {filteredTokens.map((token, i) => {
                       const network = _.find(this.props.networks, { chainId: token.chainId });
                       if(network !== undefined){
+                        token['chainName'] = network.name;
                         token['chain'] = network.chain;
                         token['chainIcon'] = network.icon;
                         token['explorerUrl'] = network.explorerUrl;
@@ -356,7 +362,8 @@ export default class SelectToken extends PureComponent {
                           token.symbol, 
                           token.address, 
                           token.icon,
-                          token.chain, 
+                          token.chain,
+                          token.chainName,
                           token.chainId,
                           token.chainIcon,
                           token.explorerUrl,
@@ -377,7 +384,7 @@ export default class SelectToken extends PureComponent {
                               className="chain-icon"
                               src={'/images/free-listing/chains/' + ((token.chainIcon).toString()).toLowerCase()} 
                               onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
-                            />{token.chain}
+                            />{token.chainName}
                         </ProICOSbx02>
                       </ProICOSbx01>
                       )

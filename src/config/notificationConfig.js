@@ -4,50 +4,45 @@ import {
     EventEmitter
 } from "events";
 
-class NotificationConfig extends EventEmitter {
+
+const defaultPosition = 'topRight';
+const defaultTimeout = 5000; // ms
+
+
+class ToastNotification extends EventEmitter {
     lastMessage = '';
-    info(message, position = 'topRight', timeout = 5000){
-        immediateToast("info", {
+    notify(type, message, timeout, position){
+        
+        if(message === undefined || message === null || message.toString().length === 0){
+            console.error(`Must specify message to show on ToastNotification.`, message)
+            return;
+        }
+
+        immediateToast(type, {
             message: message,
             timeout: timeout,
             position: position,
             displayMode: this.lastMessage === message ? 2 : 0 // 2 means - replace duplicate old error with new toast
-        })
-        this.lastMessage = message;
+        })      
+        this.lastMessage =  message;
+    }
+}
+
+class NotificationConfig extends ToastNotification {
+    info(message, position = defaultPosition, timeout = defaultTimeout){
+        this.notify('info', message, timeout, position)
     }
 
-    error(message, position = 'topRight', timeout = 5000){
-        immediateToast("error", {
-            message: message,
-            timeout: timeout,
-            position: position,
-            displayMode: this.lastMessage === message ? 2 : 0
-        })
-        this.lastMessage = message;
+    error(message, position = defaultPosition, timeout = defaultTimeout){
+        this.notify('error', message, timeout, position)
     }
 
-    warning(message, position = 'topRight', timeout = 5000){
-        immediateToast("warning", {
-            message: message,
-            timeout: timeout,
-            position: position,
-            displayMode: this.lastMessage === message ? 2 : 0
-        })
-        this.lastMessage = message;
+    warning(message, position = defaultPosition, timeout = defaultTimeout){
+        this.notify('warning', message, timeout, position)
     }
 
-    success(message, position = 'topRight', timeout = 5000){
-        immediateToast("success", {
-            message: message,
-            timeout: timeout,
-            position: position,
-            displayMode: this.lastMessage === message ? 2 : 0
-        })
-        this.lastMessage = message;
-    }
-
-    handleActions(action) {
-        switch (action.type) { }
+    success(message, position = defaultPosition, timeout = defaultTimeout){
+        this.notify('success', message, timeout, position)        
     }
 }
 

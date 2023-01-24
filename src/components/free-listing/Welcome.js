@@ -4,15 +4,12 @@ import styled from 'styled-components';
 import notificationConfig from "../../config/notificationConfig";
 import ImgIco01 from "../../assets/freelisting-images/imgIco01.png";
 import ImgIco02 from "../../assets/freelisting-images/imgIco02.png";
+import { textMasking } from '../../helper/utils';
 const $ = window.$;
 
 export default class Welcome extends PureComponent {
   constructor(props) {
     super();
-  }
-
-  textMasking = (text, maskingChar = '.', noOfMaskingChar = 4, startingLettersLength = 5, endingLettersLength = 4) => {
-    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
   }
 
   connectWallet = async () => {
@@ -52,7 +49,7 @@ export default class Welcome extends PureComponent {
                           <button onClick={() => this.props.onWalletAlreadyConnectButtonClick(1)} className="Btn01 ani-1">
                             <i className="fas fa-check-circle"></i> WALLET CONNECTED
                           </button>
-                          <SmallInfo>{this.context.account?.length > 0 ? this.textMasking(this.context?.account) : ''}</SmallInfo>
+                          <SmallInfo>{this.context.account?.length > 0 ? textMasking(this.context?.account, '.', 4, 5, 4) : ''}</SmallInfo>
                         </>
                       }
                     </Csubbx01>
