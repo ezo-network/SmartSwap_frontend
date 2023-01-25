@@ -3331,7 +3331,9 @@ a.dc-file:hover { color: #0303ff; }
 .cross-chain-price-quote-results .provider-name {text-transform: capitalize;}
 .cross-chain-price-quote-results {
     overflow-y: auto;
-    height: 395px; display: flex; flex-flow: column;
+    height: 395px; 
+    display: flex; 
+    flex-flow: column;
     -ms-overflow-style: none;  /* IE and Edge */
      scrollbar-width: none;  /* Firefox */
 }
@@ -3341,7 +3343,6 @@ a.dc-file:hover { color: #0303ff; }
 #native-token-input::-webkit-input-placeholder { 
     color: #999;
 }
-.side-pannel h5 {flex-grow: 1;}
 
 #native-token-input:-moz-placeholder { 
     color: #999;
@@ -3365,4 +3366,10 @@ a.dc-file:hover { color: #0303ff; }
 
 .dollar-amount-mode {
     padding-left: 65px;
+}
+
+.side-pannel h5 {flex-grow: 1;}
+
+.hidden-option {
+    display: none !important;
 }

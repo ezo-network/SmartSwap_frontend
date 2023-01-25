@@ -6,6 +6,7 @@ import notificationConfig from "../../config/notificationConfig";
 import styled from 'styled-components';
 import { LoopCircleLoading } from 'react-loadingg';
 import ERC20TokenContract from "../../helper/erc20TokenContract";
+import { goToExplorer } from '../../helper/utils';
 const $ = window.$;
 
 
@@ -20,6 +21,7 @@ export default class AddCustomToken extends PureComponent {
         address: '',
         icon: null,
         chain: null,
+        chainName: null,
         chainId: null,
         chainIcon: null,
         explorerUrl: null,
@@ -43,6 +45,7 @@ export default class AddCustomToken extends PureComponent {
         address: "",
         icon: 'default.png',
         chain: networkConfig.chain,
+        chainName: networkConfig.name,
         chainId: networkConfig.chainId,
         chainIcon: networkConfig.icon,
         explorerUrl: networkConfig.explorerUrl,
@@ -71,6 +74,7 @@ export default class AddCustomToken extends PureComponent {
             address: "",
             icon: 'default.png',
             chain: networkConfig.chain,
+            chainName: networkConfig.name,
             chainId: networkConfig.chainId,
             chainIcon: networkConfig.icon,
             explorerUrl: networkConfig.explorerUrl,
@@ -153,9 +157,8 @@ export default class AddCustomToken extends PureComponent {
   }
 
   goToContractOnExplorer(explorerUrl, tokenAddress) {
-    if(web3Js.utils.isAddress(this.state.selectedSourceTokenData.address)){
-      window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
-    } else {
+    const isValidAddress = goToExplorer(explorerUrl, tokenAddress);
+    if(isValidAddress === false){
       notificationConfig.error('Invalid Etherium Address.'); 
     }
   }
@@ -169,6 +172,8 @@ export default class AddCustomToken extends PureComponent {
         this.state.selectedSourceTokenData.icon == null
         ||
         this.state.selectedSourceTokenData.chain == null
+        ||
+        this.state.selectedSourceTokenData.chainName == null        
         ||
         this.state.selectedSourceTokenData.chainId == null
         ||
@@ -191,6 +196,7 @@ export default class AddCustomToken extends PureComponent {
         this.state.selectedSourceTokenData.address, 
         this.state.selectedSourceTokenData.icon, 
         this.state.selectedSourceTokenData.chain,
+        this.state.selectedSourceTokenData.chainName,
         this.state.selectedSourceTokenData.chainId,
         this.state.selectedSourceTokenData.chainIcon,
         this.state.selectedSourceTokenData.explorerUrl,
@@ -217,7 +223,7 @@ export default class AddCustomToken extends PureComponent {
                 </ProInputbx>
                 <BtnMbox02>
                   <div>
-                    <button className="Btn03">{this.state.selectedSourceTokenData.name} </button> | <button className="Btn03">{this.state.selectedSourceTokenData.chain}</button>
+                    <button className="Btn03">{this.state.selectedSourceTokenData.name} </button> | <button className="Btn03">{this.state.selectedSourceTokenData.chainName}</button>
                   </div>
                   <button onClick={() => this.goToContractOnExplorer(this.state.selectedSourceTokenData.explorerUrl, this.state.selectedSourceTokenData.address)} className="Btn04">Check the contract  <i className="fas fa-external-link-alt"></i></button>
                 </BtnMbox02>

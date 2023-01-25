@@ -7,16 +7,7 @@ import web3 from "web3";
 import notificationConfig from "../../../../../config/notificationConfig";
 import ExpediteContract from "../../../../../helper/expediteContract";
 import SmartSwapApiHelper from "../../../../../helper/smartswapApiHelper";
-
-const numberToBn = (number, decimalPoints, toString = false) => {
-    const pow = bigInt(10).pow(decimalPoints);
-    const regExp = new RegExp("^-?\\d+(?:\\.\\d{0," + decimalPoints + "})?", "g"); // toFixed without rounding
-    number = number.toString().match(regExp)[0];
-    number = Number(number * pow.toJSNumber()).toFixed(0);
-    number = bigInt(number).toString();
-    number = web3.utils.toBN(number);
-    return toString ? number.toString() : number;
-}
+import { numberToBn } from "../../../../../helper/utils";
 
 export default class PendingOrder extends PureComponent {
     _componentMounted = false;

@@ -36,6 +36,7 @@ const defaultSourceTokenData = {
     symbol:  'Choose token',
     chainId: undefined,
     chain: 'CUSTOM',
+    name: 'CUSTOM',
     amount: '',
     address: null,
     isWrappedToken: false,
@@ -44,10 +45,11 @@ const defaultSourceTokenData = {
 };
 
 const defaultDestinationTokenData = {
-    symbol: 'Derivative token on',
+    symbol: 'Choose receiving token',
     chainId: undefined,
-    chain: 'chain',
-    amount: 0,
+    chain: 'CUSTOM',
+    name: 'CUSTOM',
+    amount: '',
     address: null,
     isWrappedToken: false,
     balance: 0,
@@ -255,22 +257,24 @@ export default class BridgeSwap extends PureComponent {
     }
 
     toggleDestinationTokensPopup = (type) => {
-        if(this.state.isSourceTokenSelected){
-            if(this.pendingNetworkSwitchRequest === false){
-                if(this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) === Number(this.state.sourceTokenData.chainId))){
-                    if(this._componentMounted === true){
-                        this.setState({
-                            toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
-                        });
+        if(this.state.currentTokenSide === TOKEN_SIDES[0]){
+            if(this.state.isSourceTokenSelected){
+                if(this.pendingNetworkSwitchRequest === false){
+                    if(this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) === Number(this.state.sourceTokenData.chainId))){
+                        if(this._componentMounted === true){
+                            this.setState({
+                                toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
+                            });
+                        }
+                    } else {
+                        notificationConfig.info(errors.switchRequestMessage);                    
                     }
                 } else {
-                    notificationConfig.info(errors.switchRequestMessage);                    
-                }
+                    notificationConfig.info(errors.switchRequestPending);
+                } 
             } else {
-                notificationConfig.info(errors.switchRequestPending);
-            } 
-        } else {
-            notificationConfig.info(errors.selectSourceTokenMessage);
+                notificationConfig.info(errors.selectSourceTokenMessage);
+            }
         }
     }
 
@@ -427,7 +431,7 @@ export default class BridgeSwap extends PureComponent {
         }        
     }
 
-    setSourceToken = async(tokenSymbol, chainId, chain, address, decimals, projectChainId = null, projectId = null) => {
+    setSourceToken = async(tokenSymbol, chainId, chain, address, decimals, name, projectChainId = null, projectId = null) => {
         if(this._componentMounted === true){
             this.setState(prevState => {
                 
@@ -435,9 +439,12 @@ export default class BridgeSwap extends PureComponent {
                 sourceTokenData['symbol'] = tokenSymbol;
                 sourceTokenData['chainId'] = chainId;
                 sourceTokenData['chain'] = chain;
+                sourceTokenData['name'] = name;
                 sourceTokenData['address'] = address;
                 sourceTokenData['decimals'] = decimals;
                 sourceTokenData['isWrappedToken'] = this.state.currentTokenSide === TOKEN_SIDES[0]
+
+
                 ? false : true;
     
     
@@ -485,12 +492,16 @@ export default class BridgeSwap extends PureComponent {
 
     setDestinationToken = (tokenSymbol, chainId, chain, address) => {
         this.setState(prevState => {
+            const networkConfig =  _.find(this.state.networks, {
+                chainId: chainId
+            });
             const destinationTokenData = prevState.destinationTokenData;
             destinationTokenData['symbol'] = tokenSymbol;
             destinationTokenData['chainId'] = chainId;
             destinationTokenData['chain'] = chain;
             destinationTokenData['address'] = address;
             destinationTokenData['decimals'] = this.state.sourceTokenData.decimals;
+            destinationTokenData['name'] = networkConfig.name;
             destinationTokenData['isWrappedToken'] = this.state.currentTokenSide === TOKEN_SIDES[0]
             ? true : false;
             return {
@@ -1250,7 +1261,10 @@ export default class BridgeSwap extends PureComponent {
         if(this._componentMounted){            
             this.setState(prevState => {
                 const sourceTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] ? {...defaultDestinationTokenData} : {...defaultSourceTokenData};
+                sourceTokenData['symbol'] = this.state.currentTokenSide === TOKEN_SIDES[0] ? 'Choose derivative token' : 'Choose token';
                 const destinationTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] ? {...defaultSourceTokenData} : {...defaultDestinationTokenData};
+                //destinationTokenData['symbol'] = 'Original token';
+                destinationTokenData['symbol'] = this.state.currentTokenSide === TOKEN_SIDES[0] ? 'Receiving token' : 'Choose receiving token';
                 const newTokenSide = this.state.currentTokenSide === TOKEN_SIDES[0] ? TOKEN_SIDES[1] : TOKEN_SIDES[0];
                 this.props.toggleIsWrapTokenDeposit(newTokenSide === TOKEN_SIDES[1] ? true : false);
                 return {
@@ -1341,7 +1355,7 @@ export default class BridgeSwap extends PureComponent {
                                 </div>
                                 <figcaption>
                                     <span>{sideASymbol}</span>
-                                    <span>{sourceNetworkConfig?.chain ?? defaultSourceTokenData.chain}</span>
+                                    <span>{sourceNetworkConfig?.name ?? defaultSourceTokenData.name}</span>
                                 </figcaption>
                             </figure>
                         </div>
@@ -1376,7 +1390,7 @@ export default class BridgeSwap extends PureComponent {
                                 </div>
                                 <figcaption>
                                     <span>{sideBSymbol}</span>
-                                    <span>{this.state.destinationTokenData.chain}</span>
+                                    <span>{this.state.destinationTokenData.name === 'CUSTOM' ? "network" : this.state.destinationTokenData.name}</span>
                                 </figcaption>
                             </figure>
                         </div>

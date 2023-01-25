@@ -5,15 +5,11 @@ import styled from 'styled-components';
 import _ from "lodash";
 import BridgeApiHelper from "../../helper/bridgeApiHelper";
 import errors from "../../helper/errorConstantsHelper";
+import { goToExplorer } from '../../helper/utils';
+
 const $ = window.$;
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
-
-const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
-    if(explorerUrl !== undefined){
-        window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
-    }
-}
 
 export default class ListWrappedTokens extends PureComponent {
 	
@@ -131,7 +127,7 @@ export default class ListWrappedTokens extends PureComponent {
 													{(wrappedToken.tokenSymbol.substring(-wrapTokenSymbolPrefixLength, wrapTokenSymbolPrefixLength)).toLowerCase()}
 					    	                        {(wrappedToken.tokenSymbol.substring(wrapTokenSymbolPrefixLength)).toUpperCase()}
 												</span><span>{wrappedToken.chain}</span></ListTxt>
-												<ListTxt className="cursor"><ListLink onClick={(e) => goToContractOnExplorer(wrappedToken.explorerUrl, wrappedToken.address)}>{wrappedToken.address === null ? 'FETHING...' : wrappedToken.address}</ListLink></ListTxt>
+												<ListTxt className="cursor"><ListLink onClick={(e) => goToExplorer(wrappedToken.explorerUrl, wrappedToken.address)}>{wrappedToken.address === null ? 'FETHING...' : wrappedToken.address}</ListLink></ListTxt>
 											</List>
 										)
 									})}

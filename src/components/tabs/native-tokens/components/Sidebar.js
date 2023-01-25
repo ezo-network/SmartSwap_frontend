@@ -110,8 +110,9 @@ export default class Sidebar extends PureComponent {
                                     </span>
                                     <b>
                                         <span className="provider-quote-qty">
-                                                <strong>{Number(quoteAmount).toFixed(5)} {this.props.toChainNativeTokenSymbol}</strong> 
+                                            <strong>{Number(quoteAmount).toFixed(5)} {this.props.toChainNativeTokenSymbol}</strong> 
                                         </span>
+                                        &nbsp;
                                         <span className="provider-quote-usd">
                                             [${Number(quoteAmount * toTokenIdUsdValue).toFixed(2)}]
                                         </span>

@@ -2,16 +2,7 @@ import { PureComponent } from "react";
 import web3 from "web3";
 import moment from 'moment';
 import _ from "lodash";
-
-const checkTransactionOnExplorer = (explorerUrl, txHash) => {
-    if(explorerUrl !== undefined){
-        window.open(explorerUrl + '/tx/' + txHash, "_blank");
-    }
-}
-
-const textMasking = (text, maskingChar = '.', noOfMaskingChar = 16, startingLettersLength = 25, endingLettersLength = 25) => {
-    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
-}
+import { textMasking, checkTransactionOnExplorer } from "../../../../../helper/utils";
 
 export default class FulfilledOrder extends PureComponent {
     _componentMounted = false;
@@ -49,7 +40,7 @@ export default class FulfilledOrder extends PureComponent {
                 <p>{moment.unix(this.props.receivedOnTime).format("MMM D[. ]YYYY[, ]h[:]mma zz")}</p>
                 <div className="ledger-box">
                     <h5><i><img src="../images/tick.png" width="18px"></img></i>Funds wired to your wallet </h5>
-                    <p>{textMasking(this.props.claimApprovedTranactionHash)}</p>
+                    <p>{textMasking(this.props.claimApprovedTranactionHash, '.', 16, 25, 25)}</p>
                     <div className="flex">
                         <a className="cursor" href="#" onClick={() => checkTransactionOnExplorer(this.props.receivingToNetworkConfig?.explorerUrl, this.props.claimApprovedTranactionHash)}>View transaction</a>
                         {/* <a className="color-green" href="#">Fees breakdown <i className="fas fa-caret-up ml-2"></i></a> */}

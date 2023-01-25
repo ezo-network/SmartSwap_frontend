@@ -1,17 +1,7 @@
 import { PureComponent } from "react";
-import web3 from "web3";
 import moment from 'moment';
 import _ from "lodash";
-
-const checkTransactionOnExplorer = (explorerUrl, txHash) => {
-    if(explorerUrl !== undefined){
-        window.open(explorerUrl + '/tx/' + txHash, "_blank");
-    }
-}
-
-const textMasking = (text, maskingChar = '.', noOfMaskingChar = 16, startingLettersLength = 25, endingLettersLength = 25) => {
-    return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
-}
+import {numberExponentToLarge, checkTransactionOnExplorer, textMasking} from "../../../../helper/utils";
 
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
@@ -46,7 +36,7 @@ export default class OrderInformation extends PureComponent {
                     <i className="fas fa-chevron-right"></i>
                 </h3>
                 <h4>
-                    {web3.utils.fromWei(this.props.value)} {symbol} ({this.props.fromNetworkConfig.chain})
+                    {numberExponentToLarge(this.props.value / 10 ** this.props.decimals)} {symbol} ({this.props.fromNetworkConfig.name})
                 </h4>
                 {/* <p>Feb 2. 2019, 9:21am PST</p> */}
                 <p>{moment(this.props.depositOn).format("MMM D[. ]YYYY[, ]h[:]mma zz")}</p>

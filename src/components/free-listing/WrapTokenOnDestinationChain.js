@@ -10,14 +10,10 @@ import addImg from "../../assets/images/add-chain.png";
 import BridgeApiHelper from "../../helper/bridgeApiHelper";
 import BridgeContract from "../../helper/bridgeContract";
 import errors from "../../helper/errorConstantsHelper";
+import { goToExplorer } from '../../helper/utils';
+
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 const $ = window.$;
-
-const goToContractOnExplorer = (explorerUrl, tokenAddress) => {
-  if(explorerUrl !== undefined){
-      window.open(explorerUrl + '/address/' + tokenAddress, "_blank");
-  }
-}
 
 export default class WrapTokenOnDestinationChain extends PureComponent {
   pendingNetworkSwitchRequest = false;
@@ -416,7 +412,7 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                               src={'/images/free-listing/chains/' + this.props.selectedSourceTokenData.chainIcon}
                               onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
                             />
-                            {this.props.selectedSourceTokenData.chain}
+                            {this.props.selectedSourceTokenData.chainName}
                           </ProICOSbx02>
                         </ProICOSbx01>
                         <ProColImg><img alt="add image" src={addImg}></img></ProColImg>
@@ -438,12 +434,12 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                               src={'/images/free-listing/chains/' + network.icon} 
                               onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')}
                             />
-                            {network.chain}
+                            {network.name}
                           </ProICOSbx02>
                         </ProICOSbx01>
                         <ProColBtn>
                           {network.wrappedTokenExist === true && (
-                            <label onClick={(e) => goToContractOnExplorer(network.explorerUrl, network.wrappedTokenAddress)} className="Btn02">
+                            <label onClick={(e) => goToExplorer(network.explorerUrl, network.wrappedTokenAddress)} className="Btn02">
                               <i className="far fa-check-circle" aria-hidden="true"></i> Bridge Created <i className="fas fa-external-link-alt" aria-hidden="true"></i>
                             </label>
                           )}

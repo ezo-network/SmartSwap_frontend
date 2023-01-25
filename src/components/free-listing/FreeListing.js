@@ -42,6 +42,7 @@ export default class FreeListing extends PureComponent {
         chainIcon: null,
         chainId: null,
         chain: null,
+        chainName: null,
         explorerUrl: null,
         txHash: null,
         decimals: null
@@ -101,6 +102,7 @@ export default class FreeListing extends PureComponent {
             token.address,
             token.icon,
             networkConfig.chain,
+            networkConfig.name,
             networkConfig.chainId,
             networkConfig.icon,
             networkConfig.explorerUrl,
@@ -190,7 +192,7 @@ export default class FreeListing extends PureComponent {
     }
   }
 
-  async sourceTokenSelectedCallback(sourceToken, sourceTokenAddress, sourceTokenIcon, sourceChain, sourceChainId, sourceChainIcon, explorerUrl, decimals) {
+  async sourceTokenSelectedCallback(sourceToken, sourceTokenAddress, sourceTokenIcon, sourceChain, sourceChainName, sourceChainId, sourceChainIcon, explorerUrl, decimals) {
     await this.getBridge(sourceChainId).then(async () => {
       if (this.state.bridgeAddress !== null) {
         await this.isProjectExist(sourceChainId, sourceTokenAddress).then(async () => {
@@ -201,6 +203,7 @@ export default class FreeListing extends PureComponent {
               sourceTokenData['address'] = sourceTokenAddress;
               sourceTokenData['icon'] = sourceTokenIcon;
               sourceTokenData['chain'] = sourceChain;
+              sourceTokenData['chainName'] = sourceChainName;
               sourceTokenData['chainId'] = sourceChainId;
               sourceTokenData['chainIcon'] = sourceChainIcon;
               sourceTokenData['explorerUrl'] = explorerUrl;

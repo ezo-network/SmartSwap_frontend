@@ -189,6 +189,7 @@ export default class TransferDeployerOwnership extends PureComponent {
       //const originalToken = _.find(this.props.tokens, {symbol: wrappedToken.tokenSymbol.slice(2)});
       const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.toChainId });
       if (networkConfig !== undefined) {
+        wrappedToken['chainName'] = networkConfig['name'];
         wrappedToken['chain'] = networkConfig['chain'];
         usersWrappedTokens.push(wrappedToken);
       }
@@ -255,7 +256,7 @@ export default class TransferDeployerOwnership extends PureComponent {
                                 {(wrappedToken.tokenSymbol.substring(-wrapTokenSymbolPrefixLength, wrapTokenSymbolPrefixLength)).toLowerCase()}
                                 {(wrappedToken.tokenSymbol.substring(wrapTokenSymbolPrefixLength)).toUpperCase()}                                
                               </ProICOSbx02>
-                              <ProICOSbx02>{wrappedToken.chain}</ProICOSbx02>
+                              <ProICOSbx02>{wrappedToken.chainName}</ProICOSbx02>
                             </ProICOSbx01>
                           )
                         }.bind(this))

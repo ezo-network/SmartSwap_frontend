@@ -126,8 +126,16 @@ class LedgerHistory extends PureComponent {
             return (swapRequest.chainId === activeNetworkConfig?.chainId ?? null) &&
             (this.state.filterBy === 'ALL' ? true : (
                 this.state.filterBy === 'COMPLETED' 
-                    ? (swapRequest.status === 'FULFILLED' && swapRequest.claimStatus === 'CLAIMED') 
-                    : (swapRequest.status === 'PENDING' || swapRequest.status === 'SP_MATCHED')
+                    ? (swapRequest.status === 'FULFILLED' && swapRequest.claimStatus === 'CLAIMED')
+                    : (
+                        swapRequest.status === 'PENDING' 
+                        || swapRequest.status === 'CLAIM_PROCESSING'
+                        || swapRequest.status === 'CLAIM_SENT'
+                        || swapRequest.status === 'SP_MATCHED' 
+                        || swapRequest.status === 'SP_CLAIM_SENT'
+                        || swapRequest.status === 'FAILED'
+                        || (swapRequest.status === 'FULFILLED' && swapRequest.claimStatus === 'PENDING')
+                    )
             ));
         });
 
@@ -183,13 +191,17 @@ class LedgerHistory extends PureComponent {
                                 {(
                                     (swapRequest?.status === 'PENDING') 
                                     || 
+                                    (swapRequest?.status === 'CLAIM_PROCESSING')
+                                    || 
+                                    (swapRequest?.status === 'CLAIM_SENT')
+                                    ||
                                     (swapRequest?.status === 'SP_MATCHED') 
+                                    ||
+                                    (swapRequest?.status === 'SP_CLAIM_SENT')                                                                         
                                     || 
                                     (swapRequest?.status === 'FAILED') 
                                     || 
-                                    (swapRequest?.status === 'CLAIM_PROCESSING')
-                                    ||
-                                    (swapRequest?.status === 'CLAIM_SENT')
+                                    (swapRequest.status === 'FULFILLED' && swapRequest.claimStatus === 'PENDING')
                                 )  &&
                                 <div className="ledger-half">
                                     <PendingOrder

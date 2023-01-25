@@ -264,7 +264,9 @@ export default class NativeSwap extends PureComponent {
                             <p className={`${this.state.slippageMode === SLIPPAGE_MODES[1] ? "" : "active"}`} style={{ paddingRight: "8px" }}>Slippage free </p>
                             <Switch
                                 checked={this.state.slippageMode === SLIPPAGE_MODES[1] ? true : false}
-                                onChange={(e) => this.toggleSlippageMode(this.state.slippageMode)}
+                                onChange={(e) => {
+                                    //this.toggleSlippageMode(this.state.slippageMode)
+                                }}
                                 handleDiameter={14}
                                 offColor="#2e303a"
                                 onColor="#2e303a"

@@ -8,19 +8,10 @@ import notificationConfig from "../../../../../config/notificationConfig";
 import AuthorityServerApiHelper from "../../../../../helper/authorityServerApiHelper";
 import BridgeContract from "../../../../../helper/bridgeContract";
 import errors from '../../../../../helper/errorConstantsHelper';
+import {numberExponentToLarge} from "../../../../../helper/utils";
 
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
-
-const numberToBn = (number, decimalPoints, toString = false) => {
-    const pow = bigInt(10).pow(decimalPoints);
-    const regExp = new RegExp("^-?\\d+(?:\\.\\d{0," + decimalPoints + "})?", "g"); // toFixed without rounding
-    number = number.toString().match(regExp)[0];
-    number = Number(number * pow.toJSNumber()).toFixed(0);
-    number = bigInt(number).toString();
-    number = Web3.utils.toBN(number);
-    return toString ? number.toString() : number;
-}
 
 export default class ClaimPending extends PureComponent {
     _componentMounted = false;
@@ -287,7 +278,7 @@ export default class ClaimPending extends PureComponent {
                 <h3>
                     <b>{this.props.title}</b>
                 </h3>
-                <h4>{Web3.utils.fromWei(this.props.value)} {symbol} ({this.props.toNetworkConfig.chain})
+                <h4>{numberExponentToLarge(this.props.value / 10 ** this.props.decimals)} {symbol} ({this.props.toNetworkConfig.name})
                 </h4>
                 <p>{moment().format("MMM D[. ]YYYY[, ]h[:]mma zz")}</p>
                 <div className="ledger-box">
