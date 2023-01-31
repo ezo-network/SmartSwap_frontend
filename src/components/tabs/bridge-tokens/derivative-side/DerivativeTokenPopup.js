@@ -298,7 +298,7 @@ export default class DerivativeTokenPopup extends PureComponent {
                                         <i className="fa fa-remove" aria-hidden="true"></i>                                
                                     }
                                 </Search>
-                                {totalTokens === 0 && Web3.utils.isAddress(this.state.filteredToken) && 
+                                {/* {totalTokens === 0 && Web3.utils.isAddress(this.state.filteredToken) && 
                                 <SelectList>
                                         <Selected>
                                             <Token
@@ -308,7 +308,7 @@ export default class DerivativeTokenPopup extends PureComponent {
                                             </Token>
                                         </Selected>
                                 </SelectList>                                                            
-                                }
+                                } */}
                                 <SelectList>
                                     {this.state.pinnedTokens.map(function(pinnedToken, i) {
                                         const token = _.find(this.props.tokens, {address: (pinnedToken).toLowerCase() })

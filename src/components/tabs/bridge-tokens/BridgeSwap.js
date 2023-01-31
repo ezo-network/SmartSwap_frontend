@@ -1078,8 +1078,8 @@ export default class BridgeSwap extends PureComponent {
                             notificationConfig.error("execution reverted: TransferHelper: TRANSFER_FROM_FAILED");                        
                         }
                 
-                        if(response.code === 'NOT_A_CONTRACT'){
-                            notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', networkConfig.bridgeContractAddress));
+                        if(response.code === 'NOT_A_BRIDGE_CONTRACT'){
+                            notificationConfig.error(errors.erc20Errors.NOT_A_BRIDGE_CONTRACT('Bridge', networkConfig.bridgeContractAddress));
                         }
                 
                         if(
@@ -1426,7 +1426,7 @@ export default class BridgeSwap extends PureComponent {
                                     onClick={
                                         () => this.depositTokens()
                                     }
-                                    className="btn btn-primary">
+                                    className={`btn btn-primary ${this.state.isDestinationTokenSelected && this.state.isSourceTokenSelected ? 'can-bridge' : 'cant-bridge'}`}>
                                     <div className="btn-container">
                                         <img
                                             src={'/images/free-listing/chains/' + (sourceNetworkConfig?.chain + '.png').toLowerCase()}

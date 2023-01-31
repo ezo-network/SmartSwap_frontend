@@ -115,16 +115,23 @@ class BridgeContract extends EventEmitter {
 
     async addTokenOnSourceChain(address, txCb, receiptCb){
         try {
-            const isContractExist = await this.isContractExist(address);
+            const isContractExist = await this.isContractExist();
+            // address will be valid etherium bridge address
             if(isContractExist){
-                // address will be valid etherium bc address
-                address = web3Js.utils.toHex(address);
-                address = address.slice(2);
-                var payload = `0xd48bfca7${this.pad32Bytes(address)}`;
-                await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+                const response = await this.web3.getCode(address);
+                if(response === '0x'){
+                    receiptCb({
+                        code: 'INVALID_TOKEN_ADDRESS',
+                    });
+                } else {
+                    address = web3Js.utils.toHex(address);
+                    address = address.slice(2);
+                    var payload = `0xd48bfca7${this.pad32Bytes(address)}`;
+                    await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+                }
             } else {
                 receiptCb({
-                    code: 'NOT_A_CONTRACT',
+                    code: 'NOT_A_BRIDGE_CONTRACT',
                 });
             }
         } catch (error){
@@ -138,36 +145,42 @@ class BridgeContract extends EventEmitter {
 
     async addWrappedTokenOnDestinationChain(tokenAddress, chainId, decimals, name, symbol, sig, txCb, receiptCb){
         try {
-
-            console.log({
-                tokenAddress: tokenAddress,
-                chainId: chainId,
-                decimals: decimals,
-                name: name,
-                symbol: symbol,
-                sig: sig
-            });
-
-            let payload = ethers.utils.defaultAbiCoder.encode([ 
-                "address", 
-                "uint256", 
-                "uint256", 
-                "string", 
-                "string", 
-                "bytes[]" 
-            ], [ 
-                tokenAddress,
-                Number(chainId),
-                Number(decimals),
-                name,
-                symbol,
-                [sig]
-            ]);
-
-            payload = payload.slice(2);
-            payload = `0xa85c33cd${this.pad32Bytes(payload)}`;
-
-            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            const isContractExist = await this.isContractExist();
+            if(isContractExist){
+                console.log({
+                    tokenAddress: tokenAddress,
+                    chainId: chainId,
+                    decimals: decimals,
+                    name: name,
+                    symbol: symbol,
+                    sig: sig
+                });
+    
+                let payload = ethers.utils.defaultAbiCoder.encode([ 
+                    "address", 
+                    "uint256", 
+                    "uint256", 
+                    "string", 
+                    "string", 
+                    "bytes[]" 
+                ], [ 
+                    tokenAddress,
+                    Number(chainId),
+                    Number(decimals),
+                    name,
+                    symbol,
+                    [sig]
+                ]);
+    
+                payload = payload.slice(2);
+                payload = `0xa85c33cd${this.pad32Bytes(payload)}`;
+    
+                await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            } else {
+                receiptCb({
+                    code: 'NOT_A_BRIDGE_CONTRACT',
+                });
+            }
         } catch (err){
             console.error({
                 addWrappedTokenOnDestinationChain: err.message
@@ -178,32 +191,39 @@ class BridgeContract extends EventEmitter {
 
     async depositTokens(originalTokenAddress, amountToDepositInWei, toChainId, txCb, receiptCb){
         try {
+            const isContractExist = await this.isContractExist();
+            if(isContractExist){
+                const args = {
+                    receiver: this.ownerAddress,
+                    token: originalTokenAddress,
+                    value: (amountToDepositInWei).toString(),
+                    toChainId: Number(toChainId)
+                };
+    
+                console.log(args);
+    
+                let payload = ethers.utils.defaultAbiCoder.encode([
+                    "address",
+                    "address",
+                    "uint256",
+                    "uint256"
+                ], [
+                    this.ownerAddress,
+                    originalTokenAddress,
+                    (amountToDepositInWei).toString(),
+                    Number(toChainId)
+                ]);
+    
+                payload = payload.slice(2);
+                payload = `0x487cda0d${this.pad32Bytes(payload)}`;
+    
+                await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            } else {
+                receiptCb({
+                    code: 'NOT_A_BRIDGE_CONTRACT',
+                });
+            }
 
-            const args = {
-                receiver: this.ownerAddress,
-                token: originalTokenAddress,
-                value: (amountToDepositInWei).toString(),
-                toChainId: Number(toChainId)
-            };
-
-            console.log(args);
-
-            let payload = ethers.utils.defaultAbiCoder.encode([
-                "address",
-                "address",
-                "uint256",
-                "uint256"
-            ], [
-                this.ownerAddress,
-                originalTokenAddress,
-                (amountToDepositInWei).toString(),
-                Number(toChainId)
-            ]);
-
-            payload = payload.slice(2);
-            payload = `0x487cda0d${this.pad32Bytes(payload)}`;
-
-            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
         } catch (err){
             console.error({
                depositTokens: err.message
@@ -214,44 +234,50 @@ class BridgeContract extends EventEmitter {
 
     async claimToken(orignalToken, orignalChainId, txId, to, value, fromChainId, sig, txCb, receiptCb){
         try {
-
-            const args = {
-                orignalToken: orignalToken,
-                orignalChainId: orignalChainId,
-                txId: txId,
-                to: to,
-                value: value,
-                fromChainId: fromChainId,
-                sig: sig
-            };
-
-            console.log("claimToken args:", args);
-
-            let payload = ethers.utils.defaultAbiCoder.encode([
-                "address", // orignalToken
-                "uint256", // orignalChainId
-                "bytes32", // txId
-                "address", // to
-                "uint256", // value
-                "uint256", // fromChainId
-                "bytes[]" // sig
-            ], [
-                orignalToken,
-                orignalChainId,
-                txId,
-                to,
-                value,
-                fromChainId,
-                [sig]
-            ]);
-
-            payload = payload.slice(2);
-            payload = `0x1c9499e8${this.pad32Bytes(payload)}`;
-
-            await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            const isContractExist = await this.isContractExist();
+            if(isContractExist){
+                const args = {
+                    orignalToken: orignalToken,
+                    orignalChainId: orignalChainId,
+                    txId: txId,
+                    to: to,
+                    value: value,
+                    fromChainId: fromChainId,
+                    sig: sig
+                };
+    
+                console.log("claimToken args:", args);
+    
+                let payload = ethers.utils.defaultAbiCoder.encode([
+                    "address", // orignalToken
+                    "uint256", // orignalChainId
+                    "bytes32", // txId
+                    "address", // to
+                    "uint256", // value
+                    "uint256", // fromChainId
+                    "bytes[]" // sig
+                ], [
+                    orignalToken,
+                    orignalChainId,
+                    txId,
+                    to,
+                    value,
+                    fromChainId,
+                    [sig]
+                ]);
+    
+                payload = payload.slice(2);
+                payload = `0x1c9499e8${this.pad32Bytes(payload)}`;
+    
+                await this.sendTransaction(payload, 0, this.contractAddress, txCb, receiptCb);
+            } else {
+                receiptCb({
+                    code: 'NOT_A_BRIDGE_CONTRACT',
+                });
+            }
         } catch (err){
             console.error({
-               depositTokens: err.message
+               claimToken: err.message
             });
             return err;   
         }        

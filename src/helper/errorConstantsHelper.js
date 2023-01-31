@@ -19,11 +19,14 @@ const errors = {
     'amountEqualToZero': `Amount can't be zero.`,
     'erc20Errors': {
         'NOT_A_CONTRACT': (title = '', address = '') =>  `${title} Address ${address.length > 0 ? '(' + address+ ')' : ''} is not a valid ERC-20 contract.`,
-        'CONTRACT_NOT_FOUND': (title = '', address = '') => `${title} contract ${address.length > 0 ? '(' + address+ ')' : ''} does not exist.`
+        'CONTRACT_NOT_FOUND': (title = '', address = '') => `${title} contract ${address.length > 0 ? '(' + address+ ')' : ''} does not exist.`,
+        'INVALID_TOKEN_ADDRESS': (title = '', address = '') => `${title} contract ${address.length > 0 ? '(' + address+ ')' : ''} address seems invalid.`,
+        'NOT_A_BRIDGE_CONTRACT': (title = '', address = '') =>  `${title} contract ${address.length > 0 ? '(' + address+ ')' : ''} address seems invalid.`,
+        'NOT_A_EXPEDITE_CONTRACT': (title = '', address = '') =>  `${title} contract ${address.length > 0 ? '(' + address+ ')' : ''} address seems invalid.`
     },
     'tokenCouldNotList': "Token not listed here due to insufficient token balance",
     'tokenImported': "Token imported",
-    'tokenWrapped': 'Token Wrapped Successfully!',
+    'tokenWrapped': 'Derivative created successfully!',
     'wrapTokenCouldNotSaved': 'Could not saved wrapped token.',
     'noWrapTokens': `You've not wapped any tokens yet`,
     'somethingWentWrong': 'Something went wrong!',

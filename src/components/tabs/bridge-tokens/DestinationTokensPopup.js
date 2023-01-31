@@ -306,7 +306,8 @@ export default class DestinationTokensPopup extends PureComponent {
                                                                 pathname: "/freelisting", 
                                                                 state: {
                                                                     sourceTokenData: this.props.selectedSourceToken,
-                                                                    destinationNetworkData: network
+                                                                    destinationNetworkData: network,
+                                                                    actionAfterBridgeCreated: "bridge-tokens"
                                                                 }
                                                             }}>
                                                                 <ButtonPrimary>CREATE NEW BRIDGE</ButtonPrimary>

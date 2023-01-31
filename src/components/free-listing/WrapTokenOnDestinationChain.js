@@ -1,5 +1,6 @@
 import {WalletContext} from '../../context/WalletProvider';
 import React, { PureComponent, lazy, Suspense } from "react";
+import { Redirect } from "react-router-dom";
 import _ from "lodash";
 import Web3 from 'web3';
 import notificationConfig from "../../config/notificationConfig";
@@ -23,8 +24,16 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
     this.state = {
       addWrappedTokenSignedParams: [],
       btnClicked: false,
-      createdBridgeAddress: null
+      createdBridgeAddress: null,
+      redirect: null,
+      selectedDestinationNetworks: []
     };
+  }
+
+  componentDidMount = async() => {
+    this.setState({
+      selectedDestinationNetworks: this.props.selectedDestinationNetworks
+    });
   }
 
   async addNetworkToWallet(chainId) {
@@ -252,11 +261,11 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
             notificationConfig.error("Intrinsic gas too low");
           }
 
-          if(response?.code === 'NOT_A_CONTRACT'){
+          if(response?.code === 'NOT_A_BRIDGE_CONTRACT'){
             this.setState({
               btnClicked: false
             });
-            notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', this.props.bridgeContractAddress));
+            notificationConfig.error(errors.erc20Errors.NOT_A_BRIDGE_CONTRACT('Bridge', this.props.bridgeContractAddress));
           }
           
 
@@ -281,7 +290,15 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                 response.receipt.transactionHash,
                 response.receipt.blockNumber
               );
+
               notificationConfig.success(errors.tokenWrapped);
+
+              // redirect after bridge created home on bridge tab
+              if(this.props.actionAfterBridgeCreated !== ''){
+                this.setState({
+                  redirect: true
+                });
+              } 
             }
           }
           
@@ -292,7 +309,15 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
               response.transactionHash,
               response.blockNumber
             );
+
             notificationConfig.success(errors.tokenWrapped);
+            
+            // redirect after bridge created home on bridge tab
+            if(this.props.actionAfterBridgeCreated !== ''){
+              this.setState({
+                redirect: true
+              });
+            }
           }
 
         });
@@ -355,10 +380,20 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
       }
   }
 
+  removeSelectedNetwork = (networkIdToRemove) => {
+    if(networkIdToRemove !== null){
+      if(this.state.selectedDestinationNetworks.length > 1){
+        this.setState({selectedDestinationNetworks: this.state.selectedDestinationNetworks.filter(function(networkId) { 
+            return networkId !== networkIdToRemove
+        })});
+      }
+    }
+  }
+
   render() {
 
     let networksData = [];
-    const selectedDestinationNetworks = this.props.selectedDestinationNetworks;
+    const selectedDestinationNetworks = this.state.selectedDestinationNetworks;
     selectedDestinationNetworks.forEach(networkId => {
       const wrappedToken = _.find(this.props.wrappedTokens, {
         projectId: this.props.projectId,
@@ -461,10 +496,16 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
                             </button>
                           )}
                           {network.wrappedTokenExist === false && Number(network.chainId) !== Number(this.context.chainIdNumber) && (
-                            <button disabled={this.state.btnClicked} onClick={e => this.switchNetwork(network.chainId)} className="Btn01 switch-network-alert">CREATE A BRIDGE</button>
+                            
+                            <button disabled={this.state.btnClicked} onClick={e => this.switchNetwork(network.chainId)} className="Btn01 switch-network-alertt">Change a network</button>
                           )}
                         </ProColBtn>
-                        <DeleteButtin><i class="fas fa-trash-alt"></i></DeleteButtin>
+                        
+                        {network.wrappedTokenExist === false &&
+                          <DeleteButtin onClick={(e) => this.removeSelectedNetwork(network.wrappedTokenExist ? null : Number(network.chainId))}>
+                            <i className="fas fa-trash-alt"></i>
+                          </DeleteButtin>
+                        }
                       </ProRowCol1>
                     </ProRow>
                   )
@@ -479,6 +520,16 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
             </MContainer>
 
           </div>
+
+          {this.state.redirect === true &&
+            <Redirect
+              to={{
+                pathname: "/",
+                search: `?active-tab=${this.props.actionAfterBridgeCreated}`
+              }}
+              push={true}
+            />
+          }
         </main>
       </>
     );

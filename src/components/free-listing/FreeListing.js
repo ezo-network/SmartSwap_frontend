@@ -60,7 +60,8 @@ export default class FreeListing extends PureComponent {
       ownershipTransfered: false,
       addCustomToken: false,
       addNewBridge: false,
-      wantToBecomeMasterValidator: false
+      wantToBecomeMasterValidator: false,
+      actionAfterBridgeCreated: ''
     };
 
     source = axios.CancelToken.source();
@@ -112,7 +113,8 @@ export default class FreeListing extends PureComponent {
               // clear
               window.history.replaceState({}, document.title)
               this.setState({
-                addNewBridge: true
+                addNewBridge: true,
+                actionAfterBridgeCreated: this.props.location.state?.actionAfterBridgeCreated
               })
             }
           });
@@ -592,6 +594,7 @@ export default class FreeListing extends PureComponent {
               onFinishButtonClicked={this.finishButtonClicked}
               onFetchWrappedTokens={this.fetchWrappedTokens}
               onAddMoreBridgeButtonClicked={this.addMoreBridgeButtonClicked}
+              actionAfterBridgeCreated={this.state.actionAfterBridgeCreated}
             />
           }
 
