@@ -8,6 +8,7 @@ import notificationConfig from "../../../../../config/notificationConfig";
 import ExpediteContract from "../../../../../helper/expediteContract";
 import SmartSwapApiHelper from "../../../../../helper/smartswapApiHelper";
 import { numberToBn } from "../../../../../helper/utils";
+import errors from '../../../../../helper/errorConstantsHelper';
 
 export default class PendingOrder extends PureComponent {
     _componentMounted = false;
@@ -84,6 +85,10 @@ export default class PendingOrder extends PureComponent {
                 
                         if (response.code === "UNPREDICTABLE_GAS_LIMIT") {
                             notificationConfig.error(response.reason);
+                        }
+
+                        if (response.code === "NOT_A_EXPEDITE_CONTRACT") {
+                            notificationConfig.error(errors.erc20Errors.NOT_A_EXPEDITE_CONTRACT('Expedite', activeNetworkConfig?.expediteContractAddress));
                         }
                 
                         if (response.code === -32016) {

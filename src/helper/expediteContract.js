@@ -74,19 +74,39 @@ class ExpediteContract extends EventEmitter {
         }
     }
 
+    isContractExist = async() => {
+        try {
+            const response = await this.web3Provider.getCode(this.expediteContractAddress);
+            if(response === '0x'){
+                return false;
+            } else {
+                return true;
+            }
+        } catch(error){
+            return false;
+        }
+    }
+
     expedite = async(txID, value, txCb, receiptCb) => {
         try {
-            console.log('Inside expedite func');
-            let payload = ethers.utils.defaultAbiCoder.encode([
-                "bytes32" // txID
-            ], [
-                txID
-            ]);
-
-            payload = payload.slice(2);
-            payload = `0xabc810a4${pad32Bytes(payload)}`;
-                            
-            this.sendTransaction(payload, value.toString(), this.expediteContractAddress, txCb, receiptCb)
+            const isContractExist = await this.isContractExist();
+            if(isContractExist){
+                console.log('Inside expedite func');
+                let payload = ethers.utils.defaultAbiCoder.encode([
+                    "bytes32" // txID
+                ], [
+                    txID
+                ]);
+    
+                payload = payload.slice(2);
+                payload = `0xabc810a4${pad32Bytes(payload)}`;
+                                
+                this.sendTransaction(payload, value.toString(), this.expediteContractAddress, txCb, receiptCb)
+            } else {
+                receiptCb({
+                    code: 'NOT_A_EXPEDITE_CONTRACT',
+                });
+            }
         } catch(error){
             console.error("expedite", error.message)
             receiptCb(error)

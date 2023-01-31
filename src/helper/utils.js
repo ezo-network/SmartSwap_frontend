@@ -86,6 +86,10 @@ export const goToExplorer = (explorerUrl, address, type = 'address') => {
 
 // defualt to tx hash masking, for address set - 3, 5, 5
 export const textMasking = (text, maskingChar = '.', noOfMaskingChar = 16, startingLettersLength = 25, endingLettersLength = 25) => {
+  const notValidValues = ["", null, undefined];
+  if(notValidValues.includes(text)){
+    return;
+  }
   return text.substring(0, startingLettersLength) + maskingChar.repeat(noOfMaskingChar) + text.slice(-endingLettersLength)
 }
 

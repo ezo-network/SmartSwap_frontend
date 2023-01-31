@@ -23,11 +23,29 @@ class NewReimbursementContract extends EventEmitter {
         );
     }
 
+    isContractExist = async() => {
+        try {
+            const response = await this.web3Provider.getCode(this.reimbursementContractAddress);
+            if(response === '0x'){
+                return false;
+            } else {
+                return true;
+            }
+        } catch(error){
+            return false;
+        }
+    }
+
     getLicenseeFee = async(vaultAddress, projectContractAddress) => {
         try {
-            return await this.reimbursementContractInstance.getLicenseeFee(vaultAddress, projectContractAddress).then(res => {
-                return res.toString();
-            });
+            const isContractExist = await this.isContractExist();
+            if(isContractExist){
+                return await this.reimbursementContractInstance.getLicenseeFee(vaultAddress, projectContractAddress).then(res => {
+                    return res.toString();
+                });
+            } else {
+                console.error('getLicenseeFee', "NOT_A_CONTRACT");
+            }
         } catch(error){
             console.error('getLicenseeFee', error.message)
         }

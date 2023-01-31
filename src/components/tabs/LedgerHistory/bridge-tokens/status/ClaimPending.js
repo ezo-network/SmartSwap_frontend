@@ -118,8 +118,8 @@ export default class ClaimPending extends PureComponent {
                                     notificationConfig.error("execution reverted: TransferHelper: TRANSFER_FROM_FAILED");                        
                                 }
                         
-                                if(response.code === 'NOT_A_CONTRACT'){
-                                    notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', networkConfig.bridgeContractAddress));
+                                if(response.code === 'NOT_A_BRIDGE_CONTRACT'){
+                                    notificationConfig.error(errors.erc20Errors.NOT_A_BRIDGE_CONTRACT('Bridge', networkConfig.bridgeContractAddress));
                                 }
                         
                                 if(

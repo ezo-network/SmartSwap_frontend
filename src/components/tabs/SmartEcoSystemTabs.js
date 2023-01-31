@@ -5,13 +5,13 @@ import {LedgerHistory as NativeTokenLedgerHistory} from "../tabs/LedgerHistory/n
 import {LedgerHistory as BridgeTokenLedgerHistory} from "../tabs/LedgerHistory/bridge-tokens/LedgerHistory";
 import {TokensUsdPriceContext} from "../../context/TokensUsdPriceProvider";
 
-
 export default class SmartEcoSystemTabs extends PureComponent {
     _componentMounted = false;
     constructor(props) {
+        const searchParams = new URLSearchParams(document.location.search);
         super();
         this.state = {
-            activeTabLink: 'native-tokens',
+            activeTabLink: searchParams.get('active-tab') ? searchParams.get('active-tab') : 'native-tokens',
             showSidebar: true,
             tabs: [
                 {
@@ -21,7 +21,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
                     disabled: false
                 },
                 {
-                    title: 'Bridge Tokens',
+                    title: 'Derivatives',
                     link: 'bridge-tokens',
                     inBeta: true,
                     disabled: false
@@ -245,6 +245,8 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                     }
                                 </div>
                             </button>
+
+
                             <button className={`tab-link ${this.state.activeTabLink === this.state.tabs[3].link ? 'current-n' : ''} ${this.state.tabs[3].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[3].link}>
                                 <div>
                                     {this.state.tabs[3].title}
@@ -253,6 +255,8 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                     }
                                 </div>
                             </button>
+
+
                             <button className={`tab-link ${this.state.activeTabLink === this.state.tabs[4].link ? 'current-n' : ''} ${this.state.tabs[4].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[4].link}>
                                 <div>
                                     {this.state.tabs[4].title}
@@ -261,6 +265,8 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                     }
                                 </div>
                             </button>
+
+
                             <button className={`tab-link ${this.state.activeTabLink === this.state.tabs[5].link ? 'current-n' : ''} ${this.state.tabs[5].disabled ? 'disable' : ''}`} data-tab={this.state.tabs[5].link}>
                                 <div>
                                     {this.state.tabs[5].title}
@@ -269,9 +275,14 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                     }
                                 </div>
                             </button>
-                            {/* <div id={`${this.state.activeTabLink}`}>
-                                {this.activeComponent(this.state.activeTabLink)}
-                            </div> */}
+
+                            
+                            {this.state.activeTabLink !== this.state.tabs[0].link && this.state.activeTabLink !== this.state.tabs[1].link && (
+                                <div id={`${this.state.activeTabLink}`} className="tabMain">
+                                    <h2 style={{ display: "flex", justifyContent: "center"}}>This feature is comming soon</h2>
+                                </div>
+                            )}
+
                         </div>
                     </div>
                 </div>

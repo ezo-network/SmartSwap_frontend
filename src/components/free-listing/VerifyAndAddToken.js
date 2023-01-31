@@ -120,11 +120,18 @@ export default class VerifyAndAddToken extends PureComponent {
             notificationConfig.error("Intrinsic gas too low");
           }
 
-          if(response.code === 'NOT_A_CONTRACT'){
+          if(response.code === 'NOT_A_BRIDGE_CONTRACT'){
             this.setState({
               btnClicked: false
             });
-            notificationConfig.error(errors.erc20Errors.NOT_A_CONTRACT('Bridge', this.props.bridgeContractAddress));
+            notificationConfig.error(errors.erc20Errors.NOT_A_BRIDGE_CONTRACT('Bridge', this.props.bridgeContractAddress));
+          }
+
+          if(response.code === 'INVALID_TOKEN_ADDRESS'){
+            this.setState({
+              btnClicked: false
+            });
+            notificationConfig.error(errors.erc20Errors.INVALID_TOKEN_ADDRESS('Token', this.props.selectedSourceTokenData.address));
           }
 
           if(

@@ -30,6 +30,19 @@ class SmartSwapContract extends EventEmitter {
 
     }
 
+    isContractExist = async() => {
+        try {
+            const response = await this.web3Provider.getCode(this.smartSwapContractAddress);
+            if(response === '0x'){
+                return false;
+            } else {
+                return true;
+            }
+        } catch(error){
+            return false;
+        }
+    }
+
     sendTransaction = async(payload, value, to, txCb, receiptCb) => {
         try {
             const gasPrice = await this.web3Provider.getGasPrice();
@@ -77,82 +90,65 @@ class SmartSwapContract extends EventEmitter {
 
     swap = async(tokenA, tokenB, amountA, value, fee, licenseeAddress, txCb, receiptCb) => {
         try {
-            console.log('Inside swap func');
-            // amountA = amountToSwap
-            // value = amountToSwap + totalFee (processingFee + companyFees + reimbursementFees)
-            // fees = companyFees + reimbursementFees 
-
-            // const swap = web3.utils.toHex(value).replace("0x", "");
-
-            // tokenA = tokenA.replace("0x", "");
-            // console.log('tokenA', tokenA);
-    
-            // tokenB = tokenB.replace("0x", "");
-            // console.log('tokenB', tokenB);
             
-            // amountA = web3.utils.toHex(amountA).replace("0x", "");
-            // console.log('amountA', amountA);
-    
-            // fee = web3.utils.toHex(fee).replace("0x", "");
-            // console.log('fee', fee);
-    
-            // const receiver = this.walletAddress.replace("0x", "");
-            // console.log('receiver', receiver);
-    
-            // licenseeAddress = licenseeAddress.replace("0x", "");
-            // console.log('licenseeAddress', licenseeAddress);
-    
-            // var payload = `0xe0e45f0e${pad32Bytes(swap)}${pad32Bytes(tokenA)}${pad32Bytes(tokenB)}${pad32Bytes(receiver)}${pad32Bytes(amountA)}${pad32Bytes(licenseeAddress)}${pad32Bytes(0)}${pad32Bytes(0)}${pad32Bytes(0)}${pad32Bytes(fee)}`
-            // console.log('payload', payload);
+            console.log('Inside swap func');
 
-            console.log([
-                "address", // tokenA
-                "address", // tokenB
-                "address", // receiver
-                "uint256", // amountA
-                "address", // licensee
-                "bool", // isInvestment
-                "uint256", // minimumAmountToClaim
-                "uint256", // limitPice
-                "uint256" // fee
-            ], [
-                tokenA,
-                tokenB,
-                this.walletAddress,
-                amountA.toString(),
-                licenseeAddress,
-                false,
-                0,
-                0,
-                fee.toString()
-            ]);
+            const isContractExist = await this.isContractExist();
 
-            let payload = ethers.utils.defaultAbiCoder.encode([
-                "address", // tokenA
-                "address", // tokenB
-                "address", // receiver
-                "uint256", // amountA
-                "address", // licensee
-                "bool", // isInvestment
-                "uint256", // minimumAmountToClaim
-                "uint256", // limitPice
-                "uint256" // fee
-            ], [
-                tokenA,
-                tokenB,
-                this.walletAddress,
-                amountA.toString(),
-                licenseeAddress,
-                false,
-                0,
-                0,
-                fee.toString()
-            ]);
-
-            payload = payload.slice(2);
-            payload = `0xe0e45f0e${pad32Bytes(payload)}`;
-                            
-            this.sendTransaction(payload, value.toString(), this.smartSwapContractAddress, txCb, receiptCb)
+            if(isContractExist){
+                console.log([
+                    "address", // tokenA
+                    "address", // tokenB
+                    "address", // receiver
+                    "uint256", // amountA
+                    "address", // licensee
+                    "bool", // isInvestment
+                    "uint256", // minimumAmountToClaim
+                    "uint256", // limitPice
+                    "uint256" // fee
+                ], [
+                    tokenA,
+                    tokenB,
+                    this.walletAddress,
+                    amountA.toString(),
+                    licenseeAddress,
+                    false,
+                    0,
+                    0,
+                    fee.toString()
+                ]);
+    
+                let payload = ethers.utils.defaultAbiCoder.encode([
+                    "address", // tokenA
+                    "address", // tokenB
+                    "address", // receiver
+                    "uint256", // amountA
+                    "address", // licensee
+                    "bool", // isInvestment
+                    "uint256", // minimumAmountToClaim
+                    "uint256", // limitPice
+                    "uint256" // fee
+                ], [
+                    tokenA,
+                    tokenB,
+                    this.walletAddress,
+                    amountA.toString(),
+                    licenseeAddress,
+                    false,
+                    0,
+                    0,
+                    fee.toString()
+                ]);
+    
+                payload = payload.slice(2);
+                payload = `0xe0e45f0e${pad32Bytes(payload)}`;
+                                
+                this.sendTransaction(payload, value.toString(), this.smartSwapContractAddress, txCb, receiptCb)
+            } else {
+                receiptCb({
+                    code: 'NOT_A_CONTRACT',
+                });
+            }
         } catch(error){
             console.error("swap", error.message)
             receiptCb(error)
@@ -161,15 +157,21 @@ class SmartSwapContract extends EventEmitter {
 
     getCompanyFeeRatio = async() => {
         try {
-            console.log('getCompanyFeeRatio', this.smartSwapContractInstance);
-            return await this.smartSwapContractInstance.companyFee().then(res => {
-                return res.toString();
-            });
+            const isContractExist = await this.isContractExist();
+            if(isContractExist){
+                console.log('getCompanyFeeRatio', this.smartSwapContractInstance);
+                return await this.smartSwapContractInstance.companyFee().then(res => {
+                    return res.toString();
+                });
+            } else {
+                console.error('getCompanyFeeRatio', "NOT_A_CONTRACT");
+                notificationConfig.error(`${this.smartSwapContractAddress} is not a smartswap contract.`)
+                return undefined;                
+            }
         } catch(error){
             console.error('getCompanyFeeRatio', error.message)
         }
     }
-
 }
 
 export default SmartSwapContract;
