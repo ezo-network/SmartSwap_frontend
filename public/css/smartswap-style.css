@@ -3234,7 +3234,8 @@ a.dc-file:hover { color: #0303ff; }
 .native-btn .currency { /* width: 40px; height: 40px; */ display: flex; align-items: center; justify-content: center; border-radius: 100%; /* background: #9d9d9d; */ margin-right: 10px; } 
 .native-icons { display: table; margin-left: auto; margin-right: -25px; margin-bottom: -11px; } 
 .native-icons a { margin-left: 10px; } 
-.native-btn { } 
+.native-btn.connect-wallet {box-shadow: none; } 
+.native-btn.connect-wallet:hover {box-shadow: 0 0 15px #9d9d9d;} 
 
 .ledger-tab { display: flex; margin-bottom: 100px; } 
 .ledger-half { width: 50%; padding: 0 42px; } 
@@ -3315,6 +3316,7 @@ a.dc-file:hover { color: #0303ff; }
 .native-btn.btn-unsupported.connect,
 .smartSwap .btn.btn-unsupported { background: none !important; border: 2px solid #f23436; box-shadow: none; color: #f23436; box-shadow: 0 0 12px 0 #f23436; } 
 .native-btn.connect { border: 2px solid #91dc27; box-shadow: 0px 0px 10px #91dc27; } 
+.native-btn.connect:hover { background: #91dc27;}
 .nativ-bottomTxt { color: #aaaaaa; font-size: 11px; margin: 15px 0 0; } 
 .nativ-bottomTxt span { color: #fff; } 
 .btn.btn-primary.inactive { border: 2px solid #000; box-shadow: 0 0 15px #9d9d9d; } 
@@ -3382,3 +3384,4 @@ a.dc-file:hover { color: #0303ff; }
 .cant-bridge:hover{
     background: transparent !important;        
 }
+.input-box1 {width: 252px;}
