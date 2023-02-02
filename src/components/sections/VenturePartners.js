@@ -26,12 +26,12 @@ export default class VenturePartners extends PureComponent {
                             alt=""
                         />
                     </div>
+                    
                     <div className="VPSubBX01">
                         <img
-                            src="images/venture-partners/bitangels.png"
+                            src="images/venture-partners/vpICON-013.png"
                             alt=""
                         />
-                        Michael Terpin
                     </div>
                     <div className="VPSubBX01">
                         <img
@@ -90,9 +90,10 @@ export default class VenturePartners extends PureComponent {
                     </div>
                     <div className="VPSubBX01">
                         <img
-                            src="images/venture-partners/vpICON-013.png"
+                            src="images/venture-partners/bitangels.png"
                             alt=""
                         />
+                        Michael Terpin
                     </div>
                     <div className="VPSubBX01">
                         <img
@@ -166,12 +167,12 @@ export default class VenturePartners extends PureComponent {
                             alt=""
                         />
                     </div>
-                    <div className="VPSubBX01">
+                    {/* <div className="VPSubBX01">
                         <img
                             src="images/venture-partners/vpICON-025.png"
                             alt=""
                         />
-                    </div>
+                    </div> */}
                     <div className="VPSubBX01">
                         <img
                             src="images/venture-partners/vpICON-026.png"
@@ -252,13 +253,19 @@ export default class VenturePartners extends PureComponent {
                     </div>
                     <div className="VPSubBX01">
                         <img
-                            src="images/venture-partners/vpICON-040.png"
+                            src="images/venture-partners/vpICON-044.png"
                             alt=""
                         />
                     </div>
                     <div className="VPSubBX01">
                         <img
                             src="images/venture-partners/legion.png"
+                            alt=""
+                        />
+                    </div>
+                    <div className="VPSubBX01">
+                        <img
+                            src="images/venture-partners/vpICON-046.png"
                             alt=""
                         />
                     </div>

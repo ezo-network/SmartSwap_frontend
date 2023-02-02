@@ -525,7 +525,7 @@
 /*.smartSwap { background: url(../images/jr-bg01.png) 50% top no-repeat; background-size: cover; background: rgb(0, 0, 0); background: -moz-linear-gradient(top, rgba(0, 0, 0, 1) 13%, rgba(5, 15, 23, 1) 55%, rgba(17, 0, 27, 1) 100%); background: -webkit-linear-gradient(top, rgba(0, 0, 0, 1) 13%, rgba(5, 15, 23, 1) 55%, rgba(17, 0, 27, 1) 100%); background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 13%, rgba(5, 15, 23, 1) 55%, rgba(17, 0, 27, 1) 100%); filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#11001b', GradientType=0); } */
 .smartSwap .green-Color { color: #89b60d !important; } 
 
-.smartSwap .btn { background: #95c608; border: none; border-radius: 4px; font-size: 24px; height: 75px; display: flex; justify-content: center; align-items: center;} 
+.smartSwap .btn { background: #95c608; border: none; border-radius: 4px; font-size: 24px; height: 75px; display: flex; justify-content: center; align-items: center; transition: all .4s ease-in-out;} 
 
 .smartSwap .btn-large { width: 100%; height: 80px; line-height: 80px; text-transform: uppercase; color: #fff !important; display: inline-block; font-weight: 700; text-align: center; font-size: 28px; margin-top: 30px; } 
 
@@ -2168,7 +2168,7 @@ select:focus { border-color: #fff !important; box-shadow: none; }
 
 .VPMainBX { display: flex; align-items: center; justify-content: flex-start; width: 100%; flex-wrap: wrap; } 
 
-.VPSubBX01 { display: flex; font-size: 16px; font-weight: 700; color: #878996; width: 25%; min-height: 190px; padding: 10px; align-items: center; justify-content: center; flex-direction: column; } 
+.VPSubBX01 { display: flex; font-size: 16px; font-weight: 700; color: #585858; width: 25%; min-height: 190px; padding: 10px; align-items: center; justify-content: center; flex-direction: column; } 
 
 .VPSubBX01 img { margin: 8px 0 15px; max-width: 100%; height: auto; } 
 
@@ -2760,7 +2760,7 @@ ul.tabs-n li.disable:hover:after { opacity: 1; color: #91dc27; }
     to { opacity: 1; } 
 }
 
-.tab-content-n-main { background-color: rgb(54 56 64 / 50%); padding: 15px 40px 15px 40px; width: 100%; min-height: 475px; /* position: relative; */ } 
+.tab-content-n-main { background-color: rgb(54 56 64 / 50%); padding: 15px 40px 15px 40px; width: 100%; min-height: 500px; /* position: relative; */ } 
 
 .form-control-n { font-size: 16px; font-weight: bold; border: 0; background-color: #fff; height: 50px; padding: 0 20px; width: 100%; color: #130929; } 
 
@@ -3234,8 +3234,8 @@ a.dc-file:hover { color: #0303ff; }
 .native-btn .currency { /* width: 40px; height: 40px; */ display: flex; align-items: center; justify-content: center; border-radius: 100%; /* background: #9d9d9d; */ margin-right: 10px; } 
 .native-icons { display: table; margin-left: auto; margin-right: -25px; margin-bottom: -11px; } 
 .native-icons a { margin-left: 10px; } 
-.native-btn.connect-wallet {box-shadow: none; } 
-.native-btn.connect-wallet:hover {box-shadow: 0 0 15px #9d9d9d;} 
+
+
 
 .ledger-tab { display: flex; margin-bottom: 100px; } 
 .ledger-half { width: 50%; padding: 0 42px; } 
@@ -3319,8 +3319,6 @@ a.dc-file:hover { color: #0303ff; }
 .native-btn.connect:hover { background: #91dc27;}
 .nativ-bottomTxt { color: #aaaaaa; font-size: 11px; margin: 15px 0 0; } 
 .nativ-bottomTxt span { color: #fff; } 
-.btn.btn-primary.inactive { border: 2px solid #000; box-shadow: 0 0 15px #9d9d9d; } 
-.btn.btn-primary.inactive:hover { background: none; } 
 
 .tab-content-n-main .tab-link { background: #0d0e13; color: #a6a2b0; padding: 21px 22px; cursor: pointer; text-align: left; position: relative; width: calc(100% - -46px); display: none; align-items: center; justify-content: flex-start; font-size: 16px; font-weight: bold; flex: 1; margin: 0 0 0 -23px;} 
 .tab-content-n-main .tab-link .text-sm-n { position: absolute; font-weight: 800; margin: -4px 0 0 5px; font-size: 9px; width: auto;} 
@@ -3376,12 +3374,8 @@ a.dc-file:hover { color: #0303ff; }
     display: none !important;
 }
 
-.cant-bridge {
-    border: 2px solid #000 !important;
-    box-shadow: 0 0 15px #9d9d9d !important;
-}
 
-.cant-bridge:hover{
-    background: transparent !important;        
-}
+
+.btn.btn-primary.inactive, .smartSwap .btn.cant-bridge, .native-btn.connect-wallet { border: 2px solid #000; box-shadow: 0 0 15px rgba(0,0,0,0.8); transition: all .4s ease-in-out;} 
+.native-btn.connect-wallet:hover, .btn.btn-primary.inactive:hover, .smartSwap .btn.cant-bridge:hover {box-shadow: 0 0 15px #b5b5b5; background: none; } 
 .input-box1 {width: 252px;}

@@ -77,10 +77,10 @@ export default class HeadFreeListing extends PureComponent {
 
                     <Nav className="deskNav">
                         <Link to=''>SmartExtension</Link> <span>|</span>
-                        <Link to=''>SmartBridge</Link><span>|</span>
-                        <Link to=''>SmartPayment</Link><span>|</span>
-                        <Link to=''>SmartWallet</Link><span>|</span>
-                        <Link className="active" to='/'>SmartSwap</Link>
+                        <Link to='/freelisting'>SmartBridge</Link><span>|</span>
+                        <Link className="active" to='/'>SmartSwap</Link><span>|</span>
+                        <Link className="c-soon" to=''>SmartPayment</Link><span>|</span>
+                        <Link className="c-soon" to=''>SmartWallet</Link>
                         {/* <Link to='/freelisting' className="active">FREE Listing</Link> */}
                     </Nav>
                     <Nav className="mobNav">
@@ -204,7 +204,13 @@ const Logo = styled(FlexDiv)`
 const Nav = styled(FlexDiv)`
     font-size:16px; font-weight:400; 
     span{ font-size: 29px; font-weight:200; color: #3c3c3c; margin: 0 14px;} 
-    &.deskNav {}
+    &.deskNav {
+        .c-soon {
+            position: relative;
+            &:after {content: "Coming Soon"; position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; opacity: 0;}
+            &:hover {color: transparent; &:after {opacity: 1; color: #91dc27;}}
+        }
+    }
     &.mobNav {display: none;
         i {margin-left: 27px;}
     }
