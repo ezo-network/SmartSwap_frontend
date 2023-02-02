@@ -234,8 +234,10 @@ export default class NativeSwap extends PureComponent {
                                         <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Slippage free trades carry higher gas costs than slippage trades. Gas and fees are 100% reimbursed" aria-hidden="true"></i>
                                     </i>
                                     &nbsp;
-                                    <span>{Number(this.state.estimateGasAndFeesData?.result ?? 0).toFixed(this.state.activeNetworkNativeTokenDecimals)}</span>
+                                    <span className='protip' data-pt-position="top" data-pt-title=' 
+0.000000000000000000 BNB' aria-hidden="true">{Number(this.state.estimateGasAndFeesData?.result ?? 0).toFixed(this.state.activeNetworkNativeTokenDecimals)}</span>
                                     &nbsp;{this.state.activeNetworkNativeTokenSymbol}
+                                    {/* Max length should be 8 */}
                                 </p>
                             </div>
                         </div> 

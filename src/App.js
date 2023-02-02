@@ -33,9 +33,9 @@ const DefaultRouter = () => (
       <Switch>
         <Route path="/projects" component={Projects} />
       </Switch>
-      <Switch>
+     {/*  <Switch>
         <Route path="/extension" component={Extension} />
-      </Switch>
+      </Switch> */}
       <Switch>
         <Route path="/freelisting" component={FreeListing} />
       </Switch>

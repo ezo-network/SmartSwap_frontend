@@ -9,9 +9,12 @@ export default class CTAButtons extends PureComponent {
                     className="ssBTNbar01 wow fadeInUp mt-145 mb-135" data-wow-delay="0.2s"
                     style={{ justifyContent: "center" }}
                 >
-                    <Link to="/ownLicence" className="ssBtn01">
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfOPWfFGLLHL6zy-JJ8XTSeMMHn2SQpONZ0KeWtO60Iv3t0Bw/viewform" target="_blank" className="ssBtn01">
+                    APPLY FOR LICENSING
+                    </a>
+                    {/* <Link to="/ownLicence" className="ssBtn01">
                         FREE SMARTSWAP LICENSE
-                    </Link>
+                    </Link> */}
                     <Link
                         to="/"
                         className="ssBtn02"
