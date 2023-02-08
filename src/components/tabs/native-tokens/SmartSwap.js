@@ -129,7 +129,7 @@ export default class SmartSwap extends PureComponent {
                 });
             } else {
                 await this.setDefaultChainIds();
-                console.error('Metamask is not installed');
+                console.error(errors.metamask.walletNotFound);
             }
 
         }
@@ -171,7 +171,7 @@ export default class SmartSwap extends PureComponent {
                 const wallet = this.context;
                 const walletConnected = await wallet.connectWallet();
                 if(walletConnected === false){
-                    notificationConfig.error('Matamask wallet not connected');
+                    notificationConfig.error(errors.metamask.walletNotConnected);
                 }
             }
         } catch(error){
@@ -251,7 +251,7 @@ export default class SmartSwap extends PureComponent {
                 }
             }
         } else {
-            notificationConfig.error('Matamask wallet not connected');
+            notificationConfig.error(errors.metamask.walletNotConnected);
         }
     }
 
@@ -286,7 +286,7 @@ export default class SmartSwap extends PureComponent {
                             });
                         });
                     } else {
-                        notificationConfig.error('Matamask wallet not connected');
+                        notificationConfig.error(errors.metamask.walletNotConnected);
                     }
                 }
             } else {

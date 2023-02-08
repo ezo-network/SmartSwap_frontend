@@ -1,5 +1,6 @@
 import { PureComponent } from "react";
 import { WalletContext, EthereumEvents } from '../../../../context/WalletProvider';
+import errors from '../../../../helper/errorConstantsHelper';
 import SmartSwapApiHelper from "../../../../helper/smartswapApiHelper";
 import _ from "lodash";
 import web3 from "web3";
@@ -50,7 +51,7 @@ class LedgerHistory extends PureComponent {
                 console.log(EthereumEvents.DISCONNECT);
             });
         } else {
-            console.error('Metamask is not installed');
+            console.error(errors.metamask.walletNotFound);
         }
     }
 

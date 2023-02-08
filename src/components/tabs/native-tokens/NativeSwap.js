@@ -13,6 +13,7 @@ import Filter from "../../../../src/assets/images/filter.png";
 import Doller from "../../../../src/assets/images/doller.png";
 import SmartExchange from "../../../../src/assets/images/smart-exchange.png";
 import CONSTANT from '../../../constants';
+import errors from "../../../helper/errorConstantsHelper";
 
 const SLIPPAGE_MODES = ["SMARTSWAP", "DAGENSWAP"];
 const INPUT_MODES = ["FIAT", "TOKEN"];
@@ -70,7 +71,7 @@ export default class NativeSwap extends PureComponent {
                     console.log(EthereumEvents.DISCONNECT);
                 });
             } else {
-                console.error('Metamask is not installed');
+                console.error(errors.metamask.walletNotFound);
             }
 
         }
@@ -202,6 +203,7 @@ export default class NativeSwap extends PureComponent {
                             inputModes={INPUT_MODES}
                             selectedSlippageMode={this.state.slippageMode} 
                             selectedInputMode={this.state.inputMode}
+                            openLedger={this.props.openLedger}
                         ></DagenSwap>
                     }                   
                 </div>
@@ -234,7 +236,12 @@ export default class NativeSwap extends PureComponent {
                                         <i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Slippage free trades carry higher gas costs than slippage trades. Gas and fees are 100% reimbursed" aria-hidden="true"></i>
                                     </i>
                                     &nbsp;
-                                    <span className="protip" data-pt-position="top" data-pt-title={Number(this.state.estimateGasAndFeesData?.result ?? 0).toFixed(this.state.activeNetworkNativeTokenDecimals) + this.state.activeNetworkNativeTokenSymbol} aria-hidden="true">
+                                    <span 
+                                        className="protip" 
+                                        data-pt-position="top" 
+                                        data-pt-title={`${Number(this.state.estimateGasAndFeesData?.result ?? 0).toFixed(this.state.activeNetworkNativeTokenDecimals)} ${this.state.activeNetworkNativeTokenSymbol}`}
+                                        aria-hidden="true"
+                                    >
                                         {Number(this.state.estimateGasAndFeesData?.result ?? 0).toFixed(6)}
                                     </span>
                                     &nbsp;{this.state.activeNetworkNativeTokenSymbol}

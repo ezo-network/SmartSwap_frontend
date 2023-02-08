@@ -30,7 +30,6 @@ let source;
 const maxAprovalLimit =  Web3.utils.toBN(process.env.REACT_APP_MAX_TOKEN_APPROVE_LIMIT); // uint96 max 
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 const wrapTokenSymbolPrefixLength = Number((wrapTokenSymbolPrefix).length);
-const TOKEN_SIDES = ["TOKEN", "DTOKEN"];
 
 const defaultSourceTokenData = {
     symbol:  'Choose token',
@@ -72,8 +71,7 @@ const initialState = {
     wrappedTokens: [],
     projects: [],
     customTokenBalance: null,
-    depositTokenSuccessful: false,
-    currentTokenSide: TOKEN_SIDES[0]
+    depositTokenSuccessful: false
 }
 
 export default class BridgeSwap extends PureComponent {
@@ -134,7 +132,7 @@ export default class BridgeSwap extends PureComponent {
                     await this.walletConnectCallback();    
                 });
             } else {
-                console.error('Metamask is not installed');
+                console.error(errors.metamask.walletNotFound);
             }
         }
     }
@@ -159,7 +157,7 @@ export default class BridgeSwap extends PureComponent {
             if(walletConnected){
                 await this.walletConnectCallback();
             } else {
-                notificationConfig.error('Matamask wallet not connected');
+                notificationConfig.error(errors.metamask.walletNotConnected);
             }
         } catch(error){
             console.error('connectWallet', error.message)
@@ -170,31 +168,8 @@ export default class BridgeSwap extends PureComponent {
 		if(this._componentMounted === true){
             // if change changed and source token selected then reset source token to 
             this.setState(prevState => {          
-                const sourceTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] 
-                ? {...defaultSourceTokenData} 
-                : {...defaultDestinationTokenData};
-                const destinationTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] 
-                ? {...defaultDestinationTokenData} 
-                : {...defaultSourceTokenData};
-
-                // sourceTokenData['symbol'] = defaultSourceTokenData.symbol;
-                // sourceTokenData['chainId'] = defaultSourceTokenData.chainId;
-                // sourceTokenData['chain'] = defaultSourceTokenData.chain;
-                // sourceTokenData['amount'] = defaultSourceTokenData.amount;
-                // sourceTokenData['address'] = defaultSourceTokenData.address;
-                // sourceTokenData['isWrappedToken'] = defaultSourceTokenData.isWrappedToken;
-                // sourceTokenData['balance'] = defaultSourceTokenData.balance;
-                // sourceTokenData['decimals'] = defaultSourceTokenData.decimals;
-
-                // destinationTokenData['symbol'] = defaultDestinationTokenData.symbol;
-                // destinationTokenData['chainId'] = defaultDestinationTokenData.chainId;
-                // destinationTokenData['chain'] = defaultDestinationTokenData.chain;
-                // destinationTokenData['amount'] = defaultDestinationTokenData.amount;
-                // destinationTokenData['address'] = defaultDestinationTokenData.address;
-                // destinationTokenData['isWrappedToken'] = defaultDestinationTokenData.isWrappedToken;
-                // destinationTokenData['balance'] = defaultDestinationTokenData.balance;
-                // destinationTokenData['decimals'] = defaultDestinationTokenData.decimals;
-
+                const sourceTokenData = {...defaultSourceTokenData};
+                const destinationTokenData = {...defaultDestinationTokenData};
                 return {
                     isSourceTokenSelected: false,
                     isDestinationTokenSelected: false,
@@ -208,73 +183,46 @@ export default class BridgeSwap extends PureComponent {
 
     toggleSourceTokenPopup = async(type) => {
 		if(this._componentMounted === true){
-            if(this.state.currentTokenSide === TOKEN_SIDES[0]){
-                if(type === 'OPEN'){
-                    if(this.pendingNetworkSwitchRequest === false){
-                        if(this.context.isAuthenticated){
+            if(type === 'OPEN'){
+                if(this.pendingNetworkSwitchRequest === false){
+                    if(this.context.isAuthenticated){
+                        await this.getAllProjectList().then(async() => {
                             await this.filterTokenByWalletBalance().then(() => {
                                 this.setState({
                                     toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
                                 });
                             });
-                        } else {
-                            notificationConfig.info(errors.connectWalletRequestMessage);
-                        }
+                        })
                     } else {
-                        notificationConfig.info(errors.switchRequestPending);
+                        notificationConfig.info(errors.connectWalletRequestMessage);
                     }
-                }
-                if(type === 'CLOSE'){
-                    this.setState({
-                        toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
-                    });
+                } else {
+                    notificationConfig.info(errors.switchRequestPending);
                 }
             }
-
-            if(this.state.currentTokenSide === TOKEN_SIDES[1]){
-                if(type === 'OPEN'){
-                    if(this.pendingNetworkSwitchRequest === false){
-                        if(this.context.isAuthenticated){
-                            await this.filterWrappedTokenByWalletBalance().then(() => {
-                                this.setState({
-                                    toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
-                                });
-                            });
-                        } else {
-                            notificationConfig.info(errors.connectWalletRequestMessage);
-                        }
-                    } else {
-                        notificationConfig.info(errors.switchRequestPending);
-                    }
-                }
-                if(type === 'CLOSE'){
-                    this.setState({
-                        toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
-                    });
-                }
+            if(type === 'CLOSE'){
+                this.setState({
+                    toggleSourceTokenPopup: !this.state.toggleSourceTokenPopup
+                });
             }
         }
     }
 
     toggleDestinationTokensPopup = (type) => {
-        if(this.state.currentTokenSide === TOKEN_SIDES[0]){
-            if(this.state.isSourceTokenSelected){
-                if(this.pendingNetworkSwitchRequest === false){
-                    if(this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) === Number(this.state.sourceTokenData.chainId))){
-                        if(this._componentMounted === true){
-                            this.setState({
-                                toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
-                            });
-                        }
-                    } else {
-                        notificationConfig.info(errors.switchRequestMessage);                    
+        if(this.state.isSourceTokenSelected && this.state.sourceTokenData.isWrappedToken === false){
+            if(this.pendingNetworkSwitchRequest === false){
+                if(this.context.isAuthenticated === true && (Number(this.context.chainIdNumber) === Number(this.state.sourceTokenData.chainId))){
+                    if(this._componentMounted === true){
+                        this.setState({
+                            toggleDestinationTokensPopup: !this.state.toggleDestinationTokensPopup
+                        });
                     }
                 } else {
-                    notificationConfig.info(errors.switchRequestPending);
-                } 
+                    notificationConfig.info(errors.switchRequestMessage);                    
+                }
             } else {
-                notificationConfig.info(errors.selectSourceTokenMessage);
-            }
+                notificationConfig.info(errors.switchRequestPending);
+            } 
         }
     }
 
@@ -399,33 +347,26 @@ export default class BridgeSwap extends PureComponent {
 
     getAllProjectList = async(chainId = null) => {
         try {
-            if(
-                (this.context.chainIdNumber !== null && this.state.currentTokenSide === TOKEN_SIDES[0])
-                ||
-                chainId !== null && this.state.currentTokenSide === TOKEN_SIDES[1]
-            ){
-                const projectOnChainId = this.state.currentTokenSide === TOKEN_SIDES[0] ? this.context.chainIdNumber : chainId;
-                const {
-                    response,
-                    error,
-                    code
-                } = await BridgeApiHelper.getProjects({chainId: projectOnChainId}, source.token);
-                console.log({
-                   'getAllProjectList': projectOnChainId
-                })
-                if (this._componentMounted === true) {
-                    if (code === 200) {
-                        if (this._componentMounted === true) {
-                            this.setState({
-                                projects: response
-                            });
-                        }
-                    } else {
-                        console.error(error)
+            const projectOnChainId = chainId === null ? this.context.chainIdNumber : chainId;
+            const {
+                response,
+                error,
+                code
+            } = await BridgeApiHelper.getProjects({chainId: projectOnChainId}, source.token);
+            console.log({
+               'getAllProjectList': projectOnChainId
+            })
+            if (this._componentMounted === true) {
+                if (code === 200) {
+                    if (this._componentMounted === true) {
+                        this.setState({
+                            projects: response
+                        });
                     }
+                } else {
+                    console.error(error)
                 }
-            }
-
+            }            
         } catch (error) {
             console.error(error)
         }        
@@ -442,13 +383,10 @@ export default class BridgeSwap extends PureComponent {
                 sourceTokenData['name'] = name;
                 sourceTokenData['address'] = address;
                 sourceTokenData['decimals'] = decimals;
-                sourceTokenData['isWrappedToken'] = this.state.currentTokenSide === TOKEN_SIDES[0]
-
-
-                ? false : true;
+                sourceTokenData['isWrappedToken'] = projectId !== null ? true : false;
     
     
-                const destinationTokenData = this.state.currentTokenSide === TOKEN_SIDES[0]
+                const destinationTokenData = projectId === null
                 ? {...defaultDestinationTokenData} : {...defaultSourceTokenData}
 
                 return {
@@ -465,7 +403,7 @@ export default class BridgeSwap extends PureComponent {
                     decimals
                 );
 
-                if(this.state.currentTokenSide === TOKEN_SIDES[1]){
+                if(projectId !== null){
                     await this.getAllProjectList(projectChainId).then(() => {
                         // find project and set destination token
                         const project = _.find(this.state.projects, {
@@ -481,7 +419,8 @@ export default class BridgeSwap extends PureComponent {
                                 project.token, 
                                 project.chainId, 
                                 project.chain, 
-                                project.tokenAddress
+                                project.tokenAddress,
+                                false
                             );
                         }
                     });
@@ -490,7 +429,7 @@ export default class BridgeSwap extends PureComponent {
         }
     }
 
-    setDestinationToken = (tokenSymbol, chainId, chain, address) => {
+    setDestinationToken = (tokenSymbol, chainId, chain, address, isWrappedToken) => {
         this.setState(prevState => {
             const networkConfig =  _.find(this.state.networks, {
                 chainId: chainId
@@ -502,8 +441,7 @@ export default class BridgeSwap extends PureComponent {
             destinationTokenData['address'] = address;
             destinationTokenData['decimals'] = this.state.sourceTokenData.decimals;
             destinationTokenData['name'] = networkConfig.name;
-            destinationTokenData['isWrappedToken'] = this.state.currentTokenSide === TOKEN_SIDES[0]
-            ? true : false;
+            destinationTokenData['isWrappedToken'] = isWrappedToken
             return {
                 destinationTokenData,
                 isDestinationTokenSelected: true
@@ -669,7 +607,7 @@ export default class BridgeSwap extends PureComponent {
         }
     }    
 
-    aggregateTokenBalanceWithMultiCall = async (chainId, tokenAddresses = [], accountAddress) => {
+    aggregateTokenBalanceWithMultiCall = async (chainId, allTokens = [], accountAddress) => {
         try {
 
             const networkConfig = _.find(this.state.networks, { chainId: Number(chainId) });
@@ -681,13 +619,21 @@ export default class BridgeSwap extends PureComponent {
             };
             
             const multicallTokensConfig = [];
-            tokenAddresses.forEach(tokenAddress => {
-                const token = _.find(this.state.tokens, { address: (tokenAddress).toLowerCase() });
-                // will only work with erc20 token addresses
-                var obj = {
-                    target: tokenAddress,
-                    call: ['balanceOf(address)(uint256)', accountAddress],
-                    returns: [['BALANCE_OF_' + tokenAddress, val => val / 10 ** Number(token.decimals)]]
+            allTokens.forEach(token => {
+                let obj = null;
+
+                if(token.hasOwnProperty('projectId')){
+                    obj = {
+                        target: token.address,
+                        call: ['balanceOf(address)(uint256)', accountAddress],
+                        returns: [['BALANCE_OF_' + token.address, val => val / 10 ** Number(token.decimals)]]
+                    }
+                } else {
+                    obj = {
+                        target: token.address,
+                        call: ['balanceOf(address)(uint256)', accountAddress],
+                        returns: [['BALANCE_OF_' + token.address, val => val / 10 ** Number(token.decimals)]]
+                    }
                 }
                 multicallTokensConfig.push(obj);
             });
@@ -707,15 +653,31 @@ export default class BridgeSwap extends PureComponent {
                     chainId: Number(chainId)
                 });
 
-                console.log("original token set");
-
+                
                 if (isTokenExist) {
+                    console.log("original token set");
                     console.log(`${index} ${isTokenExist.symbol}  ${isTokenExist.chainId} - ${token} - ${response.results.transformed[token]}`)
                     if (response.results.transformed[token] > 0) {
                         tokensBalances.push(isTokenExist);
                         // this.setState(prevState => ({
                         //     tokensWithBalance: [...prevState.tokensWithBalance, isTokenExist]
                         // }))
+                    }
+                } else {
+                    const isWarpTokenExist = _.find(this.state.wrappedTokens, {
+                        address: tokenAddress,
+                        toChainId: Number(chainId)
+                    });
+
+                    if(isWarpTokenExist){
+                        console.log("Wrap token set");
+                        console.log(`${index} ${isWarpTokenExist.symbol}  ${isWarpTokenExist.toChainId} - ${token} - ${response.results.transformed[token]}`)
+                        if (response.results.transformed[token] > 0) {
+                            tokensBalances.push(isWarpTokenExist);
+                            // this.setState(prevState => ({
+                            //     tokensWithBalance: [...prevState.tokensWithBalance, isTokenExist]
+                            // }))
+                        }
                     }
                 }
             }));
@@ -727,7 +689,7 @@ export default class BridgeSwap extends PureComponent {
         } catch (error) {
             console.log({
                 error: error,
-                chainId, tokenAddresses, accountAddress
+                chainId, allTokens, accountAddress
             })
             console.error(error.message);
         }
@@ -1156,22 +1118,22 @@ export default class BridgeSwap extends PureComponent {
             this.setState({
                 tokensWithBalance: []
             }, async() => {
+
                 await this.context.connectWallet();
-                
-                const groupedTokenByNetwork = this.state.tokens.reduce(function (r, token) {
-                    r[token.chainId] = r[token.chainId] || [];
-                    r[token.chainId].push(token.address);
-                    return r;
-                }, Object.create(null));
-    
-                await Promise.all(Object.keys(groupedTokenByNetwork).map(async (network) => {
-                // Object.keys(groupedTokenByNetwork).forEach(async (network) => {
-                    // only active network
-                    if(Number(this.context.chainIdNumber) === Number(network)){
-                        console.log(this.context.account);
-                        await this.aggregateTokenBalanceWithMultiCall(network, groupedTokenByNetwork[network], this.context.account);
-                    }
-                }));
+
+                const allTokens = [];
+
+                const filterTokens = _.filter(this.state.tokens, {
+                    chainId: this.context.chainIdNumber
+                });
+
+                const filteredWrappedTokens = _.filter(this.state.wrappedTokens, {
+                    toChainId: this.context.chainIdNumber
+                });
+
+                allTokens.push(...filterTokens, ...filteredWrappedTokens);
+
+                await this.aggregateTokenBalanceWithMultiCall(this.context.chainIdNumber, allTokens, this.context.account);
             });
 
         } catch (error) {
@@ -1209,7 +1171,9 @@ export default class BridgeSwap extends PureComponent {
         if(this._componentMounted){
             try {
                 await this.getTokenList().then(async() => {
-                    await this.filterTokenByWalletBalance();
+                    await this.getAllWrappedTokens().then(async() => {
+                        await this.filterTokenByWalletBalance();
+                    })
                 });       
             } catch(error){
                 console.error("tokenAddedCallback", error.message);
@@ -1217,31 +1181,12 @@ export default class BridgeSwap extends PureComponent {
         }
     }
 
-    // wrapTokenAddedCallback = async() => {
-    //     if(this._componentMounted){
-    //         try {
-    //             await this.getTokenList().then(async() => {
-    //                 await this.getAllProjectList().then(async() => {
-    //                     await this.filterWrappedTokenByWalletBalance();
-    //                 });
-    //             });
-    //         } catch(error){
-    //             console.error("wrapTokenAddedCallback", error.message);
-    //         }
-    //     }
-    // }
-
     refetch = async(tokenSideToRefetch) => {
         try {
             if(this._componentMounted){
-                if(tokenSideToRefetch === TOKEN_SIDES[0]){
+                await this.getAllWrappedTokens().then(async() => {
                     await this.filterTokenByWalletBalance();
-                }
-
-                if(tokenSideToRefetch === TOKEN_SIDES[1]){
-                    await this.getAllWrappedTokens();
-                    await this.filterWrappedTokenByWalletBalance();
-                }
+                });
             }
         } catch(error){
             console.error("refetch", error.message);
@@ -1254,28 +1199,6 @@ export default class BridgeSwap extends PureComponent {
                 e.preventDefault();
                 await this.resetSelectedTokens();
             }
-        }
-    }
-
-    toggleTokenSide = () => {
-        if(this._componentMounted){            
-            this.setState(prevState => {
-                const sourceTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] ? {...defaultDestinationTokenData} : {...defaultSourceTokenData};
-                sourceTokenData['symbol'] = this.state.currentTokenSide === TOKEN_SIDES[0] ? 'Choose derivative token' : 'Choose token';
-                const destinationTokenData = this.state.currentTokenSide === TOKEN_SIDES[0] ? {...defaultSourceTokenData} : {...defaultDestinationTokenData};
-                //destinationTokenData['symbol'] = 'Original token';
-                destinationTokenData['symbol'] = this.state.currentTokenSide === TOKEN_SIDES[0] ? 'Receiving token' : 'Choose receiving token';
-                const newTokenSide = this.state.currentTokenSide === TOKEN_SIDES[0] ? TOKEN_SIDES[1] : TOKEN_SIDES[0];
-                this.props.toggleIsWrapTokenDeposit(newTokenSide === TOKEN_SIDES[1] ? true : false);
-                return {
-                    isSourceTokenSelected: false,
-                    isDestinationTokenSelected: false,
-                    toggleSourceTokenPopup: false,
-                    sourceTokenData,
-                    destinationTokenData,
-                    currentTokenSide: newTokenSide
-                };
-            });
         }
     }
 
@@ -1362,8 +1285,9 @@ export default class BridgeSwap extends PureComponent {
                         <div className="tabDivider">
                             <button
                                 className="swap deposit-tokens"
+                                onClick={(e) => e.preventDefault()}
                                 //onClick={() => this.swapDirections()}
-                                onClick={() => this.toggleTokenSide()}
+                                //onClick={() => this.toggleTokenSide()}
                             >
                                 <img src={swapImg} alt="swap-directions-button"></img>
                             </button>
@@ -1458,7 +1382,7 @@ export default class BridgeSwap extends PureComponent {
                 </div>                
                 }
 
-                {this.state.toggleSourceTokenPopup && (this.state.currentTokenSide === TOKEN_SIDES[0]) &&
+                {this.state.toggleSourceTokenPopup &&
                     <SourceTokenPopup
                         show={this.state.toggleSourceTokenPopup}
                         closePopupCallback={this.toggleSourceTokenPopup}
@@ -1477,26 +1401,7 @@ export default class BridgeSwap extends PureComponent {
                     ></SourceTokenPopup>
                 }
 
-                {this.state.toggleSourceTokenPopup && (this.state.currentTokenSide === TOKEN_SIDES[1]) &&
-                    <DerivativeTokenPopup
-                        show={this.state.toggleSourceTokenPopup}
-                        closePopupCallback={this.toggleSourceTokenPopup}
-                        tokens={this.state.tokensWithBalance}
-                        networks={this.state.networks}
-                        wrappedTokens={this.state.wrappedTokens}
-                        sourceTokenSelectedCallback={this.setSourceToken}
-                        accountAddress={this.context.account}
-                        walletConnected={this.context.isAuthenticated}
-                        chainId={this.context.chainIdNumber}
-                        // onTokenAddedCallback={this.wrapTokenAddedCallback}
-                        onCustomTokenBalanceCheck={this.getCustomTokenBalance}
-                        customTokenBalance={this.state.customTokenBalance}
-                        projects={this.state.projects}
-                        refetch={this.refetch}
-                    ></DerivativeTokenPopup>                
-                }
-
-                {this.state.toggleDestinationTokensPopup && (this.state.currentTokenSide === TOKEN_SIDES[0]) &&
+                {this.state.toggleDestinationTokensPopup && (this.state.sourceTokenData?.isWrappedToken === false) &&
                     <DestinationTokensPopup
                         chainId={this.context.chainIdNumber}
                         show={this.state.toggleDestinationTokensPopup}
