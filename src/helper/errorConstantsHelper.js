@@ -9,8 +9,8 @@ const errors = {
     'sourceTokenNotSelected': 'Source token not selected yet.',
     'destinationTokenNotSelected': 'Destination token not selected yet.',
     'metamask': {        
-        'walletNotFound': 'Metamask not found.',
-        'walletNotConnected': 'Wallet not connected to metamask',
+        'walletNotFound': 'Metamask is not installed.',
+        'walletNotConnected': 'Metamask wallet not connected',
         'networkNotFound': 'Unrecognized network. Adding network to metamask',
         'signMessageRequestPending': 'A sing message request is pending. Check metamask.',
         'signMessageRequestPendingOnBackAction': 'A sing message request is pending. Check metamask and decline request to go back.',

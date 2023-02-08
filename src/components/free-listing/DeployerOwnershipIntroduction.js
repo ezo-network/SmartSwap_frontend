@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import notificationConfig from "../../config/notificationConfig";
 import Lineimg from "../../assets/freelisting-images/line01.png";
 import Badge from "../../assets/freelisting-images/imgIco02.png";
+import errors from '../../helper/errorConstantsHelper';
 const $ = window.$;
 
 export default class DeployerOwnershipIntroduction extends PureComponent {
@@ -18,7 +19,7 @@ export default class DeployerOwnershipIntroduction extends PureComponent {
     try {
       const walletConnected = await this.context.connectWallet();
       if (walletConnected === false) {
-        notificationConfig.error('Matamask wallet not connected');
+        notificationConfig.error(errors.metamask.walletNotConnected);
       }
     } catch (error) {
       console.error('connectWallet', error.message)

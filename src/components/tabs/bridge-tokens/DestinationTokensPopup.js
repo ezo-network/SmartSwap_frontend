@@ -63,7 +63,7 @@ export default class DestinationTokensPopup extends PureComponent {
 
     setDestinationToken = (tokenSymbol, chainId, chain, address) => {
         if(this._componentMounted === true){
-            this.props.destinationTokenSelectedCallback(tokenSymbol, chainId, chain, address);
+            this.props.destinationTokenSelectedCallback(tokenSymbol, chainId, chain, address, true);
             this.props.closePopupCallback();
         }
     }
