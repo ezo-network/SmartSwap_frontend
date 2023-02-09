@@ -243,7 +243,7 @@
 
 .smartSwap .menuSideBar .footer-Bottom .footer-Logo { display: inline-block; margin-bottom: 5px; } 
 
-.smartSwap .menuSideBar .footer-Bottom .footer-Logo img { width: 198px; } 
+.smartSwap .menuSideBar .footer-Bottom .footer-Logo img { max-width: 135px; } 
 
 .smartSwap .menuSideBar .footer-Bottom p { font-size: 12px; line-height: 18px; font-weight: 400; color: #a6a2b0; } 
 
