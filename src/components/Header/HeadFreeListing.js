@@ -24,7 +24,7 @@ export class CounterBox extends PureComponent {
     render() {
         return (
             <>
-                <a href="#" onClick={(e) => e.preventDefault()} className="jackpot cursor"><img src={JPico} alt='Jackpot' /> </a>
+                {/* <a href="#" onClick={(e) => e.preventDefault()} className="jackpot cursor"><img src={JPico} alt='Jackpot' /> </a>
                 <Rtimer>
                     <span>1</span>
                     <span>1</span>:
@@ -37,7 +37,7 @@ export class CounterBox extends PureComponent {
                     <span>3</span>
                     <span>4</span>
                 </Rtimer>
-                <a href="#" onClick={(e) => e.preventDefault()} className="link01 hideOnMobile cursor">Rewards program</a>
+                <a href="#" onClick={(e) => e.preventDefault()} className="link01 hideOnMobile cursor">Rewards program</a> */}
             </>
         );
     }
@@ -76,7 +76,7 @@ export default class HeadFreeListing extends PureComponent {
                     <Logo> <img src={LogoM} alt="logo" /></Logo>
 
                     <Nav className="deskNav">
-                        <Link to=''>SmartExtension</Link> <span>|</span>
+                        <Link className="c-soon" to=''>SmartExtension</Link> <span>|</span>
                         <Link to='/freelisting'>SmartBridge</Link><span>|</span>
                         <Link className="active" to='/'>SmartSwap</Link><span>|</span>
                         <Link className="c-soon" to=''>SmartPayment</Link><span>|</span>

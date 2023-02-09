@@ -144,17 +144,7 @@ export default class HowItWorks extends PureComponent {
 
                 </div>
 
-
-
-
-
-
-
-
-
-
-
-                <a href="#" onClick={(e) => { e.preventDefault(); this.props.closePopup("HowItWorks") }} className="close-Icon"></a>
+ <a href="#" onClick={(e) => { e.preventDefault(); this.props.closePopup("HowItWorks") }} className="close-Icon"></a>
             </div>
         )
 

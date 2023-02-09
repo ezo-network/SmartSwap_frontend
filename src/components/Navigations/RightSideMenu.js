@@ -215,7 +215,7 @@ export default class RightSideMenu extends PureComponent {
               <div className="msb-Linkbox02">
                 <a
                   href="#" onClick={(ev) => { ev.preventDefault();}}
-                  className="active"
+                  className="active" style={{display: "none"}}
                   data-toggle="n-collapse"
                   data-target="#msbSL-06"
                   aria-expanded="false"
@@ -224,7 +224,7 @@ export default class RightSideMenu extends PureComponent {
                   About <i className="fas fa-caret-down"></i>
                 </a>
                 <div className="msbLinkSubBox n-collapse in" id="msbSL-06">
-                  <a
+                  {/* <a
                     href="#"
                     onClick={(ev) => {
                       ev.preventDefault();
@@ -232,7 +232,7 @@ export default class RightSideMenu extends PureComponent {
                     }}
                   >
                     About Us
-                  </a>
+                  </a> */}
                   <a href="#" onClick={(ev) => { ev.preventDefault();}}>Privacy Policy</a>
                   <a href="#" onClick={(ev) => { ev.preventDefault();}}>Terms of Use</a>
                   <a href="#" onClick={(ev) => { ev.preventDefault();}}>Cookie Policy</a>
@@ -277,13 +277,13 @@ export default class RightSideMenu extends PureComponent {
                     <img src="images/menu-rb-logo.png" alt="" />
                   </a>
                 </div>
-                <p>© 2021 SmartSwap Exchange All rights reserved</p>
+                <p>© 2023 SmartSwap Exchange All rights reserved</p>
                 <div className="footer-Text">
                   <p className="pob">
                     Powered by <img src="images/atomFoundation-logo.png" alt="" />
                   </p>
                   <p>
-                    Atom Foundation is a Decentralized Financial (DeFi) liquidity ecosystem powered by proprietary protocols which underlines zero volatility platforms, a NFT (Non-fungible token) and altcoin marketplace with downside protection, post dex offerings (PDO), a dynamic AMM with multiple swap exchanges, cross network aggregation, as well as a CBDC alternative and price support game theoretic model.{" "}
+                  Qwantum Finance is a DeFi ecosystem powered by brilliant decentralized protocols designed to create an efficient financial system based on quantum finance methods. Qwantum’s methods reduce investment risk and increase liquidity to illiquid and risky assets.{" "}
                   </p>
                 </div>
               </div>

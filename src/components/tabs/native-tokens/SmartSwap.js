@@ -902,7 +902,7 @@ export default class SmartSwap extends PureComponent {
                                 <span className="color-green">~30 seconds</span>
                                 &nbsp;
                                 <i className="help-circle">
-                                    <i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Help Text"></i>
+                                    <i className="fas cust-fas fa-question-circle protip" data-pt-gravity="top" data-pt-title="Slippage free trades remain pending until there is a peer to peer match. This mean the trade time can vary greatly. For instant trades, use the Slippage option or click expedite during a pending trade."></i>
                                 </i>
                             </p>
                             {/* <p className="font-11 color-light-n">Estimated swap time: <span className="color-green">Instant</span></p> */}
