@@ -50,8 +50,8 @@ class ExpediteContract extends EventEmitter {
             const tx = {
                 to: to,
                 data: payload,
-                gasPrice: web3.utils.toHex(gasPrice),
-                gasLimit: web3.utils.toHex(gasLimit),
+                gasPrice: web3.utils.toHex(gasPrice.toString()),
+                gasLimit: web3.utils.toHex(gasLimit.toString()),
                 value: web3.utils.toHex(value)
             };
 
