@@ -213,7 +213,7 @@ export default class RightSideMenu extends PureComponent {
                 </div>
               </div>
               <div className="msb-Linkbox02">
-                <a
+                {/* <a
                   href="#" onClick={(ev) => { ev.preventDefault();}}
                   className="active"
                   data-toggle="n-collapse"
@@ -222,9 +222,9 @@ export default class RightSideMenu extends PureComponent {
                   aria-controls="msbSL-06"
                 >
                   About <i className="fas fa-caret-down"></i>
-                </a>
+                </a> */}
                 <div className="msbLinkSubBox n-collapse in" id="msbSL-06">
-                  <a
+                  {/* <a
                     href="#"
                     onClick={(ev) => {
                       ev.preventDefault();
@@ -232,7 +232,7 @@ export default class RightSideMenu extends PureComponent {
                     }}
                   >
                     About Us
-                  </a>
+                  </a> */}
                   <a href="#" onClick={(ev) => { ev.preventDefault();}}>Privacy Policy</a>
                   <a href="#" onClick={(ev) => { ev.preventDefault();}}>Terms of Use</a>
                   <a href="#" onClick={(ev) => { ev.preventDefault();}}>Cookie Policy</a>

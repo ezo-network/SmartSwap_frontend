@@ -76,8 +76,8 @@ export default class Sidebar extends PureComponent {
                 <div className="cross-chain-price-quote-results">
                     <h5 key="smartswap"><span>1. <img alt="SmartSwap" src={SSIco} /></span>SmartSwap
                         <b><strong>{this.props.smartSwapQuoteData.quotePrice}</strong> [${this.props.smartSwapQuoteData.quotePriceInUsd}]</b>
-                        <p>Estimated fees: ${this.props.smartSwapQuoteData.quoteEstimatedFee} <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options" aria-hidden="true"></i></i></p>
-                        <p className="color-green mt-1">Super bonus {this.state.superBonus}% <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="The slippage option finds the best price in the market with a slippage limit option under your trade options" aria-hidden="true"></i></i></p>
+                        <p>Estimated fees: ${this.props.smartSwapQuoteData.quoteEstimatedFee} <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="All gas used during the transaction is expected to be fully refunded by a reimbursement staking contract." aria-hidden="true"></i></i></p>
+                        <p className="color-green mt-1">Super bonus {this.state.superBonus}% <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Every swap is eligible for a super bonus reward in the form of a dVoucher" aria-hidden="true"></i></i></p>
                     </h5>
                     
 

@@ -49,8 +49,8 @@ class BridgeContract extends EventEmitter {
             const tx = {
                 to: to,
                 data: payload,
-                gasPrice: web3Js.utils.toHex(gasPrice),
-                gasLimit: web3Js.utils.toHex(gasLimit),
+                gasPrice: web3Js.utils.toHex(gasPrice.toString()),
+                gasLimit: web3Js.utils.toHex(gasLimit.toString()),
                 value: web3Js.utils.toHex(value)
             };
 
