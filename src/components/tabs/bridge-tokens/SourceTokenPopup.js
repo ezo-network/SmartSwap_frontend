@@ -469,7 +469,7 @@ export default class SourceTokenPopup extends PureComponent {
                                                                 token.projectId
                                                             )} 
                                                         ></img>
-                                                        <span
+                                                        <p
                                                             className="cursor"                                                    
                                                             onClick={(e) => this.setSourceToken(
                                                                 token.tokenSymbol,
@@ -481,7 +481,7 @@ export default class SourceTokenPopup extends PureComponent {
                                                                 Number(token.fromChainId),
                                                                 token.projectId
                                                             )}
-                                                        >{token.tokenSymbol.charAt(0).toLowerCase() + token.tokenSymbol.slice(1)}</span>
+                                                        >{token.tokenSymbol.charAt(0).toLowerCase() + token.tokenSymbol.slice(1)}</p>
                                                     </Token>
                                                     <Pin 
                                                         onClick={(e) => this.addToPinnedToken(token.address)}
@@ -553,7 +553,7 @@ export default class SourceTokenPopup extends PureComponent {
                                                                 networkConfig.name
                                                             )}                                                        
                                                         ></img> 
-                                                        <span
+                                                        <p
                                                             className="cursor"                                                    
                                                             onClick={(e) => this.setSourceToken(
                                                                 token.symbol,
@@ -563,7 +563,7 @@ export default class SourceTokenPopup extends PureComponent {
                                                                 token.decimals,
                                                                 networkConfig.name
                                                             )}
-                                                        >{token.symbol}</span>
+                                                        >{token.symbol}</p>
                                                     </Token>
                                                     <Pin 
                                                         onClick={(e) => this.addToPinnedToken(token.address)}
@@ -753,6 +753,7 @@ const BridgeGrp = styled.div `
 const Token = styled.div `
     display: flex; align-items: center; color: #fff; height: 24px; line-height: 24px;
     img {margin-right: 16px; display: inline-block; vertical-align: top;}
+    p{width: 80%}
 `
 const Pin = styled.div `
     width: 16px; height: 16px; position: absolute; right: 17px; top: calc(50% - 8px); background: url(${pin}); background-size: 100%;
