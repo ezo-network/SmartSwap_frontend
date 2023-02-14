@@ -114,7 +114,8 @@ export default class FreeListing extends PureComponent {
               window.history.replaceState({}, document.title)
               this.setState({
                 addNewBridge: true,
-                actionAfterBridgeCreated: this.props.location.state?.actionAfterBridgeCreated
+                actionAfterBridgeCreated: this.props.location.state?.actionAfterBridgeCreated,
+
               })
             }
           });
@@ -213,6 +214,7 @@ export default class FreeListing extends PureComponent {
               return {
                 isSourceTokenSelected: true,
                 sourceTokenData,
+                filteredDestinationNetworks: []
               };
             });
           }
@@ -342,7 +344,11 @@ export default class FreeListing extends PureComponent {
           console.error(error)
         }
 
-        await this.isProjectExist(this.state.sourceTokenData.chainId, this.state.sourceTokenData.address);
+        await this.isProjectExist(this.state.sourceTokenData.chainId, this.state.sourceTokenData.address).then(() => {
+          this.setState({
+            filteredDestinationNetworks: []
+          });
+        });
       }
 
     } catch (error) {
@@ -571,6 +577,8 @@ export default class FreeListing extends PureComponent {
               onDestinationNetworksSelected={this.destinationNetworksSelectedCallback}
               onFetchWrappedTokens={this.fetchWrappedTokens}
               wrappedTokens={this.state.wrappedTokens}
+              preSelectedDestinationNetwork={this.props.location.state?.destinationNetworkData}
+              filteredDestinationNetworks={this.state.filteredDestinationNetworks}
             />
           }
 

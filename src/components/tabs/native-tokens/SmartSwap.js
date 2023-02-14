@@ -594,8 +594,23 @@ export default class SmartSwap extends PureComponent {
                 const value = bigInt(amountToSwap).add(totalFee);
                 console.log('swap value without fee', amountToSwap.toString());
                 console.log('swap value', value.toString());
+                await this.getBalance();
+                const balance = bigInt(numberToBn(this.userBalance, decimalPoints, true));
 
 
+                console.log({
+                    'this.userBalance': this.userBalance,
+                    balance: balance,
+                    value: value
+                });
+
+                if(value.gt(balance)){
+                    notificationConfig.error("Insufficient funds");
+                    this.setState({
+                        btnClicked: false
+                    });
+                    return;                  
+                }
 
                 // amountA = amountToSwap
                 // value = amountToSwap + totalFee (processingFee + companyFees + reimbursementFees)
@@ -1187,8 +1202,19 @@ export default class SmartSwap extends PureComponent {
                                 <span>UNSUPPORTED NETWORK</span>
                             </button>
                         }
+
                         {   this.context.isAuthenticated === true && defaultFromSelectOption.value === this.context.chainIdNumber &&
-                            <button disabled={this.state.btnClicked} className="native-btn ani-1 connect" onClick={(e) => this.swap()}>
+                            <button 
+                                disabled={this.state.btnClicked} 
+                                className={`
+                                    native-btn 
+                                    ani-1 
+                                    connect 
+                                    ${ this.state.btnClicked ? 'cross-over-processing' : '' }
+                                    ${this.userBalance == 0 ? 'connect-wallet no-clickable' : ''}
+                                `} 
+                                onClick={(e) => this.swap()
+                            }>
                                 <span className="currency">
                                     <img
                                         style={{filter: 'none'}}
@@ -1197,7 +1223,7 @@ export default class SmartSwap extends PureComponent {
                                     ></img>
                                 </span>
 
-                                {this.state.btnClicked === false ? 'SWAP' : 'Swapping'}
+                                {this.state.btnClicked === false ? 'CORSS OVER' : 'Swapping'}
                                 {this.state.btnClicked === true &&
                                 <LoopCircleLoading
                                     height={"20px"}
@@ -1226,7 +1252,10 @@ export default class SmartSwap extends PureComponent {
                     <div className="success-msg">
                         <i className="fas fa-check"></i>
                         <h4>Swap sent successfully</h4>
-                        <p className="cursor" onClick={() => this.props.openLedger()}>Check the ledger below</p>
+                        <p className="cursor" onClick={() => this.props.openLedger()}>Check the ledger below</p> | 
+                        <p className="cursor">
+                            <a href="/" className="cursor color-light-n">Start another swap</a>
+                        </p>
                     </div>
                 }
             </>

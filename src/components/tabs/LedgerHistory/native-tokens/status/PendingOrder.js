@@ -177,9 +177,20 @@ export default class PendingOrder extends PureComponent {
                 <div className="ledger-box">
                     <div className="pending-text" style={{justifyContent: 'space-between'}}>
                         <div style={{display: 'flex'}}>
-                            Pending
+                            {(this.props.isExpedited === false && this.props.swapRequest.status === 'PENDING') && 
+                                <>
+                                    Pending
+                                </>
+                            }
+
+                            {(this.props.swapRequest.status !== 'PENDING' && this.props.swapRequest.status !== 'FULFILLED') && 
+                                <>
+                                    Swapping                                
+                                </>
+                            }
+                            
                             {this.state.btnClicked === false &&
-                            <div className="loader"></div>
+                                <div className="loader"></div>
                             }
                         </div>               
                         
@@ -227,10 +238,10 @@ export default class PendingOrder extends PureComponent {
                         }
                     </div>
                 </div>
-                <div className="pending-bottom">
+                {/* <div className="pending-bottom">
                     <i className="fas fa-cog color-green"></i>
                     <span>Wait until a match is found or cancel the transaction to redeem the 10 ETH pending to your wallet</span>
-                </div>
+                </div> */}
             </>
         )
     }

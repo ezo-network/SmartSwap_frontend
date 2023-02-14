@@ -110,7 +110,7 @@ class LedgerHistory extends PureComponent {
 			if(this._componentMounted){
 				const getDepositHistory = await this.getDepositTokensHistoryByWalletAddress();
 				const timeOutPromise = new Promise(function (resolve, reject) {
-					this.interval = setTimeout(resolve, 30000, 'Refetching deposit history');
+					this.interval = setTimeout(resolve, 5000, 'Refetching deposit history');
 				}.bind(this));
 		
 				Promise.all([getDepositHistory, timeOutPromise]).then(async (responses) => {

@@ -57,7 +57,7 @@ const defaultDestinationTokenData = {
 
 const initialState = {
     btnClicked: false,
-    btnAction: 'BRIDGE FOR FREE',
+    btnAction: 'CROSS OVER',
     sourceTokenData: {...defaultSourceTokenData},
     destinationTokenData: {...defaultDestinationTokenData},
     isSourceTokenSelected: false,
@@ -133,6 +133,26 @@ export default class BridgeSwap extends PureComponent {
                 });
             } else {
                 console.error(errors.metamask.walletNotFound);
+            }
+
+
+            if(this.props.preSelectedSourceTokenData !== undefined){
+                if(this.props.preSelectedSourceTokenData.chainId === this.context.chainIdNumber){
+                    await this.setSourceToken(
+                        this.props.preSelectedSourceTokenData?.name,
+                        this.props.preSelectedSourceTokenData?.chainId,
+                        this.props.preSelectedSourceTokenData?.chain,
+                        this.props.preSelectedSourceTokenData?.address,
+                        this.props.preSelectedSourceTokenData?.decimals,
+                        this.props.preSelectedSourceTokenData?.chainName
+                    ).then(() => {
+                        this.setState({
+                            isSourceTokenSelected: true,
+                            toggleDestinationTokensPopup: true
+                        });
+                        this.props.onResetLocationState();
+                    });
+                }
             }
         }
     }
@@ -844,15 +864,30 @@ export default class BridgeSwap extends PureComponent {
                 notificationConfig.error(errors.sourceTokenNotSelected);
                 return;
             }
+
             if(this.state.isDestinationTokenSelected === false){
                 notificationConfig.error(errors.destinationTokenNotSelected);
                 return;
             }
+
+            if(this.state.sourceTokenData.amount.length === 0){
+                notificationConfig.error("Enter amount to cross over");
+                return;                
+            }
+
+
             
+            if(this.state.sourceTokenData.amount.trim() === 0){
+                notificationConfig.error("Enter amount to cross over");
+                return;                                
+            }
+
+            console.log(this.state.sourceTokenData.amount.trim().toString());
+
             const decimalPoints = this.state.sourceTokenData.decimals;
             const pow = bigInt(10).pow(decimalPoints);
             const regExp = new RegExp("^-?\\d+(?:\\.\\d{0," + decimalPoints + "})?", "g"); // toFixed without rounding
-            let depositAmount = this.state.sourceTokenData.amount.toString().match(regExp)[0];
+            let depositAmount = (this.state.sourceTokenData.amount).trim().toString().match(regExp)[0];
             depositAmount = Number(depositAmount * pow.toJSNumber()).toFixed(0);
             depositAmount = bigInt(depositAmount).toString();
             depositAmount = Web3.utils.toBN(depositAmount);
@@ -1350,7 +1385,12 @@ export default class BridgeSwap extends PureComponent {
                                     onClick={
                                         () => this.depositTokens()
                                     }
-                                    className={`btn btn-primary ${this.state.isDestinationTokenSelected && this.state.isSourceTokenSelected ? 'can-bridge' : 'cant-bridge'}`}>
+                                    className={`
+                                        btn 
+                                        btn-primary 
+                                        ${this.state.isDestinationTokenSelected && this.state.isSourceTokenSelected && (this.state.sourceTokenData.amount).trim().toString().length > 0 ? 'can-bridge' : 'cant-bridge'}
+                                        ${this.state.btnAction !== 'CROSS OVER' ? 'cross-over-processing' : ''}
+                                    `}>
                                     <div className="btn-container">
                                         <img
                                             src={'/images/free-listing/chains/' + (sourceNetworkConfig?.chain + '.png').toLowerCase()}
@@ -1370,7 +1410,7 @@ export default class BridgeSwap extends PureComponent {
                                 this.state.isSourceTokenSelected &&
                                 <button className="btn btn-primary">{`Insufficient ${this.state.sourceTokenData.symbol} balance`}</button>
                             } */}
-                        <p>Bridge to any EVM chain for free with 1:1 derivative token</p>
+                        <p>Bridge to any EVM chain for FREE with 1:1 derivative token</p>
                     </div>
                 </div>
                 }

@@ -20,17 +20,29 @@ export default class Home extends PureComponent {
     this.handleClick = this.handleClick.bind(this);
     this.state = {
       btnClick: false,
-      sideBar: false
+      sideBar: false,
+      locationState: undefined
     };
   }
+
+  componentDidMount = async () => {
+    if(this.props.location.state !== undefined){
+      this.setState({
+        locationState: this.props.location.state
+      });
+      window.history.replaceState({}, document.title);
+    }
+  };
 
   componentWillMount = async () => {
 
   };
 
-  componentDidMount = async () => {
-
-  };
+  resetLocationState = () => {
+    this.setState({
+      locationState: undefined
+    });
+  }
 
   handleClick() {
     if (this.state.sideBar === true) {
@@ -67,7 +79,7 @@ export default class Home extends PureComponent {
                     Best cross-chain rates available with slippage or zero slippage transactions with P2P and CeDeFi
                   </div>
                   <>
-                    <SmartEcoSystemTabs></SmartEcoSystemTabs>
+                    <SmartEcoSystemTabs locationState={this.state.locationState} onResetLocationState={this.resetLocationState}></SmartEcoSystemTabs>
                     <CTAButtons2></CTAButtons2>
                   </>
 

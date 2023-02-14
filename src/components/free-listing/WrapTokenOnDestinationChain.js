@@ -295,10 +295,12 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
 
               // redirect after bridge created home on bridge tab
               if(this.props.actionAfterBridgeCreated !== ''){
-                this.setState({
-                  redirect: true
+                await this.switchNetwork(Number(this.props.selectedSourceTokenData.chainId)).then(() => {
+                  this.setState({
+                    redirect: true  
+                  });
                 });
-              } 
+              }
             }
           }
           
@@ -314,8 +316,10 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
             
             // redirect after bridge created home on bridge tab
             if(this.props.actionAfterBridgeCreated !== ''){
-              this.setState({
-                redirect: true
+              await this.switchNetwork(Number(this.props.selectedSourceTokenData.chainId)).then(() => {
+                this.setState({
+                  redirect: true
+                });
               });
             }
           }
@@ -525,7 +529,8 @@ export default class WrapTokenOnDestinationChain extends PureComponent {
             <Redirect
               to={{
                 pathname: "/",
-                search: `?active-tab=${this.props.actionAfterBridgeCreated}`
+                search: `?active-tab=${this.props.actionAfterBridgeCreated}`,
+                state: { selectedSourceTokenData: this.props.selectedSourceTokenData }
               }}
               push={true}
             />

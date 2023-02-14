@@ -21,6 +21,16 @@ export default class SelectDestinationChains extends PureComponent {
     this._componentMounted = true;
     if(this._componentMounted){
       await this.props.onFetchWrappedTokens();
+
+      if(this.props.filteredDestinationNetworks.length > 0){
+        this.setState({
+          selectedNetworks: this.props.filteredDestinationNetworks
+        });        
+      } else if (this.props.preSelectedDestinationNetwork !== undefined){
+        this.setState({
+          selectedNetworks: [this.props.preSelectedDestinationNetwork?.chainId]
+        });
+      }
     }
   }
 

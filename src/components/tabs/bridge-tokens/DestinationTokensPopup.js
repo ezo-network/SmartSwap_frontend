@@ -266,7 +266,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                                     network['wrappedTokenAddress']
                                                                 ) : e.preventDefault()}
                                                             ></img>
-                                                            <span
+                                                            <p
                                                                 className="cursor"                                                                
                                                                 onClick={(e) => network['isBridgeExistOnChain'] === true ? this.setDestinationToken(
                                                                     network['wrappedTokenSymbol'],
@@ -276,7 +276,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                                 ) : e.preventDefault()}                                                            
                                                             >
                                                             {network.name}
-                                                            </span>
+                                                            </p>
                                                         </Token>
                                                         <Pin
                                                             onClick={(e) => this.addToPinnedNetwork(network.chainId)}
@@ -451,6 +451,7 @@ const BridgeGrp = styled.div`
 const Token = styled.div`
     display: flex; align-items: center; color: #fff; height: 24px; line-height: 24px;
     img {margin-right: 16px; display: inline-block; vertical-align: top;}
+    p{width: 80%}
 `
 const Pin = styled.div`
     width: 16px; height: 16px; position: absolute; right: 17px; top: calc(50% - 8px); background: url(${pin}); background-size: 100%;

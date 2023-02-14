@@ -212,6 +212,7 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                     closeSideBar={() => this.closeSideBar()}
                                     openLedger={() => this.openLedger()}
                                     setNetworkList={this.setNetworkList}
+                                    onResetLocationState={this.props.onResetLocationState}
                                 ></NativeSwap>
                             </div>
                             )}
@@ -233,6 +234,8 @@ export default class SmartEcoSystemTabs extends PureComponent {
                                         onWrapTokenListFetched={this.setWrappedTokenList}
                                         openLedger={() => this.openLedger()}
                                         toggleIsWrapTokenDeposit={this.toggleIsWrapTokenDeposit}
+                                        preSelectedSourceTokenData={this.props.locationState?.selectedSourceTokenData !== undefined ? this.props.locationState?.selectedSourceTokenData : undefined}
+                                        onResetLocationState={this.props.onResetLocationState}
                                     ></BridgeSwap>
                                 </div>
                             )}
