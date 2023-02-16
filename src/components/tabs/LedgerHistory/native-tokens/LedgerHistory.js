@@ -69,25 +69,24 @@ class LedgerHistory extends PureComponent {
 
     getLedgerByAccountAddress = async() => {
         try {
-            const {account, connectWallet} = this.context;
+            const {account} = this.context;
     
-            if(account === null){
-                await connectWallet();
+            if(account !== null){
+                const {response, code, error} = await SmartSwapApiHelper.getLedgerByAccountAddress(account);
+                
+                if(code !== 200){
+                    console.error("getLedgerByAccountAddress", response, code, error);
+                }
+        
+                if(code === 200){
+                    if(this._componentMounted){
+                        this.setState({
+                            swapRequests: response?.data
+                        })
+                    }            
+                }
             }
     
-            const {response, code, error} = await SmartSwapApiHelper.getLedgerByAccountAddress(account);
-            
-            if(code !== 200){
-                console.error("getLedgerByAccountAddress", response, code, error);
-            }
-    
-            if(code === 200){
-                if(this._componentMounted){
-                    this.setState({
-                        swapRequests: response?.data
-                    })
-                }            
-            }
         } catch(error){
             console.error('getLedgerByAccountAddress', error.message);
         }

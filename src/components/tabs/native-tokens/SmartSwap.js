@@ -101,6 +101,7 @@ export default class SmartSwap extends PureComponent {
                 // set interval one time - runs every 30 secs
                 this.interval = setInterval(async() => {
                     await this.estimateGasAndFees();
+                    await this.getBalance();
                 }, 30000);
 
                 // detect Network account change
@@ -351,38 +352,78 @@ export default class SmartSwap extends PureComponent {
     }
 
     setMaxAmount = async() => {
-        if(this.props.selectedInputMode === this.props.inputModes[0]){
-            const networkConfig = _.find(this.props.networks, { chainId: Number(this.context.chainIdNumber) });
-            if(networkConfig !== undefined){
-                const rate = _.find(this.props.tokensUsdPrice, {chain: networkConfig.chain});
-                if(rate !== undefined){
-                    // console.log({
-                    //     calc: "setMaxAmount dollar mode",
-                    //     amountToSwap: this.userBalance * rate.value,
-                    //     estimatedAmountToSwap: this.userBalance
-                    // });
-                    this.setState({
-                        amountToSwap: toFixedWithoutRounding(numberExponentToLarge(this.userBalance * rate.value), 2),
-                        estimatedAmountToSwap: this.userBalance
-                    }, async() => {
-                        this.debouncedSmartswapPriceQuote();
-                    });
+        const networkConfig = _.find(this.props.networks, { chainId: Number(this.context.chainIdNumber) });
+        
+        if(networkConfig !== undefined){      
+            const decimalPoints = networkConfig.nativeCurrencyDecimals;
+            let userBalance = this.userBalance;
+            console.log('userBalance', userBalance);            
+            console.log('smartSwapContracts', networkConfig.smartSwapContracts);
+            const smartSwapContract = _.find(networkConfig.smartSwapContracts, { toChainId: this.state.toChainId });
+            if(smartSwapContract === undefined){
+                notificationConfig.error("Smartswap doesn't configured for this pair yet");
+                return;
+            }
+
+            console.log('swap smartSwapContract', smartSwapContract);
+            const smartSwapContractInstance = new SmartSwapContract(this.context.web3, this.context.account, smartSwapContract.address);
+            console.log('swap smartSwapContractInstance', smartSwapContractInstance);
+            const reimbursementContractInstance = new NewReimbursementContract(this.context.web3, this.context.account, networkConfig.reimbursementContractAddress);
+            console.log('swap reimbursementContractInstance', reimbursementContractInstance);                
+            let processingFee = await this.estimateProcessingFees();
+            console.log('swap processingFee', processingFee);
+            const companyFeeRatio = await smartSwapContractInstance.getCompanyFeeRatio();
+            console.log('swap companyFeeRatio', companyFeeRatio);
+            const companyFee = ((userBalance * companyFeeRatio) / 1000);
+            console.log('swap companyFee from amount', companyFee);
+            const reimbursementFeeRatio = await reimbursementContractInstance.getLicenseeFee(networkConfig.licenseeAddress, smartSwapContract.address);
+            console.log('swap reimbursementFeeRatio', reimbursementFeeRatio);
+            const reimbursementFee = ((userBalance * reimbursementFeeRatio) / 1000);
+            console.log('swap reimbursementFee from amount', reimbursementFee);
+            const fee = companyFee + reimbursementFee;
+            console.log('swap fee', fee.toString());
+            const totalFee = Number(processingFee) + Number(fee);
+            console.log('totalFee', totalFee.toString());
+            
+            if(networkConfig?.chain === 'ETH' || networkConfig?.chain === 'BSC'){
+                userBalance = Number(userBalance) - ((Number(userBalance) * 0.2) / 100);
+            } else {
+                userBalance = Number(userBalance) - ((Number(userBalance) * 2) / 100);
+            }
+
+            userBalance = Number(userBalance) - Number(totalFee);
+
+            console.log("userBalance", userBalance);
+
+            if(this.props.selectedInputMode === this.props.inputModes[0]){
+                const networkConfig = _.find(this.props.networks, { chainId: Number(this.context.chainIdNumber) });
+                if(networkConfig !== undefined){
+                    const rate = _.find(this.props.tokensUsdPrice, {chain: networkConfig.chain});
+                    if(rate !== undefined){
+                        // console.log({
+                        //     calc: "setMaxAmount dollar mode",
+                        //     amountToSwap: this.userBalance * rate.value,
+                        //     estimatedAmountToSwap: this.userBalance
+                        // });
+                        this.setState({
+                            amountToSwap: toFixedWithoutRounding(numberExponentToLarge(userBalance * rate.value), 2),
+                            estimatedAmountToSwap: userBalance
+                        }, async() => {
+                            this.debouncedSmartswapPriceQuote();
+                        });
+                    }
                 }
             }
-        }
+            
+            if(this.props.selectedInputMode === this.props.inputModes[1]){         
+                this.setState({
+                    amountToSwap: userBalance,
+                    estimatedAmountToSwap: userBalance
+                }, async() => {
+                    this.debouncedSmartswapPriceQuote();
+                });
+            }
 
-        if(this.props.selectedInputMode === this.props.inputModes[1]){
-            // console.log({
-            //     calc: "setMaxAmount token amount mode",
-            //     amountToSwap: this.userBalance,
-            //     estimatedAmountToSwap: this.userBalance
-            // });            
-            this.setState({
-                amountToSwap: this.userBalance,
-                estimatedAmountToSwap: this.userBalance
-            }, async() => {
-                this.debouncedSmartswapPriceQuote();
-            });
         }
     }
 
@@ -465,7 +506,7 @@ export default class SmartSwap extends PureComponent {
             return;
         }
 
-        await this.context.connectWallet();
+        //  await this.context.connectWallet();
 
         const fromNetworkConfig = _.find(this.props.networks, {
             chainId: this.context.chainIdNumber
@@ -1089,7 +1130,7 @@ export default class SmartSwap extends PureComponent {
                                 {/* <p className="form-label font-normal mb-0">~ $39,075</p> */}
                                 <p className="form-label font-normal mb-0">
                                     Balance: {this.state.userBalance} {defaultFromSelectOption.nativeTokenSymbol}&nbsp;
-                                    <span onClick={(e) => this.setMaxAmount()} className="color-green">MAX</span>
+                                    <span onClick={(e) => this.setMaxAmount()} className="color-green cursor">MAX</span>
                                 </p>
                             </div>
                         </div>
@@ -1223,7 +1264,7 @@ export default class SmartSwap extends PureComponent {
                                     ></img>
                                 </span>
 
-                                {this.state.btnClicked === false ? 'CORSS OVER' : 'Swapping'}
+                                {this.state.btnClicked === false ? 'CROSS OVER' : 'Swapping'}
                                 {this.state.btnClicked === true &&
                                 <LoopCircleLoading
                                     height={"20px"}
