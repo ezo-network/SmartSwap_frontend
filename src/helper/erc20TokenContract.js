@@ -67,6 +67,31 @@ class ERC20TokenContract extends EventEmitter {
         }
     }
 
+    async isTokenOwner(responseCallback) {
+        try {
+            
+            const isContractExist = await this.isContractExist();
+
+            if(isContractExist){
+                const owner = await this.contractInstance.owner();
+                if(ethers.utils.isAddress(owner) && (owner.toString().toLowerCase() === this.ownerAddress.toLowerCase())){
+                    responseCallback(true);
+                } else {
+                    responseCallback(false);
+                }
+            } else {
+                console.error({
+                    isTokenOwnerError: errors.erc20Errors.CONTRACT_NOT_FOUND('Token', this.contractAddress)
+                });
+            }
+        } catch(error){
+            console.error({
+                isTokenOwnerError: error.message
+            });
+            responseCallback(false);
+        }
+    }
+
     allowance = async(successCb, errorCb) => {
         try {
             const isContractExist = await this.isContractExist();

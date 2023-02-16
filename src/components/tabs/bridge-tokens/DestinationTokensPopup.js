@@ -8,6 +8,7 @@ import pinAct from "../../../assets/images/pin.png";
 import pin from "../../../assets/images/pin-u.png";
 import pinDeact from "../../../assets/images/pind-d.png";
 import {textMasking, goToExplorer} from "../../../helper/utils";
+import ERC20TokenContract from "../../../helper/erc20TokenContract";
 const wrapTokenSymbolPrefix = process.env.REACT_APP_WRAP_TOKEN_SYMBOL_PREFIX;
 
 export default class DestinationTokensPopup extends PureComponent {
@@ -18,15 +19,37 @@ export default class DestinationTokensPopup extends PureComponent {
             currentPageNumber: 1,
             filteredChain: "",
             chainSortOrder: 'asc',
-            pinnedNetworks: []
+            pinnedNetworks: [],
+            canClaimTokenOwnership: false
         };
     }
 
-    componentDidMount() {
+    componentDidMount = async() => {
         console.log('DestinationTokensPopup mounted');
         this._componentMounted = true;
 		if(this._componentMounted === true){
-            
+            // check for allowence and approval
+            const networkConfig = _.find(this.props.networks, {chainId: this.context.chainIdNumber});
+
+            if(networkConfig !== undefined){
+                const erc20TokenContract = new ERC20TokenContract(
+                    this.context.web3,
+                    this.context.account,
+                    this.props.selectedSourceToken.address,
+                    networkConfig.bridgeContractAddress
+                );
+
+                await erc20TokenContract.isTokenOwner((result) => {
+                    console.log({
+                        isTokenOwner: result
+                    });
+                    if(result === true){
+                        this.setState({
+                            canClaimTokenOwnership: result
+                        });
+                    }
+                });            
+            }
         }
     }
 
@@ -130,7 +153,6 @@ export default class DestinationTokensPopup extends PureComponent {
                 network['isBridgeExistOnChain'] = wrappedToken === undefined ? false : true;
                 network['wrappedTokenAddress'] = wrappedToken !== undefined ? wrappedToken.address : undefined;
                 network['wrappedTokenSymbol'] = wrappedToken !== undefined ? wrappedToken.tokenSymbol : undefined;
-                network['isSmartContractOwner'] = wrappedToken !== undefined ? (wrappedToken.creatorAddress === (this.context.account).toLowerCase() ? true : false) : false;
                 finalFilteredNetworks.push(network);
             }
         });
@@ -315,7 +337,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                         }
                                                     </Tcell>
                                                     <Tcell className="text-center">
-                                                        {network['isSmartContractOwner'] === true && 
+                                                        {this.state.canClaimTokenOwnership === true && 
                                                             <Link to={{
                                                                 pathname: "/freelisting",
                                                                 state: {
@@ -325,7 +347,7 @@ export default class DestinationTokensPopup extends PureComponent {
                                                                 <ButtonPrimary className='claim-depolyment-ownership'>Claim Ownership</ButtonPrimary>
                                                             </Link>
                                                         }
-                                                        {network['isSmartContractOwner'] === false && 
+                                                        {this.state.canClaimTokenOwnership === false && 
                                                             <>-</>
                                                         }
                                                     </Tcell>

@@ -73,25 +73,24 @@ class LedgerHistory extends PureComponent {
 
     getDepositTokensHistoryByWalletAddress = async() => {
         try {
-            const {account, chainIdNumber, connectWallet} = this.context;
+            const {account, chainIdNumber} = this.context;
     
-            if(account === null){
-                await connectWallet();
+            if(account !== null){
+                const {response, code, error} = await BridgeApiHelper.getDepositTokensHistoryByWalletAddress(account, chainIdNumber, this.props.isWrapTokenDeposit);
+    
+                if(code !== 200){
+                    console.error("getDepositTokensHistoryByWalletAddress", response, code, error);
+                }
+        
+                if(code === 200){
+                    if(this._componentMounted){
+                        this.setState({
+                            depositRequests: response
+                        })
+                    }            
+                }
             }
     
-            const {response, code, error} = await BridgeApiHelper.getDepositTokensHistoryByWalletAddress(account, chainIdNumber, this.props.isWrapTokenDeposit);
-
-            if(code !== 200){
-                console.error("getDepositTokensHistoryByWalletAddress", response, code, error);
-            }
-    
-            if(code === 200){
-                if(this._componentMounted){
-                    this.setState({
-                        depositRequests: response
-                    })
-                }            
-            }
         } catch(error){
             console.error('getDepositTokensHistoryByWalletAddress', error.message);
         }
