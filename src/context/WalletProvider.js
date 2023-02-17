@@ -37,12 +37,18 @@ const WalletProvider = React.memo((args) => {
     //console.log({ chainId, account, web3, isAuthenticated });
 
     React.useEffect(() => {
-        connectEagerly();
+        const provider = getProvider();
+        subscribeToEvents(provider);
         return () => {
-            const provider = getProvider();
             unsubscribeToEvents(provider);
         }
     }, []);
+
+    React.useEffect(() => {
+        if(isAuthenticated === true && account === null){
+            disconnectWallet();
+        }
+    }, [isAuthenticated, account]);
 
     const subscribeToEvents = (provider) => {
         if (provider && provider.on) {
@@ -95,6 +101,8 @@ const WalletProvider = React.memo((args) => {
         return chainId !== null ? Web3.utils.hexToNumber(chainId) : chainId;
     }
 
+    
+
     const getMaskedAccountAddress = () => {
         return account !== null ? textMasking(account, '.', 4, 5, 4) : account;
     }
@@ -129,10 +137,10 @@ const WalletProvider = React.memo((args) => {
 
     const disconnectWallet = () => {
         try {
-            setAccount(null);
-            setChainId(null);
             setAuthenticated(false);
-            setWeb3(null);
+            // setAccount(null);
+            // setChainId(null);
+            // setWeb3(null);
         } catch (e) {
             console.error({
                 disconnectWalletError: e
@@ -144,9 +152,7 @@ const WalletProvider = React.memo((args) => {
         const account = getNormalizeAddress(accounts);
         setAccount(account);
         if(account === null){
-            setChainId(null);
-            setAuthenticated(false);
-            setWeb3(null)
+            disconnectWallet();
         }
         console.log("[account changes]: ", getNormalizeAddress(accounts))
     }
@@ -180,7 +186,7 @@ const WalletProvider = React.memo((args) => {
                 maskedAccount: getMaskedAccountAddress(),
                 web3: web3,
                 disconnectWallet,
-                connectWallet,
+                connectWallet
             }}
         >
             {args.children}

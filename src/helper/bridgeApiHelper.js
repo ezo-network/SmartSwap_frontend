@@ -761,11 +761,11 @@ const BridgeApiHelper = {
     },
 
 
-    makeTransferWrapTokenOwnershipRequest: async (tokenSymbol = null, chain = null, chainId = null, requesterAddress = null, hashMessage = null) => {
+    makeTransferWrapTokenOwnershipRequest: async (tokenAddress = null, chain = null, chainId = null, requesterAddress = null, hashMessage = null) => {
         let response, error, code;
 
         if (
-            tokenSymbol == null
+            tokenAddress == null
             ||
             chain == null
             ||
@@ -790,7 +790,7 @@ const BridgeApiHelper = {
                 path: CONSTANT.API_ENDPOINTS.SMARTEXCHANGE_DATABASE_INSTANCE.BRIDGE_TOKENS.makeTransferWrapTokenOwnershipRequest,
                 method: 'POST',
                 data: {
-                    token: tokenSymbol,
+                    token: tokenAddress,
                     chain: chain,
                     chainId: chainId,
                     requesterAddress: requesterAddress,
