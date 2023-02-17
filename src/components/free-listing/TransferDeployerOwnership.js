@@ -100,7 +100,7 @@ export default class TransferDeployerOwnership extends PureComponent {
             if(wrappedToken !== null){
               const networkConfig = _.find(this.props.networks, { chainId: wrappedToken.toChainId });
               await BridgeApiHelper.makeTransferWrapTokenOwnershipRequest(
-                wrappedToken.tokenSymbol,
+                wrappedToken.address,
                 networkConfig.chain,
                 wrappedToken.toChainId,
                 this.context.account,

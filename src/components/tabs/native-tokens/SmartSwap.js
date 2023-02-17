@@ -86,7 +86,7 @@ export default class SmartSwap extends PureComponent {
             
             if(window?.ethereum !== undefined){
 
-                await this.connectWallet();
+                //await this.connectWallet();
     
                 const isSupportedNetwork = _.find(this.props.networks, {
                     chainId: this.context.chainIdNumber
@@ -173,6 +173,17 @@ export default class SmartSwap extends PureComponent {
                 const walletConnected = await wallet.connectWallet();
                 if(walletConnected === false){
                     notificationConfig.error(errors.metamask.walletNotConnected);
+                } else {
+                    const isSupportedNetwork = _.find(this.props.networks, {
+                        chainId: this.context.chainIdNumber
+                    });
+        
+                    if(isSupportedNetwork === undefined){
+                        await this.setDefaultChainIds(true);                
+                    } else {
+                        await this.setChainIds();
+                        await this.getBalance();
+                    }
                 }
             }
         } catch(error){
@@ -182,7 +193,7 @@ export default class SmartSwap extends PureComponent {
 
     setChainIds = async() => {
          // To network config - filter out from network then choose first element
-        await this.context.connectWallet();
+        //await this.context.connectWallet();
         
         const toNetworkConfig = (_.filter(this.props.networks, function(network) {
             return network.chainId !== this.context.chainIdNumber;
@@ -203,22 +214,26 @@ export default class SmartSwap extends PureComponent {
         } 
     }
 
-    setDefaultChainIds = async() => {
-        const fromNetworkConfig = _.find(this.props.networks, {chain: "ETH"});
-        const toNetworkConfig = _.find(this.props.networks, {chain: "BSC"});
-        if(this._componentMounted){
-            if(fromNetworkConfig !== undefined && toNetworkConfig !== undefined){
-                this.userBalance = 0;
-                this.setState({
-                    amountToSwap: 1,
-                    userBalance: 0,
-                    fromChainId: fromNetworkConfig.chainId,
-                    toChainId: toNetworkConfig.chainId
-                }, async() => {
-                    await this.smartswapPriceQuote();
-                    await this.estimateGasAndFees();
-                    await this.switchNetwork(fromNetworkConfig.chainId, toNetworkConfig.chainId);
-                });
+    setDefaultChainIds = async(switchNetworkRequired = false) => {
+        if(document.hidden === false){
+            const fromNetworkConfig = _.find(this.props.networks, {chain: "ETH"});
+            const toNetworkConfig = _.find(this.props.networks, {chain: "BSC"});
+            if(this._componentMounted){
+                if(fromNetworkConfig !== undefined && toNetworkConfig !== undefined){
+                    this.userBalance = 0;
+                    this.setState({
+                        amountToSwap: 1,
+                        userBalance: 0,
+                        fromChainId: fromNetworkConfig.chainId,
+                        toChainId: toNetworkConfig.chainId
+                    }, async() => {
+                        await this.smartswapPriceQuote();
+                        await this.estimateGasAndFees();
+                        if(switchNetworkRequired){
+                            await this.switchNetwork(fromNetworkConfig.chainId, toNetworkConfig.chainId);
+                        }
+                    });
+                }
             }
         }
     }
@@ -577,7 +592,7 @@ export default class SmartSwap extends PureComponent {
             this.setState({
                 btnClicked: true
             });
-            await this.connectWallet();
+            //await this.connectWallet();
             const {web3: web3Provider, chainIdNumber, account} = this.context;
             const {networks} = this.props;
             let {amountToSwap, estimatedAmountToSwap, toChainId} = this.state;
@@ -1224,7 +1239,7 @@ export default class SmartSwap extends PureComponent {
                         </div>
                     </div>
                     <div className="text-center ">
-                        {   this.context.isAuthenticated === false && 
+                        {   (this.context.isAuthenticated === false || (this.context.isAuthenticated === true && this.context.account === null)) &&
                             <button className="native-btn ani-1 connect-wallet" onClick={(e) => this.connectWallet()}>
                                 CONNECT YOUR WALLET
                             </button>
@@ -1244,7 +1259,7 @@ export default class SmartSwap extends PureComponent {
                             </button>
                         }
 
-                        {   this.context.isAuthenticated === true && defaultFromSelectOption.value === this.context.chainIdNumber &&
+                        {   this.context.isAuthenticated === true && defaultFromSelectOption.value === this.context.chainIdNumber && this.context.account !== null &&
                             <button 
                                 disabled={this.state.btnClicked} 
                                 className={`
@@ -1258,7 +1273,7 @@ export default class SmartSwap extends PureComponent {
                             }>
                                 <span className="currency">
                                     <img
-                                        style={{filter: 'none'}}
+                                        style={{filter: 'none', width: '30px'}}
                                         alt={defaultFromSelectOption.nativeTokenSymbol}
                                         src={defaultFromSelectOption.nativeTokenIcon}
                                     ></img>

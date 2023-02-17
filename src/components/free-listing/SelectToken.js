@@ -40,7 +40,7 @@ export default class SelectToken extends PureComponent {
     this._componentMounted = true;
     if(this._componentMounted){
       console.log('Screen2 mounted');
-      await this.context.connectWallet();
+      //await this.context.connectWallet();
       await this.filterTokenByWalletBalance();
     }
   }

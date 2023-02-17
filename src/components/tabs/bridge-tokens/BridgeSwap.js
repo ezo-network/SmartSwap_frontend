@@ -675,7 +675,7 @@ export default class BridgeSwap extends PureComponent {
 
                 
                 if (isTokenExist) {
-                    console.log("original token set");
+                    console.log("Original token");
                     console.log(`${index} ${isTokenExist.symbol}  ${isTokenExist.chainId} - ${token} - ${response.results.transformed[token]}`)
                     if (response.results.transformed[token] > 0) {
                         tokensBalances.push(isTokenExist);
@@ -690,8 +690,8 @@ export default class BridgeSwap extends PureComponent {
                     });
 
                     if(isWarpTokenExist){
-                        console.log("Wrap token set");
-                        console.log(`${index} ${isWarpTokenExist.symbol}  ${isWarpTokenExist.toChainId} - ${token} - ${response.results.transformed[token]}`)
+                        console.log("Wrap token");
+                        console.log(`${index} ${isWarpTokenExist.tokenSymbol}  ${isWarpTokenExist.toChainId} - ${token} - ${response.results.transformed[token]}`)
                         if (response.results.transformed[token] > 0) {
                             tokensBalances.push(isWarpTokenExist);
                             // this.setState(prevState => ({
@@ -1154,19 +1154,22 @@ export default class BridgeSwap extends PureComponent {
                 tokensWithBalance: []
             }, async() => {
 
-                await this.context.connectWallet();
+                //await this.context.connectWallet();
+                
+                await Promise.all([
+                    await this.getAllWrappedTokens()
+                ]);
 
-                const allTokens = [];
+                const [filterTokens, filteredWrappedTokens] = await Promise.all([
+                    _.filter(this.state.tokens, {
+                        chainId: this.context.chainIdNumber
+                    }),
+                    _.filter(this.state.wrappedTokens, {
+                        toChainId: this.context.chainIdNumber
+                    })
+                ]);
 
-                const filterTokens = _.filter(this.state.tokens, {
-                    chainId: this.context.chainIdNumber
-                });
-
-                const filteredWrappedTokens = _.filter(this.state.wrappedTokens, {
-                    toChainId: this.context.chainIdNumber
-                });
-
-                allTokens.push(...filterTokens, ...filteredWrappedTokens);
+                const allTokens = [...filterTokens, ...filteredWrappedTokens];
 
                 await this.aggregateTokenBalanceWithMultiCall(this.context.chainIdNumber, allTokens, this.context.account);
             });
@@ -1181,7 +1184,7 @@ export default class BridgeSwap extends PureComponent {
             this.setState({
                 tokensWithBalance: []
             }, async() => {
-                await this.context.connectWallet();
+                //await this.context.connectWallet();
                 const filteredWrappedTokens = _.filter(this.state.wrappedTokens, {
                     toChainId: this.context.chainIdNumber
                 });
@@ -1242,9 +1245,9 @@ export default class BridgeSwap extends PureComponent {
 
         let sourceNetworkConfig = _.find(this.state.networks, {chainId: this.context.chainIdNumber});
 
-        console.log({
-            sourceNetworkConfig: sourceNetworkConfig
-        });
+        // console.log({
+        //     sourceNetworkConfig: sourceNetworkConfig
+        // });
 
         if(sourceNetworkConfig === undefined){
             sourceNetworkConfig = {};
