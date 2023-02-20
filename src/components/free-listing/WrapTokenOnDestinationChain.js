@@ -671,7 +671,7 @@ const ProColBtn = styled.div `
   width: calc(50% - 36px);
   padding-left: 30px;
   button {
-    color:#fff; background-color:#0d0e13; width: 100%;  text-align:center; padding:18px 15px; border:2px solid #91dc27; font-size:18px; font-weight:700; -webkit-box-shadow: 0 0 12px 5px rgba(145,220,39,0.5); box-shadow: 0 0 12px 5px rgba(145,220,39,0.5);
+    color:#fff; background-color:#0d0e13; width: 100%;  text-align:center; padding:18px 15px; border:2px solid #fff; font-size:18px; font-weight:700; box-shadow: 0 0 12px 0 #ffffff90;
     &:hover{ background-color:#91dc27;}
   }
   .switch-network-alert {

@@ -198,15 +198,7 @@ export default class PendingOrder extends PureComponent {
                         <div disabled={this.state.btnClicked} onClick={
                             (e) => this.expedite(this.props.swapRequest?.txHash, this.props.swapRequest?.crossChainId)
                         } className="expedite-section cursor">
-                                <span style={{
-                                    padding: '5px', 
-                                    background: '#f8834d', 
-                                    color: '#fff', 
-                                    display: 'flex', 
-                                    alignContent: "center",
-                                    justifyContent: "space-between",
-                                    borderRadius: "3px"
-                                }}>
+                                <span className='expedite-btn'>
                                     {this.state.btnClicked === false &&
                                     <>
                                         Expedite
@@ -223,15 +215,7 @@ export default class PendingOrder extends PureComponent {
                         }
                         {(this.props.isExpedited || this.state.expedited) && 
                         <div className="expedite-section cursor">
-                                <span style={{
-                                    padding: '5px', 
-                                    background: '#f8834d', 
-                                    color: '#fff', 
-                                    display: 'flex', 
-                                    alignContent: "center",
-                                    justifyContent: "space-between",
-                                    borderRadius: "3px"
-                                }}>
+                                <span className='expedite-btn'>
                                     Expedited
                                 </span>
                         </div>         

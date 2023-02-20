@@ -1,4 +1,5 @@
 import { WalletContext, EthereumEvents } from '../../../context/WalletProvider';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import React, { PureComponent, lazy, Suspense } from "react";
 import {Link} from "react-router-dom";
 import Swap from "../../../../src/assets/images/swap-arrow.png";
@@ -1027,7 +1028,7 @@ export default class SmartSwap extends PureComponent {
 
         const chainOptions = ({ children, ...props }) => (
             <Option className={props.data.label === 'UNSUPPORTED' ? "hidden-option" : ""} {...props} value={props.data.value}>
-                <img
+                <LazyLoadImage
                     src={props.data.icon}
                     style={{ width: 15 }}
                     alt={props.data.label}
@@ -1039,7 +1040,7 @@ export default class SmartSwap extends PureComponent {
         
         const singleChain = ({ children, ...props }) => (
             <SingleValue {...props}>
-                <img
+                <LazyLoadImage
                     src={props.data.icon}
                     style={{ width: 20 }}
                     alt={props.data.label}
@@ -1051,7 +1052,7 @@ export default class SmartSwap extends PureComponent {
         
         const tokenOptions = ({ children, ...props }) => (
             <Option className={props.data.label === 'UNSUPPORTED' ? "hidden-option" : ""} {...props} value={props.data.value}>
-                <img
+                <LazyLoadImage
                     src={props.data.icon}
                     style={{ width: 15 }}
                     alt={props.data.label}
@@ -1063,7 +1064,7 @@ export default class SmartSwap extends PureComponent {
         
         const singleToken = ({ children, ...props }) => (
             <SingleValue {...props} value={props.data.value}>
-                <img
+                <LazyLoadImage
                     src={props.data.icon}
                     style={{ width: 20 }}
                     alt={props.data.label}
@@ -1157,7 +1158,7 @@ export default class SmartSwap extends PureComponent {
                                     this.swapDirection(defaultToSelectOption.value);
                                 }}
                             >
-                                <img width="22" src={Swap} alt="" />
+                                <LazyLoadImage width="22" src={Swap} alt="" />
                             </a>
                             <a className="green-arrow"
                                 href="#"
@@ -1166,7 +1167,7 @@ export default class SmartSwap extends PureComponent {
                                     this.swapDirection(defaultToSelectOption.value);
                                 }}
                             >
-                                <img width="22" src={Swap} alt="" />
+                                <LazyLoadImage width="22" src={Swap} alt="" />
                             </a>
                         </div>
                         <div className="flex-1 w-100-sm flex-auto-sm">
@@ -1272,11 +1273,11 @@ export default class SmartSwap extends PureComponent {
                                 onClick={(e) => this.swap()
                             }>
                                 <span className="currency">
-                                    <img
+                                    <LazyLoadImage
                                         style={{filter: 'none', width: '30px'}}
                                         alt={defaultFromSelectOption.nativeTokenSymbol}
                                         src={defaultFromSelectOption.nativeTokenIcon}
-                                    ></img>
+                                    ></LazyLoadImage>
                                 </span>
 
                                 {this.state.btnClicked === false ? 'CROSS OVER' : 'Swapping'}

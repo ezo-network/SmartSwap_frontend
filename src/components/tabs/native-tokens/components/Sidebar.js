@@ -1,4 +1,5 @@
 import React, { PureComponent, lazy, Suspense } from "react";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import Web3 from "web3";
 import _ from "lodash";
 import { LoopCircleLoading } from "react-loadingg";
@@ -74,7 +75,7 @@ export default class Sidebar extends PureComponent {
             <div className={`side-pannel ${this.props.showSidebar ? '' : 'hidden'}`}>
                 <h4>Best cross chain prices</h4>
                 <div className="cross-chain-price-quote-results">
-                    <h5 key="smartswap"><span>1. <img alt="SmartSwap" src={SSIco} /></span>SmartSwap
+                    <h5 key="smartswap"><span>1. <LazyLoadImage alt="SmartSwap" src={SSIco} /></span>SmartSwap
                         <b><strong>{this.props.smartSwapQuoteData.quotePrice}</strong> [${this.props.smartSwapQuoteData.quotePriceInUsd}]</b>
                         <p>Estimated fees: ${this.props.smartSwapQuoteData.quoteEstimatedFee} <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="All gas used during the transaction is expected to be fully refunded by a reimbursement staking contract." aria-hidden="true"></i></i></p>
                         <p className="color-green mt-1">Super bonus {this.state.superBonus}% <i className="help-circle"><i className="fas fa-question-circle protip" data-pt-position="top" data-pt-title="Every swap is eligible for a super bonus reward in the form of a dVoucher" aria-hidden="true"></i></i></p>
@@ -103,7 +104,7 @@ export default class Sidebar extends PureComponent {
                                 <h5 key={index+1}>
                                     <span>{index+2}.</span>
                                     <span className="provider-image">
-                                        <img alt={bridge.provider_name} src={bridge.provider_icon_url} />
+                                        <LazyLoadImage alt={bridge.provider_name} src={bridge.provider_icon_url} />
                                     </span>
                                     <span className="provider-name">
                                         {bridge.provider_name === 'anyswap' ? 'Multichain' : bridge.provider_name}   

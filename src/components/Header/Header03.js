@@ -1,9 +1,10 @@
 import React, { PureComponent } from "react";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import styled from 'styled-components';
 import { Link } from "react-router-dom";
 
-import LogoM from '../../assets/welcome/logo.png'
-import Logo2 from '../../assets/welcome/logo2.png'
+import LogoM from '../../assets/welcome/logo.webp'
+import Logo2 from '../../assets/welcome/logo2.webp'
 
 
 export default class Header03 extends PureComponent {
@@ -12,16 +13,14 @@ export default class Header03 extends PureComponent {
     this.state = { 
     };
   }
- 
- 
 
   render() {
     
     return (
         <>
         <LHead className="header wow fadeInDown">
-            <Logo><img src={LogoM} alt="logo" />
-            <img className="logo2" src={Logo2} alt="logo" /></Logo>
+            <Logo><LazyLoadImage src={LogoM} alt="logo" />
+            <LazyLoadImage className="logo2" src={Logo2} alt="logo" /></Logo>
 
             <RMbox>
                 {/* <a href="#" onClick={(e) => e.preventDefault()} class="link01" >Rewards program</a> */}

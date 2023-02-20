@@ -915,9 +915,9 @@ input { border-radius: 4px; }
 
 .bb-traHSection .trasaction-Box .trasaction-Status { font-size: 16px; color: #95c608; margin-bottom: 10px; } 
 
-.bb-traHSection .trasaction-Box .trasaction-Status.pending-Text { color: #91dc27; font-weight: 700; margin: 0; } 
+.bb-traHSection .trasaction-Box .trasaction-Status.pending-Text { color: #f43436 ; font-weight: 700; margin: 0; } 
 
-.bb-traHSection .trasaction-Box .trasaction-Status .icon-Box { display: inline-block; vertical-align: middle; margin-right: 15px; color: #95c608; font-size: 18px; } 
+.bb-traHSection .trasaction-Box .trasaction-Status .icon-Box { display: inline-block; vertical-align: middle; margin-right: 15px; color: #f43436 ; font-size: 18px; } 
 
 .bb-traHSection .trasaction-Box .pending-loader img { width: 40px; height: 40px; display: inline-block; vertical-align: middle; } 
 
@@ -2732,7 +2732,7 @@ p.withdrawOnContractAlert { color: #f43436; display: flex; width: 100%; flex-wra
 
 ul.tabs-n { margin: 0px; padding: 0px; list-style: none; display: block; } 
 
-ul.tabs-n li { background: #0d0e13; color: #a6a2b0; padding: 0px 18px; cursor: pointer; text-align: left; position: relative; width: 198px; height: calc(16.66% - 2px); display: flex; align-items: center; justify-content: flex-start; font-size: 16px; font-weight: bold; flex: 1; margin-bottom: 2px; } 
+ul.tabs-n li { background: #0d0e13; color: #a6a2b0; padding: 0px 18px; cursor: pointer; text-align: left; position: relative; width: 198px; height: calc(16.66% - 1.6px); display: flex; align-items: center; justify-content: flex-start; font-size: 16px; font-weight: bold; flex: 1; margin-bottom: 2px; } 
 ul.tabs-n li .text-sm-n { position: absolute; font-weight: 800; margin: -4px 0 0 5px; font-size: 9px; } 
 
 ul.tabs-n li:last-child { margin-bottom: 0; } 
@@ -3274,7 +3274,7 @@ a.dc-file:hover { color: #0303ff; }
 .success-msg h4 { font-size: 24px; margin: 46px 0 18px; text-transform: uppercase; color: #91dc27; } 
 .success-msg p { color: #aaaaaa; font-size: 16px; margin: 0; font-weight: 800; } 
 
-.pending-text { display: flex; align-items: center; font-size: 18px; font-weight: 800; color: #f8834d; margin: -4px 0 10px -24px; } 
+.pending-text { display: flex; align-items: center; font-size: 18px; font-weight: 800; color: #91dc27; margin: -4px 0 10px -24px; } 
 .pending-bottom { display: flex; margin: -18px 0 0 0 } 
 .pending-bottom .fas { font-size: 14px; } 
 .pending-bottom span { font-size: 11px; margin-left: auto; color: #ff3737; } 
@@ -3282,13 +3282,13 @@ a.dc-file:hover { color: #0303ff; }
 .loader:after { border-radius: 50%; width: 22px; height: 22px; } 
 .loader { margin: 0 0 0 12px; font-size: 10px; position: relative; text-indent: -9999em; border-top: 3px solid rgba(255, 255, 255, 0.2); border-right: 3px solid rgba(255, 255, 255, 0.2); border-bottom: 3px solid rgba(255, 255, 255, 0.2); border-left: 2px solid #c69646; -webkit-transform: translateZ(0); -ms-transform: translateZ(0); transform: translateZ(0); -webkit-animation: load8 1.1s infinite linear; animation: load8 1.1s infinite linear; } 
 @-webkit-keyframes load8 { 
- 0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); } 
- 100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); } 
- }
+    0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); } 
+    100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); } 
+}
 @keyframes load8 { 
- 0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); } 
- 100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); } 
- }
+    0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); } 
+    100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); } 
+}
 /** bridge token UI **/
 #bridge-tokens .figIcon:hover { /* background: #91dc27; */ box-shadow: 0px 0px 10px #91dc27; } 
 #bridge-tokens .btn-container { display: flex; justify-content: center; align-items: center; } 
@@ -3388,3 +3388,5 @@ a.dc-file:hover { color: #0303ff; }
 .no-clickable {
     pointer-events: none;    
 }
+.expedite-btn {padding: 5px; background: #91dc27; color: #fff; display: flex; align-content: center; justify-content: space-between; border-radius: 3px;}
+.expedite-btn:hover {box-shadow: 0 0 6px #91dc27;}

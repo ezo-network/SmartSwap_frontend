@@ -1,16 +1,17 @@
 import { PureComponent } from "react";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import Carousel from "react-multi-carousel";
-import SBLogo01 from "../../assets/images/sb-ICO-01.png";
-import SBLogo02 from "../../assets/images/sb-ICO-02.png";
-import SBLogo03 from "../../assets/images/sb-ICO-03.png";
-import SBLogo04 from "../../assets/images/sb-ICO-04.png";
-import SBLogo05 from "../../assets/images/sb-ICO-05.png";
-import SBLogo06 from "../../assets/images/sb-ICO-06.png";
-import SBLogo07 from "../../assets/images/sb-ICO-07.png";
-import SBLogo08 from "../../assets/images/sb-ICO-08.png";
-import SBLogo09 from "../../assets/images/sb-ICO-09.png";
-import SBLogo010 from "../../assets/images/sb-ICO-010.png";
-import SBLogo011 from "../../assets/images/sb-ICO-011.png";
+import SBLogo01 from "../../assets/images/sb-ICO-01.webp";
+import SBLogo02 from "../../assets/images/sb-ICO-02.webp";
+import SBLogo03 from "../../assets/images/sb-ICO-03.webp";
+import SBLogo04 from "../../assets/images/sb-ICO-04.webp";
+import SBLogo05 from "../../assets/images/sb-ICO-05.webp";
+import SBLogo06 from "../../assets/images/sb-ICO-06.webp";
+import SBLogo07 from "../../assets/images/sb-ICO-07.webp";
+import SBLogo08 from "../../assets/images/sb-ICO-08.webp";
+import SBLogo09 from "../../assets/images/sb-ICO-09.webp";
+import SBLogo010 from "../../assets/images/sb-ICO-010.webp";
+import SBLogo011 from "../../assets/images/sb-ICO-011.webp";
 
 const responsive = {
     desktop: {
@@ -76,83 +77,83 @@ export default class SupportedBlockchainsCarousel extends PureComponent {
                 >
                     <div className="sbSlide">
                         {" "}
-                        <img src={SBLogo01} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo01} alt="" />{" "}
                     </div>
                     <div className="sbSlide">
                         {" "}
-                        <img src={SBLogo02} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo02} alt="" />{" "}
                     </div>
                     <div className="sbSlide">
                         {" "}
-                        <img src={SBLogo03} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo03} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo04} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo04} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo05} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo05} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo06} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo06} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo07} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo07} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo08} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo08} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo09} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo09} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo010} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo010} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo011} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo011} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo03} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo03} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo04} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo04} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo05} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo05} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo06} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo06} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo07} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo07} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo08} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo08} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo09} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo09} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo010} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo010} alt="" />{" "}
                     </div>
                     <div className="sbSlide disable">
                         {" "}
-                        <img src={SBLogo011} alt="" />{" "}
+                        <LazyLoadImage src={SBLogo011} alt="" />{" "}
                     </div>
                 </Carousel>
             </>
