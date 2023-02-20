@@ -3390,3 +3390,57 @@ a.dc-file:hover { color: #0303ff; }
 }
 .expedite-btn {padding: 5px; background: #91dc27; color: #fff; display: flex; align-content: center; justify-content: space-between; border-radius: 3px;}
 .expedite-btn:hover {box-shadow: 0 0 6px #91dc27;}
+
+.action-btn .btn .dot {
+    display: inline;
+    margin-left: 0;
+    margin-right: 2px;
+    position: relative;
+    top: -2px;
+    font-size: 30px;
+    font-style: normal;
+    opacity: 0;
+    -webkit-animation: showHideDot 2.5s ease-in-out infinite;
+            animation: showHideDot 2.5s ease-in-out infinite;
+}
+
+.action-btn .btn .dot.one {
+    -webkit-animation-delay: 0.2s;
+            animation-delay: 0.2s;
+}
+.action-btn .btn .dot.two {
+    -webkit-animation-delay: 0.4s;
+            animation-delay: 0.4s;
+}
+.action-btn .btn .dot.three {
+    -webkit-animation-delay: 0.6s;
+            animation-delay: 0.6s;
+}
+@-webkit-keyframes showHideDot {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    60% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes showHideDot {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    60% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+  }

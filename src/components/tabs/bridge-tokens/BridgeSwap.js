@@ -57,7 +57,7 @@ const defaultDestinationTokenData = {
 
 const initialState = {
     btnClicked: false,
-    btnAction: 'CROSS OVER',
+    btnAction: "CROSS OVER",
     sourceTokenData: {...defaultSourceTokenData},
     destinationTokenData: {...defaultDestinationTokenData},
     isSourceTokenSelected: false,
@@ -919,7 +919,7 @@ export default class BridgeSwap extends PureComponent {
             if(this._componentMounted){
                 this.setState({
                     btnClicked: true,
-                    btnAction: "PROCESSING..."
+                    btnAction: "PROCESSING"
                 });
             }
 
@@ -1400,7 +1400,11 @@ export default class BridgeSwap extends PureComponent {
                                             onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
                                             alt={sourceNetworkConfig?.chain}
                                         ></img>
-                                        {this.state.btnAction}
+                                        {/* {this.state.btnAction} */}
+
+                                        {/* HTML for processing animation */}
+                                        PROCESSING&nbsp;<i class='dot one'>.</i><i class='dot two'>.</i><i class='dot three'>.</i> 
+                                        {/* HTML for processing animation */}
                                     </div>
                                 </button>
                             </>
