@@ -57,7 +57,7 @@ const defaultDestinationTokenData = {
 
 const initialState = {
     btnClicked: false,
-    btnAction: "CROSS OVER",
+    btnAction: 'CROSS OVER',
     sourceTokenData: {...defaultSourceTokenData},
     destinationTokenData: {...defaultDestinationTokenData},
     isSourceTokenSelected: false,
@@ -962,7 +962,7 @@ export default class BridgeSwap extends PureComponent {
                         console.log({ 'approveHash': hash });
                         if(this._componentMounted){
                             this.setState({
-                                btnAction: "AWATING APPROVAL..."
+                                btnAction: "AWATING APPROVAL"
                             });
                         }
                     }, (response) => {
@@ -1400,11 +1400,10 @@ export default class BridgeSwap extends PureComponent {
                                             onError={(e) => (e.currentTarget.src = '/images/free-listing/chains/default.png')} // fallback image
                                             alt={sourceNetworkConfig?.chain}
                                         ></img>
-                                        {/* {this.state.btnAction} */}
-
-                                        {/* HTML for processing animation */}
-                                        PROCESSING&nbsp;<i class='dot one'>.</i><i class='dot two'>.</i><i class='dot three'>.</i> 
-                                        {/* HTML for processing animation */}
+                                        {this.state.btnAction}
+                                        {(this.state.btnAction === 'PROCESSING' || this.state.btnAction === 'AWATING APPROVAL')  && <>
+                                            <i class='dot one'>.</i><i class='dot two'>.</i><i class='dot three'>.</i>
+                                        </>}
                                     </div>
                                 </button>
                             </>

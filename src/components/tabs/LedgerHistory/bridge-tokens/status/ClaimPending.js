@@ -305,7 +305,7 @@ export default class ClaimPending extends PureComponent {
                         <div className="expedite-section cursor">
                                 <span style={{
                                     padding: '5px', 
-                                    background: (this.props.depositRequest?.toChainId === this.context.chainIdNumber) ? '#f8834d' : '#f00', 
+                                    background: (this.props.depositRequest?.toChainId === this.context.chainIdNumber) ? "#91dc27" : '#f00', 
                                     color: '#fff', 
                                     display: 'flex', 
                                     alignContent: "center",

@@ -35,10 +35,10 @@ export default class Welcome extends PureComponent {
                   <CMbx>
                     <Csubbx01> 
                       <CStitle01>
-                        <i className="imgIco"><LazyLoadImage src={ImgIco01} alt="Ico" /></i>  
+                        <i className="imgIco"><LazyLoadImage src={ImgIco01} alt="Ico" /></i>
                         Create a cross-chain bridge token to any EVM blockchain in a few seconds
                         <span>It's free and open to any project or users</span>
-                      </CStitle01>
+                      </CStitle01> 
                       { 
                         this.context.isAuthenticated === false && 
                         this.props.claimDeployerOwnerShip === false &&

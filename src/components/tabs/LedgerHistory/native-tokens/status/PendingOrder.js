@@ -215,9 +215,9 @@ export default class PendingOrder extends PureComponent {
                         }
                         {(this.props.isExpedited || this.state.expedited) && 
                         <div className="expedite-section cursor">
-                                <span className='expedite-btn'>
-                                    Expedited
-                                </span>
+                            <span className='expedite-btn'>
+                                Expedited
+                            </span>
                         </div>         
                         }
                     </div>

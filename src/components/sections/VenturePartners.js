@@ -1,7 +1,6 @@
 import { PureComponent } from "react";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
-
 export default class VenturePartners extends PureComponent {
     render() {
         return (
