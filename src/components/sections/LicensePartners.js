@@ -1,4 +1,5 @@
 import { PureComponent } from "react";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default class LicensePartners extends PureComponent {
     render() {
@@ -14,11 +15,11 @@ export default class LicensePartners extends PureComponent {
                 >
                     <div className="VPSubBX01">
                         {" "}
-                        <img src="images/lp-logo01.png" alt="" />{" "}
+                        <LazyLoadImage src="images/lp-logo01.png" alt="" />{" "}
                     </div>
                     <div className="VPSubBX01">
                         {" "}
-                        <img src="images/lp-logo02.png" alt="" />{" "}
+                        <LazyLoadImage src="images/lp-logo02.png" alt="" />{" "}
                     </div>
                 </div>
             </>

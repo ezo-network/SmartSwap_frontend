@@ -1,9 +1,10 @@
 import {WalletContext} from '../../context/WalletProvider';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import React, { PureComponent} from "react";
 import styled from 'styled-components';
 import notificationConfig from "../../config/notificationConfig";
-import ImgIco01 from "../../assets/freelisting-images/imgIco01.png";
-import ImgIco02 from "../../assets/freelisting-images/imgIco02.png";
+import ImgIco01 from "../../assets/freelisting-images/imgIco01.webp";
+import ImgIco02 from "../../assets/freelisting-images/imgIco02.webp";
 import { textMasking } from '../../helper/utils';
 import errors from '../../helper/errorConstantsHelper';
 const $ = window.$;
@@ -34,7 +35,7 @@ export default class Welcome extends PureComponent {
                   <CMbx>
                     <Csubbx01> 
                       <CStitle01>
-                        <i className="imgIco"><img src={ImgIco01} alt="Ico" /></i>
+                        <i className="imgIco"><LazyLoadImage src={ImgIco01} alt="Ico" /></i>
                         Create a cross-chain bridge token to any EVM blockchain in a few seconds
                         <span>It's free and open to any project or users</span>
                       </CStitle01> 
@@ -56,7 +57,7 @@ export default class Welcome extends PureComponent {
                     </Csubbx01>
                     <Csubbx01 className="v2"> 
                       <CStitle01>
-                        <i className="imgIco"><img src={ImgIco02} alt="Ico" /></i>
+                        <i className="imgIco"><LazyLoadImage src={ImgIco02} alt="Ico" /></i>
                         Projects, claim the bridge deployer to become the master validator
                         <span>
                           <button onClick={() => this.props.onStartHereButtonClick()} className="Btn02 ani-1">START HERE</button>

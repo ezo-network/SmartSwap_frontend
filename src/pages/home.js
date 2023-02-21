@@ -70,10 +70,10 @@ export default class Home extends PureComponent {
               <div className="swap-Block">
                 <div className="container-Grid">
                   <div
-                    className="smeTitle01 wow fadeInUp" data-wow-delay="0.1s">
+                    className="smeTitle01">
                     <span>One click</span> decentralized layer zero solutions
                   </div>
-                  <div className="smvTitle02 wow fadeInUp" data-wow-delay="0.2s">
+                  <div className="smvTitle02">
                     {/* Unlimited Liquidity CeFi to Defi Decentralized Bridge <span style={{ color: '#525252' }}>|</span> AMM Alternative */}
                     {/* Best multichain rates available with slippage free transactions or with a DeFi aggregator */}
                     Best cross-chain rates available with slippage or zero slippage transactions with P2P and CeDeFi

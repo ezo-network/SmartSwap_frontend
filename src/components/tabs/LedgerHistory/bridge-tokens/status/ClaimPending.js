@@ -283,7 +283,7 @@ export default class ClaimPending extends PureComponent {
                 <p>{moment().format("MMM D[. ]YYYY[, ]h[:]mma zz")}</p>
                 <div className="ledger-box">
                     <div className="pending-text" style={{justifyContent: 'space-between'}}>
-                        <div style={{display: 'flex', color: this.props.depositRequest.status === "CLAIM_FAILED" ? '#f00' : "#f8834d"}}>
+                        <div style={{display: 'flex', color: this.props.depositRequest.status === "CLAIM_FAILED" ? '#f00' : "#91dc27"}}>
                             {(this.props.depositRequest.status === 'CLAIM_FAILED') && (
                                 <>
                                     Failed
@@ -305,7 +305,7 @@ export default class ClaimPending extends PureComponent {
                         <div className="expedite-section cursor">
                                 <span style={{
                                     padding: '5px', 
-                                    background: (this.props.depositRequest?.toChainId === this.context.chainIdNumber) ? '#f8834d' : '#f00', 
+                                    background: (this.props.depositRequest?.toChainId === this.context.chainIdNumber) ? "#91dc27" : '#f00', 
                                     color: '#fff', 
                                     display: 'flex', 
                                     alignContent: "center",

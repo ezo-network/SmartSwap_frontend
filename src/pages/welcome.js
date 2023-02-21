@@ -26,17 +26,17 @@ import listico6 from "../assets/welcome/listico6.png";
 import listico7 from "../assets/welcome/listico7.png";
 import listico8 from "../assets/welcome/listico8.png";
 
-import SBLogo01 from "../assets/images/sb-ICO-01.png";
-import SBLogo02 from "../assets/images/sb-ICO-02.png";
-import SBLogo03 from "../assets/images/sb-ICO-03.png";
-import SBLogo04 from "../assets/images/sb-ICO-04.png";
-import SBLogo05 from "../assets/images/sb-ICO-05.png";
-import SBLogo06 from "../assets/images/sb-ICO-06.png";
-import SBLogo07 from "../assets/images/sb-ICO-07.png";
-import SBLogo08 from "../assets/images/sb-ICO-08.png";
-import SBLogo09 from "../assets/images/sb-ICO-09.png";
-import SBLogo010 from "../assets/images/sb-ICO-010.png";
-import SBLogo011 from "../assets/images/sb-ICO-011.png";
+import SBLogo01 from "../assets/images/sb-ICO-01.webp";
+import SBLogo02 from "../assets/images/sb-ICO-02.webp";
+import SBLogo03 from "../assets/images/sb-ICO-03.webp";
+import SBLogo04 from "../assets/images/sb-ICO-04.webp";
+import SBLogo05 from "../assets/images/sb-ICO-05.webp";
+import SBLogo06 from "../assets/images/sb-ICO-06.webp";
+import SBLogo07 from "../assets/images/sb-ICO-07.webp";
+import SBLogo08 from "../assets/images/sb-ICO-08.webp";
+import SBLogo09 from "../assets/images/sb-ICO-09.webp";
+import SBLogo010 from "../assets/images/sb-ICO-010.webp";
+import SBLogo011 from "../assets/images/sb-ICO-011.webp";
 
 const responsive = {
     desktop: {

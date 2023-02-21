@@ -919,7 +919,7 @@ export default class BridgeSwap extends PureComponent {
             if(this._componentMounted){
                 this.setState({
                     btnClicked: true,
-                    btnAction: "PROCESSING..."
+                    btnAction: "PROCESSING"
                 });
             }
 
@@ -962,7 +962,7 @@ export default class BridgeSwap extends PureComponent {
                         console.log({ 'approveHash': hash });
                         if(this._componentMounted){
                             this.setState({
-                                btnAction: "AWATING APPROVAL..."
+                                btnAction: "AWATING APPROVAL"
                             });
                         }
                     }, (response) => {
@@ -1401,6 +1401,9 @@ export default class BridgeSwap extends PureComponent {
                                             alt={sourceNetworkConfig?.chain}
                                         ></img>
                                         {this.state.btnAction}
+                                        {(this.state.btnAction === 'PROCESSING' || this.state.btnAction === 'AWATING APPROVAL')  && <>
+                                            <i class='dot one'>.</i><i class='dot two'>.</i><i class='dot three'>.</i>
+                                        </>}
                                     </div>
                                 </button>
                             </>

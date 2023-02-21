@@ -4625,6 +4625,9 @@
   .Box-bottom i {margin: -35px 0 0 0;}
   .Box-bottom a {line-height: 25px;}
   .smartSwap .msb-Waddress a.rmDotLink {top: 47px;}
+  .smartSwap .rightMenu a.rmDotLink, .rmDotLink02 {width: 30px; border-radius: 2px; height: 4px; margin-top: -8px;}
+  .smartSwap .rightMenu a.rmDotLink:before, .rmDotLink02:before {width: 30px; height: 4px; border-radius: 2px; left: 0; top: -10px;}
+  .smartSwap .rightMenu a.rmDotLink:after, .rmDotLink02:after {width: 30px; height: 4px; border-radius: 2px; left: 0; bottom: -10px;}
 }
 
 @media(max-width: 640px) {
