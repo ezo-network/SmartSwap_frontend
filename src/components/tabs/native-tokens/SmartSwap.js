@@ -1158,7 +1158,7 @@ export default class SmartSwap extends PureComponent {
                                     this.swapDirection(defaultToSelectOption.value);
                                 }}
                             >
-                                <img width="22" src={Swap} alt="" />
+                                <LazyLoadImage width="22" src={Swap} alt="" />
                             </a>
                             <a className="green-arrow"
                                 href="#"
@@ -1167,7 +1167,7 @@ export default class SmartSwap extends PureComponent {
                                     this.swapDirection(defaultToSelectOption.value);
                                 }}
                             >
-                                <img width="22" src={Swap} alt="" />
+                                <LazyLoadImage width="22" src={Swap} alt="" />
                             </a>
                         </div>
                         <div className="flex-1 w-100-sm flex-auto-sm">
